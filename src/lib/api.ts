@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { AuthResponse, ApiResponse, LoginData, SignupData, UpdateUserData, SalesAnalytics } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+// Use the NEXT_PUBLIC_API_BASE environment variable for the base URL.
+// Fallback to the production PHP backend if the env var isn't provided.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE || 'https://quickgig.ph';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
