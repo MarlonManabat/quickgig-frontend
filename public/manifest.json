@@ -1,0 +1,71 @@
+{
+  "name": "QuickGig.ph - Find Gigs Fast in the Philippines",
+  "short_name": "QuickGig.ph",
+  "description": "Kahit saan sa Pinas, may gig para sa'yo! Connect with opportunities and talent across the Philippines.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#00B272",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-PH",
+  "categories": ["business", "productivity", "social"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "favicon"
+    },
+    {
+      "src": "/logo-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo-main.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "QuickGig.ph Homepage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Find Work",
+      "short_name": "Find Work",
+      "description": "Browse available gigs and jobs",
+      "url": "/find-work",
+      "icons": [
+        {
+          "src": "/logo-icon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Post Job",
+      "short_name": "Post Job",
+      "description": "Post a new job or gig",
+      "url": "/post-job",
+      "icons": [
+        {
+          "src": "/logo-icon.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,127 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import { AuthProvider } from "../context/AuthContext";
+import { SocketProvider } from "../context/SocketContext";
+import Navigation from "../components/Navigation";
+
+export const metadata: Metadata = {
+  title: "QuickGig.ph - Find Gigs Fast in the Philippines",
+  description: "Kahit saan sa Pinas, may gig para sa'yo! Connect with opportunities and talent across the Philippines. Find work or hire skilled professionals quickly and easily.",
+  keywords: "freelance, gigs, Philippines, work, jobs, hiring, talent, remote work, Filipino freelancers",
+  authors: [{ name: "QuickGig.ph Team" }],
+  creator: "QuickGig.ph",
+  publisher: "QuickGig.ph",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://quickgig.ph'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: "QuickGig.ph - Find Gigs Fast in the Philippines",
+    description: "Kahit saan sa Pinas, may gig para sa'yo! Connect with opportunities and talent across the Philippines.",
+    url: 'https://quickgig.ph',
+    siteName: 'QuickGig.ph',
+    images: [
+      {
+        url: '/logo-main.png',
+        width: 1200,
+        height: 630,
+        alt: 'QuickGig.ph - Filipino Freelance Platform',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "QuickGig.ph - Find Gigs Fast in the Philippines",
+    description: "Kahit saan sa Pinas, may gig para sa'yo!",
+    images: ['/logo-main.png'],
+    creator: '@QuickGigPH',
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/logo-icon.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/logo-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.png',
+  },
+  manifest: '/manifest.json',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className="scroll-smooth">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body className="font-body antialiased bg-white text-gray-700">
+        <AuthProvider>
+          <SocketProvider>
+            <Navigation />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <footer className="qg-footer">
+              <div className="qg-container">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                  <div className="col-span-1 md:col-span-2">
+                    <img src="/logo-horizontal.png" alt="QuickGig.ph" className="h-8 mb-4" />
+                    <p className="text-gray-300 mb-4">
+                      Ang pinakamabilis na paraan para makahanap ng trabaho at talent sa Pilipinas.
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      © 2024 QuickGig.ph. All rights reserved.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-semibold text-white mb-4">Para sa Freelancers</h3>
+                    <ul className="space-y-2 text-gray-300">
+                      <li><a href="/find-work" className="hover:text-qg-accent transition-colors">Find Work</a></li>
+                      <li><a href="/profile" className="hover:text-qg-accent transition-colors">Profile</a></li>
+                      <li><a href="/my-jobs" className="hover:text-qg-accent transition-colors">My Jobs</a></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-semibold text-white mb-4">Para sa Employers</h3>
+                    <ul className="space-y-2 text-gray-300">
+                      <li><a href="/post-job" className="hover:text-qg-accent transition-colors">Post Job</a></li>
+                      <li><a href="/buy-tickets" className="hover:text-qg-accent transition-colors">Buy Tickets</a></li>
+                      <li><a href="/messages" className="hover:text-qg-accent transition-colors">Messages</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </footer>
+          </SocketProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
