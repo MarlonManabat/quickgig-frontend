@@ -1,0 +1,28 @@
+# Ensure Apache/LiteSpeed serves our static export correctly
+
+# Avoid content negotiation issues
+Options -MultiViews
+
+# Use index.html for directories
+DirectoryIndex index.html
+
+RewriteEngine On
+RewriteBase /
+
+# 1) Serve existing files or directories as-is (e.g., /_next/, /assets/, /login/index.html)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 2) If there's a matching .html file, serve it (e.g., /about -> /about.html)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [L]
+
+# 3) Fallback for client-side routing: send unknown paths to /index.html
+#    (This lets the Next.js router render the correct page if it's an SPA-style route)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
