@@ -1,0 +1,21 @@
+name: smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Base URL to test
+        required: false
+        default: https://quickgig.ph
+  push:
+    branches: [main]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run smoke test
+        env:
+          BASE_URL: ${{ inputs.base_url || 'https://quickgig.ph' }}
+        run: scripts/smoke.sh

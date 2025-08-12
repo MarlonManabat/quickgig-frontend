@@ -29,4 +29,9 @@ npm run dev
 
 ## Deployment
 
-This project is configured for Vercel. Connect the repository to Vercel and ensure the `NEXT_PUBLIC_API_URL` environment variable is set in your project settings.
+Deployment is handled via the Vercel GitHub integration. Ensure the
+`NEXT_PUBLIC_API_URL` environment variable is set in your Vercel project
+settings.
+
+Login, signup, and other protected pages call the external API at
+`https://api.quickgig.ph`; this Next.js app does not provide any API routes.
