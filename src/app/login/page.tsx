@@ -17,7 +17,7 @@ export default function LoginPage() {
     if (!email || !password) { setError('Email and password are required'); return; }
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/login.php`, {
+      const res = await fetch(`${API_BASE}/login.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -30,7 +30,15 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      router.push('/?login=success');
+
+      // Persist basic auth state for the rest of the app
+      try {
+        if (data.token) localStorage.setItem('token', data.token);
+        if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('auth', 'true');
+      } catch {}
+
+      router.push('/');
     } catch (err:any) {
       setError('Network error. Please try again.');
     } finally {

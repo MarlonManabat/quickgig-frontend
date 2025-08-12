@@ -13,8 +13,6 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 
-  // Optional CSS inlining (safe now that critters is installed)
-  experimental: { optimizeCss: true },
 };
 
 module.exports = nextConfig;
