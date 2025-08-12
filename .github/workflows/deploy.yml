@@ -36,6 +36,9 @@ jobs:
           port: 21
           local-dir: ./out/
           server-dir: ${{ secrets.HOSTINGER_SERVER_DIR }}
+          include: |
+            .htaccess
+            **
           exclude: |
             **/.git*
             **/.github/**
