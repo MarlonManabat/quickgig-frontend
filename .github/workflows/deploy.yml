@@ -1,0 +1,27 @@
+name: Deploy API to Hostinger
+on:
+  push:
+    branches: [ main ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Install Composer deps
+        run: composer install --no-dev --prefer-dist --no-progress --no-interaction
+        working-directory: api.quickgig.ph
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          username: ${{ secrets.HOSTINGER_FTP_USER }}
+          password: ${{ secrets.HOSTINGER_FTP_PASS }}
+          server-dir: /public_html/api/
+          local-dir: api.quickgig.ph/
+          exclude: |
+            **/.git*
+            **/.github/**

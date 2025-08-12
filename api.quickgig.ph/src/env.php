@@ -5,4 +5,4 @@ define('DB_NAME', getenv('DB_NAME') ?: 'quickgig');
 define('DB_USER', getenv('DB_USER') ?: 'user');
 define('DB_PASS', getenv('DB_PASS') ?: 'pass');
 define('JWT_SECRET', getenv('JWT_SECRET') ?: 'change_this_super_secret_key');
-define('CORS_ORIGIN', getenv('CORS_ORIGIN') ?: 'https://app.quickgig.ph');
+define('CORS_ORIGIN', getenv('CORS_ORIGIN') ?: 'https://quickgig.ph,https://www.quickgig.ph');
