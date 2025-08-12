@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, User, Clock, DollarSign, FileText, Check, XIcon, Mail, Phone } from 'lucide-react';
-import { api } from '../../lib/api';
-import { Bid } from '../../types';
+import { api } from '@/lib/api';
+import { Bid } from '@/types';
 
 interface BidListModalProps {
   isOpen: boolean;

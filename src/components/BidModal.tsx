@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Send, Clock, DollarSign, FileText, Wallet } from 'lucide-react';
-import { api } from '../../lib/api';
-import { BidFormData, WalletInfo } from '../../types';
+import { api } from '@/lib/api';
+import { BidFormData, WalletInfo } from '@/types';
 import { useAuth } from '../context/AuthContext';
 import TicketWarning from './TicketWarning';
 import TicketConfirmModal from './TicketConfirmModal';

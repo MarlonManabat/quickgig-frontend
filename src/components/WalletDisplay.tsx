@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Wallet, Plus } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../../lib/api';
-import { WalletInfo } from '../../types';
+import { useAuth } from '@/context/AuthContext';
+import { api } from '@/lib/api';
+import { WalletInfo } from '@/types';
 
 const WalletDisplay: React.FC = () => {
   const { user, isAuthenticated } = useAuth();

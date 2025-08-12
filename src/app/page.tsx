@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useAuth } from '../context/AuthContext';
-import Button from '../components/ui/Button';
-import { Card, CardHeader, CardContent, CardTag } from '../components/ui/Card';
+import { useAuth } from '@/context/AuthContext';
+import Button from '@/components/ui/Button';
+import { Card, CardHeader, CardContent, CardTag } from '@/components/ui/Card';
 import { Search, Briefcase, Users, Star, ArrowRight, CheckCircle, Zap, Shield, Heart } from 'lucide-react';
 
 export default function HomePage() {
