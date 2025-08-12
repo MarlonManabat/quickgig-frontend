@@ -20,7 +20,7 @@ export default function SignupPage() {
     if (!name || !email || !phone || !password) { setError('Please fill in all required fields'); return; }
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/register.php`, {
+      const res = await fetch(`${API_BASE}/register.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
