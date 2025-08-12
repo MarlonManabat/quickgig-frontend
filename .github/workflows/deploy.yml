@@ -24,7 +24,7 @@ jobs:
       - name: Build
         run: |
           npm run build
-          npx next export
+          # IMPORTANT: Do NOT run "npx next export" – Next 13/14 uses output:'export'
 
       - name: Deploy to Hostinger (FTPS)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
