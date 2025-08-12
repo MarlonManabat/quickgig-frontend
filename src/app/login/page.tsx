@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://quickgig.ph';
+import { api } from '@/lib/api';
+import { saveToken } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,30 +17,17 @@ export default function LoginPage() {
     if (!email || !password) { setError('Email and password are required'); return; }
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/login.php`, {
+      const data = await api('/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
-      const text = await res.text();
-      let data: any = null; try { data = JSON.parse(text); } catch {}
-      if (!res.ok || !data || data.success === false) {
-        setError((data && data.message) ? data.message : ('Login failed. ' + text));
-        setLoading(false);
-        return;
-      }
 
-      // Persist basic auth state for the rest of the app
-      try {
-        if (data.token) localStorage.setItem('token', data.token);
-        if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('auth', 'true');
-      } catch {}
+      if (data.token) saveToken(data.token);
+      if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
 
       router.push('/');
-    } catch (err:any) {
-      setError('Network error. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }

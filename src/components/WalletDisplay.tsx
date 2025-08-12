@@ -21,8 +21,8 @@ const WalletDisplay: React.FC = () => {
   const fetchWalletInfo = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/wallet');
-      setWalletInfo(response.data.data);
+      const response = await api('/wallet', { auth: true });
+      setWalletInfo(response.data?.data || response.data);
     } catch (error) {
       console.error('Error fetching wallet info:', error);
     } finally {

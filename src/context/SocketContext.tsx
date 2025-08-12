@@ -34,9 +34,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated && token && user) {
       // Initialize socket connection
-      // Use NEXT_PUBLIC_API_BASE to determine the backend for sockets.
-      // Fallback to the production PHP backend when not specified.
-      const newSocket = io(process.env.NEXT_PUBLIC_API_BASE || 'https://quickgig.ph', {
+      const newSocket = io(process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph', {
         auth: {
           token: token,
         },
