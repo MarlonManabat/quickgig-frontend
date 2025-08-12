@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { FacebookPost, formatFacebookPost, getTimeSince } from './lib/facebook';
 import { Card } from './components/ui/Card';
+import { api } from '@/lib/api';
 
 interface CommunityUpdatesProps {
   pageId?: string;
@@ -38,13 +39,7 @@ export default function CommunityUpdates({
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/facebook/posts?pageId=${pageId}&limit=${maxPosts}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch posts');
-      }
-
-      const data = await response.json();
+      const data = await api(`/facebook/posts?pageId=${pageId}&limit=${maxPosts}`);
       setPosts(data.posts || []);
     } catch (err) {
       console.error('Error fetching Facebook posts:', err);

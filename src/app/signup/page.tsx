@@ -1,8 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://quickgig.ph';
+import { api } from '@/lib/api';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -20,22 +19,13 @@ export default function SignupPage() {
     if (!name || !email || !phone || !password) { setError('Please fill in all required fields'); return; }
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/register.php`, {
+      await api('/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ name, email, phone, role, password })
       });
-      const text = await res.text();
-      let data: any = null; try { data = JSON.parse(text); } catch {}
-      if (!res.ok || !data || data.success === false) {
-        setError((data && data.message) ? data.message : ('Registration failed. ' + text));
-        setLoading(false);
-        return;
-      }
       router.push('/login?register=success');
-    } catch (err:any) {
-      setError('Network error. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }

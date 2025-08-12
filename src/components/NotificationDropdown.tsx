@@ -48,8 +48,8 @@ export default function NotificationDropdown() {
     try {
       setLoading(true);
       setError('');
-      const response = await api.get('/api/notifications/list');
-      setNotifications(response.data.data);
+      const response = await api('/notifications/list', { auth: true });
+      setNotifications(response.data?.data || response.data || []);
     } catch (err: any) {
       setError('Failed to load notifications');
       console.error('Error fetching notifications:', err);
@@ -60,7 +60,10 @@ export default function NotificationDropdown() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      await api.put(`/api/notifications/${notificationId}/read`);
+      await api(`/notifications/${notificationId}/read`, {
+        method: 'PUT',
+        auth: true,
+      });
       setNotifications(prev => 
         prev.map(notif => 
           notif._id === notificationId ? { ...notif, read: true } : notif
@@ -75,8 +78,11 @@ export default function NotificationDropdown() {
     try {
       const unreadNotifications = notifications.filter(n => !n.read);
       await Promise.all(
-        unreadNotifications.map(notif => 
-          api.put(`/api/notifications/${notif._id}/read`)
+        unreadNotifications.map(notif =>
+          api(`/notifications/${notif._id}/read`, {
+            method: 'PUT',
+            auth: true,
+          })
         )
       );
       setNotifications(prev => 

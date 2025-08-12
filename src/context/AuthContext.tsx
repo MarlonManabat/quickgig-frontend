@@ -2,16 +2,18 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginData, SignupData, UpdateUserData } from '@/types';
-import { authAPI, userAPI } from '@/lib/api';
+import { api } from '@/lib/api';
+import { saveToken, clearAuth, getToken } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (data: LoginData) => Promise<void>;
   signup: (data: SignupData) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateUser: (data: UpdateUserData) => Promise<void>;
   isAuthenticated: boolean;
+  token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,17 +36,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('token');
+      const token = getToken();
       const savedUser = localStorage.getItem('user');
-
       if (token && savedUser) {
+        setUser(JSON.parse(savedUser));
+      } else if (token) {
         try {
-          // Verify token is still valid by fetching user profile
-          const response = await userAPI.getProfile();
-          setUser(response.user || null);
-        } catch (error) {
-          // Token is invalid, clear storage
-          localStorage.removeItem('token');
+          const response = await api('/user/me', { auth: true });
+          if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+            setUser(response.user);
+          }
+        } catch {
+          clearAuth();
           localStorage.removeItem('user');
           setUser(null);
         }
@@ -57,47 +61,59 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (data: LoginData) => {
     try {
-      const response = await authAPI.login(data);
-      const { token, user } = response;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
+      const response = await api('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      if (response.token) saveToken(response.token);
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user));
+        setUser(response.user);
+      }
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Login failed');
+      throw new Error(error.message || 'Login failed');
     }
   };
 
   const signup = async (data: SignupData) => {
     try {
-      const response = await authAPI.signup(data);
-      const { token, user } = response;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
+      const response = await api('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      if (response.token) saveToken(response.token);
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user));
+        setUser(response.user);
+      }
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Signup failed');
+      throw new Error(error.message || 'Signup failed');
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
+  const logout = async () => {
+    try {
+      await api('/auth/logout', { method: 'POST', auth: true });
+    } catch {}
+    clearAuth();
     localStorage.removeItem('user');
     setUser(null);
   };
 
   const updateUser = async (data: UpdateUserData) => {
     try {
-      const response = await userAPI.updateProfile(data);
+      const response = await api('/user/update', {
+        method: 'PUT',
+        auth: true,
+        body: JSON.stringify(data)
+      });
       const updatedUser = response.user;
-      
       if (updatedUser) {
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
       }
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Update failed');
+      throw new Error(error.message || 'Update failed');
     }
   };
 
@@ -109,6 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     updateUser,
     isAuthenticated: !!user,
+    token: getToken(),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

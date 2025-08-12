@@ -3,15 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
-  // ⬇️ Static export for Hostinger
-  output: 'export',
-
-  // Force trailing slashes so /login -> /login/index.html
-  trailingSlash: true,
-
-  // next/image off for purely static hosting
+  // Use default routing behavior on Vercel
   images: {
-    unoptimized: true,
+    unoptimized: false,
   },
 
   // Let production build pass even if lint/types complain

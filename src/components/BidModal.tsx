@@ -37,8 +37,8 @@ export default function BidModal({ isOpen, onClose, jobId, jobTitle, onBidSubmit
 
   const fetchWalletInfo = async () => {
     try {
-      const response = await api.get('/wallet');
-      setWalletInfo(response.data.data);
+      const response = await api('/wallet', { auth: true });
+      setWalletInfo(response.data?.data || response.data);
     } catch (error) {
       console.error('Error fetching wallet info:', error);
     }
@@ -58,9 +58,13 @@ export default function BidModal({ isOpen, onClose, jobId, jobTitle, onBidSubmit
     setError('');
 
     try {
-      await api.post('/api/bids/create', {
-        jobId,
-        ...formData,
+      await api('/bids/create', {
+        method: 'POST',
+        auth: true,
+        body: JSON.stringify({
+          jobId,
+          ...formData,
+        }),
       });
 
       // Reset form
@@ -73,7 +77,7 @@ export default function BidModal({ isOpen, onClose, jobId, jobTitle, onBidSubmit
       onBidSubmitted();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to submit bid');
+      setError(err.message || 'Failed to submit bid');
     } finally {
       setLoading(false);
     }

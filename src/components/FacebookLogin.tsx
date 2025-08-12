@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { facebookSDK, FacebookUser, FacebookLoginResponse } from './lib/facebook';
 import { Button } from './components/ui/Button';
 import { useRouter } from 'next/navigation';
+import { api } from '@/lib/api';
+import { saveToken, clearAuth } from '@/lib/auth';
 
 interface FacebookLoginProps {
   onLoginSuccess?: (user: FacebookUser) => void;
@@ -47,27 +49,13 @@ export default function FacebookLogin({
 
   const authenticateWithBackend = async (accessToken: string, userInfo: FacebookUser) => {
     try {
-      const response = await fetch('/api/auth/facebook', {
+      const data = await api('/auth/facebook', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          accessToken,
-          userInfo
-        }),
+        body: JSON.stringify({ accessToken, userInfo })
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Store JWT token
-        localStorage.setItem('token', data.token);
-        
-        if (onLoginSuccess) {
-          onLoginSuccess(userInfo);
-        }
-      } else {
-        throw new Error('Backend authentication failed');
+      if (data.token) saveToken(data.token);
+      if (onLoginSuccess) {
+        onLoginSuccess(userInfo);
       }
     } catch (error) {
       console.error('Backend authentication error:', error);
@@ -115,7 +103,7 @@ export default function FacebookLogin({
       setIsLoggedIn(false);
       
       // Clear local storage
-      localStorage.removeItem('token');
+      clearAuth();
       
       // Redirect to home
       router.push('/');
@@ -204,23 +192,16 @@ export function FacebookLoginButton({ className = '' }: { className?: string }) 
         const userInfo = await facebookSDK.getUserInfo();
         
         // Authenticate with backend
-        const authResponse = await fetch('/api/auth/facebook', {
+        const data = await api('/auth/facebook', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify({
             accessToken: response.authResponse!.accessToken,
             userInfo
-          }),
+          })
         });
-
-        if (authResponse.ok) {
-          const data = await authResponse.json();
-          localStorage.setItem('token', data.token);
-          setIsLoggedIn(true);
-          router.push('/dashboard');
-        }
+        if (data.token) saveToken(data.token);
+        setIsLoggedIn(true);
+        router.push('/dashboard');
       }
     } catch (error) {
       console.error('Facebook login error:', error);
