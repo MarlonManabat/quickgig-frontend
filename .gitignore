@@ -38,3 +38,4 @@ next-env.d.ts
 
 # PHP API vendor
 api.quickgig.ph/vendor/
+api.quickgig.ph/.env
