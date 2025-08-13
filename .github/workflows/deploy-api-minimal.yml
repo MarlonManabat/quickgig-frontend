@@ -1,0 +1,20 @@
+name: Deploy API minimal to Hostinger
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: api-minimal
+          server-dir: ${{ secrets.REMOTE_DIR }} # e.g. /domains/api.quickgig.ph/public_html/
+          dangerous-clean-slate: true

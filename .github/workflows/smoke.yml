@@ -18,4 +18,5 @@ jobs:
       - name: Run smoke test
         env:
           BASE_URL: ${{ inputs.base_url || 'https://quickgig.ph' }}
+          NEXT_PUBLIC_API_URL: https://api.quickgig.ph
         run: scripts/smoke.sh
