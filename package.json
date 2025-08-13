@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
+    "test": "node tools/check_live_api.mjs --soft",
     "test:e2e": "playwright test"
   },
   "dependencies": {
