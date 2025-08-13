@@ -35,3 +35,7 @@ settings.
 
 Login, signup, and other protected pages call the external API at
 `https://api.quickgig.ph`; this Next.js app does not provide any API routes.
+
+## Backend API
+
+The PHP API powering QuickGig lives in [backend-php/](backend-php/README.md). Refer there for environment variables, testing, and deployment instructions.

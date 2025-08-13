@@ -1,0 +1,35 @@
+name: Deploy PHP API to Hostinger (FTP)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend-php/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Build .env from a single secret so we don't store secrets in repo
+      - name: Create .env
+        run: |
+          mkdir -p backend-php
+          echo "$API_ENV" > backend-php/.env
+        env:
+          API_ENV: ${{ secrets.API_ENV }}  # full .env content pasted in one secret
+
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT || 21 }}
+          protocol: ftp
+          local-dir: backend-php/
+          server-dir: /domains/api.quickgig.ph/public_html/
+          dangerous-clean-slate: true
