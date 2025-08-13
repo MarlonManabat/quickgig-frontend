@@ -14,6 +14,13 @@ interface MessengerChatProps {
   className?: string;
 }
 
+declare global {
+  interface Window {
+    FB?: any; // eslint-disable-line @typescript-eslint/no-explicit-any -- Facebook SDK globals
+    fbAsyncInit?: () => void;
+  }
+}
+
 export default function MessengerChat({
   pageId = process.env.NEXT_PUBLIC_FACEBOOK_PAGE_ID,
   appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
@@ -37,6 +44,7 @@ export default function MessengerChat({
     } else {
       initializeMessenger();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadFacebookSDK is stable
   }, [pageId, appId]);
 
   const loadFacebookSDK = () => {

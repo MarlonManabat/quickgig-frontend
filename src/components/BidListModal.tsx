@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, User, Clock, DollarSign, FileText, Check, XIcon, Mail, Phone, CheckCircle } from 'lucide-react';
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { Bid } from '@/types';
 
 interface BidListModalProps {
@@ -22,16 +22,21 @@ export default function BidListModal({ isOpen, onClose, jobId, jobTitle }: BidLi
     if (isOpen && jobId) {
       fetchBids();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchBids does not change
   }, [isOpen, jobId]);
 
   const fetchBids = async () => {
     try {
       setLoading(true);
       setError('');
-      const response = await api(`/bids/list?jobId=${jobId}`, { auth: true });
-      setBids(response.data?.data || response.data || []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch bids');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
+      const response = await apiFetch<{ data?: Bid[] }>(`/bids/list?jobId=${jobId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include',
+      });
+      setBids(response.data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch bids');
     } finally {
       setLoading(false);
     }
@@ -40,9 +45,11 @@ export default function BidListModal({ isOpen, onClose, jobId, jobTitle }: BidLi
   const handleBidAction = async (bidId: string, status: 'Accepted' | 'Rejected') => {
     try {
       setActionLoading(bidId);
-      await api(`/bids/${bidId}/status`, {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
+      await apiFetch(`/bids/${bidId}/status`, {
         method: 'PUT',
-        auth: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include',
         body: JSON.stringify({ status }),
       });
       
@@ -52,8 +59,8 @@ export default function BidListModal({ isOpen, onClose, jobId, jobTitle }: BidLi
           bid._id === bidId ? { ...bid, status } : bid
         )
       );
-    } catch (err: any) {
-      setError(err.message || `Failed to ${status.toLowerCase()} bid`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Failed to ${status.toLowerCase()} bid`);
     } finally {
       setActionLoading(null);
     }

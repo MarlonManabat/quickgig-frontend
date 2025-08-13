@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -19,13 +19,13 @@ export default function SignupPage() {
     if (!name || !email || !phone || !password) { setError('Please fill in all required fields'); return; }
     setLoading(true);
     try {
-      await api('/auth/register', {
+      await apiFetch('/auth/register', {
         method: 'POST',
         body: JSON.stringify({ name, email, phone, role, password })
       });
       router.push('/login?register=success');
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -52,7 +52,7 @@ export default function SignupPage() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Role</label>
-            <select className="w-full border rounded-lg p-2" value={role} onChange={e=>setRole(e.target.value as any)}>
+            <select className="w-full border rounded-lg p-2" value={role} onChange={e=>setRole(e.target.value as 'Job Seeker' | 'Employer')}>
               <option value="Job Seeker">Job Seeker</option>
               <option value="Employer">Employer</option>
             </select>

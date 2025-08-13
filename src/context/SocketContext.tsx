@@ -71,7 +71,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         setIsConnected(false);
       }
     }
-  }, [isAuthenticated, token, user]);
+  }, [isAuthenticated, token, user, socket]);
 
   const joinChat = (chatRoomId: string) => {
     if (socket && isConnected) {

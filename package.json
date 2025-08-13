@@ -4,13 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run typecheck && npm run lint:ci && next build",
     "start": "next start",
-    "lint": "next lint",
-    "analyze": "ANALYZE=true npm run build",
-    "build:production": "NODE_ENV=production next build",
-    "export": "next export",
-    "type-check": "tsc --noEmit"
+    "lint": "eslint .",
+    "lint:ci": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",

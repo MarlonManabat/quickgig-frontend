@@ -92,6 +92,7 @@ export default function RootLayout({
               <div className="qg-container">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                   <div className="col-span-1 md:col-span-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- logo placeholder */}
                     <img src="/logo-horizontal.png" alt="QuickGig.ph" className="h-8 mb-4" />
                     <p className="text-gray-300 mb-4">
                       Ang pinakamabilis na paraan para makahanap ng trabaho at talent sa Pilipinas.

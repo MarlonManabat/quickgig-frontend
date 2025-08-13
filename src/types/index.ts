@@ -15,7 +15,7 @@ export interface AuthResponse {
   user: User;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   message: string;
   user?: User;
   data?: T;
@@ -97,7 +97,8 @@ export interface Notification {
   bid?: Bid;
   chatRoom?: string;
   isRead: boolean;
-  data?: any;
+  read?: boolean;
+  data?: unknown;
   createdAt: string;
 }
 
@@ -158,15 +159,16 @@ export interface AdminUser extends User {
 }
 
 export interface AdminTicketTransaction extends TicketTransaction {
-  userId: AdminUser;
-  relatedJobId?: Job;
+  userId: string;
+  user?: AdminUser;
+  relatedJob?: Job;
   adminId?: User;
 }
 
 export interface SalesAnalytics {
   period: 'daily' | 'weekly' | 'monthly';
   salesData: Array<{
-    _id: any;
+    _id: unknown;
     totalTickets: number;
     totalRevenue: number;
     transactionCount: number;

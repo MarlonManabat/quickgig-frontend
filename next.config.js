@@ -1,17 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-
-  // Use default routing behavior on Vercel
-  images: {
-    unoptimized: false,
+  async rewrites() {
+    const target = process.env.API_BASE_URL;
+    return target ? [{ source: '/api/:path*', destination: `${target}/:path*` }] : [];
   },
-
-  // Let production build pass even if lint/types complain
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
-
+  eslint: { ignoreDuringBuilds: false },
+  typescript: { ignoreBuildErrors: false },
 };
-
 module.exports = nextConfig;
