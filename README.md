@@ -35,3 +35,8 @@ settings.
 
 Login, signup, and other protected pages call the external API at
 `https://api.quickgig.ph`; this Next.js app does not provide any API routes.
+
+### API sanity check
+- Local hard fail: `node tools/check_live_api.mjs`
+- Non-blocking (CI): `npm test` (runs with `--soft`)
+- Flags: `--base`, `--origin`, `--timeout`, `--soft`
