@@ -20,31 +20,16 @@ jobs:
         env:
           API_ENV: ${{ secrets.API_ENV }}
 
-      - name: Try deploy to /domains/.../public_html (primary)
-        id: deploy_primary
-        continue-on-error: true
+      - name: Deploy API via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT || 21 }}
-          protocol: ftp
+          protocol: ftps
           local-dir: api.quickgig.ph/
-          server-dir: /domains/api.quickgig.ph/public_html/
-          dangerous-clean-slate: true
-
-      - name: Fallback deploy to /public_html (if primary failed)
-        if: steps.deploy_primary.outcome == 'failure'
-        uses: SamKirkland/FTP-Deploy-Action@v4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT || 21 }}
-          protocol: ftp
-          local-dir: api.quickgig.ph/
-          server-dir: /public_html/
+          server-dir: /home/u789476867/domains/quickgig.ph/public_html/api/
           dangerous-clean-slate: true
 
       - name: Verify API endpoints
