@@ -27,7 +27,7 @@ jobs:
           echo "file=__probe-$ts.txt" >> "$GITHUB_OUTPUT"
 
       - name: Upload probe (no clean slate)
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -94,7 +94,7 @@ jobs:
           HT
 
       - name: Deploy minimal API (endpoints + .htaccess)
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
