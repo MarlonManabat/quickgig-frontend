@@ -81,17 +81,14 @@ jobs:
           RewriteEngine Off
           Options -Indexes
           DirectoryIndex index.php index.html
-          <FilesMatch "^(\.|composer\.json|composer\.lock|\.env|README|LICENSE)$">
-            Require all denied
-          </FilesMatch>
-          <IfModule mod_headers.c>
-            Header set X-Content-Type-Options "nosniff"
-            Header set X-Frame-Options "SAMEORIGIN"
-            Header set Referrer-Policy "no-referrer-when-downgrade"
-            Header set X-XSS-Protection "1; mode=block"
-            Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-          </IfModule>
           HT
+
+      - name: Upload .htaccess (ensure index.php priority)
+        run: |
+          set -e
+          curl --ftp-ssl --ftp-pasv \
+            --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+            -T api-minimal/.htaccess "ftp://${{ secrets.FTP_SERVER }}:${{ secrets.FTP_PORT || 21 }}${{ env.SERVER_DIR }}.htaccess"
 
       - name: Deploy minimal API (endpoints + .htaccess)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -104,6 +101,12 @@ jobs:
           local-dir: api-minimal/
           server-dir: ${{ env.SERVER_DIR }}
           dangerous-clean-slate: false
+
+      - name: Remove default index.html
+        run: |
+          curl --ftp-ssl --ftp-pasv \
+            --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
+            -Q "DELE index.html" "ftp://${{ secrets.FTP_SERVER }}:${{ secrets.FTP_PORT || 21 }}${{ env.SERVER_DIR }}" || true
 
       # C) VERIFY & REPORT
       - name: Verify / and /health and print report
