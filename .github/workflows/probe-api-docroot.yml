@@ -1,0 +1,31 @@
+name: Probe API docroot
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate probe file
+        id: gen
+        run: |
+          TS=$(date +%s)
+          echo "probe-$TS" > api-minimal/__probe-$TS.txt
+          echo "PROBE_FILE=__probe-$TS.txt" >> $GITHUB_OUTPUT
+      - name: Upload probe to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT || 21 }}
+          protocol: ftps
+          local-dir: api-minimal
+          server-dir: /home/u789476867/domains/quickgig.ph/public_html/api/
+          dangerous-clean-slate: false
+      - name: Try to fetch probe over HTTPS
+        run: |
+          set -e
+          echo "Fetching https://api.quickgig.ph/${{ steps.gen.outputs.PROBE_FILE }}"
+          curl -i -sS https://api.quickgig.ph/${{ steps.gen.outputs.PROBE_FILE }} | sed -n '1,15p'
