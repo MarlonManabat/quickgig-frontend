@@ -3,10 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface Transaction {
+  id: string;
+  userId: string;
+  userName: string;
+  type: string;
+  amount: number;
+  tickets: number;
+  paymentMethod: string;
+  status: string;
+  createdAt: string;
+}
+
 const AdminTransactionsPage: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
     // Simulate loading transactions

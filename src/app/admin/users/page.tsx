@@ -3,10 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface AdminUserRow {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  ticketBalance: number;
+  createdAt: string;
+  authProvider: string;
+}
+
 const AdminUsersPage: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<AdminUserRow[]>([]);
 
   useEffect(() => {
     // Simulate loading users

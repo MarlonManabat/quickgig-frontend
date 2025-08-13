@@ -1,12 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { X, Send, Clock, DollarSign, FileText, Wallet } from 'lucide-react';
-import { api } from '@/lib/api';
-import { BidFormData, WalletInfo } from '@/types';
-import { useAuth } from '../context/AuthContext';
-import TicketWarning from './TicketWarning';
-import TicketConfirmModal from './TicketConfirmModal';
+import React, { useState } from 'react';
+import { X, Send, Clock, DollarSign, FileText } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
+import { BidFormData } from '@/types';
 
 interface BidModalProps {
   isOpen: boolean;
@@ -17,7 +14,6 @@ interface BidModalProps {
 }
 
 export default function BidModal({ isOpen, onClose, jobId, jobTitle, onBidSubmitted }: BidModalProps) {
-  const { user } = useAuth();
   const [formData, setFormData] = useState<BidFormData>({
     proposalText: '',
     expectedDeliveryTime: 1,
@@ -25,24 +21,6 @@ export default function BidModal({ isOpen, onClose, jobId, jobTitle, onBidSubmit
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null);
-  const [showTicketModal, setShowTicketModal] = useState(false);
-  const [pendingSubmission, setPendingSubmission] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchWalletInfo();
-    }
-  }, [isOpen]);
-
-  const fetchWalletInfo = async () => {
-    try {
-      const response = await api('/wallet', { auth: true });
-      setWalletInfo(response.data?.data || response.data);
-    } catch (error) {
-      console.error('Error fetching wallet info:', error);
-    }
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -58,9 +36,11 @@ export default function BidModal({ isOpen, onClose, jobId, jobTitle, onBidSubmit
     setError('');
 
     try {
-      await api('/bids/create', {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
+      await apiFetch('/bids/create', {
         method: 'POST',
-        auth: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include',
         body: JSON.stringify({
           jobId,
           ...formData,
@@ -76,8 +56,8 @@ export default function BidModal({ isOpen, onClose, jobId, jobTitle, onBidSubmit
 
       onBidSubmitted();
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit bid');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to submit bid');
     } finally {
       setLoading(false);
     }

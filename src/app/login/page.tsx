@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { saveToken } from '@/lib/auth';
+import { User } from '@/types';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function LoginPage() {
     if (!email || !password) { setError('Email and password are required'); return; }
     setLoading(true);
     try {
-      const data = await api('/auth/login', {
+      const data = await apiFetch<{ token?: string; user?: User }>('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
@@ -26,8 +27,8 @@ export default function LoginPage() {
       if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
 
       router.push('/');
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setLoading(false);
     }

@@ -3,10 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface DashboardStats {
+  totalUsers: number;
+  totalJobs: number;
+  totalTransactions: number;
+  totalRevenue: number;
+  recentActivity: Array<{ type: string; message: string; time: string }>;
+}
+
 const AdminDashboard: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
     // Simulate loading stats
@@ -158,7 +166,7 @@ const AdminDashboard: React.FC = () => {
           </div>
           <div className="p-6">
             <div className="space-y-4">
-              {stats?.recentActivity?.map((activity: any, index: number) => (
+              {stats?.recentActivity?.map((activity: { message: string; time: string }, index: number) => (
                 <div key={index} className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                   <div className="flex-1">

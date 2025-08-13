@@ -4,8 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/ui/Button';
-import { Card, CardHeader, CardContent, CardTag } from '@/components/ui/Card';
-import { Search, Briefcase, Users, Star, ArrowRight, CheckCircle, Zap, Shield, Heart } from 'lucide-react';
+import { Card, CardHeader, CardContent } from '@/components/ui/Card';
+import { Search, Briefcase, ArrowRight, CheckCircle, Zap, Shield, Heart } from 'lucide-react';
 
 export default function HomePage() {
   const { isAuthenticated } = useAuth();
@@ -19,7 +19,7 @@ export default function HomePage() {
           <div className="text-center animate-qg-fade-in">
             <h1 className="font-heading text-4xl md:text-6xl font-bold mb-6 leading-tight">
               Kahit saan sa Pinas,
-              <span className="block text-qg-accent drop-shadow-lg">may gig para sa'yo!</span>
+              <span className="block text-qg-accent drop-shadow-lg">may gig para sa&apos;yo!</span>
             </h1>
             <p className="font-body text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
               Ang pinakamabilis na paraan para makahanap ng trabaho o mag-hire ng skilled professionals. 
@@ -61,7 +61,7 @@ export default function HomePage() {
             <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm text-white/80">
               <div className="flex items-center">
                 <CheckCircle className="w-4 h-4 mr-2 text-qg-accent" />
-                First ticket? Libre 'yan!
+                First ticket? Libre&nbsp;yan!
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-4 h-4 mr-2 text-qg-accent" />

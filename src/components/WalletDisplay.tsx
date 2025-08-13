@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Wallet, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { WalletInfo } from '@/types';
 
 const WalletDisplay: React.FC = () => {
@@ -21,9 +21,14 @@ const WalletDisplay: React.FC = () => {
   const fetchWalletInfo = async () => {
     try {
       setLoading(true);
-      const response = await api('/wallet', { auth: true });
-      setWalletInfo(response.data?.data || response.data);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
+      const response = await apiFetch<{ data?: WalletInfo }>('/wallet', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include',
+      });
+      setWalletInfo(response.data || null);
     } catch (error) {
+      // eslint-disable-next-line no-console -- log wallet fetch failure
       console.error('Error fetching wallet info:', error);
     } finally {
       setLoading(false);

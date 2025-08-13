@@ -1,29 +1,11 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-
-type Options = RequestInit & { auth?: boolean };
-
-export async function api(path: string, opts: Options = {}) {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(opts.headers as any),
-  };
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-  if (opts.auth && token) headers.Authorization = `Bearer ${token}`;
-
-  const res = await fetch(`${API_URL}${path}`, {
-    ...opts,
-    headers,
-    credentials: 'include',
+const publicBase = process.env.NEXT_PUBLIC_API_URL!;
+const serverBase = process.env.API_BASE_URL || publicBase;
+export const apiBase = typeof window === 'undefined' ? serverBase : publicBase;
+export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${apiBase}${path}`, {
+    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+    ...init,
   });
-  if (res.status === 401) {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-      window.location.href = '/login';
-    }
-    throw new Error('Unauthorized');
-  }
-  if (!res.ok) throw new Error(await res.text());
-  const ct = res.headers.get('content-type') || '';
-  return ct.includes('application/json') ? res.json() : res.text();
+  if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
+  return res.json() as Promise<T>;
 }

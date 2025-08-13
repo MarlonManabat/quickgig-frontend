@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginData, SignupData, UpdateUserData } from '@/types';
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { saveToken, clearAuth, getToken } from '@/lib/auth';
 
 interface AuthContextType {
@@ -42,7 +42,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(JSON.parse(savedUser));
       } else if (token) {
         try {
-          const response = await api('/user/me', { auth: true });
+          const response = await apiFetch<{ user?: User }>('/user/me', {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            credentials: 'include',
+          });
           if (response.user) {
             localStorage.setItem('user', JSON.stringify(response.user));
             setUser(response.user);
@@ -61,39 +64,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (data: LoginData) => {
     try {
-      const response = await api('/auth/login', {
+      const response = await apiFetch<{ token?: string; user?: User }>('/auth/login', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
       if (response.token) saveToken(response.token);
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user));
         setUser(response.user);
       }
-    } catch (error: any) {
-      throw new Error(error.message || 'Login failed');
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Login failed');
     }
   };
 
   const signup = async (data: SignupData) => {
     try {
-      const response = await api('/auth/register', {
+      const response = await apiFetch<{ token?: string; user?: User }>('/auth/register', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
       if (response.token) saveToken(response.token);
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user));
         setUser(response.user);
       }
-    } catch (error: any) {
-      throw new Error(error.message || 'Signup failed');
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Signup failed');
     }
   };
 
   const logout = async () => {
     try {
-      await api('/auth/logout', { method: 'POST', auth: true });
+      const token = getToken();
+      await apiFetch('/auth/logout', {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include',
+      });
     } catch {}
     clearAuth();
     localStorage.removeItem('user');
@@ -102,18 +110,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateUser = async (data: UpdateUserData) => {
     try {
-      const response = await api('/user/update', {
+      const token = getToken();
+      const response = await apiFetch<{ user?: User }>('/user/update', {
         method: 'PUT',
-        auth: true,
-        body: JSON.stringify(data)
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include',
+        body: JSON.stringify(data),
       });
       const updatedUser = response.user;
       if (updatedUser) {
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
       }
-    } catch (error: any) {
-      throw new Error(error.message || 'Update failed');
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Update failed');
     }
   };
 

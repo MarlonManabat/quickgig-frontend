@@ -2,21 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { api } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { Notification } from '@/types';
-import { 
-  Bell, 
-  BellRing, 
-  Check, 
-  User, 
-  Briefcase, 
-  MessageCircle,
-  Clock,
-  X
-} from 'lucide-react';
+import { Bell, BellRing, Check, User, MessageCircle, Clock, X } from 'lucide-react';
 
 export default function NotificationDropdown() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,10 +39,15 @@ export default function NotificationDropdown() {
     try {
       setLoading(true);
       setError('');
-      const response = await api('/notifications/list', { auth: true });
-      setNotifications(response.data?.data || response.data || []);
-    } catch (err: any) {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
+      const response = await apiFetch<{ data?: Notification[] }>('/notifications/list', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include',
+      });
+      setNotifications(response.data || []);
+    } catch (err) {
       setError('Failed to load notifications');
+      // eslint-disable-next-line no-console -- surface fetch failure for debugging
       console.error('Error fetching notifications:', err);
     } finally {
       setLoading(false);
@@ -60,16 +56,19 @@ export default function NotificationDropdown() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      await api(`/notifications/${notificationId}/read`, {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
+      await apiFetch(`/notifications/${notificationId}/read`, {
         method: 'PUT',
-        auth: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        credentials: 'include',
       });
       setNotifications(prev => 
         prev.map(notif => 
           notif._id === notificationId ? { ...notif, read: true } : notif
         )
       );
-    } catch (err: any) {
+    } catch (err) {
+      // eslint-disable-next-line no-console -- best effort logging
       console.error('Error marking notification as read:', err);
     }
   };
@@ -77,18 +76,21 @@ export default function NotificationDropdown() {
   const markAllAsRead = async () => {
     try {
       const unreadNotifications = notifications.filter(n => !n.read);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
       await Promise.all(
         unreadNotifications.map(notif =>
-          api(`/notifications/${notif._id}/read`, {
+          apiFetch(`/notifications/${notif._id}/read`, {
             method: 'PUT',
-            auth: true,
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            credentials: 'include',
           })
         )
       );
       setNotifications(prev => 
         prev.map(notif => ({ ...notif, read: true }))
       );
-    } catch (err: any) {
+    } catch (err) {
+      // eslint-disable-next-line no-console -- best effort logging
       console.error('Error marking all notifications as read:', err);
     }
   };
