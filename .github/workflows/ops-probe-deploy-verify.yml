@@ -1,0 +1,130 @@
+name: Ops: Probe → Deploy → Verify
+on:
+  workflow_dispatch:
+
+env:
+  BASE: https://api.quickgig.ph
+  ORIGIN: https://quickgig.ph
+  SERVER_DIR: /home/u789476867/domains/quickgig.ph/public_html/api/
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- A) PROBE DOCROOT ---
+      - name: Create probe file
+        id: probe
+        run: |
+          TS=$(date +%s)
+          mkdir -p api-minimal
+          echo "probe-$TS" > api-minimal/__probe-$TS.txt
+          echo "file=__probe-$TS.txt" >> $GITHUB_OUTPUT
+
+      - name: Upload probe (no clean slate)
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT || 21 }}
+          protocol: ftps
+          local-dir: api-minimal
+          server-dir: ${{ env.SERVER_DIR }}
+          dangerous-clean-slate: false
+
+      - name: Fetch probe over HTTPS
+        id: fetch_probe
+        run: |
+          set -e
+          URL="$BASE/${{ steps.probe.outputs.file }}"
+          echo "GET $URL"
+          code=$(curl -sS -o /tmp/probe -w "%{http_code}" "$URL")
+          head -c 80 /tmp/probe || true
+          echo ""
+          echo "probe_code=$code" >> $GITHUB_OUTPUT
+
+      # --- B) DEPLOY MINIMAL API ---
+      - name: Ensure minimal endpoints exist locally
+        run: |
+          mkdir -p api-minimal
+          cat > api-minimal/index.php <<'PHP'
+          <?php
+          $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+          $allowed = ['https://quickgig.ph','https://www.quickgig.ph'];
+          if (in_array($origin, $allowed, true)) { header('Access-Control-Allow-Origin: ' . $origin); header('Vary: Origin'); }
+          header('Access-Control-Allow-Methods: GET, OPTIONS');
+          header('Access-Control-Allow-Headers: Content-Type, Authorization');
+          if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+          header('Content-Type: application/json');
+          echo json_encode(['message' => 'QuickGig API']);
+          PHP
+          cat > api-minimal/health.php <<'PHP'
+          <?php
+          $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+          $allowed = ['https://quickgig.ph','https://www.quickgig.ph'];
+          if (in_array($origin, $allowed, true)) { header('Access-Control-Allow-Origin: ' . $origin); header('Vary: Origin'); }
+          header('Access-Control-Allow-Methods: GET, OPTIONS');
+          header('Access-Control-Allow-Headers: Content-Type, Authorization');
+          if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+          header('Content-Type: application/json');
+          echo json_encode(['status' => 'ok']);
+          PHP
+          cat > api-minimal/.htaccess <<'HT'
+          RewriteEngine Off
+          Options -Indexes
+          DirectoryIndex index.php index.html
+          <FilesMatch "^(\.|composer\.json|composer\.lock|\.env|README|LICENSE)$">
+            Require all denied
+          </FilesMatch>
+          <IfModule mod_headers.c>
+            Header set X-Content-Type-Options "nosniff"
+            Header set X-Frame-Options "SAMEORIGIN"
+            Header set Referrer-Policy "no-referrer-when-downgrade"
+            Header set X-XSS-Protection "1; mode=block"
+            Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+          </IfModule>
+          HT
+
+      - name: Deploy minimal API (endpoints + .htaccess)
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT || 21 }}
+          protocol: ftps
+          local-dir: api-minimal
+          server-dir: ${{ env.SERVER_DIR }}
+          dangerous-clean-slate: false
+
+      # --- C) VERIFY & PRINT PASS/FAIL ---
+      - name: Verify / and /health and print report
+        id: verify
+        run: |
+          set -e
+          check () {
+            path="$1"
+            body_file=$(mktemp)
+            code=$(curl -sS -H "Origin: $ORIGIN" -o "$body_file" -w "%{http_code}" "$BASE$path" || echo "000")
+            body=$(tr -d '\n\r\t' < "$body_file" | sed -E 's/[[:space:]]+/ /g' | head -c 180)
+            printf "%-10s %-5s %-8s %s\n" "$path" "$code" "$( [ "$code" = "200" ] && echo PASS || echo FAIL )" "$body"
+          }
+          echo "Endpoint   Code  Result   Body snippet"
+          check "/"
+          check "/health"
+
+      - name: Gate on results (fail if not both 200)
+        run: |
+          set -e
+          root=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/")
+          health=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/health")
+          if [ "$root" != "200" ] || [ "$health" != "200" ]; then
+            echo "::warning::One or more checks failed. Common fixes:"
+            echo " - 403 → ensure .htaccess above is present in $SERVER_DIR and folder perms are 755, files 644."
+            echo " - 404 → confirm workflow server-dir matches the subdomain Document Root."
+            echo " - 500 'could not find driver' → enable nd_pdo_mysql; 'undefined function mysqli' → enable nd_mysqli."
+            exit 1
+          fi
+
