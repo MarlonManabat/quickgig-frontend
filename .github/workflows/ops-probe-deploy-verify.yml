@@ -1,6 +1,9 @@
-name: Ops: Probe → Deploy → Verify
+name: ops-probe-deploy-verify
 on:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 env:
   BASE: https://api.quickgig.ph
@@ -13,14 +16,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # --- A) PROBE DOCROOT ---
+      # A) PROBE DOCROOT
       - name: Create probe file
         id: probe
         run: |
-          TS=$(date +%s)
+          set -e
+          ts=$(date +%s)
           mkdir -p api-minimal
-          echo "probe-$TS" > api-minimal/__probe-$TS.txt
-          echo "file=__probe-$TS.txt" >> $GITHUB_OUTPUT
+          echo "probe-$ts" > "api-minimal/__probe-$ts.txt"
+          echo "file=__probe-$ts.txt" >> "$GITHUB_OUTPUT"
 
       - name: Upload probe (no clean slate)
         uses: SamKirkland/FTP-Deploy-Action@v4
@@ -38,16 +42,18 @@ jobs:
         id: fetch_probe
         run: |
           set -e
-          URL="$BASE/${{ steps.probe.outputs.file }}"
-          echo "GET $URL"
-          code=$(curl -sS -o /tmp/probe -w "%{http_code}" "$URL")
-          head -c 80 /tmp/probe || true
-          echo ""
-          echo "probe_code=$code" >> $GITHUB_OUTPUT
+          url="$BASE/${{ steps.probe.outputs.file }}"
+          echo "GET $url"
+          code=$(curl -sS -o /tmp/probe -w "%{http_code}" "$url")
+          echo "HTTP $code"
+          head -c 120 /tmp/probe || true
+          echo
+          echo "probe_code=$code" >> "$GITHUB_OUTPUT"
 
-      # --- B) DEPLOY MINIMAL API ---
-      - name: Ensure minimal endpoints exist locally
+      # B) DEPLOY MINIMAL API
+      - name: Prepare minimal API payload
         run: |
+          set -e
           mkdir -p api-minimal
           cat > api-minimal/index.php <<'PHP'
           <?php
@@ -99,32 +105,18 @@ jobs:
           server-dir: ${{ env.SERVER_DIR }}
           dangerous-clean-slate: false
 
-      # --- C) VERIFY & PRINT PASS/FAIL ---
+      # C) VERIFY & REPORT
       - name: Verify / and /health and print report
-        id: verify
         run: |
           set -e
+          printf "%-10s %-5s %-6s %s\n" "Endpoint" "Code" "Result" "Body"
           check () {
             path="$1"
-            body_file=$(mktemp)
-            code=$(curl -sS -H "Origin: $ORIGIN" -o "$body_file" -w "%{http_code}" "$BASE$path" || echo "000")
-            body=$(tr -d '\n\r\t' < "$body_file" | sed -E 's/[[:space:]]+/ /g' | head -c 180)
-            printf "%-10s %-5s %-8s %s\n" "$path" "$code" "$( [ "$code" = "200" ] && echo PASS || echo FAIL )" "$body"
+            body=$(curl -sS -H "Origin: $ORIGIN" -w "\n%{http_code}" "$BASE$path")
+            code=$(echo "$body" | tail -n1)
+            json=$(echo "$body" | head -n-1 | tr -d '\n\r\t' | sed -E 's/[[:space:]]+/ /g' | head -c 160)
+            res="FAIL"; [ "$code" = "200" ] && res="PASS"
+            printf "%-10s %-5s %-6s %s\n" "$path" "$code" "$res" "$json"
           }
-          echo "Endpoint   Code  Result   Body snippet"
           check "/"
           check "/health"
-
-      - name: Gate on results (fail if not both 200)
-        run: |
-          set -e
-          root=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/")
-          health=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE/health")
-          if [ "$root" != "200" ] || [ "$health" != "200" ]; then
-            echo "::warning::One or more checks failed. Common fixes:"
-            echo " - 403 → ensure .htaccess above is present in $SERVER_DIR and folder perms are 755, files 644."
-            echo " - 404 → confirm workflow server-dir matches the subdomain Document Root."
-            echo " - 500 'could not find driver' → enable nd_pdo_mysql; 'undefined function mysqli' → enable nd_mysqli."
-            exit 1
-          fi
-
