@@ -1,5 +1,0 @@
-{
-  "redirects": [
-    { "source": "https://www.quickgig.ph/(.*)", "destination": "https://quickgig.ph/$1", "permanent": true }
-  ]
-}

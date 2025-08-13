@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy API via FTP
+      - name: Deploy via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -23,6 +23,7 @@ jobs:
           port: ${{ secrets.FTP_PORT || 21 }}
           protocol: ftps
           local-dir: api-minimal
+          # *** IMPORTANT: exact docroot path for api.quickgig.ph ***
           server-dir: /home/u789476867/domains/quickgig.ph/public_html/api/
           dangerous-clean-slate: true
 
