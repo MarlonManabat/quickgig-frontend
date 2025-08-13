@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Deploy via FTPS to Hostinger docroot
         uses: SamKirkland/FTP-Deploy-Action@v4
         with:
@@ -17,6 +16,5 @@ jobs:
           port: ${{ secrets.FTP_PORT || 21 }}
           protocol: ftps
           local-dir: api-minimal
-          # IMPORTANT: actual docroot for api.quickgig.ph
           server-dir: /home/u789476867/domains/quickgig.ph/public_html/api/
           dangerous-clean-slate: true
