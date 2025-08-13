@@ -1,4 +1,16 @@
 <?php
+$envPath = __DIR__ . '/.env';
+if (is_readable($envPath)) {
+  foreach (file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+    if (str_starts_with($line, '#')) continue;
+    $parts = explode('=', $line, 2);
+    if (count($parts) === 2) {
+      [$k, $v] = $parts;
+      $k = trim($k); $v = trim($v, " \t\n\r\0\x0B\"'");
+      putenv("$k=$v"); $_ENV[$k] = $v;
+    }
+  }
+}
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/src/env.php';
 require_once __DIR__ . '/src/db.php';
