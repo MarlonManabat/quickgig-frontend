@@ -15,6 +15,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT || 21 }}
           protocol: ftps
-          local-dir: api-minimal
+          local-dir: api-minimal/
           server-dir: /home/u789476867/domains/quickgig.ph/public_html/api/
           dangerous-clean-slate: true

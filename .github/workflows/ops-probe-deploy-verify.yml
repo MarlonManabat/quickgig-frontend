@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT || 21 }}
           protocol: ftps
-          local-dir: api-minimal
+          local-dir: api-minimal/
           server-dir: ${{ env.SERVER_DIR }}
           dangerous-clean-slate: false
 
@@ -101,7 +101,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT || 21 }}
           protocol: ftps
-          local-dir: api-minimal
+          local-dir: api-minimal/
           server-dir: ${{ env.SERVER_DIR }}
           dangerous-clean-slate: false
 
