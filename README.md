@@ -35,3 +35,9 @@ settings.
 
 Login, signup, and other protected pages call the external API at
 `https://api.quickgig.ph`; this Next.js app does not provide any API routes.
+
+## Health check
+
+The app expects an external API base URL provided via `NEXT_PUBLIC_API_URL` (set in `.env.local`). After running `npm run dev`, visit `/health-check` to verify connectivity. The page queries `${NEXT_PUBLIC_API_URL}/health` and shows a green **UP** badge when it returns `{status:"ok"}`.
+
+Deployments are handled by Vercel; once deployed, check https://quickgig.ph/health-check to confirm the badge reports **UP**.
