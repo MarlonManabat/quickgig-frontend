@@ -1,0 +1,22 @@
+# No directory listings; ensure PHP/HTML are index
+Options -Indexes
+DirectoryIndex index.php index.html
+
+# Deny access to dotfiles and sensitive files
+<FilesMatch "^(\.|composer\.json|composer\.lock|\.env|README|LICENSE)$">
+  Require all denied
+</FilesMatch>
+
+# Basic security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "no-referrer-when-downgrade"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# Prevent access to phpinfo if accidentally left behind
+<Files "phpinfo.php">
+  Require all denied
+</Files>
