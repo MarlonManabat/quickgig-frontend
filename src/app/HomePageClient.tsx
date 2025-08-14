@@ -36,18 +36,24 @@ export default function HomePageClient() {
             Gigs and talent, matched fast.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/login" prefetch={false}>
-              <Button size="lg" variant="secondary" className="text-lg">
-                Open the app
+            <Link href="/signup">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="text-lg"
+                data-cta="signup"
+              >
+                Simulan Na!
               </Button>
             </Link>
-            <Link href="/health-check">
+            <Link href="/find-work">
               <Button
                 size="lg"
                 variant="outline"
                 className="text-lg border-fg text-fg hover:bg-fg hover:text-bg"
+                data-cta="browse-jobs"
               >
-                Health check
+                Browse Jobs
               </Button>
             </Link>
           </div>
