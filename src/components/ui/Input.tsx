@@ -32,7 +32,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="space-y-2">
         {label && (
-          <label htmlFor={inputId} className="qg-label block text-sm font-medium text-qg-navy">
+          <label htmlFor={inputId} className="block text-sm font-medium text-fg">
             {label}
           </label>
         )}
@@ -46,8 +46,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             type={type}
             id={inputId}
             className={cn(
-              'qg-input block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
-              'focus:ring-2 focus:ring-qg-primary/20 focus:border-qg-primary transition-all duration-qg-fast',
+              'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+              'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
               'placeholder:text-gray-400',
               error && 'border-red-300 focus:border-red-500 focus:ring-red-500/20',
               icon && iconPosition === 'left' && 'pl-10',
@@ -81,19 +81,19 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="space-y-2">
         {label && (
-          <label htmlFor={textareaId} className="qg-label block text-sm font-medium text-qg-navy">
+          <label htmlFor={textareaId} className="block text-sm font-medium text-fg">
             {label}
           </label>
         )}
         <textarea
           id={textareaId}
-          className={cn(
-            'qg-input block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
-            'focus:ring-2 focus:ring-qg-primary/20 focus:border-qg-primary transition-all duration-qg-fast',
-            'placeholder:text-gray-400 resize-vertical min-h-[100px]',
-            error && 'border-red-300 focus:border-red-500 focus:ring-red-500/20',
-            className
-          )}
+            className={cn(
+              'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+              'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
+              'placeholder:text-gray-400 resize-vertical min-h-[100px]',
+              error && 'border-red-300 focus:border-red-500 focus:ring-red-500/20',
+              className
+            )}
           ref={ref}
           {...props}
         />
@@ -115,15 +115,15 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="space-y-2">
         {label && (
-          <label htmlFor={selectId} className="qg-label block text-sm font-medium text-qg-navy">
+          <label htmlFor={selectId} className="block text-sm font-medium text-fg">
             {label}
           </label>
         )}
         <select
           id={selectId}
           className={cn(
-            'qg-input block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
-            'focus:ring-2 focus:ring-qg-primary/20 focus:border-qg-primary transition-all duration-qg-fast',
+            'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+            'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
             'bg-white cursor-pointer',
             error && 'border-red-300 focus:border-red-500 focus:ring-red-500/20',
             className

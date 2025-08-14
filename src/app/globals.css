@@ -6,14 +6,18 @@
 @import '../styles/design-system.css';
 
 :root {
-  --background: #ffffff;
-  --foreground: #374151;
+  --color-primary: #00B272;
+  --color-secondary: #FFD447;
+  --bg: #ffffff;
+  --fg: #002C3E;
+  --background: var(--bg);
+  --foreground: var(--fg);
 }
 
 /* Base styles with QuickGig branding */
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--fg);
+  background: var(--bg);
   font-family: var(--qg-font-body);
   line-height: var(--qg-leading-normal);
   -webkit-font-smoothing: antialiased;
@@ -24,7 +28,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--qg-font-heading);
   font-weight: var(--qg-font-bold);
-  color: var(--qg-navy);
+  color: var(--fg);
   line-height: var(--qg-leading-tight);
 }
 
@@ -46,13 +50,19 @@ button {
 
 /* Link styles */
 a {
-  color: var(--qg-primary-green);
+  color: var(--color-primary);
   text-decoration: none;
   transition: color var(--qg-transition-fast);
 }
 
 a:hover {
-  color: var(--qg-green-hover);
+  color: var(--color-secondary);
+}
+
+a:focus,
+button:focus {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
 }
 
 /* Form element styles */
@@ -64,7 +74,7 @@ input, textarea, select {
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--qg-primary-green);
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(0, 178, 114, 0.1);
 }
 
