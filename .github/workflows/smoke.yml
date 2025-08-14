@@ -1,21 +1,27 @@
-name: smoke
+name: Smoke
 
 on:
-  workflow_dispatch:
-    inputs:
-      base_url:
-        description: Base URL to test
-        required: false
-        default: https://quickgig.ph
+  pull_request:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      API: https://api.quickgig.ph
+      PAGE_ORIGIN: https://quickgig.ph
+      # On PRs we don't know the preview URL; skip app check unless BASE is set.
+      BASE: ${{ github.ref == 'refs/heads/main' && 'https://quickgig.ph' || '' }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Run smoke test
-        env:
-          BASE_URL: ${{ inputs.base_url || 'https://quickgig.ph' }}
-        run: scripts/smoke.sh
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci --ignore-scripts
+      - name: Check API health
+        run: npm run check:api
+      - name: Check App (skips if BASE not set)
+        run: npm run check:app
