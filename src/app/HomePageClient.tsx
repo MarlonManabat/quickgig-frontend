@@ -36,7 +36,7 @@ export default function HomePageClient() {
             Gigs and talent, matched fast.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/app" prefetch={false}>
+            <Link href="https://app.quickgig.ph" prefetch={false}>
               <Button size="lg" variant="secondary" className="text-lg">
                 Open the app
               </Button>

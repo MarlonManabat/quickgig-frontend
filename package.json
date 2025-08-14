@@ -17,7 +17,8 @@
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
-    "scan:appdomain": "node tools/scan_app_domain.mjs"
+    "scan:appdomain": "node tools/scan_app_domain.mjs",
+    "scan:links": "node tools/scan_links.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",

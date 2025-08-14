@@ -21,11 +21,9 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci --ignore-scripts
-      - name: Scan for hardcoded app subdomain
-        run: npm run scan:appdomain
+      - name: Scan for stale /app links
+        run: npm run scan:links
       - name: Check API health
         run: npm run check:api
-      - name: Check App (skips if BASE not set)
-        run: npm run check:app
-      - name: Check App Assets (skips if BASE not set)
-        run: npm run check:appassets
+      - name: Check Root Redirect (skips if BASE not set)
+        run: node tools/check_root_redirect.mjs
