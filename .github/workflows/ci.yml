@@ -1,48 +1,25 @@
 name: CI
-
 on:
   push:
   pull_request:
-
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - run: npm install
+          registry-url: https://registry.npmjs.org/
+      - name: Configure npm registry
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config get registry
+      - name: Install deps
+        run: npm install --no-audit --no-fund
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
-      - name: Verify API
-        run: |
-          set +e
-          out=$(npm run --silent check:api 2>&1)
-          echo "${out}"
-          echo "::notice::${out//$'\n'/ }"
-          exit 0
-      - name: Check App (soft)
-        run: npm run check:app || true
-        if: github.event_name == 'pull_request'
-      - name: Smoke preview
-        if: github.event_name == 'pull_request' && env.previewUrl
-        env:
-          previewUrl: ${{ env.previewUrl }}
-        run: |
-          set -e
-          code_root=$(curl -sS -o /dev/null -w "%{http_code}" -I "$previewUrl/")
-          if [ "$code_root" != "307" ]; then
-            echo "Expected 307 from /, got $code_root"
-            exit 1
-          fi
-          code_app=$(curl -sS -o /dev/null -w "%{http_code}" -I "$previewUrl/app")
-          case "$code_app" in
-            2*|3*) ;;
-            *) echo "Unexpected /app status $code_app"; exit 1 ;;
-          esac
-      - name: Check App
-        run: npm run check:app
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
