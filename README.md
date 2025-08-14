@@ -21,7 +21,7 @@ Tokens are managed through `/src/lib/auth.ts`, and basic route protection is ava
 
 ## Development
 
-Run the development server:
+Run the development server and visit [http://localhost:3000/health-check](http://localhost:3000/health-check):
 
 ```bash
 npm run dev
@@ -37,6 +37,10 @@ Login, signup, and other protected pages call the external API at
 `https://api.quickgig.ph`; this Next.js app does not provide any API routes.
 
 ### API sanity check
-- Local hard fail: `node tools/check_live_api.mjs`
-- Non-blocking (CI): `npm test` (runs with `--soft`)
-- Flags: `--base`, `--origin`, `--timeout`, `--soft`
+Smoke test the live API:
+
+```bash
+npm run check:api
+```
+
+CI uses the soft variant (`npm run check:api:soft`).

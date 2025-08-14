@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { getBaseUrl } from '@/lib/api';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -34,7 +35,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated && token && user) {
       // Initialize socket connection
-      const newSocket = io(process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph', {
+      const newSocket = io(getBaseUrl(), {
         auth: {
           token: token,
         },
