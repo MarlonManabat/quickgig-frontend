@@ -47,11 +47,11 @@ Login, signup, and other protected pages call the external API at
 
 ### Behavior
 
-* The root `https://quickgig.ph` permanently redirects to `https://app.quickgig.ph`.
+* `https://quickgig.ph` serves the QuickGig app directly (no `/app` prefix).
 * `/health-check` remains available for diagnostics.
-* If login via `https://app.quickgig.ph` has cookie issues, set API/app cookies with:
+* If login via `https://quickgig.ph` has cookie issues, set API/app cookies with:
   `Domain=.quickgig.ph; Path=/; Secure; HttpOnly; SameSite=None`.
-* Direct usage of [https://app.quickgig.ph](https://app.quickgig.ph) is canonical.
+* The `app.quickgig.ph` host remains as a legacy alias.
 
 ### Smoke checks
 
@@ -61,27 +61,29 @@ The app defaults to the public API if `NEXT_PUBLIC_API_URL` is unset:
 NEXT_PUBLIC_API_URL=https://api.quickgig.ph
 ```
 
-Verify the production root redirect and API:
+Verify the production root and API:
 
 ```bash
-BASE=https://quickgig.ph node tools/check_root_redirect.mjs
+BASE=https://quickgig.ph node tools/check_root.mjs
 BASE=https://api.quickgig.ph npm run check:api
 ```
 
 ## Production routing
-- Root: `https://quickgig.ph` → **301/308 to `https://app.quickgig.ph`**
+- `https://quickgig.ph` (primary) serves the app
+- `https://www.quickgig.ph` → 301 to `https://quickgig.ph`
+- `https://app.quickgig.ph` → optional legacy alias
 
 # QuickGig Frontend – Production Runbook
 
 This repo hosts the Next.js frontend for QuickGig.
 
 ## Domains
-- **Root (Vercel):** `https://quickgig.ph`
-- **App:** `https://app.quickgig.ph`
+- **Primary:** `https://quickgig.ph`
+- **Legacy alias:** `https://app.quickgig.ph`
 - **API (PHP on Hostinger):** `https://api.quickgig.ph`
 
 ## Routing
-- `/` **redirects** to `https://app.quickgig.ph` (permanent).
+- `/` serves the app directly. Legacy `/app` paths redirect to `/`.
 
 ## Environment
 - `NEXT_PUBLIC_API_URL=https://api.quickgig.ph`
@@ -121,8 +123,8 @@ Preflight (`OPTIONS`) should return `200`.
 * **API health:** `https://api.quickgig.ph/health.php` → JSON `{ ok: true, ts: <unix> }`
 * **Smoke workflow** (`.github/workflows/smoke.yml`):
 
-  * On `main`: checks API health and that `/` redirects to `https://app.quickgig.ph` using `BASE=https://quickgig.ph`.
-  * On PRs: redirect check may skip unless `BASE` is provided.
+  * On `main`: checks API health and that the root returns 200 using `BASE=https://quickgig.ph`.
+  * On PRs: root check may skip unless `BASE` is provided.
 
 ### Local/Preview Notes
 
@@ -130,14 +132,13 @@ Preflight (`OPTIONS`) should return `200`.
 
 ## Manual Triage
 
-* Frontend: `curl -I https://quickgig.ph/` shows `Location: https://app.quickgig.ph/` and navigating to the app works.
+* Frontend: `curl -I https://quickgig.ph/` shows `200 OK` and navigating to the app works.
 * API: `https://api.quickgig.ph/health.php` in a browser.
 * DevTools → Application → Cookies: confirm `.quickgig.ph` cookie, `Secure`, `HttpOnly`, `SameSite=None`.
 
 ## Screenshots / Evidence (attach in PR description)
 
-* `quickgig.ph` redirecting to `https://app.quickgig.ph`
-* `https://app.quickgig.ph` rendering correctly
+* `quickgig.ph` rendering correctly
 * `api.quickgig.ph/health.php` JSON
 * Latest successful **Smoke** run on `main`
 

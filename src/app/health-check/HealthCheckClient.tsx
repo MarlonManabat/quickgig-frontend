@@ -24,7 +24,7 @@ export default function HealthCheckClient({
   useEffect(() => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
-    fetch('/app', { method: 'HEAD', signal: controller.signal })
+    fetch('/', { method: 'HEAD', signal: controller.signal })
       .then((res) =>
         setAppStatus(res.status >= 200 && res.status < 400 ? 'ok' : 'error'),
       )
