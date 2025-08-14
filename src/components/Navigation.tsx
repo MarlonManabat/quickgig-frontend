@@ -35,7 +35,7 @@ const Navigation: React.FC = () => {
                 className="h-10 w-10 transition-transform duration-qg-fast group-hover:scale-105"
                 priority
               />
-              <span className="font-heading text-xl font-bold text-white hidden sm:block">
+              <span className="font-heading text-xl font-bold text-fg hidden sm:block">
                 QuickGig<span className="text-qg-accent">.ph</span>
               </span>
             </Link>
@@ -109,11 +109,11 @@ const Navigation: React.FC = () => {
                   </Link>
                   <div className="hidden xl:flex flex-col">
                     <span className="text-xs text-gray-300">Kumusta,</span>
-                    <span className="text-sm font-medium text-white">{user?.name}</span>
+                    <span className="text-sm font-medium text-fg">{user?.name}</span>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-white"
+                    className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-fg"
                   >
                     <LogOut className="w-4 h-4" />
                     <span className="hidden xl:inline ml-2">Logout</span>
@@ -123,7 +123,7 @@ const Navigation: React.FC = () => {
             ) : (
               <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-qg-navy-light">
                 <Link href="/login">
-                  <Button variant="ghost" size="sm" className="text-white hover:bg-qg-navy-light hover:text-qg-accent">
+                  <Button variant="ghost" size="sm" className="text-fg hover:bg-qg-navy-light hover:text-qg-accent">
                     Login
                   </Button>
                 </Link>
@@ -181,7 +181,7 @@ const Navigation: React.FC = () => {
                 <>
                   <div className="border-t border-qg-navy-light my-4 pt-4">
                     <div className="px-4 py-2 text-sm text-gray-300">
-                      Kumusta, <span className="font-medium text-white">{user?.name}</span>
+                      Kumusta, <span className="font-medium text-fg">{user?.name}</span>
                     </div>
                   </div>
                   
@@ -225,7 +225,7 @@ const Navigation: React.FC = () => {
                   <div className="border-t border-qg-navy-light mt-4 pt-4">
                     <button
                       onClick={handleLogout}
-                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-white w-full text-left"
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-fg w-full text-left"
                     >
                       <LogOut className="w-5 h-5 mr-3" />
                       Logout
@@ -235,7 +235,7 @@ const Navigation: React.FC = () => {
               ) : (
                 <div className="border-t border-qg-navy-light mt-4 pt-4 space-y-3">
                   <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full text-white hover:bg-qg-navy-light hover:text-qg-accent">
+                    <Button variant="ghost" className="w-full text-fg hover:bg-qg-navy-light hover:text-qg-accent">
                       Login
                     </Button>
                   </Link>

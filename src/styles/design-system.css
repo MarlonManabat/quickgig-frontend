@@ -7,10 +7,10 @@
 /* CSS Custom Properties - Brand Colors */
 :root {
   /* Primary Brand Colors */
-  --qg-primary-green: #00B272;
-  --qg-accent-yellow: #FFD447;
-  --qg-navy: #002C3E;
-  --qg-white: #FFFFFF;
+  --qg-primary-green: var(--color-primary);
+  --qg-accent-yellow: var(--color-secondary);
+  --qg-navy: var(--bg);
+  --qg-white: var(--fg);
   
   /* Color Variations */
   --qg-green-light: #00D085;
