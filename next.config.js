@@ -6,15 +6,15 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      {
-        // NOTE: source must be a PATH, not a full URL
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.quickgig.ph' }],
-        destination: 'https://quickgig.ph/:path*',
-        permanent: true,
-      },
-    ];
-  },
+        {
+          // NOTE: source must be a PATH, not a full URL
+          source: '/:path*',
+          has: [{ type: 'host', value: 'www.quickgig.ph' }],
+          destination: 'https://quickgig.ph/:path*',
+          permanent: false,
+        },
+      ];
+    },
   eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
 };

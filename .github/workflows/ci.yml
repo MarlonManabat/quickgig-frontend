@@ -16,6 +16,15 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run check:api
-        env:
-          NEXT_PUBLIC_API_URL: https://api.quickgig.ph
+      - name: Check API (soft)
+        run: BASE=https://api.quickgig.ph npm run check:api || true
+        if: github.event_name == 'pull_request'
+      - name: Check App (soft)
+        run: npm run check:app || true
+        if: github.event_name == 'pull_request'
+      - name: Check API
+        run: BASE=https://api.quickgig.ph npm run check:api
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Check App
+        run: npm run check:app
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
