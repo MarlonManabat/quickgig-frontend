@@ -2,6 +2,13 @@
 
 A Next.js application for QuickGig.ph configured for deployment on Vercel.
 
+## Routing (production)
+
+- `quickgig.ph` and `www.quickgig.ph` are served by Vercel and issue a 308 to `https://app.quickgig.ph/:path*`
+- `app.quickgig.ph` is hosted on Hostinger and serves the live product.
+- No Vercel domain is attached to `app.quickgig.ph`. This avoids DNS conflicts and preserves the working app.
+- Rollback: revert this PR to restore any previous behavior.
+
 ## Setup
 
 1. Install dependencies:
@@ -47,11 +54,11 @@ Login, signup, and other protected pages call the external API at
 
 ### Behavior
 
-* `https://quickgig.ph` serves the QuickGig app directly (no `/app` prefix).
+* `https://quickgig.ph` and `https://www.quickgig.ph` issue a 308 redirect to `https://app.quickgig.ph`.
 * `/health-check` remains available for diagnostics.
-* If login via `https://quickgig.ph` has cookie issues, set API/app cookies with:
+* If login via `https://app.quickgig.ph` has cookie issues, set API/app cookies with:
   `Domain=.quickgig.ph; Path=/; Secure; HttpOnly; SameSite=None`.
-* The `app.quickgig.ph` host remains as a legacy alias.
+* The `app.quickgig.ph` host serves the live product on Hostinger.
 
 ### Smoke checks
 
@@ -69,9 +76,9 @@ BASE=https://api.quickgig.ph npm run check:api
 ```
 
 ## Production routing
-- `https://quickgig.ph` (primary) serves the app
-- `https://www.quickgig.ph` → 301 to `https://quickgig.ph`
-- `https://app.quickgig.ph` → optional legacy alias
+- `https://quickgig.ph` → 308 to `https://app.quickgig.ph`
+- `https://www.quickgig.ph` → 308 to `https://app.quickgig.ph`
+- `https://app.quickgig.ph` serves the live product
 
 # QuickGig Frontend – Production Runbook
 
@@ -123,8 +130,8 @@ Preflight (`OPTIONS`) should return `200`.
 * **API health:** `https://api.quickgig.ph/health.php` → JSON `{ ok: true, ts: <unix> }`
 * **Smoke workflow** (`.github/workflows/smoke.yml`):
 
-  * On `main`: checks API health and that the root returns 200 using `BASE=https://quickgig.ph`.
-  * On PRs: root check may skip unless `BASE` is provided.
+  * On `main`: checks API health and that `quickgig.ph` and `www.quickgig.ph` return 308 to `https://app.quickgig.ph`.
+  * On PRs: redirect checks are non-blocking and emit `::notice` on failure.
 
 ### Local/Preview Notes
 
@@ -132,7 +139,7 @@ Preflight (`OPTIONS`) should return `200`.
 
 ## Manual Triage
 
-* Frontend: `curl -I https://quickgig.ph/` shows `200 OK` and navigating to the app works.
+* Frontend: `curl -I https://quickgig.ph/` shows `308` with `Location: https://app.quickgig.ph/`.
 * API: `https://api.quickgig.ph/health.php` in a browser.
 * DevTools → Application → Cookies: confirm `.quickgig.ph` cookie, `Secure`, `HttpOnly`, `SameSite=None`.
 
@@ -178,4 +185,4 @@ Preflight (`OPTIONS`) should return `200`.
   Operator tools only; CI does not enforce these checks.
 
 ### CI Smoke Policy
-Our GitHub Actions **Smoke** job intentionally treats external endpoint checks as **non-blocking** on pull requests (runners can block outbound requests). On `main`, we perform header checks against `https://app.quickgig.ph`, `https://quickgig.ph`, and `https://www.quickgig.ph` as **warn-only**. Build/lint/type checks remain blocking.
+Our GitHub Actions **Smoke** job treats external endpoint checks as **non-blocking** on pull requests (runners can block outbound requests). On `main`, redirect assertions for `https://quickgig.ph` and `https://www.quickgig.ph` are **required** and will fail the workflow if missing. Build/lint/type checks remain blocking.
