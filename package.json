@@ -18,6 +18,10 @@
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report",
+    "smoke:app": "node tools/check_app.mjs",
+    "smoke:api": "node tools/check_api.mjs",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/scan_links.mjs"
   },
@@ -42,6 +46,7 @@
     "eslint-config-next": "14.2.31",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@playwright/test": "^1.45.0"
   }
 }

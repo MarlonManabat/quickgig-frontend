@@ -16,6 +16,11 @@
 # production
 /build
 
+# playwright reports
+playwright-report/
+reports/
+test-results/
+
 # misc
 .DS_Store
 *.pem

@@ -75,6 +75,23 @@ BASE=https://quickgig.ph node tools/check_root.mjs
 BASE=https://api.quickgig.ph npm run check:api
 ```
 
+### E2E tests
+
+Run the Playwright end-to-end suite locally against a dev server:
+
+```bash
+BASE=http://localhost:3000 npm run test:e2e
+```
+
+Run against production:
+
+```bash
+BASE=https://quickgig.ph npm run test:e2e
+```
+
+Use `npm run test:e2e:headed` to watch the browser and `npm run test:e2e:report` to open the last HTML report.
+Tests are non-destructive; no posts or purchases are submitted. When test credentials are added later via `TEST_EMAIL` and `TEST_PASSWORD` GitHub secrets, real login flows can be enabled.
+
 ## Production routing
 - `https://quickgig.ph` → 308 to `https://app.quickgig.ph`
 - `https://www.quickgig.ph` → 308 to `https://app.quickgig.ph`
