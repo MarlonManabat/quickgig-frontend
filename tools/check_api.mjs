@@ -1,13 +1,19 @@
-const api = (process.env.API || 'https://api.quickgig.ph').replace(/\/$/, '');
-const pageOrigin = (process.env.PAGE_ORIGIN || 'https://quickgig.ph');
+const API_BASE = (process.env.API_BASE || 'https://api.quickgig.ph').replace(/\/$/, '');
 
 (async () => {
-  const r = await fetch(api + '/health.php', { method: 'GET' });
-  if (!r.ok) throw new Error(`API health ${r.status}`);
-  // If server includes CORS on GET, ensure it's sane (some hosts only add it on actual CORS requests; tolerate absence)
-  const allowOrigin = r.headers.get('access-control-allow-origin');
-  if (allowOrigin && allowOrigin !== pageOrigin) {
-    throw new Error(`CORS allow-origin mismatch: got "${allowOrigin}" expected "${pageOrigin}"`);
+  try {
+    const res = await fetch(`${API_BASE}/health.php`);
+    if (res.status !== 200) {
+      throw new Error(`unexpected status ${res.status}`);
+    }
+    const body = await res.json().catch(() => ({}));
+    if (body.status !== 'ok') {
+      throw new Error(`unexpected body ${JSON.stringify(body)}`);
+    }
+    console.log('API ok', res.headers.get('server'), res.headers.get('date'));
+    process.exit(0);
+  } catch (err) {
+    console.error('API check failed:', err.message);
+    process.exit(1);
   }
-  console.log('API OK');
 })();

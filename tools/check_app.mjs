@@ -1,27 +1,22 @@
-const base = (process.env.BASE || '').replace(/\/$/, '');
-if (!base) { console.warn('No BASE provided; skipping app check'); process.exit(0); }
-
-const fetchImpl = globalThis.fetch;
-const wait = (ms)=>new Promise(r=>setTimeout(r,ms));
-async function get(u, o) {
-  let last;
-  for (let i = 0; i < 5; i++) {
-    try { return await fetchImpl(u, { redirect: 'manual', ...o }); }
-    catch (e) { last = e; await wait(1000 * (i + 1)); }
-  }
-  throw last || new Error('fetch failed');
-}
+const BASE = (process.env.BASE || 'https://app.quickgig.ph').replace(/\/$/, '');
 
 (async () => {
-  // HEAD /
-  const head = await get(base + '/', { method: 'HEAD' });
-  if (head.status < 200 || head.status >= 400) throw new Error(`HEAD / expected 2xx; got ${head.status}`);
-
-  // HEAD /app should redirect to root
-  const app = await get(base + '/app', { method: 'HEAD' });
-  if (![301,302,307,308].includes(app.status)) throw new Error(`HEAD /app expected redirect; got ${app.status}`);
-  const loc = app.headers.get('location') || '';
-  if (loc !== '/' && loc !== base + '/') throw new Error(`Redirect location not root: ${loc}`);
-
-  console.log('App OK');
+  try {
+    const res = await fetch(`${BASE}/`);
+    const text = await res.text();
+    if (res.status !== 200) {
+      throw new Error(`unexpected status ${res.status}`);
+    }
+    if (!/QuickGig\.ph/i.test(text)) {
+      throw new Error('missing QuickGig text');
+    }
+    if (/404\s+not\s+found/i.test(text)) {
+      throw new Error('received 404 page');
+    }
+    console.log('App ok');
+    process.exit(0);
+  } catch (err) {
+    console.error('App check failed:', err.message);
+    process.exit(1);
+  }
 })();

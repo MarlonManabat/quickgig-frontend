@@ -27,6 +27,25 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+## Testing
+
+Run the end-to-end suite against the live app:
+
+```bash
+BASE=https://app.quickgig.ph API_BASE=https://api.quickgig.ph \
+npm run test:e2e:install && npm run test:e2e
+```
+
+Run only the smoke subset and health checks:
+
+```bash
+npm run test:e2e:smoke
+npm run check:api && npm run check:cors && npm run check:app
+```
+
+Playwright HTML, JUnit, and trace artifacts are output to
+`playwright-report/`, `junit.xml`, and `test-results/` respectively in CI.
+
 ## Authentication
 
 The app communicates with an external API using the `/src/lib/api.ts` helper. When `auth` is set on a request, a JWT token stored in `localStorage` is sent in the `Authorization` header. If the backend issues HttpOnly cookies, they are included automatically.

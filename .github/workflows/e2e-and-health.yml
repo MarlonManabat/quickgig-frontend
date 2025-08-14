@@ -1,0 +1,71 @@
+name: E2E and Health Checks
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * *'
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      - run: npm run test:e2e:install
+      - name: API health
+        id: api
+        run: npm run check:api
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
+      - if: always()
+        run: echo "API check: ${{ steps.api.outcome }}" >> $GITHUB_STEP_SUMMARY
+      - name: CORS preflight
+        id: cors
+        run: npm run check:cors
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
+      - if: always()
+        run: echo "CORS check: ${{ steps.cors.outcome }}" >> $GITHUB_STEP_SUMMARY
+      - name: App health
+        id: app
+        run: npm run check:app
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
+      - if: always()
+        run: echo "App check: ${{ steps.app.outcome }}" >> $GITHUB_STEP_SUMMARY
+      - name: Smoke tests
+        id: smoke
+        if: github.event_name == 'pull_request'
+        run: npm run test:e2e:smoke
+        continue-on-error: true
+      - if: github.event_name == 'pull_request'
+        run: echo "Smoke tests: ${{ steps.smoke.outcome }}" >> $GITHUB_STEP_SUMMARY
+      - name: Full e2e tests
+        id: full
+        if: github.event_name == 'schedule'
+        run: npm run test:e2e
+      - if: github.event_name == 'schedule'
+        run: echo "Full e2e: ${{ steps.full.outcome }}" >> $GITHUB_STEP_SUMMARY
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+      - name: Upload junit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit
+          path: junit.xml

@@ -9,15 +9,18 @@
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
+    "test:e2e:install": "playwright install --with-deps",
+    "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test -g \"@smoke\"",
     "check:api": "node tools/check_api.mjs",
-    "check:api:soft": "node tools/check_live_api.mjs || true",
+    "check:cors": "node tools/check_cors.mjs",
     "check:app": "node tools/check_app.mjs",
+    "check:api:soft": "node tools/check_live_api.mjs || true",
     "check:appassets": "node tools/check_app_assets.mjs",
     "check:app:soft": "node tools/check_live_app.mjs || true",
     "check:dns:app": "node tools/check_dns_app.mjs",
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
-    "test:e2e": "playwright test",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/scan_links.mjs"
   },
@@ -34,6 +37,7 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.43.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
