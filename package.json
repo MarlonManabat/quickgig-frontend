@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run typecheck && npm run lint:ci && next build",
+    "build": "npm run typecheck && npm run lint:ci && NEXT_PRIVATE_TSCONFIG_PATH=tsconfig.app.json next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
+    "postinstall": "if [ \"$PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD\" != \"1\" ]; then npx playwright install --with-deps; fi",
     "check:api": "node tools/check_api.mjs",
     "check:api:soft": "node tools/check_live_api.mjs || true",
     "check:app": "node tools/check_app.mjs",
@@ -20,7 +22,6 @@
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test -c ./playwright.config.ts --grep @smoke",
-    "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/check_links.mjs"
   },

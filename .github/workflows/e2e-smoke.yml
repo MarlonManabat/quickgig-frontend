@@ -22,8 +22,14 @@ jobs:
       - name: Install deps
         run: npm install
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Typecheck tests
+        run: npm run typecheck:test
+
       - name: Install Playwright browsers
-        run: npm run playwright:install
+        run: npx playwright install --with-deps
 
       - name: Run smoke tests
         env:

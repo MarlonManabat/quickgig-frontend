@@ -16,6 +16,7 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm run typecheck:test
       - run: npm run build
       - name: Verify API
         run: |
