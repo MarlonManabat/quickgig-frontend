@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "check:api": "node tools/check_api.mjs",
     "check:api:soft": "node tools/check_live_api.mjs || true",
-    "check:app": "node tools/check_app.mjs",
+    "check:app": "node tools/check_app_hostinger.mjs",
+    "check:cors": "node tools/check_cors.mjs",
     "check:appassets": "node tools/check_app_assets.mjs",
     "check:app:soft": "node tools/check_live_app.mjs || true",
     "check:dns:app": "node tools/check_dns_app.mjs",
@@ -19,6 +20,9 @@
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test -c playwright.config.ts --grep @smoke",
+    "test:e2e:report": "playwright show-report",
+    "playwright:install": "npx playwright install --with-deps chromium",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/check_links.mjs"
   },
@@ -35,7 +39,8 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^22",
+    "@playwright/test": "^1.48.2",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "critters": "^0.0.23",
