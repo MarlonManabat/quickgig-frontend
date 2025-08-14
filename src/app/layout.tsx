@@ -4,6 +4,8 @@ import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { SocketProvider } from "../context/SocketContext";
 import Navigation from "../components/Navigation";
+import ErrorBoundary from "../components/ErrorBoundary";
+import { ToastProvider } from "../components/ToastProvider";
 
 export const metadata: Metadata = {
   title: "QuickGig.ph - Find Gigs Fast in the Philippines",
@@ -85,11 +87,13 @@ export default function RootLayout({
       <body className="font-body antialiased bg-bg text-fg">
         <AuthProvider>
           <SocketProvider>
-            <Navigation />
-            <main className="min-h-screen">
-              {children}
-            </main>
-            <footer className="qg-footer">
+            <ToastProvider>
+              <ErrorBoundary>
+                <Navigation />
+                <main className="min-h-screen">
+                  {children}
+                </main>
+                <footer className="qg-footer">
               <div className="qg-container">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                   <div className="col-span-1 md:col-span-2">
@@ -132,7 +136,9 @@ export default function RootLayout({
                   </div>
                 </div>
               </div>
-            </footer>
+                </footer>
+              </ErrorBoundary>
+            </ToastProvider>
           </SocketProvider>
         </AuthProvider>
       </body>

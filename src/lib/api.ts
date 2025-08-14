@@ -1,4 +1,6 @@
 import { safeJsonParse } from './json';
+import { toast } from './toast';
+import { report } from './report';
 import type { Job } from '../../types/jobs';
 
 export const API_BASE =
@@ -41,7 +43,7 @@ export async function safeFetch(
     return { ok: res.ok, status: res.status, body };
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
-    console.error('safeFetch error:', error);
+    report(error, `safeFetch ${path}`);
     return { ok: false, status: 0, body: '', error };
   } finally {
     clearTimeout(timeout);
@@ -86,14 +88,20 @@ export async function checkHealth(): Promise<HealthResponse> {
  * Throws on non-2xx responses or invalid JSON.
  */
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await safeFetch(path, {
-    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
-    ...init,
-  });
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.body}`);
-  const json = safeJsonParse<T>(res.body);
-  if (!json.ok) throw json.error;
-  return json.value as T;
+  try {
+    const res = await safeFetch(path, {
+      headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+      ...init,
+    });
+    if (!res.ok) throw new Error(`API ${res.status}: ${res.body}`);
+    const json = safeJsonParse<T>(res.body);
+    if (!json.ok) throw json.error;
+    return json.value as T;
+  } catch (error) {
+    report(error, `apiFetch ${path}`);
+    toast('Something went wrong. Please try again.');
+    throw error instanceof Error ? error : new Error(String(error));
+  }
 }
 
 export async function fetchJobs(): Promise<Job[]> {
