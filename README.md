@@ -16,10 +16,10 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
    npm install
    ```
 2. Copy `.env.example` to `.env.local` and adjust as needed. The app
- defaults to the public API if the variable is missing:
-  ```env
-  NEXT_PUBLIC_API_URL=https://api.quickgig.ph
-  ```
+  defaults to the public API if the variable is missing:
+   ```env
+    NEXT_PUBLIC_API_BASE=https://api.quickgig.ph
+    ```
 
 To verify the live API locally, run:
 
@@ -46,7 +46,7 @@ npm run dev
 ## Deployment
 
 Deployment is handled via the Vercel GitHub integration. Ensure the
-`NEXT_PUBLIC_API_URL` environment variable is set in your Vercel project
+  `NEXT_PUBLIC_API_BASE` environment variable is set in your Vercel project
 settings.
 
 Login, signup, and other protected pages call the external API at
@@ -62,10 +62,10 @@ Login, signup, and other protected pages call the external API at
 
 ### Smoke checks
 
-The app defaults to the public API if `NEXT_PUBLIC_API_URL` is unset:
+  The app defaults to the public API if `NEXT_PUBLIC_API_BASE` is unset:
 
 ```env
-NEXT_PUBLIC_API_URL=https://api.quickgig.ph
+  NEXT_PUBLIC_API_BASE=https://api.quickgig.ph
 ```
 
 Verify the production root and API:
@@ -93,7 +93,7 @@ This repo hosts the Next.js frontend for QuickGig.
 - `/` serves the app directly. Legacy `/app` paths redirect to `/`.
 
 ## Environment
-- `NEXT_PUBLIC_API_URL=https://api.quickgig.ph`
+  - `NEXT_PUBLIC_API_BASE=https://api.quickgig.ph`
 
 ## Cookies & Auth
 The API sets a session cookie (e.g., `qg_session`) with:
