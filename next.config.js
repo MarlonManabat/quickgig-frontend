@@ -1,15 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '',
   async redirects() {
     return [
-      // Catch legacy /app paths and send them to the root app
-      { source: '/app', destination: '/', permanent: true },
-      { source: '/app/:path*', destination: '/:path*', permanent: true },
+      {
+        source: '/:path*',
+        destination: 'https://app.quickgig.ph/:path*',
+        permanent: true, // use 308 on Vercel
+      },
     ];
-  },
-  async rewrites() {
-    return [];
   },
 };
 
