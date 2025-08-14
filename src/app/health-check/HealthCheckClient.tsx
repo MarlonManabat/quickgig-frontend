@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { runHealthChecks, type HealthResult } from '@/lib/health';
 
+type Status = 'loading' | 'ok' | 'error';
+
 export default function HealthCheckClient({
   serverResults,
 }: {
@@ -11,11 +13,24 @@ export default function HealthCheckClient({
   const [clientResults, setClientResults] = useState<HealthResult[] | null>(
     null,
   );
+  const [appStatus, setAppStatus] = useState<Status>('loading');
 
   useEffect(() => {
     runHealthChecks()
       .then(setClientResults)
       .catch(() => setClientResults([]));
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    fetch('/app', { method: 'HEAD', signal: controller.signal })
+      .then((res) =>
+        setAppStatus(res.status >= 200 && res.status < 400 ? 'ok' : 'error'),
+      )
+      .catch(() => setAppStatus('error'))
+      .finally(() => clearTimeout(timeout));
+    return () => controller.abort();
   }, []);
 
   const paths = serverResults.map((r) => r.path);
@@ -38,6 +53,19 @@ export default function HealthCheckClient({
 
   return (
     <div className="space-y-4">
+      <div>
+        {appStatus === 'loading' ? (
+          <span className="text-sm text-gray-500">Checking APP…</span>
+        ) : (
+          <span
+            className={`px-2 py-1 text-white text-xs rounded ${
+              appStatus === 'ok' ? 'bg-green-600' : 'bg-red-600'
+            }`}
+          >
+            APP: {appStatus === 'ok' ? 'OK' : 'ERROR'}
+          </span>
+        )}
+      </div>
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="text-left border-b">

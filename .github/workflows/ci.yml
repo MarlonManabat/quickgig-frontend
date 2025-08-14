@@ -22,6 +22,22 @@ jobs:
       - name: Check App (soft)
         run: npm run check:app || true
         if: github.event_name == 'pull_request'
+      - name: Smoke preview
+        if: github.event_name == 'pull_request' && env.previewUrl
+        env:
+          previewUrl: ${{ env.previewUrl }}
+        run: |
+          set -e
+          code_root=$(curl -sS -o /dev/null -w "%{http_code}" -I "$previewUrl/")
+          if [ "$code_root" != "307" ]; then
+            echo "Expected 307 from /, got $code_root"
+            exit 1
+          fi
+          code_app=$(curl -sS -o /dev/null -w "%{http_code}" -I "$previewUrl/app")
+          case "$code_app" in
+            2*|3*) ;;
+            *) echo "Unexpected /app status $code_app"; exit 1 ;;
+          esac
       - name: Check API
         run: BASE=https://api.quickgig.ph npm run check:api
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

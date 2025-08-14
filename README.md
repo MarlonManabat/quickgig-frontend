@@ -45,6 +45,14 @@ settings.
 Login, signup, and other protected pages call the external API at
 `https://api.quickgig.ph`; this Next.js app does not provide any API routes.
 
+### Option A behavior
+
+* The main site `/` redirects to `/app`, which proxies `https://app.quickgig.ph`.
+* `/health-check` remains available for diagnostics.
+* If login via `/app` has cookie issues, set API/app cookies with:
+  `Domain=.quickgig.ph; Path=/; Secure; HttpOnly; SameSite=None`.
+* Direct usage of [https://app.quickgig.ph](https://app.quickgig.ph) still works.
+
 ### Smoke checks
 
 The app defaults to the public API if `NEXT_PUBLIC_API_URL` is unset:
