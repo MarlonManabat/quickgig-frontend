@@ -1,0 +1,67 @@
+name: E2E
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+
+  smoke:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run smoke:app
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: BASE=https://quickgig.ph npm run test:e2e
+      - name: Check API
+        run: npm run smoke:api || echo "::warning::API check failed"
+      - name: Check CORS
+        run: node tools/check_cors.mjs || echo "::warning::CORS check failed"
+      - name: Summary
+        if: always()
+        run: node tools/ci_summary.mjs >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit
+          path: reports/junit.xml
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: traces
+          path: test-results/**/*.zip

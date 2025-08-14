@@ -1,13 +1,23 @@
+import fs from 'fs';
+
 const api = (process.env.API || 'https://api.quickgig.ph').replace(/\/$/, '');
-const pageOrigin = (process.env.PAGE_ORIGIN || 'https://quickgig.ph');
+fs.mkdirSync('reports', { recursive: true });
 
 (async () => {
-  const r = await fetch(api + '/health.php', { method: 'GET' });
-  if (!r.ok) throw new Error(`API health ${r.status}`);
-  // If server includes CORS on GET, ensure it's sane (some hosts only add it on actual CORS requests; tolerate absence)
-  const allowOrigin = r.headers.get('access-control-allow-origin');
-  if (allowOrigin && allowOrigin !== pageOrigin) {
-    throw new Error(`CORS allow-origin mismatch: got "${allowOrigin}" expected "${pageOrigin}"`);
+  const url = api + '/health.php';
+  const r = await fetch(url, { method: 'GET' });
+  const status = r.status;
+  let body = {};
+  try {
+    body = await r.json();
+  } catch (e) {
+    throw new Error(`Invalid JSON from API (${status})`);
   }
+  console.log(body);
+  if (status !== 200 || body.status !== 'ok') {
+    fs.writeFileSync('reports/api.json', JSON.stringify({ status: 'fail', code: status, body }));
+    throw new Error(`API health check failed (${status})`);
+  }
+  fs.writeFileSync('reports/api.json', JSON.stringify({ status: 'ok', code: status, body }));
   console.log('API OK');
 })();
