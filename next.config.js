@@ -5,45 +5,26 @@ const nextConfig = {
   },
   async rewrites() {
     return [
-      // Existing proxy for the HTML itself
+      // HTML proxy for the product under /app
       { source: '/app/:path*', destination: 'https://app.quickgig.ph/:path*' },
 
-      // --- Asset proxies (only when coming from /app) ---
-      {
-        source: '/_next/:path*',
-        has: [{ type: 'header', key: 'referer', value: '.*\\/app.*' }],
-        destination: 'https://app.quickgig.ph/_next/:path*',
-      },
-      {
-        source: '/assets/:path*',
-        has: [{ type: 'header', key: 'referer', value: '.*\\/app.*' }],
-        destination: 'https://app.quickgig.ph/assets/:path*',
-      },
-      {
-        source: '/static/:path*',
-        has: [{ type: 'header', key: 'referer', value: '.*\\/app.*' }],
-        destination: 'https://app.quickgig.ph/static/:path*',
-      },
-      {
-        source: '/images/:path*',
-        has: [{ type: 'header', key: 'referer', value: '.*\\/app.*' }],
-        destination: 'https://app.quickgig.ph/images/:path*',
-      },
-      {
-        source: '/fonts/:path*',
-        has: [{ type: 'header', key: 'referer', value: '.*\\/app.*' }],
-        destination: 'https://app.quickgig.ph/fonts/:path*',
-      },
-      {
-        source: '/favicon.ico',
-        has: [{ type: 'header', key: 'referer', value: '.*\\/app.*' }],
-        destination: 'https://app.quickgig.ph/favicon.ico',
-      },
-      {
-        source: '/manifest.json',
-        has: [{ type: 'header', key: 'referer', value: '.*\\/app.*' }],
-        destination: 'https://app.quickgig.ph/manifest.json',
-      },
+      // ==== GLOBAL ASSET PROXY (UNCONDITIONAL) ====
+      // Next/SPA assets
+      { source: '/_next/:path*', destination: 'https://app.quickgig.ph/_next/:path*' },
+      // Common static buckets used by the app
+      { source: '/assets/:path*', destination: 'https://app.quickgig.ph/assets/:path*' },
+      { source: '/static/:path*', destination: 'https://app.quickgig.ph/static/:path*' },
+      { source: '/images/:path*', destination: 'https://app.quickgig.ph/images/:path*' },
+      { source: '/img/:path*',    destination: 'https://app.quickgig.ph/img/:path*' },
+      { source: '/fonts/:path*',  destination: 'https://app.quickgig.ph/fonts/:path*' },
+      { source: '/media/:path*',  destination: 'https://app.quickgig.ph/media/:path*' },
+      { source: '/uploads/:path*',destination: 'https://app.quickgig.ph/uploads/:path*' },
+      // Root assets / meta
+      { source: '/favicon.ico',      destination: 'https://app.quickgig.ph/favicon.ico' },
+      { source: '/manifest.json',    destination: 'https://app.quickgig.ph/manifest.json' },
+      { source: '/site.webmanifest', destination: 'https://app.quickgig.ph/site.webmanifest' },
+      { source: '/robots.txt',       destination: 'https://app.quickgig.ph/robots.txt' },
+      { source: '/sitemap.xml',      destination: 'https://app.quickgig.ph/sitemap.xml' },
     ];
   },
   eslint: { ignoreDuringBuilds: false },
