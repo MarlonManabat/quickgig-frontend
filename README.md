@@ -9,10 +9,16 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
    npm install
    ```
 2. Copy `.env.example` to `.env.local` and adjust as needed. The app
-   defaults to the public API if the variable is missing:
-   ```env
-   NEXT_PUBLIC_API_URL=https://api.quickgig.ph
-   ```
+ defaults to the public API if the variable is missing:
+  ```env
+  NEXT_PUBLIC_API_URL=https://api.quickgig.ph
+  ```
+
+To verify the live API locally, run:
+
+```bash
+BASE=https://api.quickgig.ph node tools/check_live_api.mjs
+```
 
 ## Authentication
 

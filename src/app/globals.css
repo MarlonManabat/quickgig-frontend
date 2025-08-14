@@ -6,12 +6,18 @@
 @import '../styles/design-system.css';
 
 :root {
-  --color-primary: #7C3AED; /* TODO: replace with real primary from app.quickgig.ph */
-  --color-secondary: #0EA5E9; /* TODO: replace with real secondary from app.quickgig.ph */
-  --bg: #0B0B0F; /* TODO: replace with real background from app.quickgig.ph */
-  --fg: #F5F7FA; /* TODO: replace with real foreground from app.quickgig.ph */
+  --color-primary: #0B3C49;
+  --color-secondary: #FFD451;
+  --bg: #0C1720;
+  --fg: #F8FAFC;
+  --hero-start: #0B3C49;
+  --hero-end: #0C1720;
   --background: var(--bg);
   --foreground: var(--fg);
+}
+
+.hero {
+  background: linear-gradient(180deg, var(--hero-start) 0%, var(--hero-end) 100%);
 }
 
 /* Base styles with QuickGig branding */
@@ -32,7 +38,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: var(--qg-leading-tight);
 }
 
-h1 { font-size: var(--qg-text-5xl); font-weight: var(--qg-font-extrabold); }
+h1 { font-size: var(--qg-text-6xl); font-weight: var(--qg-font-extrabold); }
 h2 { font-size: var(--qg-text-4xl); font-weight: var(--qg-font-bold); }
 h3 { font-size: var(--qg-text-3xl); font-weight: var(--qg-font-bold); }
 h4 { font-size: var(--qg-text-2xl); font-weight: var(--qg-font-semibold); }

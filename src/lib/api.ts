@@ -9,7 +9,7 @@ let cachedBase: string | undefined;
 export function getApiBase(): string {
   if (!cachedBase)
     cachedBase =
-      process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph';
+      process.env.NEXT_PUBLIC_API_URL ?? 'https://api.quickgig.ph';
   return cachedBase;
 }
 
@@ -25,21 +25,52 @@ export async function safeFetch(
   const timeout = setTimeout(() => controller.abort(), 5000);
   try {
     const res = await fetch(`${getApiBase()}${path}`, {
+      mode: 'cors',
       ...init,
       signal: controller.signal,
     });
     const body = await res.text();
     return { ok: res.ok, status: res.status, body };
   } catch (err) {
-    return {
-      ok: false,
-      status: 0,
-      body: '',
-      error: err instanceof Error ? err.message : String(err),
-    };
+    const error = err instanceof Error ? err.message : String(err);
+    console.error('safeFetch error:', error);
+    return { ok: false, status: 0, body: '', error };
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export interface HealthResponse {
+  ok: boolean;
+  status: number;
+  body: string;
+  path: string;
+  latency: number;
+  error?: string;
+}
+
+/**
+ * Try /health then /health.php. Returns the first successful result
+ * or the final failure.
+ */
+export async function checkHealth(): Promise<HealthResponse> {
+  const paths = ['/health', '/health.php'];
+  for (const path of paths) {
+    const start = Date.now();
+    const res = await safeFetch(path);
+    const latency = Date.now() - start;
+    const parsed = safeJsonParse<{ status?: string }>(res.body);
+    const ok =
+      res.ok &&
+      parsed.ok &&
+      parsed.value?.status &&
+      String(parsed.value.status).toLowerCase() === 'ok';
+    if (ok) return { ...res, path, latency };
+    if (res.error) console.error(`Health check ${path} error:`, res.error);
+    if (!parsed.ok)
+      console.error(`Health check ${path} parse error:`, parsed.error);
+  }
+  return { ok: false, status: 0, body: '', path: '/health.php', latency: 0, error: 'Health check failed' };
 }
 
 /**

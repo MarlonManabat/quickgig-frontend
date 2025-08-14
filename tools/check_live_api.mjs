@@ -4,11 +4,6 @@
 const BASE = process.env.BASE || process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph';
 const TIMEOUT = 10000;
 
-const endpoints = [
-  { path: '/', expect: { key: 'message', value: 'QuickGig API' } },
-  { path: '/health', expect: { key: 'status', value: 'ok' } },
-];
-
 function trim(str) {
   return str.length > 60 ? str.slice(0, 60) + '…' : str;
 }
@@ -23,8 +18,8 @@ async function fetchWithTimeout(url) {
   }
 }
 
-async function check(ep) {
-  const url = `${BASE}${ep.path}`;
+async function check(path, expect) {
+  const url = `${BASE}${path}`;
   let status = 0;
   let body = '';
   let pass = false;
@@ -33,16 +28,22 @@ async function check(ep) {
     status = res.status;
     body = await res.text();
     const json = (() => { try { return JSON.parse(body); } catch { return null; } })();
-    pass = res.ok && json && json[ep.expect.key] === ep.expect.value;
+    pass = res.ok && json && json[expect.key] === expect.value;
   } catch (err) {
     body = String(err.message || err);
   }
-  return { path: ep.path, status, pass, body: trim(body) };
+  return { path, status, pass, body: trim(body) };
 }
 
 (async () => {
   const rows = [];
-  for (const ep of endpoints) rows.push(await check(ep));
+  // Root check
+  rows.push(await check('/', { key: 'message', value: 'QuickGig API' }));
+
+  // Health check with fallback
+  let health = await check('/health', { key: 'status', value: 'ok' });
+  if (!health.pass) health = await check('/health.php', { key: 'status', value: 'ok' });
+  rows.push(health);
 
   console.log('Endpoint | Code | Result | Body');
   for (const r of rows) {

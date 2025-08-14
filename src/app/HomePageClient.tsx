@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Briefcase, MousePointerClick, Shield } from 'lucide-react';
-import { safeFetch } from '@/lib/api';
+import { checkHealth } from '@/lib/api';
 
 type ApiStatus = 'loading' | 'ok' | 'error';
 
@@ -13,18 +13,12 @@ export default function HomePageClient() {
   const [status, setStatus] = useState<ApiStatus>('loading');
 
   useEffect(() => {
-    async function check() {
-      try {
-        const res = await safeFetch('/health');
-        if (!res.ok) throw new Error(String(res.status));
-        const data = JSON.parse(res.body);
-        if (data?.status === 'ok' || data?.message === 'QuickGig API') setStatus('ok');
-        else setStatus('error');
-      } catch {
+    checkHealth()
+      .then((res) => setStatus(res.ok ? 'ok' : 'error'))
+      .catch((err) => {
+        console.error(err);
         setStatus('error');
-      }
-    }
-    check();
+      });
   }, []);
 
   const features = [
@@ -35,9 +29,9 @@ export default function HomePageClient() {
 
   return (
     <div>
-      <section className="bg-gradient-to-br from-primary via-primary to-secondary text-fg">
+      <section className="hero text-fg">
         <div className="qg-container text-center py-24">
-          <h1 className="font-heading text-5xl font-bold mb-4">QuickGig</h1>
+          <h1 className="font-heading text-6xl font-bold mb-4">QuickGig</h1>
           <p className="font-body text-xl mb-8 text-fg opacity-90">
             Gigs and talent, matched fast.
           </p>
