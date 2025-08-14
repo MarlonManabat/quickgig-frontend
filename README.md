@@ -22,7 +22,8 @@ Tokens are managed through `/src/lib/auth.ts`, and basic route protection is ava
 
 ## Development
 
-Run the development server and visit
+Run the development server and visit the branded home page at
+[http://localhost:3000/](http://localhost:3000/) or the health page at
 [http://localhost:3000/health-check](http://localhost:3000/health-check):
 
 ```bash
@@ -38,20 +39,17 @@ settings.
 Login, signup, and other protected pages call the external API at
 `https://api.quickgig.ph`; this Next.js app does not provide any API routes.
 
-### Health check
+### Smoke checks
 
-Production API base:
+The app defaults to the public API if `NEXT_PUBLIC_API_URL` is unset:
 
-```bash
+```env
 NEXT_PUBLIC_API_URL=https://api.quickgig.ph
 ```
 
-Smoke test the live API:
+Verify the production app and API:
 
 ```bash
+npm run check:app
 BASE=https://api.quickgig.ph npm run check:api
 ```
-
-Preview the UI health page at `/health-check`.
-
-CI uses the soft variant (`npm run check:api:soft`).
