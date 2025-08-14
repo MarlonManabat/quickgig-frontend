@@ -1,0 +1,4 @@
+{
+  "compilerOptions": { "types": ["node","@playwright/test"] },
+  "include": ["e2e/**/*.ts","tests/**/*.ts","playwright.config.ts"]
+}
