@@ -16,7 +16,9 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm run typecheck:test
       - run: npm run build
+      - run: npm run test:e2e:smoke
       - name: Verify API
         run: |
           set +e

@@ -54,6 +54,8 @@ npm run playwright:install
 BASE=https://app.quickgig.ph npm run test:e2e:smoke
 ```
 
+Set `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` in environments like Vercel to skip downloading browsers during install.
+
 ## Deployment
 
 Deployment is handled via the Vercel GitHub integration. Ensure the
