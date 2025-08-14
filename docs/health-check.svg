@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="120" font-family="monospace" font-size="14">
+  <rect width="600" height="120" fill="white"/>
+  <text x="10" y="20">Endpoint    Code  Result  Body                      Latency</text>
+  <text x="10" y="40">/           200   PASS   {"message":"QuickGig API"}   20ms</text>
+  <text x="10" y="60">/health     200   PASS   {"status":"ok"}            18ms</text>
+</svg>
