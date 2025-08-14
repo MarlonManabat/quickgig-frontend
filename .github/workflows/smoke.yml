@@ -10,11 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    env:
-      API: https://api.quickgig.ph
-      PAGE_ORIGIN: https://quickgig.ph
-      # On PRs we don't know the preview URL; skip app check unless BASE is set.
-      BASE: ${{ github.ref == 'refs/heads/main' && 'https://quickgig.ph' || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,7 +18,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Scan for stale /app links
         run: npm run scan:links
+      - name: Check domain redirects
+        run: node tools/check_redirects.mjs
       - name: Check API health
-        run: npm run check:api
-      - name: Check Root Redirect (skips if BASE not set)
-        run: node tools/check_root_redirect.mjs
+        run: node tools/check_api_health.mjs

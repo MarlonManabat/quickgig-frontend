@@ -142,3 +142,24 @@ Preflight (`OPTIONS`) should return `200`.
 * `api.quickgig.ph/health.php` JSON
 * Latest successful **Smoke** run on `main`
 
+
+## Production Domains (canonical)
+- Product: https://app.quickgig.ph  ✅
+- Root: https://quickgig.ph  → 308 to https://app.quickgig.ph
+- WWW:  https://www.quickgig.ph → 308 to https://app.quickgig.ph
+- API:  https://api.quickgig.ph
+
+### Operations
+- Verify redirects:
+  curl -I https://quickgig.ph
+  curl -I https://www.quickgig.ph
+
+- Verify product:
+  open https://app.quickgig.ph
+
+- Verify API:
+  curl -i https://api.quickgig.ph/health.php
+
+### Cookies & CORS
+- Cookies from API: Domain=.quickgig.ph; Path=/; Secure; HttpOnly; SameSite=None
+- CORS: allow https://app.quickgig.ph (and quickgig.ph if needed), with credentials.
