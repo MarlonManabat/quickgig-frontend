@@ -15,11 +15,13 @@ async function get(u, o) {
 (async () => {
   // HEAD /
   const head = await get(base + '/', { method: 'HEAD' });
-  if (![301,302,307,308].includes(head.status)) throw new Error(`HEAD / expected redirect, got ${head.status}`);
+  if (head.status < 200 || head.status >= 400) throw new Error(`HEAD / expected 2xx; got ${head.status}`);
 
-  // GET /app
-  const app = await get(base + '/app', { method: 'GET' });
-  if (app.status < 200 || app.status >= 400) throw new Error(`GET /app expected 2xx/3xx; got ${app.status}`);
+  // HEAD /app should redirect to root
+  const app = await get(base + '/app', { method: 'HEAD' });
+  if (![301,302,307,308].includes(app.status)) throw new Error(`HEAD /app expected redirect; got ${app.status}`);
+  const loc = app.headers.get('location') || '';
+  if (loc !== '/' && loc !== base + '/') throw new Error(`Redirect location not root: ${loc}`);
 
   console.log('App OK');
 })();

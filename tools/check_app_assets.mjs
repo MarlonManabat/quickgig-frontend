@@ -17,8 +17,8 @@ function pickAssets(html) {
 }
 
 (async () => {
-  const page = await fetchImpl(base + '/app', { redirect: 'manual' });
-  if (page.status < 200 || page.status >= 400) throw new Error(`GET /app ${page.status}`);
+  const page = await fetchImpl(base + '/', { redirect: 'manual' });
+  if (page.status < 200 || page.status >= 400) throw new Error(`GET / ${page.status}`);
   const html = await page.text();
   const assets = pickAssets(html);
 

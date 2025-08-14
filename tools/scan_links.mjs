@@ -9,17 +9,22 @@ const globs = [
 
 function grep(pattern) {
   try {
-    const out = execSync(`grep -RIl --line-number --fixed-strings "${pattern}" ${globs}`, { stdio: ['ignore','pipe','ignore'] }).toString().trim();
+    const out = execSync(`grep -RIl --line-number --fixed-strings "${pattern}" ${globs}`, {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .toString()
+      .trim();
     return out;
   } catch (e) {
-    return ''; // not found
+    return '';
   }
 }
 
-// Fail if any UI still links to /app (same-origin), we want the canonical full host
-const leftovers = grep('href="/app') || grep("href='/app");
+// Fail if any UI still links to legacy app domain or /app paths
+const leftovers =
+  grep('https://app.quickgig.ph') || grep('href="/app') || grep("href='/app");
 if (leftovers) {
-  console.error('Found stale /app links in UI (should be https://app.quickgig.ph):\n' + leftovers);
+  console.error('Found stale app.quickgig.ph or /app links in UI:\n' + leftovers);
   process.exit(1);
 }
-console.log('Scan OK: no stale /app links.');
+console.log('Scan OK: no stale app links.');

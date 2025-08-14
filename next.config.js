@@ -1,15 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: '',
   async redirects() {
     return [
-      // Canonicalize root to the live product
-      { source: '/', destination: 'https://app.quickgig.ph', permanent: true },
-      // Safety: also catch any lingering /app usages
-      { source: '/app/:path*', destination: 'https://app.quickgig.ph/:path*', permanent: true },
-      { source: '/app', destination: 'https://app.quickgig.ph', permanent: true },
+      // Catch legacy /app paths and send them to the root app
+      { source: '/app', destination: '/', permanent: true },
+      { source: '/app/:path*', destination: '/:path*', permanent: true },
     ];
   },
-  // No rewrites needed anymore.
-  async rewrites() { return []; },
+  async rewrites() {
+    return [];
+  },
 };
+
 module.exports = nextConfig;

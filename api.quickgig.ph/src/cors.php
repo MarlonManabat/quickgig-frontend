@@ -1,7 +1,7 @@
 <?php
 function cors() {
   $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-  $allowed = ['https://quickgig.ph', 'https://app.quickgig.ph'];
+  $allowed = ['https://quickgig.ph', 'https://www.quickgig.ph', 'https://app.quickgig.ph'];
   if (in_array($origin, $allowed, true)) {
     header("Access-Control-Allow-Origin: $origin");
   }
