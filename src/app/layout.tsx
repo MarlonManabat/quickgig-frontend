@@ -81,7 +81,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="font-body antialiased bg-white text-gray-700">
+      <body className="font-body antialiased bg-bg text-fg">
         <AuthProvider>
           <SocketProvider>
             <Navigation />
@@ -94,24 +94,24 @@ export default function RootLayout({
                   <div className="col-span-1 md:col-span-2">
                     {/* eslint-disable-next-line @next/next/no-img-element -- logo placeholder */}
                     <img src="/logo-horizontal.png" alt="QuickGig.ph" className="h-8 mb-4" />
-                    <p className="text-gray-300 mb-4">
+                    <p className="text-fg opacity-70 mb-4">
                       Ang pinakamabilis na paraan para makahanap ng trabaho at talent sa Pilipinas.
                     </p>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-fg opacity-60">
                       © 2024 QuickGig.ph. All rights reserved.
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-white mb-4">Para sa Freelancers</h3>
-                    <ul className="space-y-2 text-gray-300">
+                    <h3 className="font-heading font-semibold text-fg mb-4">Para sa Freelancers</h3>
+                    <ul className="space-y-2 text-fg opacity-70">
                       <li><a href="/find-work" className="hover:text-qg-accent transition-colors">Find Work</a></li>
                       <li><a href="/profile" className="hover:text-qg-accent transition-colors">Profile</a></li>
                       <li><a href="/my-jobs" className="hover:text-qg-accent transition-colors">My Jobs</a></li>
                     </ul>
                   </div>
                   <div>
-                    <h3 className="font-heading font-semibold text-white mb-4">Para sa Employers</h3>
-                    <ul className="space-y-2 text-gray-300">
+                    <h3 className="font-heading font-semibold text-fg mb-4">Para sa Employers</h3>
+                    <ul className="space-y-2 text-fg opacity-70">
                       <li><a href="/post-job" className="hover:text-qg-accent transition-colors">Post Job</a></li>
                       <li><a href="/buy-tickets" className="hover:text-qg-accent transition-colors">Buy Tickets</a></li>
                       <li><a href="/messages" className="hover:text-qg-accent transition-colors">Messages</a></li>

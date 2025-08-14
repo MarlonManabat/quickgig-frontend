@@ -1,10 +1,12 @@
-export const metadata = {
+import type { Metadata } from 'next';
+import HomePageClient from './_components/HomePageClient';
+
+export const metadata: Metadata = {
   title: 'QuickGig',
   description: 'Gigs and talent, matched fast.',
 };
-import HomeHeroClient from './_components/HomeHeroClient';
 
-export default function HomePage() {
-  return <HomeHeroClient />;
+export default async function Page() {
+  return <HomePageClient />;
 }
 

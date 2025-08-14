@@ -9,7 +9,7 @@ import { safeFetch } from '@/lib/api';
 
 type ApiStatus = 'loading' | 'ok' | 'error';
 
-export default function HomeHeroClient() {
+export default function HomePageClient() {
   const [status, setStatus] = useState<ApiStatus>('loading');
 
   useEffect(() => {
@@ -35,10 +35,10 @@ export default function HomeHeroClient() {
 
   return (
     <div>
-      <section className="bg-gradient-to-br from-primary via-primary to-secondary text-white">
+      <section className="bg-gradient-to-br from-primary via-primary to-secondary text-fg">
         <div className="qg-container text-center py-24">
           <h1 className="font-heading text-5xl font-bold mb-4">QuickGig</h1>
-          <p className="font-body text-xl mb-8 text-white/90">
+          <p className="font-body text-xl mb-8 text-fg opacity-90">
             Gigs and talent, matched fast.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -55,7 +55,7 @@ export default function HomeHeroClient() {
               <Button
                 size="lg"
                 variant="outline"
-                className="text-lg border-white text-white hover:bg-white hover:text-primary"
+                className="text-lg border-fg text-fg hover:bg-fg hover:text-bg"
               >
                 Health check
               </Button>
@@ -64,14 +64,14 @@ export default function HomeHeroClient() {
         </div>
       </section>
 
-      <div className="bg-gray-100">
+      <div className="bg-bg">
         <div className="qg-container py-2 flex justify-center">
           {status === 'loading' ? (
-            <span className="text-sm text-gray-600">Checking API…</span>
+            <span className="text-sm text-fg opacity-80">Checking API…</span>
           ) : (
             <span
-              className={`px-3 py-1 rounded-full text-sm font-medium text-white ${
-                status === 'ok' ? 'bg-green-600' : 'bg-red-600'
+              className={`px-3 py-1 rounded-full text-sm font-medium text-fg ${
+                status === 'ok' ? 'bg-primary' : 'bg-red-600'
               }`}
             >
               API: {status === 'ok' ? 'OK' : 'ERROR'}
