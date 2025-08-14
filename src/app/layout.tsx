@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { SocketProvider } from "../context/SocketContext";
@@ -104,17 +105,29 @@ export default function RootLayout({
                   <div>
                     <h3 className="font-heading font-semibold text-fg mb-4">Para sa Freelancers</h3>
                     <ul className="space-y-2 text-fg opacity-70">
-                      <li><a href="/find-work" className="hover:text-qg-accent transition-colors">Find Work</a></li>
-                      <li><a href="/profile" className="hover:text-qg-accent transition-colors">Profile</a></li>
-                      <li><a href="/my-jobs" className="hover:text-qg-accent transition-colors">My Jobs</a></li>
+                      <li>
+                        <Link href="/find-work" className="hover:text-qg-accent transition-colors">Find Work</Link>
+                      </li>
+                      <li>
+                        <Link href="/profile" className="hover:text-qg-accent transition-colors">Profile</Link>
+                      </li>
+                      <li>
+                        <Link href="/my-jobs" className="hover:text-qg-accent transition-colors">My Jobs</Link>
+                      </li>
                     </ul>
                   </div>
                   <div>
                     <h3 className="font-heading font-semibold text-fg mb-4">Para sa Employers</h3>
                     <ul className="space-y-2 text-fg opacity-70">
-                      <li><a href="/post-job" className="hover:text-qg-accent transition-colors">Post Job</a></li>
-                      <li><a href="/buy-tickets" className="hover:text-qg-accent transition-colors">Buy Tickets</a></li>
-                      <li><a href="/messages" className="hover:text-qg-accent transition-colors">Messages</a></li>
+                      <li>
+                        <Link href="/post-job" className="hover:text-qg-accent transition-colors">Post Job</Link>
+                      </li>
+                      <li>
+                        <Link href="/buy-tickets" className="hover:text-qg-accent transition-colors">Buy Tickets</Link>
+                      </li>
+                      <li>
+                        <Link href="/messages" className="hover:text-qg-accent transition-colors">Messages</Link>
+                      </li>
                     </ul>
                   </div>
                 </div>
