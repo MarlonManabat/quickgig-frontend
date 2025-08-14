@@ -1,4 +1,4 @@
-import { safeFetch } from './api';
+import { safeFetch, checkHealth } from './api';
 import { safeJsonParse } from './json';
 
 export interface HealthResult {
@@ -12,42 +12,45 @@ export interface HealthResult {
 
 /** Run health checks against the QuickGig API. */
 export async function runHealthChecks(): Promise<HealthResult[]> {
-  const endpoints = [
-    { path: '/', expect: { key: 'message', value: 'QuickGig API' } },
-    { path: '/health', expect: { key: 'status', value: 'ok' } },
-  ];
-
   const results: HealthResult[] = [];
-  for (const ep of endpoints) {
-    const start = Date.now();
-    const res = await safeFetch(ep.path);
-    const latency = Date.now() - start;
-    const parsed = safeJsonParse<Record<string, unknown>>(res.body);
-    const pass =
-      res.ok &&
-      parsed.ok &&
-      parsed.value &&
-      parsed.value[ep.expect.key] === ep.expect.value;
 
-    let hint: string | undefined;
-    if (!pass) {
-      if (res.status === 404 && ep.path === '/health')
-        hint = 'Ensure health.php exists at api docroot';
-      else if (res.status === 403)
-        hint = 'Check Hostinger .htaccess or WAF rule; DirectoryIndex and RewriteEngine Off';
-      else if (res.status === 500)
-        hint = 'Check PHP extensions nd_mysqli / nd_pdo_mysql and DB creds (if used)';
-    }
+  // Root check
+  const rootStart = Date.now();
+  const rootRes = await safeFetch('/');
+  const rootLatency = Date.now() - rootStart;
+  const rootParsed = safeJsonParse<Record<string, unknown>>(rootRes.body);
+  const rootPass =
+    rootRes.ok &&
+    rootParsed.ok &&
+    rootParsed.value &&
+    rootParsed.value['message'] === 'QuickGig API';
+  results.push({
+    path: '/',
+    status: rootRes.status,
+    pass: rootPass,
+    body: rootRes.body.trim().slice(0, 200),
+    latency: rootLatency,
+  });
 
-    results.push({
-      path: ep.path,
-      status: res.status,
-      pass,
-      body: res.body.trim().slice(0, 200),
-      latency,
-      hint,
-    });
+  // Health check with fallback
+  const health = await checkHealth();
+  let hint: string | undefined;
+  if (!health.ok) {
+    if (health.status === 404 && health.path === '/health')
+      hint = 'Ensure health.php exists at api docroot';
+    else if (health.status === 403)
+      hint = 'Check Hostinger .htaccess or WAF rule; DirectoryIndex and RewriteEngine Off';
+    else if (health.status === 500)
+      hint = 'Check PHP extensions nd_mysqli / nd_pdo_mysql and DB creds (if used)';
   }
+  results.push({
+    path: health.path,
+    status: health.status,
+    pass: health.ok,
+    body: health.body.trim().slice(0, 200),
+    latency: health.latency,
+    hint,
+  });
 
   return results;
 }

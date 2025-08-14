@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import HomePageClient from './_components/HomePageClient';
+import HomePageClient from './HomePageClient';
 
 export const metadata: Metadata = {
   title: 'QuickGig',

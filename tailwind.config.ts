@@ -43,8 +43,8 @@ const config: Config = {
         info: '#3B82F6',
       },
       fontFamily: {
-        heading: ['Montserrat', 'sans-serif'],
-        body: ['Open Sans', 'sans-serif'],
+        heading: ['DM Sans', 'sans-serif'],
+        body: ['DM Sans', 'sans-serif'],
       },
       fontSize: {
         'qg-xs': '0.75rem',
