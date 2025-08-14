@@ -21,6 +21,8 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci --ignore-scripts
+      - name: Scan for hardcoded app subdomain
+        run: npm run scan:appdomain
       - name: Check API health
         run: npm run check:api
       - name: Check App (skips if BASE not set)
