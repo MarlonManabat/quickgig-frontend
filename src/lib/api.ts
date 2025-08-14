@@ -1,4 +1,5 @@
 import { safeJsonParse } from './json';
+import type { Job } from '../../types/jobs';
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE || 'https://api.quickgig.ph';
@@ -93,5 +94,9 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   const json = safeJsonParse<T>(res.body);
   if (!json.ok) throw json.error;
   return json.value as T;
+}
+
+export async function fetchJobs(): Promise<Job[]> {
+  return apiFetch<Job[]>('/jobs');
 }
 

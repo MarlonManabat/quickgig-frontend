@@ -15,6 +15,7 @@
     "check:appassets": "node tools/check_app_assets.mjs",
     "check:app:soft": "node tools/check_live_app.mjs || true",
     "check:dns:app": "node tools/check_dns_app.mjs",
+    "check:jobs": "node tools/check_jobs_api.mjs || true",
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
