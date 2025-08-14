@@ -59,6 +59,14 @@ try {
     $u = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$u || !password_verify($pass, $u['password_hash'])) return json_bad('Invalid credentials', 401);
     $token = jwt_sign(['uid' => (int)$u['id'], 'iat'=>time(), 'exp'=>time()+60*60*24*7]); // 7d
+    setcookie('qg_session', $token, [
+      'expires' => time() + 60*60*24*30,
+      'path' => '/',
+      'domain' => '.quickgig.ph',
+      'secure' => true,
+      'httponly' => true,
+      'samesite' => 'None',
+    ]);
     return json_ok(['token'=>$token]);
   }
 
