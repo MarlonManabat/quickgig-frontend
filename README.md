@@ -67,3 +67,7 @@ Verify the production app and API:
 npm run check:app
 BASE=https://api.quickgig.ph npm run check:api
 ```
+
+## Production routing
+- quickgig.ph/ redirects to /app
+- /app/* proxies https://app.quickgig.ph/*
