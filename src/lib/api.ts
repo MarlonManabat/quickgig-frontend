@@ -27,6 +27,7 @@ export async function safeFetch(
     const res = await fetch(`${getApiBase()}${path}`, {
       mode: 'cors',
       ...init,
+      credentials: 'include',
       signal: controller.signal,
     });
     const body = await res.text();
