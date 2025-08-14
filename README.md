@@ -44,6 +44,16 @@ Run the development server and visit the branded home page at
 npm run dev
 ```
 
+## E2E Smoke Tests
+
+To run the Playwright smoke suite locally against the live app:
+
+```bash
+npm i
+npm run playwright:install
+BASE=https://app.quickgig.ph npm run test:e2e:smoke
+```
+
 ## Deployment
 
 Deployment is handled via the Vercel GitHub integration. Ensure the
