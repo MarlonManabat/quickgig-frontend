@@ -71,3 +71,77 @@ BASE=https://api.quickgig.ph npm run check:api
 ## Production routing
 - quickgig.ph/ redirects to /app
 - /app/* proxies https://app.quickgig.ph/*
+
+# QuickGig Frontend – Production Runbook
+
+This repo hosts the Next.js frontend for QuickGig.
+
+## Domains
+- **Root (Vercel):** `https://quickgig.ph`
+- **Product path:** `https://quickgig.ph/app` *(proxied from `https://app.quickgig.ph` via Next.js rewrites)*
+- **Legacy app (preserved):** `https://app.quickgig.ph`
+- **API (PHP on Hostinger):** `https://api.quickgig.ph`
+
+## Routing
+- `/` **redirects** to `/app` (permanent).
+- `/app/*` is **proxied** to `https://app.quickgig.ph/*` by `next.config.js` rewrites.
+- Deep links and nav CTAs must point to `/app` (same-origin). CI has a scan that fails if `https://app.quickgig.ph` is hardcoded in UI.
+
+## Environment
+- `NEXT_PUBLIC_API_URL=https://api.quickgig.ph`
+
+## Cookies & Auth
+The API sets a session cookie (e.g., `qg_session`) with:
+- `Domain=.quickgig.ph`
+- `Path=/`
+- `Secure; HttpOnly; SameSite=None`
+- Expiry: ~30 days
+
+Frontend requests must include credentials:
+```ts
+fetch(apiUrl, { credentials: 'include' })
+```
+
+## CORS (API)
+
+Allowlist:
+
+* `https://quickgig.ph` *(and `https://app.quickgig.ph` while legacy host is preserved)*
+
+Headers:
+
+```
+Access-Control-Allow-Origin: <request origin if allowlisted>
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+```
+
+Preflight (`OPTIONS`) should return `200`.
+
+## Health & CI
+
+* **API health:** `https://api.quickgig.ph/health.php` → JSON `{ ok: true, ts: <unix> }`
+* **Smoke workflow** (`.github/workflows/smoke.yml`):
+
+  * On `main`: checks API health and that `/` redirects and `/app` loads (2xx/3xx) using `BASE=https://quickgig.ph`.
+  * On PRs: app check may skip unless `BASE` is provided.
+
+### Local/Preview Notes
+
+* Local dev: the `/app` rewrite attempts to reach `https://app.quickgig.ph`; if blocked, local `/app` may 500—this is expected and not a blocker. Validate on Vercel preview or production.
+
+## Manual Triage
+
+* Frontend: visit `https://quickgig.ph/` (should redirect to `/app`) and navigate through the product.
+* API: `https://api.quickgig.ph/health.php` in a browser.
+* DevTools → Application → Cookies: confirm `.quickgig.ph` cookie, `Secure`, `HttpOnly`, `SameSite=None`.
+
+## Screenshots / Evidence (attach in PR description)
+
+* `quickgig.ph` redirecting to `/app`
+* `/app` rendering under the **quickgig.ph** origin
+* `api.quickgig.ph/health.php` JSON
+* Latest successful **Smoke** run on `main`
+
