@@ -1,21 +1,39 @@
 'use client';
 
-import { useState } from 'react';
-import type { HealthResult } from '@/lib/health';
+import { useEffect, useState } from 'react';
+import { runHealthChecks, type HealthResult } from '@/lib/health';
 
-export default function HealthCheckClient({ initial }: { initial: HealthResult[] }) {
-  const [results, setResults] = useState(initial);
-  const [loading, setLoading] = useState(false);
+export default function HealthCheckClient({
+  serverResults,
+}: {
+  serverResults: HealthResult[];
+}) {
+  const [clientResults, setClientResults] = useState<HealthResult[] | null>(
+    null,
+  );
 
-  async function recheck() {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/health-check');
-      const data: HealthResult[] = await res.json();
-      setResults(data);
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    runHealthChecks()
+      .then(setClientResults)
+      .catch(() => setClientResults([]));
+  }, []);
+
+  const paths = serverResults.map((r) => r.path);
+
+  function renderResult(res?: HealthResult) {
+    if (!res)
+      return <span className="text-gray-500">—</span>;
+    return (
+      <div className="flex items-center space-x-2">
+        <span
+          className={`px-2 py-1 text-white text-xs rounded ${res.pass ? 'bg-green-600' : 'bg-red-600'}`}
+        >
+          {res.pass ? 'OK' : 'FAIL'}
+        </span>
+        <span className="text-xs">{res.status}</span>
+        <span className="font-mono break-all text-xs">{res.body}</span>
+      </div>
+    );
   }
 
   return (
@@ -24,44 +42,36 @@ export default function HealthCheckClient({ initial }: { initial: HealthResult[]
         <thead>
           <tr className="text-left border-b">
             <th className="p-2">Endpoint</th>
-            <th className="p-2">Code</th>
-            <th className="p-2">Result</th>
-            <th className="p-2">Body</th>
-            <th className="p-2">Latency</th>
-            <th className="p-2">Hint</th>
+            <th className="p-2">Server</th>
+            <th className="p-2">Client</th>
           </tr>
         </thead>
         <tbody>
-          {results.map((r) => (
-            <tr key={r.path} className="border-b">
-              <td className="p-2 font-mono">{r.path}</td>
-              <td className="p-2">{r.status}</td>
-              <td className="p-2">
-                {r.pass ? (
-                  <span className="text-green-600">PASS</span>
-                ) : (
-                  <span className="text-red-600">FAIL</span>
-                )}
-              </td>
-              <td className="p-2 font-mono break-all">{r.body}</td>
-              <td className="p-2">{r.latency} ms</td>
-              <td className="p-2">
-                {!r.pass && r.hint ? (
-                  <span className="bg-red-600 text-white px-2 py-1 rounded">{r.hint}</span>
-                ) : null}
-              </td>
-            </tr>
-          ))}
+          {paths.map((p) => {
+            const server = serverResults.find((r) => r.path === p);
+            const client = clientResults?.find((r) => r.path === p);
+            return (
+              <tr key={p} className="border-b">
+                <td className="p-2 font-mono">{p}</td>
+                <td className="p-2">{renderResult(server)}</td>
+                <td className="p-2">
+                  {clientResults ? renderResult(client) : '…'}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-
-      <button
-        onClick={recheck}
-        disabled={loading}
-        className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-      >
-        {loading ? 'Checking...' : 'Re-check'}
-      </button>
+      <p>
+        <a
+          href="https://api.quickgig.ph/health"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-blue-600"
+        >
+          Open API /health
+        </a>
+      </p>
     </div>
   );
 }

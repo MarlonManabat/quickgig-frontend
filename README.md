@@ -8,7 +8,8 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
    ```bash
    npm install
    ```
-2. Copy `.env.example` to `.env.local` and adjust as needed:
+2. Copy `.env.example` to `.env.local` and adjust as needed. The app
+   defaults to the public API if the variable is missing:
    ```env
    NEXT_PUBLIC_API_URL=https://api.quickgig.ph
    ```
@@ -21,7 +22,8 @@ Tokens are managed through `/src/lib/auth.ts`, and basic route protection is ava
 
 ## Development
 
-Run the development server and visit [http://localhost:3000/health-check](http://localhost:3000/health-check):
+Run the development server and visit
+[http://localhost:3000/health-check](http://localhost:3000/health-check):
 
 ```bash
 npm run dev
@@ -36,11 +38,20 @@ settings.
 Login, signup, and other protected pages call the external API at
 `https://api.quickgig.ph`; this Next.js app does not provide any API routes.
 
-### API sanity check
+### Health check
+
+Production API base:
+
+```bash
+NEXT_PUBLIC_API_URL=https://api.quickgig.ph
+```
+
 Smoke test the live API:
 
 ```bash
-npm run check:api
+BASE=https://api.quickgig.ph npm run check:api
 ```
+
+Preview the UI health page at `/health-check`.
 
 CI uses the soft variant (`npm run check:api:soft`).

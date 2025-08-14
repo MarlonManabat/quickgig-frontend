@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "check:api": "node tools/check_live_api.mjs",
     "check:api:soft": "node tools/check_live_api.mjs || true",
+    "api:check": "npm run check:api",
     "test:e2e": "playwright test"
   },
   "dependencies": {
