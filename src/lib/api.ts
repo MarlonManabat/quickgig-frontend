@@ -1,16 +1,22 @@
 import { safeJsonParse } from './json';
 
-let cachedBase: string | undefined;
+export const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE || 'https://api.quickgig.ph';
 
-/**
- * Resolve the QuickGig API base URL once. Defaults to the public
- * production API if the env variable is missing.
- */
-export function getApiBase(): string {
-  if (!cachedBase)
-    cachedBase =
-      process.env.NEXT_PUBLIC_API_URL ?? 'https://api.quickgig.ph';
-  return cachedBase;
+export function get(path: string, init?: RequestInit) {
+  return fetch(`${API_BASE}${path}`, { ...init, method: 'GET' });
+}
+
+export function post(path: string, body: unknown, init?: RequestInit) {
+  return fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(init?.headers || {}),
+    },
+    body: JSON.stringify(body),
+    ...init,
+  });
 }
 
 /**
@@ -24,7 +30,7 @@ export async function safeFetch(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
   try {
-    const res = await fetch(`${getApiBase()}${path}`, {
+    const res = await fetch(`${API_BASE}${path}`, {
       mode: 'cors',
       ...init,
       credentials: 'include',

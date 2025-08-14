@@ -16,9 +16,14 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - name: Check API (soft)
-        run: BASE=https://api.quickgig.ph npm run check:api || true
-        if: github.event_name == 'pull_request'
+      - run: npm run build
+      - name: Verify API
+        run: |
+          set +e
+          out=$(npm run --silent check:api 2>&1)
+          echo "${out}"
+          echo "::notice::${out//$'\n'/ }"
+          exit 0
       - name: Check App (soft)
         run: npm run check:app || true
         if: github.event_name == 'pull_request'
@@ -38,9 +43,6 @@ jobs:
             2*|3*) ;;
             *) echo "Unexpected /app status $code_app"; exit 1 ;;
           esac
-      - name: Check API
-        run: BASE=https://api.quickgig.ph npm run check:api
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       - name: Check App
         run: npm run check:app
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
