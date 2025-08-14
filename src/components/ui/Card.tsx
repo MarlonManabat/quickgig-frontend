@@ -39,7 +39,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'qg-card bg-white rounded-qg-lg shadow-qg-md transition-all duration-qg-normal',
+          'bg-white rounded-qg-lg shadow-qg-md transition-all duration-qg-normal',
           hover && 'hover:shadow-qg-lg hover:-translate-y-1 cursor-pointer',
           paddingClasses[padding],
           className
@@ -56,8 +56,8 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, children, variant = 'default', ...props }, ref) => {
     const variants = {
       default: 'bg-gray-50 text-gray-900',
-      primary: 'qg-card-header bg-qg-primary text-white',
-      accent: 'bg-qg-accent text-qg-navy',
+      primary: 'bg-primary text-white',
+      accent: 'bg-secondary text-fg',
     };
 
     return (
@@ -108,8 +108,8 @@ const CardTag = React.forwardRef<HTMLSpanElement, CardTagProps>(
   ({ className, children, variant = 'default', ...props }, ref) => {
     const variants = {
       default: 'bg-gray-100 text-gray-800',
-      primary: 'bg-qg-primary text-white',
-      accent: 'qg-card-tag bg-qg-accent text-qg-navy',
+      primary: 'bg-primary text-white',
+      accent: 'bg-secondary text-fg',
     };
 
     return (
