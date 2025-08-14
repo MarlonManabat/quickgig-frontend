@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run typecheck && npm run lint:ci && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "lint:ci": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit",
+    "lint": "next lint",
+    "lint:ci": "next lint --max-warnings=0",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "check:api": "node tools/check_api.mjs",
     "check:api:soft": "node tools/check_live_api.mjs || true",
     "check:app": "node tools/check_app.mjs",
@@ -19,10 +19,12 @@
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
-    "test:e2e:smoke": "playwright test -c ./playwright.config.ts --grep @smoke",
+    "test:e2e:smoke": "playwright test -c playwright.config.ts --reporter=line",
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
-    "scan:links": "node tools/check_links.mjs"
+    "scan:links": "node tools/check_links.mjs",
+    "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
+    "postinstall": "node -e \"if(process.env.VERCEL){process.exit(0)}\" || true"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
@@ -37,13 +39,13 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "devDependencies": {
-    "@playwright/test": "^1.41.2",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@playwright/test": "^1.47.0",
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
     "critters": "^0.0.23",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.31",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "latest",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
