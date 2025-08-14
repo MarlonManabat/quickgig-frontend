@@ -1,13 +1,16 @@
 import { safeJsonParse } from './json';
 
+let cachedBase: string | undefined;
+
 /**
- * Returns the base URL for the QuickGig API.
- * Throws if NEXT_PUBLIC_API_URL is not defined.
+ * Resolve the QuickGig API base URL once. Defaults to the public
+ * production API if the env variable is missing.
  */
-export function getBaseUrl(): string {
-  const base = process.env.NEXT_PUBLIC_API_URL;
-  if (!base) throw new Error('NEXT_PUBLIC_API_URL is not set');
-  return base;
+export function getApiBase(): string {
+  if (!cachedBase)
+    cachedBase =
+      process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph';
+  return cachedBase;
 }
 
 /**
@@ -21,7 +24,7 @@ export async function safeFetch(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
   try {
-    const res = await fetch(`${getBaseUrl()}${path}`, {
+    const res = await fetch(`${getApiBase()}${path}`, {
       ...init,
       signal: controller.signal,
     });

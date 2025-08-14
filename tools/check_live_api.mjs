@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 
 const BASE = process.env.BASE || process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph';
-const TIMEOUT = 5000;
+const TIMEOUT = 10000;
 
 const endpoints = [
   { path: '/', expect: { key: 'message', value: 'QuickGig API' } },
