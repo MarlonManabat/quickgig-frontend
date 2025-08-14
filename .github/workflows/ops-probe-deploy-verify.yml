@@ -83,30 +83,20 @@ jobs:
           DirectoryIndex index.php index.html
           HT
 
-      - name: Upload .htaccess (ensure index.php priority)
-        run: |
-          set -e
-          curl --ftp-ssl --ftp-pasv \
-            --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            -T api-minimal/.htaccess "ftp://${{ secrets.FTP_SERVER }}:${{ secrets.FTP_PORT || 21 }}${{ env.SERVER_DIR }}.htaccess"
-
       - name: Deploy minimal API (endpoints + .htaccess)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT || 21 }}
-          protocol: ftps
-          local-dir: api-minimal/
-          server-dir: ${{ env.SERVER_DIR }}
+          server:     ${{ secrets.FTP_SERVER }}
+          username:   ${{ secrets.FTP_USERNAME }}
+          password:   ${{ secrets.FTP_PASSWORD }}
+          port:       ${{ secrets.FTP_PORT || 21 }}
+          protocol:   ftps
+          # Important: api-minimal contains .htaccess, index.php, health.php
+          local-dir:  api-minimal/
+          server-dir: /home/u789476867/domains/quickgig.ph/public_html/api/
           dangerous-clean-slate: false
-
-      - name: Remove default index.html
-        run: |
-          curl --ftp-ssl --ftp-pasv \
-            --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            -Q "DELE index.html" "ftp://${{ secrets.FTP_SERVER }}:${{ secrets.FTP_PORT || 21 }}${{ env.SERVER_DIR }}" || true
+          # optional, if available in v4.3.5; safe with Hostinger FTPS
+          # security: loose
 
       # C) VERIFY & REPORT
       - name: Verify / and /health and print report
