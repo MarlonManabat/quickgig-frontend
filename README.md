@@ -19,6 +19,7 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
   defaults to the public API if the variable is missing:
    ```env
     NEXT_PUBLIC_API_BASE=https://api.quickgig.ph
+    NEXT_PUBLIC_ENV=local
     ```
 
 To verify the live API locally, run:
@@ -94,6 +95,7 @@ This repo hosts the Next.js frontend for QuickGig.
 
 ## Environment
   - `NEXT_PUBLIC_API_BASE=https://api.quickgig.ph`
+  - `NEXT_PUBLIC_ENV=production|preview|local`
 
 ## Cookies & Auth
 The API sets a session cookie (e.g., `qg_session`) with:
