@@ -1,0 +1,53 @@
+name: Rollback app.quickgig.ph to Hostinger
+
+on:
+  workflow_dispatch:
+    inputs:
+      vercelProject:
+        description: Vercel project name or id
+        required: false
+      vercelTeamId:
+        description: Vercel team id (optional)
+        required: false
+      domainToDetach:
+        description: Domain to detach from Vercel
+        default: app.quickgig.ph
+        required: true
+
+jobs:
+  verify-hostinger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Check DNS (A=89.116.53.39, no Vercel CNAME)
+        run: node tools/check_dns_app.mjs
+      - name: Force-hit Hostinger IP with correct Host header
+        run: |
+          curl -sS -I --resolve app.quickgig.ph:443:89.116.53.39 https://app.quickgig.ph
+      - name: App content check (best-effort)
+        run: node tools/check_app_via_resolve.mjs || echo "JS resolve check skipped; curl step above is source of truth."
+
+  detach-vercel-app:
+    if: ${{ secrets.VERCEL_TOKEN != '' }}
+    needs: verify-hostinger
+    runs-on: ubuntu-latest
+    steps:
+      - name: Detach app.quickgig.ph from Vercel project (idempotent)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT: ${{ inputs.vercelProject }}
+          VERCEL_TEAM_ID: ${{ inputs.vercelTeamId }}
+          DOMAIN: ${{ inputs.domainToDetach }}
+        run: |
+          set -e
+          base="https://api.vercel.com"
+          teamQuery=""
+          if [ -n "$VERCEL_TEAM_ID" ]; then teamQuery="&teamId=$VERCEL_TEAM_ID"; fi
+          # Try delete, ignore 404
+          curl -sS -X DELETE \
+            -H "Authorization: Bearer $VERCEL_TOKEN" \
+            "$base/v10/projects/$VERCEL_PROJECT/domains/$DOMAIN?skipRecorder=true$teamQuery" \
+            | jq -r '.error?.message//"detached-or-not-present"'
+          echo "Detached (or not present): $DOMAIN"

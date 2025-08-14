@@ -163,3 +163,14 @@ Preflight (`OPTIONS`) should return `200`.
 ### Cookies & CORS
 - Cookies from API: Domain=.quickgig.ph; Path=/; Secure; HttpOnly; SameSite=None
 - CORS: allow https://app.quickgig.ph (and quickgig.ph if needed), with credentials.
+
+## Rollback runbook (app.quickgig.ph → Hostinger)
+- Hostinger DNS:
+  - A record: app → 89.116.53.39
+  - No CNAME to Vercel for app.
+- Vercel:
+  - Remove app.quickgig.ph from project Domains (or run the GH Action with VERCEL_TOKEN).
+- Verify:
+  dig +short app.quickgig.ph
+  dig +short CNAME app.quickgig.ph
+  curl -I --resolve app.quickgig.ph:443:89.116.53.39 https://app.quickgig.ph
