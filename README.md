@@ -163,3 +163,16 @@ Preflight (`OPTIONS`) should return `200`.
 ### Cookies & CORS
 - Cookies from API: Domain=.quickgig.ph; Path=/; Secure; HttpOnly; SameSite=None
 - CORS: allow https://app.quickgig.ph (and quickgig.ph if needed), with credentials.
+
+## Routing restore runbook
+
+- `app.quickgig.ph` serves the product on Hostinger (A=89.116.53.39).
+- `quickgig.ph` and `www.quickgig.ph` redirect with 308 to `https://app.quickgig.ph`.
+- No proxying of `/app` via Next.js or Vercel.
+- Verification commands:
+  ```bash
+  dig +short app.quickgig.ph; dig +short CNAME app.quickgig.ph
+  curl -I --resolve app.quickgig.ph:443:89.116.53.39 https://app.quickgig.ph
+  curl -I https://quickgig.ph; curl -I https://www.quickgig.ph
+  ```
+  Operator tools only; CI does not enforce these checks.
