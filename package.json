@@ -15,7 +15,8 @@
     "check:app:soft": "node tools/check_live_app.mjs || true",
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "scan:appdomain": "node tools/scan_app_domain.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
