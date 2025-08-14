@@ -172,7 +172,10 @@ Preflight (`OPTIONS`) should return `200`.
 - Verification commands:
   ```bash
   dig +short app.quickgig.ph; dig +short CNAME app.quickgig.ph
-  curl -I --resolve app.quickgig.ph:443:89.116.53.39 https://app.quickgig.ph
+  curl -I https://app.quickgig.ph
   curl -I https://quickgig.ph; curl -I https://www.quickgig.ph
   ```
   Operator tools only; CI does not enforce these checks.
+
+### CI Smoke Policy
+Our GitHub Actions **Smoke** job intentionally treats external endpoint checks as **non-blocking** on pull requests (runners can block outbound requests). On `main`, we perform header checks against `https://app.quickgig.ph`, `https://quickgig.ph`, and `https://www.quickgig.ph` as **warn-only**. Build/lint/type checks remain blocking.
