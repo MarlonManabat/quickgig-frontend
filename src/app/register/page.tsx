@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { env } from '@/config/env';
 import { track } from '@/lib/track';
+import { register } from '@/lib/auth/client';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,13 +19,8 @@ export default function RegisterPage() {
     if (!name || !email || !password) { setError('All fields are required'); return; }
     setLoading(true);
     try {
-      const res = await fetch('/api/session/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
+      const data = await register({ name, email, password });
+      if (!data?.ok) throw new Error(data?.message || 'Registration failed');
       if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('signup_success');
       router.push('/dashboard');
     } catch (err) {
