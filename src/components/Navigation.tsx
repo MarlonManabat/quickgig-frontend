@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
@@ -11,13 +12,15 @@ import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home }
 
 const Navigation: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setIsMenuOpen(false);
+    router.push("/");
   };
 
   return (
@@ -67,6 +70,13 @@ const Navigation: React.FC = () => {
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-qg-navy-light">
+                  <Link
+                    href="/dashboard"
+                    className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                  >
+                    <Home className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </Link>
                 {user?.role === 'Admin' && (
                   <Link
                     href="/admin"
@@ -127,7 +137,7 @@ const Navigation: React.FC = () => {
                     Login
                   </Button>
                 </Link>
-                <Link href="/signup">
+                <Link href="/register">
                   <Button variant="secondary" size="sm">
                     Sign Up
                   </Button>
@@ -184,6 +194,10 @@ const Navigation: React.FC = () => {
                       Kumusta, <span className="font-medium text-fg">{user?.name}</span>
                     </div>
                   </div>
+                    <Link href="/dashboard" className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent" onClick={() => setIsMenuOpen(false)}>
+                      <Home className="w-5 h-5 mr-3" />
+                      Dashboard
+                    </Link>
                   
                   {user?.role === 'Admin' && (
                     <Link
@@ -239,7 +253,7 @@ const Navigation: React.FC = () => {
                       Login
                     </Button>
                   </Link>
-                  <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
+                  <Link href="/register" onClick={() => setIsMenuOpen(false)}>
                     <Button variant="secondary" className="w-full">
                       Sign Up
                     </Button>

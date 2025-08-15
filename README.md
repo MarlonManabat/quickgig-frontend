@@ -18,9 +18,12 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 2. Copy `.env.example` to `.env.local` and adjust as needed. Sensible
    defaults are included for local development:
    ```env
-   NEXT_PUBLIC_API_BASE=http://localhost:3001
-   NEXT_PUBLIC_ENV=local
-   ```
+NEXT_PUBLIC_API_URL=http://localhost:3001
+API_URL=http://localhost:3001
+JWT_COOKIE_NAME=auth_token
+NEXT_PUBLIC_ENABLE_APPLY=false
+NEXT_PUBLIC_ENV=local
+```
 
 To verify the live API locally, run:
 
@@ -30,9 +33,7 @@ BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 
 ## Authentication
 
-The app communicates with an external API using the `/src/lib/api.ts` helper. When `auth` is set on a request, a JWT token stored in `localStorage` is sent in the `Authorization` header. If the backend issues HttpOnly cookies, they are included automatically.
-
-Tokens are managed through `/src/lib/auth.ts`, and basic route protection is available via `/src/lib/withAuth.tsx`.
+Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
 
 ## Development
 
@@ -60,7 +61,7 @@ BASE=https://app.quickgig.ph npm run test:e2e:smoke
 ## Deployment
 
 Deployment is handled via the Vercel GitHub integration. Ensure the
-  `NEXT_PUBLIC_API_BASE` environment variable is set in your Vercel project
+  `NEXT_PUBLIC_API_URL` environment variable is set in your Vercel project
 settings.
 
 Login, signup, and other protected pages call the external API at
@@ -76,10 +77,10 @@ Login, signup, and other protected pages call the external API at
 
 ### Smoke checks
 
-  The app defaults to a local API if `NEXT_PUBLIC_API_BASE` is unset:
+  The app defaults to a local API if `NEXT_PUBLIC_API_URL` is unset:
 
 ```env
-  NEXT_PUBLIC_API_BASE=http://localhost:3001
+  NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 Verify the production root and API:
@@ -110,8 +111,10 @@ This repo hosts the Next.js frontend for QuickGig.
 Set these in `.env.local` for local development and in Vercel under
 **Settings → Environment Variables**:
 
-- `NEXT_PUBLIC_API_BASE` – base URL for the backend API. Defaults to
-  `http://localhost:3001`.
+- `NEXT_PUBLIC_API_URL` – backend API base URL exposed to the client. Defaults to `http://localhost:3001`.
+- `API_URL` – server-side base URL for the backend API
+- `JWT_COOKIE_NAME` – name of the auth cookie
+- `NEXT_PUBLIC_ENABLE_APPLY` – enable Apply buttons for jobs
 - `NEXT_PUBLIC_FACEBOOK_APP_ID` – Facebook app ID for login and chat
   widgets. Optional.
 - `NEXT_PUBLIC_FACEBOOK_PAGE_ID` – Facebook page ID for the Messenger

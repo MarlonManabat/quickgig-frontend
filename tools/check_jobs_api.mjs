@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
-const BASE = (process.env.NEXT_PUBLIC_API_BASE || 'https://api.quickgig.ph').replace(/\/$/, '');
+const BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph').replace(/\/$/, '');
 
 (async () => {
   try {
