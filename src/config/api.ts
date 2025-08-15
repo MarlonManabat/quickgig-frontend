@@ -9,4 +9,7 @@ export const API = {
   createJob: '/employer/jobs/create.php', // POST
   updateJob: (id: number | string) => `/employer/jobs/update.php?id=${id}`, // PATCH
   toggleJob: (id: number | string) => `/employer/jobs/toggle.php?id=${id}`, // POST { published: boolean }
+  applicationsMine: '/applications/mine.php', // GET current user's apps
+  employerApplications: '/employer/applications/list.php', // GET employer's incoming apps
+  applicationDetail: (id: string | number) => `/applications/show.php?id=${id}`,
 };

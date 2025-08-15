@@ -121,6 +121,9 @@ Set these in Vercel → Project → Settings → Environment Variables:
 - `JWT_COOKIE_NAME` – name of the auth cookie
 - `NEXT_PUBLIC_ENABLE_APPLY` – enable Apply buttons for jobs
 - `EMPLOYER_EMAILS` – comma-separated list of emails with employer access in dev
+- `RESEND_API_KEY` – Resend API key (optional)
+- `NOTIFY_FROM` – notification sender address
+- `NOTIFY_ADMIN_EMAIL` – fallback recipient for employer emails
 
 To enable the Apply flow in production, set `NEXT_PUBLIC_ENABLE_APPLY=true` in your Vercel project settings.
 
@@ -132,6 +135,13 @@ API endpoints live in [`src/config/api.ts`](src/config/api.ts); edit them if you
 - `POST /employer/jobs/create.php`
 - `PATCH /employer/jobs/update.php?id={id}`
 - `POST /employer/jobs/toggle.php?id={id}` with `{ published: boolean }`
+
+### Application pages & APIs
+
+- `/applications` → `GET /applications/mine.php`
+- `/applications/[id]` → `GET /applications/show.php?id={id}`
+- `/employer/applications` → `GET /employer/applications/list.php`
+- `/employer/applications/[id]` → `GET /applications/show.php?id={id}`
 
 ## Cookies & Auth
 The API sets a session cookie (e.g., `qg_session`) with:
