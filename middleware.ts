@@ -4,6 +4,7 @@ import { env } from './src/config/env';
 
 const protectedPaths = ['/dashboard', '/settings/profile', '/settings/account'];
 const employerPaths = ['/employer'];
+const adminPaths = ['/admin'];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -31,6 +32,24 @@ export function middleware(req: NextRequest) {
     }
   }
 
+  if (adminPaths.some((p) => pathname.startsWith(p))) {
+    if (!token) {
+      const url = req.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
+    const role = req.cookies.get('role')?.value || '';
+    const email = req.cookies.get('email')?.value || '';
+    const isAdmin =
+      ['admin', 'moderator', 'staff'].includes(role.toLowerCase()) ||
+      (email && env.ADMIN_EMAILS.includes(email));
+    if (!isAdmin) {
+      const url = req.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -40,5 +59,6 @@ export const config = {
     '/settings/profile/:path*',
     '/settings/account/:path*',
     '/employer/:path*',
+    '/admin/:path*',
   ],
 };

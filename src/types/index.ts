@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   phone: string;
-  role: 'Job Seeker' | 'Employer' | 'Admin';
+  role?: string;
   isEmployer?: boolean;
   ticketBalance?: number;
   createdAt?: string;

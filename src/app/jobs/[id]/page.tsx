@@ -2,8 +2,10 @@ import { API } from '@/config/api';
 import { env } from '@/config/env';
 import ApplyButton from '../apply-button';
 import SaveJobButton from '@/components/SaveJobButton';
+import ReportButton from '@/components/ReportButton';
 import type { Job } from '@/types/jobs';
 import { canonical } from '@/lib/canonical';
+import { getUser } from '@/auth/getUser';
 
 interface JobPageProps {
   params: { id: string };
@@ -37,6 +39,7 @@ export async function generateMetadata({ params }: JobPageProps) {
 
 export default async function JobPage({ params }: JobPageProps) {
   let job: Job;
+  const user = await getUser();
   try {
     job = await fetchJob(params.id);
   } catch (err) {
@@ -79,6 +82,9 @@ export default async function JobPage({ params }: JobPageProps) {
             </li>
           ))}
         </ul>
+      ) : null}
+      {user ? (
+        <ReportButton type="job" targetId={job.id} />
       ) : null}
     </main>
   );

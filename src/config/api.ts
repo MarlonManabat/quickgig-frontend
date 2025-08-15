@@ -33,6 +33,24 @@ export const API = {
   alertsDelete: (id: string | number) => `/alerts/delete.php?id=${id}`,
   alertsToggle: (id: string | number) => `/alerts/toggle.php?id=${id}`,
   alertsRunDigest: '/alerts/runDigest.php',
+
+  // Reports (public)
+  reportCreate: '/reports/create.php', // POST { type:'job'|'user', targetId, reason, details? }
+
+  // Admin moderation
+  adminSummary: '/admin/summary.php', // GET { counts: { pendingJobs, reports, users } }
+  adminJobsPending: '/admin/jobs/pending.php', // GET list of pending jobs
+  adminJobApprove: (id: string | number) => `/admin/jobs/approve.php?id=${id}`, // POST {}
+  adminJobReject: (id: string | number) => `/admin/jobs/reject.php?id=${id}`, // POST { reason? }
+
+  adminReportsList: '/admin/reports/list.php', // GET
+  adminReportResolve: (id: string | number) => `/admin/reports/resolve.php?id=${id}`, // POST { action:'dismiss'|'remove'|'ban' }
+  adminUsersList: '/admin/users/list.php', // GET (supports ?q=&status=active|banned)
+  adminUserBan: (id: string | number) => `/admin/users/ban.php?id=${id}`, // POST { reason? }
+  adminUserUnban: (id: string | number) => `/admin/users/unban.php?id=${id}`, // POST {}
+
+  // Audit
+  adminAuditList: '/admin/audit/list.php', // GET { items:[{at,actor,action,target,meta}] }
 };
 
 export type JobFilters = {
