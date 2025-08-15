@@ -7,6 +7,7 @@ import Navigation from "../components/Navigation";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { ToastProvider } from "../components/ToastProvider";
 import ClientBootstrap from './ClientBootstrap';
+import ClientAuthGuard from './ClientAuthGuard';
 import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
 
@@ -88,6 +89,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="font-body antialiased bg-bg text-fg">
+        <ClientAuthGuard />
         <ClientBootstrap />
         <AuthProvider>
           <SocketProvider>
