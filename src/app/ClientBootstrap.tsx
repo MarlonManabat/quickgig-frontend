@@ -1,10 +1,10 @@
 'use client';
 import { useEffect } from 'react';
 
-/** Intercepts any client fetch to engine auth endpoints and reroutes to our proxy */
 export default function ClientBootstrap() {
   useEffect(() => {
-    const orig = window.fetch;
+    // 1) Intercept fetch
+    const origFetch = window.fetch;
     window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string'
         ? input
@@ -12,23 +12,44 @@ export default function ClientBootstrap() {
           ? input.href
           : (input as Request).url;
 
-      if (typeof url === 'string') {
-        if (/^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?login\.php/i.test(url)) {
-          console.warn('[auth-guard] rerouting → /api/session/login');
-          input = '/api/session/login';
-        }
-        if (/^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?register\.php/i.test(url)) {
-          console.warn('[auth-guard] rerouting → /api/session/register');
-          input = '/api/session/register';
-        }
-        if (/^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?me\.php/i.test(url)) {
-          console.warn('[auth-guard] rerouting → /api/session/me');
-          input = '/api/session/me';
-        }
+      const m = typeof url === 'string' &&
+        url.match(/^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?(login|register|me)\.php/i);
+
+      if (m) {
+        const name = m[3];
+        const target = `/api/session/${name}`;
+        console.warn('[auth-guard][fetch] rerouting', url, '→', target);
+        input = target;
       }
-      return orig(input, init);
+      return origFetch(input as RequestInfo, init);
     };
-    return () => { window.fetch = orig; };
+
+    // 2) Intercept XMLHttpRequest (axios, legacy code)
+    const origOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(
+      method: string,
+      url: string,
+      async?: boolean,
+      username?: string | null,
+      password?: string | null
+    ) {
+      const m = typeof url === 'string' &&
+        url.match(/^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?(login|register|me)\.php/i);
+      if (m) {
+        const name = m[3];
+        const target = `/api/session/${name}`;
+        console.warn('[auth-guard][xhr] rerouting', url, '→', target);
+        return origOpen.call(this, method, target, async ?? true, username ?? null, password ?? null);
+      }
+      return origOpen.call(this, method, url, async ?? true, username ?? null, password ?? null);
+    };
+
+    console.log('[auth-guard] installed');
+    return () => {
+      window.fetch = origFetch;
+      XMLHttpRequest.prototype.open = origOpen;
+    };
   }, []);
+
   return null;
 }

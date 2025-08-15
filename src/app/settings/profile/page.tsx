@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button';
 import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { toast } from '@/lib/toast';
+import { me } from '@/lib/auth/client';
 
 interface ProfileData {
   name: string;
@@ -34,8 +35,7 @@ export default function ProfileSettingsPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get(API.me);
-        const d = res.data || {};
+        const d = await me();
         setData({
           name: d.name || '',
           headline: d.headline || '',
