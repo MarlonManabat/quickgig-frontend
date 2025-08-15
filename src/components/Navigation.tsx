@@ -8,7 +8,8 @@ import { useAuth } from '@/context/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import WalletDisplay from './WalletDisplay';
 import Button from './ui/Button';
-import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard } from 'lucide-react';
+import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard, Bell } from 'lucide-react';
+import { env } from '@/config/env';
 
 const Navigation: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -131,27 +132,36 @@ const Navigation: React.FC = () => {
                 {/* Wallet Display */}
                 <WalletDisplay />
                 
-                <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-qg-navy-light">
-                  <Link
-                    href="/settings/profile"
-                    className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    <span className="hidden xl:inline">Profile</span>
-                  </Link>
-                  <div className="hidden xl:flex flex-col">
-                    <span className="text-xs text-gray-300">Kumusta,</span>
-                    <span className="text-sm font-medium text-fg">{user?.name}</span>
+                  <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-qg-navy-light">
+                    {env.NEXT_PUBLIC_ENABLE_ALERTS && (
+                      <Link
+                        href="/settings/alerts"
+                        className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      >
+                        <Bell className="w-4 h-4 mr-2" />
+                        <span className="hidden xl:inline">Alerts</span>
+                      </Link>
+                    )}
+                    <Link
+                      href="/settings/profile"
+                      className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      <span className="hidden xl:inline">Profile</span>
+                    </Link>
+                    <div className="hidden xl:flex flex-col">
+                      <span className="text-xs text-gray-300">Kumusta,</span>
+                      <span className="text-sm font-medium text-fg">{user?.name}</span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-fg"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="hidden xl:inline ml-2">Logout</span>
+                    </button>
                   </div>
-                  <button
-                    onClick={handleLogout}
-                    className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-fg"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span className="hidden xl:inline ml-2">Logout</span>
-                  </button>
                 </div>
-              </div>
             ) : (
               <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-qg-navy-light">
                 <Link href="/login">
@@ -258,22 +268,32 @@ const Navigation: React.FC = () => {
                     <MessageCircle className="w-5 h-5 mr-3" />
                     Messages
                   </Link>
-                  <Link
-                    href="/payment"
-                    className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <CreditCard className="w-5 h-5 mr-3" />
-                    Payment (Beta)
-                  </Link>
-                  <Link
-                    href="/settings/profile"
-                    className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <User className="w-5 h-5 mr-3" />
-                    Profile
-                  </Link>
+                    <Link
+                      href="/payment"
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <CreditCard className="w-5 h-5 mr-3" />
+                      Payment (Beta)
+                    </Link>
+                    {env.NEXT_PUBLIC_ENABLE_ALERTS && (
+                      <Link
+                        href="/settings/alerts"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Bell className="w-5 h-5 mr-3" />
+                        Alerts
+                      </Link>
+                    )}
+                    <Link
+                      href="/settings/profile"
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <User className="w-5 h-5 mr-3" />
+                      Profile
+                    </Link>
                   
                   <div className="border-t border-qg-navy-light mt-4 pt-4">
                     <button

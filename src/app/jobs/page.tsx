@@ -10,6 +10,8 @@ import ApplyButton from './apply-button';
 import SaveJobButton from '@/components/SaveJobButton';
 import JobsFilters from '@/components/jobs/JobsFilters';
 import { getSavedIds, hydrateSavedIds } from '@/lib/savedJobs';
+import AlertModal from '@/components/alerts/AlertModal';
+import { env } from '@/config/env';
 
 function JobsPageContent() {
   const router = useRouter();
@@ -20,6 +22,7 @@ function JobsPageContent() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [alertOpen, setAlertOpen] = useState(false);
 
   // read filters from URL
   useEffect(() => {
@@ -109,6 +112,16 @@ function JobsPageContent() {
   return (
     <main className="p-4 space-y-4">
       <JobsFilters filters={filters} onChange={setFilters} onClear={clearFilters} />
+      {env.NEXT_PUBLIC_ENABLE_ALERTS && (
+        <div className="flex justify-end">
+          <button
+            className="border px-2 py-1 rounded"
+            onClick={() => setAlertOpen(true)}
+          >
+            Create Alert from filters
+          </button>
+        </div>
+      )}
       {loading ? (
         <div className="space-y-2" aria-busy="true">
           {[...Array(3)].map((_, i) => (
@@ -181,6 +194,14 @@ function JobsPageContent() {
       >
         Copy link
       </button>
+      {env.NEXT_PUBLIC_ENABLE_ALERTS && (
+        <AlertModal
+          open={alertOpen}
+          onClose={() => setAlertOpen(false)}
+          initial={{ filters, email: true, frequency: 'daily' }}
+          onSaved={() => setAlertOpen(false)}
+        />
+      )}
     </main>
   );
 }

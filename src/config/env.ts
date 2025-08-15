@@ -15,6 +15,9 @@ export const env = {
   NOTIFY_ADMIN_EMAIL: process.env.NOTIFY_ADMIN_EMAIL || '',
   EMPLOYER_EMAILS:
     process.env.EMPLOYER_EMAILS?.split(',').map((e) => e.trim()).filter(Boolean) || [],
+  ALERTS_DIGEST_SECRET: process.env.ALERTS_DIGEST_SECRET || '',
+  NEXT_PUBLIC_ENABLE_ALERTS:
+    String(process.env.NEXT_PUBLIC_ENABLE_ALERTS ?? 'false').toLowerCase() === 'true',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {
