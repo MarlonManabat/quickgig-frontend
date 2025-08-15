@@ -21,7 +21,7 @@ export default function EnvPage() {
             <span className="font-mono">{key}</span>: {value ? (
               <span>{value}</span>
             ) : (
-              <span className="rounded bg-yellow-200 px-1 text-yellow-800">missing</span>
+              <span className="rounded bg-red-200 px-1 text-red-800">missing</span>
             )}
           </li>
         ))}

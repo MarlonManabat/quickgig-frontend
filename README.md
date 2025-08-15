@@ -108,21 +108,20 @@ This repo hosts the Next.js frontend for QuickGig.
 - `/` serves the app directly. Legacy `/app` paths redirect to `/`.
 
 ## Environment
-Set these in `.env.local` for local development and in Vercel under
-**Settings → Environment Variables**:
+Copy `.env.example` to `.env.local` for local development:
 
-- `NEXT_PUBLIC_API_URL` – backend API base URL exposed to the client. Defaults to `http://localhost:3001`.
-- `API_URL` – server-side base URL for the backend API
+```bash
+cp .env.example .env.local && npm run dev
+```
+
+Set these in Vercel → Project → Settings → Environment Variables:
+
+- `NEXT_PUBLIC_API_URL` – backend API base URL exposed to the client
+- `API_URL` – server-side base URL for the backend
 - `JWT_COOKIE_NAME` – name of the auth cookie
 - `NEXT_PUBLIC_ENABLE_APPLY` – enable Apply buttons for jobs
-- `NEXT_PUBLIC_FACEBOOK_APP_ID` – Facebook app ID for login and chat
-  widgets. Optional.
-- `NEXT_PUBLIC_FACEBOOK_PAGE_ID` – Facebook page ID for the Messenger
-  chat plugin. Optional.
-- `NEXT_PUBLIC_ENV` – environment name used in logs (`local`, `preview`,
-  `production`).
-- `BASE` – base URL for scripts and smoke tests. Optional and not
-  exposed to the client.
+
+API endpoints live in [`src/config/api.ts`](src/config/api.ts); edit them if your backend paths differ.
 
 ## Cookies & Auth
 The API sets a session cookie (e.g., `qg_session`) with:

@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
-import apiClient from '@/lib/apiClient';
+import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { env } from '@/config/env';
+import { toast } from '@/lib/toast';
 
 export default function ApplyButton({ jobId }: { jobId: string }) {
   const [open, setOpen] = useState(false);
@@ -14,12 +15,9 @@ export default function ApplyButton({ jobId }: { jobId: string }) {
 
   if (!env.NEXT_PUBLIC_ENABLE_APPLY) {
     return (
-      <button
-        className="bg-yellow-400 rounded px-3 py-1"
-        onClick={() => alert('Applications are handled manually during beta.')}
-      >
-        Apply
-      </button>
+      <span className="text-sm text-gray-500">
+        Applications handled manually during beta.
+      </span>
     );
   }
 
@@ -27,8 +25,11 @@ export default function ApplyButton({ jobId }: { jobId: string }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await apiClient.post(API.apply, { jobId, name, email, phone, note });
+      await api.post(API.apply, { jobId, name, email, phone, note });
+      toast('Application submitted');
       setOpen(false);
+    } catch {
+      toast('Failed to submit application');
     } finally {
       setLoading(false);
     }

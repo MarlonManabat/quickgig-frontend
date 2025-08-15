@@ -1,7 +1,7 @@
 export const API = {
-  login: '/auth/login',
-  register: '/auth/register',
-  me: '/auth/me',
-  jobs: '/jobs',           // GET ?status=active&page=1&limit=20
-  apply: '/applications',  // POST application payload
+  login: '/auth/login.php',
+  register: '/auth/register.php',
+  me: '/auth/me.php',
+  jobs: '/jobs/list.php',            // supports ?status=active&page&limit
+  apply: '/applications/create.php', // POST application payload
 };
