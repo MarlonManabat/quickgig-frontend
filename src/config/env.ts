@@ -18,6 +18,14 @@ export const env = {
   ALERTS_DIGEST_SECRET: process.env.ALERTS_DIGEST_SECRET || '',
   NEXT_PUBLIC_ENABLE_ALERTS:
     String(process.env.NEXT_PUBLIC_ENABLE_ALERTS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_REPORTS:
+    String(process.env.NEXT_PUBLIC_ENABLE_REPORTS ?? 'true').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_ADMIN:
+    String(process.env.NEXT_PUBLIC_ENABLE_ADMIN ?? 'true').toLowerCase() === 'true',
+  ADMIN_EMAILS: (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

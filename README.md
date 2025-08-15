@@ -73,6 +73,30 @@ Vercel Cron setup:
 Create an alert from the **Create Alert from filters** button on `/jobs` and
 manage them in `/settings/alerts`.
 
+## Reports & Admin Moderation
+
+- `NEXT_PUBLIC_ENABLE_REPORTS` — show reporting UI on jobs and profiles.
+- `NEXT_PUBLIC_ENABLE_ADMIN` — enable admin links in the UI.
+- `ADMIN_EMAILS` — comma-separated allowlist of email addresses treated as admins.
+
+Admin pages live under `/admin` and expect the following backend endpoints
+(see `src/config/api.ts`):
+
+- `GET ${API.adminSummary}` – dashboard counts
+- `GET ${API.adminJobsPending}` – pending jobs
+- `POST ${API.adminJobApprove(id)}` – approve job
+- `POST ${API.adminJobReject(id)}` – reject job
+- `GET ${API.adminReportsList}` – list reports
+- `POST ${API.adminReportResolve(id)}` – resolve report
+- `GET ${API.adminUsersList}` – list users
+- `POST ${API.adminUserBan(id)}` – ban user
+- `POST ${API.adminUserUnban(id)}` – unban user
+- `GET ${API.adminAuditList}` – audit log
+
+Logged-in users can report a job or profile via a small **Report** link, which
+sends `{ type:'job'|'user', targetId, reason, details? }` to
+`${API.reportCreate}`.
+
 ## Authentication
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.

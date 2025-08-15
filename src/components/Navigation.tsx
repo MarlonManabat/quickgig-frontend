@@ -10,6 +10,7 @@ import WalletDisplay from './WalletDisplay';
 import Button from './ui/Button';
 import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard, Bell } from 'lucide-react';
 import { env } from '@/config/env';
+import { isAdmin } from '@/auth/isAdmin';
 
 const Navigation: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -101,7 +102,7 @@ const Navigation: React.FC = () => {
                     <Home className="w-4 h-4 mr-2" />
                     Dashboard
                   </Link>
-                {user?.role === 'Admin' && (
+                {isAdmin(user) && env.NEXT_PUBLIC_ENABLE_ADMIN && (
                   <Link
                     href="/admin"
                     className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
@@ -222,7 +223,7 @@ const Navigation: React.FC = () => {
                       Dashboard
                     </Link>
                   
-                  {user?.role === 'Admin' && (
+                  {isAdmin(user) && env.NEXT_PUBLIC_ENABLE_ADMIN && (
                     <Link
                       href="/admin"
                       className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"

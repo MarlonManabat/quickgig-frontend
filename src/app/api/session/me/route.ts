@@ -34,6 +34,9 @@ export async function GET(req: NextRequest) {
   if (data.user?.role) {
     response.cookies.set('role', data.user.role);
   }
+  if (data.user?.email) {
+    response.cookies.set('email', data.user.email);
+  }
   response.cookies.set('isEmployer', String(isEmployer));
 
   return response;

@@ -1,6 +1,8 @@
 import { API } from '@/config/api';
 import { env } from '@/config/env';
 import { cookies } from 'next/headers';
+import ReportButton from '@/components/ReportButton';
+import { getUser } from '@/auth/getUser';
 
 async function fetchUser(id: string) {
   const path = id === 'me' ? API.me : API.publicUser(id);
@@ -14,6 +16,7 @@ async function fetchUser(id: string) {
 
 export default async function PublicProfilePage({ params }: { params: { id: string } }) {
   const data = await fetchUser(params.id);
+  const me = await getUser();
   if (!data) return <main className="p-4">Profile not found</main>;
   return (
     <main className="p-4 space-y-4 max-w-2xl">
@@ -40,6 +43,7 @@ export default async function PublicProfilePage({ params }: { params: { id: stri
           Download Resume
         </a>
       )}
+      {me ? <ReportButton type="user" targetId={data.id || params.id} /> : null}
     </main>
   );
 }
