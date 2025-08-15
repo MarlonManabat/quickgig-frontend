@@ -2,11 +2,45 @@ export const API = {
   login: '/auth/login.php',
   register: '/auth/register.php',
   me: '/auth/me.php',
-  jobs: '/jobs/list.php', // GET list
-  jobById: (id: string | number) => `/jobs/show.php?id=${id}`, // GET details
-  apply: '/applications/create.php', // POST application
-  myJobs: '/employer/jobs/list.php', // GET my jobs
-  createJob: '/employer/jobs/create.php', // POST
-  updateJob: (id: number | string) => `/employer/jobs/update.php?id=${id}`, // PATCH
-  toggleJob: (id: number | string) => `/employer/jobs/toggle.php?id=${id}`, // POST { published: boolean }
+  jobs: '/jobs/list.php',
+  jobById: (id: string | number) => `/jobs/show.php?id=${id}`,
+  // optional saved endpoints (used only if enabled)
+  savedList: '/user/saved/list.php',
+  savedToggle: (id: string | number) => `/user/saved/toggle.php?id=${id}`,
+  apply: '/applications/create.php',
+  myJobs: '/employer/jobs/list.php',
+  createJob: '/employer/jobs/create.php',
+  updateJob: (id: number | string) => `/employer/jobs/update.php?id=${id}`,
+  toggleJob: (id: number | string) => `/employer/jobs/toggle.php?id=${id}`,
 };
+
+export type JobFilters = {
+  q?: string;
+  location?: string;
+  category?: string;
+  type?: 'full-time' | 'part-time' | 'contract' | 'intern' | 'gig' | string;
+  remote?: boolean;
+  minSalary?: number;
+  maxSalary?: number;
+  sort?: 'recent' | 'salary' | 'relevance';
+  page?: number;
+  limit?: number;
+  savedOnly?: boolean;
+};
+
+// Map UI filters -> backend query params (adjust here if backend differs)
+export function mapToJobQuery(f: JobFilters) {
+  return {
+    q: f.q || '',
+    location: f.location || '',
+    category: f.category || '',
+    type: f.type || '',
+    remote: f.remote ? '1' : '',
+    minSalary: f.minSalary != null ? String(f.minSalary) : '',
+    maxSalary: f.maxSalary != null ? String(f.maxSalary) : '',
+    sort: f.sort || 'recent',
+    page: String(f.page ?? 1),
+    limit: String(f.limit ?? 20),
+    saved: f.savedOnly ? '1' : '', // backend may ignore
+  };
+}

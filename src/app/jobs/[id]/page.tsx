@@ -1,6 +1,7 @@
 import { API } from '@/config/api';
 import { env } from '@/config/env';
 import ApplyButton from '../apply-button';
+import SaveJobButton from '@/components/SaveJobButton';
 import type { Job } from '@/types/jobs';
 import { canonical } from '@/lib/canonical';
 
@@ -62,7 +63,10 @@ export default async function JobPage({ params }: JobPageProps) {
           {job.company} · {job.location} · {job.rate}
         </p>
       </div>
-      <ApplyButton jobId={String(job.id)} title={job.title} />
+      <div className="flex items-center gap-2">
+        <ApplyButton jobId={String(job.id)} title={job.title} />
+        <SaveJobButton id={job.id} />
+      </div>
       <p>{job.description}</p>
       {job.tags?.length ? (
         <ul className="flex flex-wrap gap-2">
