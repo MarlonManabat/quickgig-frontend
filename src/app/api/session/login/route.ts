@@ -1,53 +1,59 @@
 import { NextResponse } from 'next/server';
 import { env } from '@/config/env';
-async function toJsonSafe(r: Response) {
-  const t = await r.text();
-  try { return JSON.parse(t); } catch { return t ? { raw: t } : {}; }
-}
+import { proxyFetch } from '@/server/proxy';
 
 export async function POST(req: Request) {
-  const { email, password } = await req.json().catch(() => ({}));
-  const url = `${env.API_URL}/auth/login`;
+  const body = await req.json().catch(() => ({}));
   try {
-    // Try JSON
-    let r = await fetch(url, {
+    const { res, data } = await proxyFetch('/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body,
+      formFallback: true,
     });
 
-    // If engine expects form-encoded
-    if (!r.ok && (r.status === 400 || r.status === 415)) {
-      r = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ email: String(email || ''), password: String(password || '') }),
-      });
-    }
+    const d = (typeof data === 'object' && data
+      ? (data as Record<string, unknown>)
+      : {}) as Record<string, unknown>;
+    const token =
+      typeof d['token'] === 'string'
+        ? (d['token'] as string)
+        : typeof d['accessToken'] === 'string'
+          ? (d['accessToken'] as string)
+          : typeof d['jwt'] === 'string'
+            ? (d['jwt'] as string)
+            : typeof d['data'] === 'object' && d['data'] !== null &&
+              typeof (d['data'] as Record<string, unknown>)['token'] === 'string'
+              ? ((d['data'] as Record<string, unknown>)['token'] as string)
+              : '';
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data: any = await toJsonSafe(r);
-    const token = data?.token || data?.accessToken || data?.jwt || data?.data?.token || '';
-
-    if (r.ok && token) {
+    if (res.ok && token) {
       const resp = NextResponse.json({ ok: true });
-      resp.headers.set(
-        'Set-Cookie',
-        `${env.JWT_COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; ${
-          process.env.NODE_ENV === 'production' ? 'Secure; ' : ''
-        }Max-Age=${60 * 60 * 24 * 30}`
-      );
+      resp.cookies.set(env.JWT_COOKIE_NAME, token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30,
+      });
       return resp;
     }
 
-    return NextResponse.json(
-      { ok: false, message: data?.message || data?.error || 'Invalid email or password' },
-      { status: 200 }
-    );
+    const message =
+      typeof d['message'] === 'string'
+        ? (d['message'] as string)
+        : typeof d['error'] === 'string'
+          ? (d['error'] as string)
+          : 'Invalid email or password';
+
+    return NextResponse.json({ ok: false, message }, { status: 200 });
   } catch {
     return NextResponse.json(
       { ok: false, message: 'Auth service unreachable' },
       { status: 200 }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new Response(null, { status: 200 });
 }
