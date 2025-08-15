@@ -1,9 +1,9 @@
-name: E2E Smoke
+name: E2E Smoke (nightly)
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 3 * * *' # 03:00 UTC daily
+    - cron: '0 3 * * *'  # 03:00 UTC daily
 
 jobs:
   smoke:
@@ -15,14 +15,18 @@ jobs:
         with:
           node-version: 20
           cache: npm
+
       - name: Install dev deps
         run: npm ci --include=dev --no-audit --no-fund || npm install --include=dev --no-audit --no-fund
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+
       - name: Run smoke tests
         env:
           BASE: https://app.quickgig.ph
         run: npm run test:e2e:smoke
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4

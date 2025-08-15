@@ -13,15 +13,19 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      # Explicit dev install for Playwright, types, etc.
+
+      # Explicitly include dev deps for smoke (Playwright, types, etc.)
       - name: Install dev deps
         run: npm ci --include=dev --no-audit --no-fund || npm install --include=dev --no-audit --no-fund
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+
       - name: Run smoke tests
         env:
           BASE: https://app.quickgig.ph
         run: npm run test:e2e:smoke
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
