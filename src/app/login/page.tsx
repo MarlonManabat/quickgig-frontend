@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login } from '@/lib/auth/client';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,9 +14,14 @@ export default function LoginPage() {
     setErr('');
     setLoading(true);
     try {
-      const data = await login(email, password);
-      if (data?.ok) router.replace('/dashboard');
-      else setErr(data?.message || 'Invalid email or password');
+      const res = await fetch('/api/session/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data?.ok) { router.replace('/dashboard'); return; }
+      setErr(data?.message || 'Invalid email or password');
     } catch {
       setErr('Auth service unreachable');
     } finally {
@@ -30,7 +34,7 @@ export default function LoginPage() {
       <div className="max-w-md mx-auto bg-white/70 rounded-2xl p-6 shadow">
         <h1 className="text-2xl font-bold mb-2">Login</h1>
         <p className="text-sm text-gray-600 mb-4">Sign in to your QuickGig account.</p>
-        <form onSubmit={onSubmit} className="space-y-3">
+        <form onSubmit={onSubmit} noValidate className="space-y-3">
           {err && (
             <div role="alert" className="alert-error">
               {err}
