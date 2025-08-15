@@ -31,6 +31,26 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+## Jobs search & saved jobs
+
+The `/jobs` page offers search, filters and pagination. Filter values are
+reflected in the URL so a pre-filtered view can be shared by copying the link.
+Supported query parameters:
+
+```
+q, location, category, type, remote=1, minSalary, maxSalary,
+sort=recent|salary|relevance, page, limit, saved=1
+```
+
+Job cards include a **Save** button. Saved jobs are stored in `localStorage` by
+default. If the optional `NEXT_PUBLIC_ENABLE_SAVED_API=true` flag is set and the
+backend provides the endpoints, saved jobs are also synced via:
+
+- `GET ${API.savedList}` – hydrate saved IDs
+- `POST ${API.savedToggle(id)}` – toggle saved status
+
+Use the “Saved only” filter on the Jobs page to view saved jobs.
+
 ## Authentication
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
