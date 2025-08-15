@@ -4,7 +4,7 @@ if (!base) {
   process.exit(0);
 }
 
-const paths = ['/', '/find-work', '/post-job', '/login', '/signup'];
+const paths = ['/', '/find-work', '/post-job', '/login', '/register'];
 
 const fetchImpl = globalThis.fetch;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));

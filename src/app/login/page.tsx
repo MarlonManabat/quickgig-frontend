@@ -1,9 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
-import { saveToken } from '@/lib/auth';
-import { User } from '@/types';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,15 +15,13 @@ export default function LoginPage() {
     if (!email || !password) { setError('Email and password are required'); return; }
     setLoading(true);
     try {
-      const data = await apiFetch<{ token?: string; user?: User }>('/auth/login', {
+      const res = await fetch('/api/session/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
-
-      if (data.token) saveToken(data.token);
-      if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
-
-      router.push('/');
+      if (!res.ok) throw new Error('Login failed');
+      router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
@@ -53,7 +48,7 @@ export default function LoginPage() {
             {loading ? 'Signing in…' : 'Login'}
           </button>
         </form>
-        <p className="text-sm mt-3">No account? <a className="text-sky-600 font-semibold" href="/signup">Sign up</a></p>
+        <p className="text-sm mt-3">No account? <a className="text-sky-600 font-semibold" href="/register">Sign up</a></p>
       </div>
     </div>
   );

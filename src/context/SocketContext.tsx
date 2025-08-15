@@ -30,17 +30,11 @@ interface SocketProviderProps {
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const { user, token, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated && token && user) {
-      // Initialize socket connection
-      const newSocket = io(API_BASE, {
-        auth: {
-          token: token,
-        },
-        transports: ['websocket', 'polling'],
-      });
+    if (isAuthenticated && user) {
+      const newSocket = io(API_BASE, { withCredentials: true, transports: ['websocket', 'polling'] });
 
       newSocket.on('connect', () => {
         console.log('Connected to server');
@@ -72,7 +66,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         setIsConnected(false);
       }
     }
-  }, [isAuthenticated, token, user, socket]);
+  }, [isAuthenticated, user, socket]);
 
   const joinChat = (chatRoomId: string) => {
     if (socket && isConnected) {
