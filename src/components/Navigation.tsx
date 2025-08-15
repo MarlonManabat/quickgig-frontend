@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
+import { usePolling } from '@/lib/usePolling';
 import WalletDisplay from './WalletDisplay';
 import Button from './ui/Button';
 import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard } from 'lucide-react';
@@ -14,6 +15,14 @@ const Navigation: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const [unread, setUnread] = useState(0);
+  usePolling(pathname.startsWith('/messages/') ? null : "/api/msg/list", 45000, (d: unknown) => {
+    const data = d as { conversations?: { unread?: number }[]; data?: { unread?: number }[] };
+    const list = data.conversations || data.data || [];
+    const total = list.reduce((sum: number, c: { unread?: number }) => sum + (c.unread || 0), 0);
+    setUnread(total);
+  });
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -111,10 +120,10 @@ const Navigation: React.FC = () => {
                 )}
                 <Link
                   href="/messages"
-                  className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                  className="relative qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
-                  Messages
+                  Messages{unread > 0 && (<span className="ml-1 bg-qg-accent text-white rounded-full px-2 text-xs">{unread}</span>)}
                 </Link>
 
                 <Link
@@ -252,11 +261,11 @@ const Navigation: React.FC = () => {
                   )}
                   <Link
                     href="/messages"
-                    className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    className="relative qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <MessageCircle className="w-5 h-5 mr-3" />
-                    Messages
+                    Messages{unread > 0 && (<span className="ml-1 bg-qg-accent text-white rounded-full px-2 text-xs">{unread}</span>)}
                   </Link>
                   <Link
                     href="/payment"
