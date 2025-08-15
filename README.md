@@ -140,10 +140,7 @@ Preflight (`OPTIONS`) should return `200`.
 ## Health & CI
 
 * **API health:** `https://api.quickgig.ph/health.php` → JSON `{ ok: true, ts: <unix> }`
-* **Smoke workflow** (`.github/workflows/smoke.yml`):
-
-  * On `main`: checks API health and that `quickgig.ph` and `www.quickgig.ph` return 308 to `https://app.quickgig.ph`.
-  * On PRs: redirect checks are non-blocking and emit `::notice` on failure.
+* Minimal CI: install + build.
 
 ### Local/Preview Notes
 
@@ -159,7 +156,6 @@ Preflight (`OPTIONS`) should return `200`.
 
 * `quickgig.ph` rendering correctly
 * `api.quickgig.ph/health.php` JSON
-* Latest successful **Smoke** run on `main`
 
 
 ## Production Domains (canonical)
@@ -195,6 +191,3 @@ Preflight (`OPTIONS`) should return `200`.
   curl -I https://quickgig.ph; curl -I https://www.quickgig.ph
   ```
   Operator tools only; CI does not enforce these checks.
-
-### CI Smoke Policy
-Our GitHub Actions **Smoke** job treats external endpoint checks as **non-blocking** on pull requests (runners can block outbound requests). On `main`, redirect assertions for `https://quickgig.ph` and `https://www.quickgig.ph` are **required** and will fail the workflow if missing. Build/lint/type checks remain blocking.
