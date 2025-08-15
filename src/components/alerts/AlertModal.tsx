@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import { api } from '@/lib/apiClient';
 import { API, JobFilters } from '@/config/api';
 import { toast } from '@/lib/toast';
+import { env } from '@/config/env';
+import { track } from '@/lib/track';
 
 export interface AlertData {
   id?: string | number;
@@ -76,10 +78,12 @@ export default function AlertModal({ open, onClose, initial, onSaved }: Props) {
             : undefined,
       };
       const payload = { name, filters: clean, frequency, email };
-      const res = initial?.id
-        ? await api.patch(API.alertsUpdate(initial.id), payload)
-        : await api.post(API.alertsCreate, payload);
+      const creating = !initial?.id;
+      const res = creating
+        ? await api.post(API.alertsCreate, payload)
+        : await api.patch(API.alertsUpdate(initial!.id!), payload);
       toast('Alert saved');
+      if (creating && env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('alert_create');
       onSaved?.(res.data);
       onClose();
     } catch {

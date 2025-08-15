@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { env } from '@/config/env';
+import { track } from '@/lib/track';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -23,6 +25,7 @@ export default function RegisterPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Registration failed');
+      if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('signup_success');
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');

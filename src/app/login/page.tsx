@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { env } from '@/config/env';
+import { track } from '@/lib/track';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Login failed');
+      if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('login_success');
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');

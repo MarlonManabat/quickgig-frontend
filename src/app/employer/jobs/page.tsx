@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
+import { env } from '@/config/env';
+import { track } from '@/lib/track';
 
 interface MyJob {
   id: number | string;
@@ -36,6 +38,7 @@ export default function EmployerJobsPage() {
     try {
       await api.post(API.toggleJob(id), { published: !published });
       await load();
+      if (!published && env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('job_publish');
     } catch {
       // ignore
     }

@@ -22,7 +22,7 @@ export default function AdminDashboard() {
   return (
     <main className="p-4 space-y-4">
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <Link href="/admin/jobs" className="border rounded p-4 block">
           <p className="text-sm">Pending Jobs</p>
           <p className="text-2xl font-semibold">
@@ -40,6 +40,9 @@ export default function AdminDashboard() {
           <p className="text-2xl font-semibold">
             {summary?.counts?.users ?? 0}
           </p>
+        </Link>
+        <Link href="/admin/metrics" className="border rounded p-4 block">
+          <p className="text-sm">Metrics</p>
         </Link>
       </div>
     </main>
