@@ -4,6 +4,7 @@ export interface User {
   email: string;
   phone: string;
   role: 'Job Seeker' | 'Employer' | 'Admin';
+  isEmployer?: boolean;
   ticketBalance?: number;
   createdAt?: string;
   updatedAt?: string;

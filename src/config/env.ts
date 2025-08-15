@@ -6,6 +6,8 @@ export const env = {
     process.env.NEXT_PUBLIC_API_URL ||
     'http://localhost:3001',
   JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'auth_token',
+  EMPLOYER_EMAILS:
+    process.env.EMPLOYER_EMAILS?.split(',').map((e) => e.trim()).filter(Boolean) || [],
   NEXT_PUBLIC_ENABLE_APPLY:
     process.env.NEXT_PUBLIC_ENABLE_APPLY !== undefined
       ? String(process.env.NEXT_PUBLIC_ENABLE_APPLY).toLowerCase() === 'true'

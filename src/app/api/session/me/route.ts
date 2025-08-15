@@ -17,5 +17,24 @@ export async function GET(req: NextRequest) {
     cache: 'no-store',
   });
   const data = await res.json();
-  return NextResponse.json(data, { status: res.status });
+
+  let isEmployer: boolean | undefined = data.isEmployer;
+  if (typeof isEmployer !== 'boolean' && data.user?.role) {
+    isEmployer = data.user.role === 'Employer';
+  }
+  if (typeof isEmployer !== 'boolean' && data.user?.email) {
+    isEmployer = env.EMPLOYER_EMAILS.includes(data.user.email);
+  }
+  if (typeof isEmployer !== 'boolean') {
+    isEmployer = false;
+  }
+  data.isEmployer = isEmployer;
+
+  const response = NextResponse.json(data, { status: res.status });
+  if (data.user?.role) {
+    response.cookies.set('role', data.user.role);
+  }
+  response.cookies.set('isEmployer', String(isEmployer));
+
+  return response;
 }
