@@ -13,18 +13,14 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          registry-url: https://registry.npmjs.org/
-
-      # Prod-only install (keeps Playwright/dev deps out of builds)
-      - name: Install prod deps only
-        run: npm ci --omit=dev --no-audit --no-fund || npm install --omit=dev --no-audit --no-fund
-
+      - name: Use public npm registry
+        run: npm config set registry https://registry.npmjs.org/
+      - name: Clean install (prod-only)
+        env:
+          NODE_ENV: production
+        run: |
+          rm -rf node_modules
+          npm ci --omit=dev --no-audit --no-fund
       - name: Build
         run: npm run build
 
-      # Optional soft check: surfaces output but never fails the job
-      - name: Verify API (soft)
-        run: |
-          outs=$(npm run --silent check:api 2>&1 || true)
-          echo "${outs}"
-          echo "::notice::${outs//$'\n'/ ' '}"
