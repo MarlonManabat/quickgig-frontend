@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginData, SignupData, UpdateUserData } from '@/types';
 import { api } from '@/lib/apiClient';
+import { login as loginApi, register as registerApi, me as meApi } from '@/lib/auth/client';
 
 interface AuthContextType {
   user: User | null;
@@ -34,10 +35,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const fetchMe = async () => {
     try {
-      const res = await fetch('/api/session/me', { cache: 'no-store' });
-      if (!res.ok) throw new Error('Not authenticated');
-      const data = (await res.json()) as User;
-      setUser(data);
+      const data = await meApi();
+      const userData = (data.user || data) as User;
+      if (userData && Object.keys(userData).length) setUser(userData);
+      else setUser(null);
     } catch {
       setUser(null);
     }
@@ -48,20 +49,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (data: LoginData) => {
-    await fetch('/api/session/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+    await loginApi(data.email, data.password);
     await fetchMe();
   };
 
   const signup = async (data: SignupData) => {
-    await fetch('/api/session/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+    await registerApi({ email: data.email, password: data.password, name: data.name });
     await fetchMe();
   };
 
