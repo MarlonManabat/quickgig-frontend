@@ -1,28 +1,28 @@
-name: E2E Smoke
+name: E2E Smoke (nightly)
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 3 * * *' # daily at 03:00 UTC
+    - cron: '0 3 * * *'
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-          registry-url: https://registry.npmjs.org/
 
-      # Explicitly include dev deps; .npmrc defaults to omit=dev
+      - name: Use public registry
+        run: npm config set registry https://registry.npmjs.org/
+
       - name: Install dev deps (Playwright, types, etc.)
-        run: npm ci --include=dev --no-audit --no-fund || npm install --include=dev --no-audit --no-fund
+        run: |
+          rm -rf node_modules
+          npm ci --include=dev --no-audit --no-fund || npm install --include=dev --no-audit --no-fund
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
