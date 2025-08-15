@@ -1,30 +1,31 @@
 import fs from 'fs';
 import path from 'path';
 
+export const dynamic = 'force-dynamic';
+
+function getQrSrc() {
+  const base = path.join(process.cwd(), 'public');
+  const png = path.join(base, 'gcash-qr.png');
+  if (fs.existsSync(png)) return '/gcash-qr.png';
+  const jpg = path.join(base, 'gcash-qr.jpg');
+  if (fs.existsSync(jpg)) return '/gcash-qr.jpg';
+  return '/gcash-qr.svg';
+}
+
 export default function PaymentPage() {
-  const qrPath = path.join(process.cwd(), 'public', 'gcash-qr.png');
-  const hasQr = fs.existsSync(qrPath);
+  const qrSrc = getQrSrc();
   return (
-    <main className="p-4 space-y-4">
+    <main className="p-4 flex flex-col items-center space-y-4">
       <h1 className="text-2xl font-bold">Payment</h1>
-      {hasQr ? (
-        // eslint-disable-next-line @next/next/no-img-element -- placeholder
-        <img
-          src="/gcash-qr.png"
-          alt="GCash QR"
-          className="max-w-xs w-full h-auto"
-        />
-      ) : (
-        <div className="max-w-sm border rounded p-4 bg-white/70 space-y-4">
-          <p>No QR uploaded yet. Email or upload proof of payment while the gateway is in beta.</p>
-          <a
-            href="mailto:support@quickgig.ph"
-            className="inline-block bg-yellow-400 px-4 py-2 rounded"
-          >
-            Upload Proof
-          </a>
-        </div>
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element -- static asset */}
+      <img src={qrSrc} alt="GCash QR" className="w-full max-w-xs h-auto" />
+      <p className="text-center">Scan QR in GCash, then send proof via Support.</p>
+      <a
+        href="mailto:support@quickgig.ph?subject=GCash%20Payment%20Proof"
+        className="bg-yellow-400 px-4 py-2 rounded"
+      >
+        Email Support
+      </a>
     </main>
   );
 }
