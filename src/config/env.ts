@@ -7,8 +7,9 @@ export const env = {
     'http://localhost:3001',
   JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'auth_token',
   NEXT_PUBLIC_ENABLE_APPLY:
-    String(process.env.NEXT_PUBLIC_ENABLE_APPLY ?? 'false').toLowerCase() ===
-    'true',
+    process.env.NEXT_PUBLIC_ENABLE_APPLY !== undefined
+      ? String(process.env.NEXT_PUBLIC_ENABLE_APPLY).toLowerCase() === 'true'
+      : process.env.NODE_ENV !== 'production',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

@@ -121,6 +121,8 @@ Set these in Vercel → Project → Settings → Environment Variables:
 - `JWT_COOKIE_NAME` – name of the auth cookie
 - `NEXT_PUBLIC_ENABLE_APPLY` – enable Apply buttons for jobs
 
+To enable the Apply flow in production, set `NEXT_PUBLIC_ENABLE_APPLY=true` in your Vercel project settings.
+
 API endpoints live in [`src/config/api.ts`](src/config/api.ts); edit them if your backend paths differ.
 
 ## Cookies & Auth

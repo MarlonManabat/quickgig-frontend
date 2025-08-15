@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
-import type { Job } from '../../../types/jobs';
+import type { Job } from '@/types/jobs';
 import ApplyButton from './apply-button';
 
 export default function JobsPage() {
@@ -59,12 +60,14 @@ export default function JobsPage() {
           className="border rounded p-4 flex justify-between items-center"
         >
           <div>
-            <h2 className="font-semibold">{job.title}</h2>
+            <h2 className="font-semibold">
+              <Link href={`/jobs/${job.id}`}>{job.title}</Link>
+            </h2>
             <p className="text-sm text-gray-600">
               {job.company} · {job.location} · {job.rate}
             </p>
           </div>
-          <ApplyButton jobId={job.id} />
+          <ApplyButton jobId={String(job.id)} title={job.title} />
         </div>
       ))}
     </main>
