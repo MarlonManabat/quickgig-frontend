@@ -6,7 +6,7 @@ import { SocketProvider } from "../context/SocketContext";
 import Navigation from "../components/Navigation";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { ToastProvider } from "../components/ToastProvider";
-import ClientBootstrap from '@/app/ClientBootstrap';
+import ClientBootstrap from './ClientBootstrap';
 import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
 
