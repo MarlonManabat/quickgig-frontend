@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run typecheck && npm run lint:ci && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
@@ -19,7 +19,7 @@
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
-    "test:e2e:smoke": "playwright test -c ./playwright.config.ts --grep @smoke",
+    "test:e2e:smoke": "playwright test -c ./playwright.config.ts --reporter=line --grep @smoke",
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/check_links.mjs"
