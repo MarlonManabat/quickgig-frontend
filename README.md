@@ -15,12 +15,12 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
    ```bash
    npm install
    ```
-2. Copy `.env.example` to `.env.local` and adjust as needed. The app
-  defaults to the public API if the variable is missing:
+2. Copy `.env.example` to `.env.local` and adjust as needed. Sensible
+   defaults are included for local development:
    ```env
-    NEXT_PUBLIC_API_BASE=https://api.quickgig.ph
-    NEXT_PUBLIC_ENV=local
-    ```
+   NEXT_PUBLIC_API_BASE=http://localhost:3001
+   NEXT_PUBLIC_ENV=local
+   ```
 
 To verify the live API locally, run:
 
@@ -43,6 +43,9 @@ Run the development server and visit the branded home page at
 ```bash
 npm run dev
 ```
+
+During development, `/system/env` displays the public environment values
+with badges for any missing entries.
 
 ## E2E Smoke Tests
 
@@ -73,10 +76,10 @@ Login, signup, and other protected pages call the external API at
 
 ### Smoke checks
 
-  The app defaults to the public API if `NEXT_PUBLIC_API_BASE` is unset:
+  The app defaults to a local API if `NEXT_PUBLIC_API_BASE` is unset:
 
 ```env
-  NEXT_PUBLIC_API_BASE=https://api.quickgig.ph
+  NEXT_PUBLIC_API_BASE=http://localhost:3001
 ```
 
 Verify the production root and API:
@@ -104,8 +107,19 @@ This repo hosts the Next.js frontend for QuickGig.
 - `/` serves the app directly. Legacy `/app` paths redirect to `/`.
 
 ## Environment
-  - `NEXT_PUBLIC_API_BASE=https://api.quickgig.ph`
-  - `NEXT_PUBLIC_ENV=production|preview|local`
+Set these in `.env.local` for local development and in Vercel under
+**Settings → Environment Variables**:
+
+- `NEXT_PUBLIC_API_BASE` – base URL for the backend API. Defaults to
+  `http://localhost:3001`.
+- `NEXT_PUBLIC_FACEBOOK_APP_ID` – Facebook app ID for login and chat
+  widgets. Optional.
+- `NEXT_PUBLIC_FACEBOOK_PAGE_ID` – Facebook page ID for the Messenger
+  chat plugin. Optional.
+- `NEXT_PUBLIC_ENV` – environment name used in logs (`local`, `preview`,
+  `production`).
+- `BASE` – base URL for scripts and smoke tests. Optional and not
+  exposed to the client.
 
 ## Cookies & Auth
 The API sets a session cookie (e.g., `qg_session`) with:

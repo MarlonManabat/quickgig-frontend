@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { initFacebook } from '@/lib/facebook';
+import { env } from '@/config/env';
 import Button from '@/components/ui/Button';
 
 interface FacebookLoginProps {
@@ -18,8 +19,8 @@ export default function FacebookLogin({
   size = 'md',
 }: FacebookLoginProps) {
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_FACEBOOK_APP_ID) {
-      initFacebook(process.env.NEXT_PUBLIC_FACEBOOK_APP_ID);
+    if (env.NEXT_PUBLIC_FACEBOOK_APP_ID) {
+      initFacebook(env.NEXT_PUBLIC_FACEBOOK_APP_ID);
     }
   }, []);
 

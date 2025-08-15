@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { env } from '@/config/env';
 
 interface MessengerChatProps {
   pageId?: string;
@@ -22,8 +23,8 @@ declare global {
 }
 
 export default function MessengerChat({
-  pageId = process.env.NEXT_PUBLIC_FACEBOOK_PAGE_ID,
-  appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+  pageId = env.NEXT_PUBLIC_FACEBOOK_PAGE_ID,
+  appId = env.NEXT_PUBLIC_FACEBOOK_APP_ID,
   themeColor = '#00B272',
   loggedInGreeting = 'Kumusta! Paano ka namin matutulungan sa QuickGig.ph?',
   loggedOutGreeting = 'Kumusta! May tanong ka ba tungkol sa QuickGig.ph? Message mo kami!',
