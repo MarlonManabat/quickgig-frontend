@@ -1,8 +1,8 @@
 export const env = {
   NEXT_PUBLIC_API_URL:
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
   API_URL:
-    process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+    process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
   JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'auth_token',
   NEXT_PUBLIC_ENABLE_APPLY:
     String(process.env.NEXT_PUBLIC_ENABLE_APPLY ?? 'false').toLowerCase() === 'true',
@@ -35,7 +35,7 @@ if (process.env.NODE_ENV !== 'production') {
   if (!process.env.NEXT_PUBLIC_API_URL && !process.env.API_URL) {
     // eslint-disable-next-line no-console
     console.warn(
-      '[env] NEXT_PUBLIC_API_URL / API_URL not set. Using http://localhost:3001'
+      '[env] NEXT_PUBLIC_API_URL / API_URL not set. Using https://api.quickgig.ph'
     );
   }
 }

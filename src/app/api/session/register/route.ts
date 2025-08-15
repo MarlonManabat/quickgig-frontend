@@ -1,32 +1,17 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import { env } from '@/config/env';
 import { API } from '@/config/api';
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const res = await fetch(`${env.API_URL}${API.register}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    return NextResponse.json(data, { status: res.status });
-  }
-  const token = data.token || data.accessToken || data.jwt;
-  if (!token) {
+export async function POST(req: Request) {
+  const body = await req.json().catch(() => ({}));
+  try {
+    const r = await fetch(`${env.API_URL}${API.register}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    const data = await r.json().catch(() => ({}));
     return NextResponse.json(
-      { message: data.message || 'Missing token' },
-      { status: 400 },
+      r.ok ? { ok: true, ...data } : { ok: false, message: data?.message || 'Registration failed' },
+      { status: 200 }
     );
-  }
-  const response = NextResponse.json({ ok: true });
-  response.cookies.set(env.JWT_COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 30,
-  });
-  return response;
+  } catch { return NextResponse.json({ ok:false, message:'Auth service unreachable' }, { status:200 }); }
 }
