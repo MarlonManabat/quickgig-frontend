@@ -27,6 +27,12 @@ export const API = {
   sendMessage: (id: string) => `/messages/send.php?id=${id}`,
   markConversationRead: (id: string) => `/messages/read.php?id=${id}`,
   startConversation: '/messages/start.php',
+  alertsList: '/alerts/list.php',
+  alertsCreate: '/alerts/create.php',
+  alertsUpdate: (id: string | number) => `/alerts/update.php?id=${id}`,
+  alertsDelete: (id: string | number) => `/alerts/delete.php?id=${id}`,
+  alertsToggle: (id: string | number) => `/alerts/toggle.php?id=${id}`,
+  alertsRunDigest: '/alerts/runDigest.php',
 };
 
 export type JobFilters = {

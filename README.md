@@ -51,6 +51,28 @@ backend provides the endpoints, saved jobs are also synced via:
 
 Use the “Saved only” filter on the Jobs page to view saved jobs.
 
+## Job Alerts
+
+Turn on with `NEXT_PUBLIC_ENABLE_ALERTS=true` and optionally set
+`ALERTS_DIGEST_SECRET` if the backend checks a shared secret. Backend
+endpoints expected (see `src/config/api.ts`):
+
+- `GET ${API.alertsList}` – list my alerts
+- `POST ${API.alertsCreate}` – create `{ name, filters, frequency, email }`
+- `PATCH ${API.alertsUpdate(id)}` – update an alert
+- `POST ${API.alertsDelete(id)}` – delete an alert
+- `POST ${API.alertsToggle(id)}` – toggle email notifications
+- `POST ${API.alertsRunDigest}` – trigger digest (optional)
+
+Vercel Cron setup:
+
+- Path: `/api/cron/job-alerts`
+- Method: `POST`
+- Schedule: `0 1 * * *` (daily 01:00 UTC) or `0 17 * * *`
+
+Create an alert from the **Create Alert from filters** button on `/jobs` and
+manage them in `/settings/alerts`.
+
 ## Authentication
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
