@@ -22,6 +22,11 @@ export const API = {
   uploadLogo: '/employer/company/uploadLogo.php',
   publicUser: (id: string | number) => `/public/user.php?id=${id}`,
   publicCompany: (slug: string) => `/public/company.php?slug=${encodeURIComponent(slug)}`,
+  conversationsMine: '/messages/list.php',
+  conversationById: (id: string) => `/messages/show.php?id=${id}`,
+  sendMessage: (id: string) => `/messages/send.php?id=${id}`,
+  markConversationRead: (id: string) => `/messages/read.php?id=${id}`,
+  startConversation: '/messages/start.php',
 };
 
 export type JobFilters = {
