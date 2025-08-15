@@ -90,6 +90,13 @@ BASE=https://quickgig.ph node tools/check_root.mjs
 BASE=https://api.quickgig.ph npm run check:api
 ```
 
+## SEO & Sitemap
+
+- `NEXT_PUBLIC_SITE_URL` sets the canonical base URL.
+- Use the `canonical()` helper in `src/lib/canonical.ts` to build canonical links.
+- `/sitemap.xml` and `/robots.txt` are served from `app/sitemap.ts` and `app/robots.ts`.
+- Job detail pages embed [JSON-LD](https://schema.org/JobPosting); verify with Google's [Rich Results Test](https://search.google.com/test/rich-results).
+
 ## Production routing
 - `https://quickgig.ph` → 308 to `https://app.quickgig.ph`
 - `https://www.quickgig.ph` → 308 to `https://app.quickgig.ph`

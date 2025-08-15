@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
+import { canonical } from '@/lib/canonical';
 import HomePageClient from './HomePageClient';
 
-export const metadata: Metadata = {
-  title: 'QuickGig',
-  description: 'Gigs and talent, matched fast.',
-};
+export function generateMetadata(): Metadata {
+  return {
+    alternates: { canonical: canonical('/') },
+  };
+}
 
-export default async function Page() {
+export default function Page() {
   return <HomePageClient />;
 }
 

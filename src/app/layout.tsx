@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
@@ -6,46 +7,27 @@ import { SocketProvider } from "../context/SocketContext";
 import Navigation from "../components/Navigation";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { ToastProvider } from "../components/ToastProvider";
+import { SEO } from "@/config/seo";
 
 export const metadata: Metadata = {
-  title: "QuickGig.ph - Find Gigs Fast in the Philippines",
-  description: "Kahit saan sa Pinas, may gig para sa'yo! Connect with opportunities and talent across the Philippines. Find work or hire skilled professionals quickly and easily.",
-  keywords: "freelance, gigs, Philippines, work, jobs, hiring, talent, remote work, Filipino freelancers",
-  authors: [{ name: "QuickGig.ph Team" }],
-  creator: "QuickGig.ph",
-  publisher: "QuickGig.ph",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
+  metadataBase: new URL(SEO.siteUrl),
+  title: {
+    default: SEO.defaultTitle,
+    template: `%s | ${SEO.siteName}`,
   },
-  metadataBase: new URL('https://quickgig.ph'),
-  alternates: {
-    canonical: '/',
-  },
+  description: SEO.defaultDescription,
   openGraph: {
-    title: "QuickGig.ph - Find Gigs Fast in the Philippines",
-    description: "Kahit saan sa Pinas, may gig para sa'yo! Connect with opportunities and talent across the Philippines.",
-    url: 'https://quickgig.ph',
-    siteName: 'QuickGig.ph',
-    images: [
-      {
-        url: '/logo-main.png',
-        width: 1200,
-        height: 630,
-        alt: 'QuickGig.ph - Filipino Freelance Platform',
-      },
-    ],
-    locale: 'en_PH',
-    type: 'website',
+    title: SEO.defaultTitle,
+    description: SEO.defaultDescription,
+    url: SEO.siteUrl,
+    siteName: SEO.siteName,
   },
   twitter: {
     card: 'summary_large_image',
-    title: "QuickGig.ph - Find Gigs Fast in the Philippines",
-    description: "Kahit saan sa Pinas, may gig para sa'yo!",
-    images: ['/logo-main.png'],
-    creator: '@QuickGigPH',
+    site: SEO.twitter.site,
+    creator: SEO.twitter.creator,
   },
+  themeColor: '#0ea5e9',
   icons: {
     icon: [
       { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
@@ -57,20 +39,6 @@ export const metadata: Metadata = {
     shortcut: '/favicon.png',
   },
   manifest: '/manifest.json',
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  verification: {
-    google: 'your-google-verification-code',
-  },
 };
 
 export default function RootLayout({
@@ -81,6 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <meta name="theme-color" content="#0ea5e9" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
@@ -97,8 +66,7 @@ export default function RootLayout({
               <div className="qg-container">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                   <div className="col-span-1 md:col-span-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element -- logo placeholder */}
-                    <img src="/logo-horizontal.png" alt="QuickGig.ph" className="h-8 mb-4" />
+                    <Image src="/logo-horizontal.png" alt="QuickGig.ph" width={160} height={32} className="h-8 mb-4 w-auto" />
                     <p className="text-fg opacity-70 mb-4">
                       Ang pinakamabilis na paraan para makahanap ng trabaho at talent sa Pilipinas.
                     </p>

@@ -122,6 +122,12 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .qg-container {
