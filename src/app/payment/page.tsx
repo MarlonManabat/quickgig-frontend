@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,8 +18,7 @@ export default function PaymentPage() {
   return (
     <main className="p-4 flex flex-col items-center space-y-4">
       <h1 className="text-2xl font-bold">Payment</h1>
-      {/* eslint-disable-next-line @next/next/no-img-element -- static asset */}
-      <img src={qrSrc} alt="GCash QR" className="w-full max-w-xs h-auto" />
+      <Image src={qrSrc} alt="GCash QR" width={300} height={300} className="w-full max-w-xs h-auto" />
       <p className="text-center">Scan QR in GCash, then send proof via Support.</p>
       <a
         href="mailto:support@quickgig.ph?subject=GCash%20Payment%20Proof"

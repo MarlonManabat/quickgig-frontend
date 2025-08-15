@@ -1,5 +1,7 @@
 import { API } from '@/config/api';
 import { env } from '@/config/env';
+import { canonical } from '@/lib/canonical';
+import { SEO } from '@/config/seo';
 import ApplyButton from '../apply-button';
 import type { Job } from '@/types/jobs';
 
@@ -23,12 +25,12 @@ export async function generateMetadata({ params }: JobPageProps) {
     return {
       title: job.title,
       description: job.description,
-      alternates: { canonical: `/jobs/${params.id}` },
+      alternates: { canonical: canonical(`/jobs/${params.id}`) },
     };
   } catch {
     return {
       title: 'Job not found',
-      alternates: { canonical: `/jobs/${params.id}` },
+      alternates: { canonical: canonical(`/jobs/${params.id}`) },
     };
   }
 }
@@ -53,6 +55,9 @@ export default async function JobPage({ params }: JobPageProps) {
     );
   }
 
+  const employmentType = (job as any).employmentType;
+  const datePosted = (job as any).datePosted || new Date().toISOString();
+
   return (
     <main className="p-4 space-y-4">
       <div>
@@ -75,6 +80,24 @@ export default async function JobPage({ params }: JobPageProps) {
           ))}
         </ul>
       ) : null}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'JobPosting',
+            title: job.title,
+            description: job.description,
+            hiringOrganization: { '@type': 'Organization', name: job.company || SEO.siteName },
+            datePosted,
+            jobLocation: {
+              '@type': 'Place',
+              address: { '@type': 'PostalAddress', addressCountry: 'PH' },
+            },
+            ...(employmentType ? { employmentType } : {}),
+          }),
+        }}
+      />
     </main>
   );
 }
