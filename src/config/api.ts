@@ -1,5 +1,4 @@
 export const API = {
-  login: '/auth/login.php',
   register: '/auth/register.php',
   me: '/auth/me.php',
   jobs: '/jobs/list.php',
