@@ -222,3 +222,18 @@ Preflight (`OPTIONS`) should return `200`.
   curl -I https://quickgig.ph; curl -I https://www.quickgig.ph
   ```
   Operator tools only; CI does not enforce these checks.
+
+## Production Setup
+
+Set the following in Vercel → Project → Settings → Environment Variables:
+
+- `NEXT_PUBLIC_API_URL`
+- `API_URL`
+- `JWT_COOKIE_NAME`
+- `NEXT_PUBLIC_ENABLE_APPLY`
+- `RESEND_API_KEY` *(optional)*
+- `NOTIFY_FROM` *(optional)*
+- `NOTIFY_ADMIN_EMAIL` *(optional)*
+
+After saving, redeploy via Vercel and verify at [`/system/status`](./src/app/system/status/page.tsx).
+To add a payment QR, upload `public/gcash-qr.png` and redeploy.
