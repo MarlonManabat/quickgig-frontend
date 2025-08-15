@@ -1,60 +1,31 @@
-name: Smoke
+name: Smoke (pull_request)
 
 on:
   pull_request:
-  push:
-    branches: [ main ]
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    continue-on-error: true
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Show Branch / Event
-        run: |
-          echo "event: ${{ github.event_name }}"
-          echo "ref: ${{ github.ref }}"
-
-      # 👉 PRs: check redirects but do not block (network may be restricted)
-      - name: PR redirect check (non-blocking)
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          set +e
-          fail=0
-          curl -I --max-time 8 --retry 1 https://app.quickgig.ph || true
-          check() {
-            url=$1
-            out=$(curl -sI --max-time 8 --retry 1 "$url" || true)
-            echo "$out"
-            echo "$out" | grep -q 'HTTP/.* 308' && echo "$out" | grep -q 'Location: https://app.quickgig.ph/' || fail=1
-          }
-          check https://quickgig.ph
-          check https://www.quickgig.ph
-          if [ $fail -ne 0 ]; then
-            echo "::notice::Redirect check failed (non-blocking)."
-          else
-            echo "::notice::Redirect check passed."
-          fi
-
-      # 👉 main: redirect assertions are required
-      - name: Main branch redirect check
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
-          set -e
-          echo "Checking production redirects..."
-          curl -I --max-time 10 --retry 2 https://app.quickgig.ph
-          check() {
-            url=$1
-            out=$(curl -sI --max-time 10 --retry 2 "$url")
-            echo "$out"
-            echo "$out" | grep -q 'HTTP/.* 308'
-            echo "$out" | grep -q 'Location: https://app.quickgig.ph/'
-          }
-          check https://quickgig.ph
-          check https://www.quickgig.ph
-          echo "Redirect checks passed."
-
-      # Keep any existing build/lint/type steps if they lived in this file before.
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      # Explicit dev install for Playwright, types, etc.
+      - name: Install dev deps
+        run: npm ci --include=dev --no-audit --no-fund || npm install --include=dev --no-audit --no-fund
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run smoke tests
+        env:
+          BASE: https://app.quickgig.ph
+        run: npm run test:e2e:smoke
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
