@@ -67,6 +67,23 @@ New routes:
 Uploads are proxied via `/api/upload/resume` and `/api/upload/logo`, forwarding multipart bodies to the backend with auth cookies.
 Backend endpoints for these features are defined in [`src/config/api.ts`](src/config/api.ts).
 
+## Messaging
+
+- `/messages` – inbox listing conversations
+- `/messages/[id]` – thread view
+
+Expected backend endpoints (configure in `src/config/api.ts`):
+- `GET ${API.conversationsMine}`
+- `GET ${API.conversationById(id)}`
+- `GET ${API.conversationForApplication(appId)}`
+- `POST ${API.sendMessage(id)}` with `{ text }`
+- `POST ${API.startConversation}` with `{ appId, toUserId?, firstMessage? }`
+- `POST ${API.markRead(id)}`
+
+Threads poll for new messages every 6–8 s (backing off when unfocused). The navbar unread badge polls the conversation list about every 30–60 s.
+Email notifications for new messages are optional and use `/api/notify/message` when `RESEND_API_KEY` is set.
+
+
 ## Development
 
 Run the development server and visit the branded home page at
