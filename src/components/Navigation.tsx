@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import WalletDisplay from './WalletDisplay';
 import Button from './ui/Button';
-import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard } from 'lucide-react';
+import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard, FileText } from 'lucide-react';
 
 const Navigation: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -60,6 +60,15 @@ const Navigation: React.FC = () => {
               <Briefcase className="w-4 h-4 mr-2" />
               Find Work
             </Link>
+            {isAuthenticated && !user?.isEmployer && (
+              <Link
+                href="/applications"
+                className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                My Applications
+              </Link>
+            )}
             {user?.isEmployer && (
               <div className="relative group">
                 <button
@@ -69,6 +78,12 @@ const Navigation: React.FC = () => {
                   Employer
                 </button>
                 <div className="absolute hidden group-hover:block bg-qg-navy-light rounded-qg-md mt-2 min-w-[150px]">
+                  <Link
+                    href="/employer/applications"
+                    className="block px-4 py-2 qg-navbar-link hover:bg-qg-navy"
+                  >
+                    Applications
+                  </Link>
                   <Link
                     href="/employer/jobs"
                     className="block px-4 py-2 qg-navbar-link hover:bg-qg-navy"
@@ -196,11 +211,17 @@ const Navigation: React.FC = () => {
               </Link>
               {isAuthenticated ? (
                 <>
-                  <div className="border-t border-qg-navy-light my-4 pt-4">
-                    <div className="px-4 py-2 text-sm text-gray-300">
-                      Kumusta, <span className="font-medium text-fg">{user?.name}</span>
-                    </div>
+                <div className="border-t border-qg-navy-light my-4 pt-4">
+                  <div className="px-4 py-2 text-sm text-gray-300">
+                    Kumusta, <span className="font-medium text-fg">{user?.name}</span>
                   </div>
+                </div>
+                    {!user?.isEmployer && (
+                      <Link href="/applications" className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent" onClick={() => setIsMenuOpen(false)}>
+                        <FileText className="w-5 h-5 mr-3" />
+                        My Applications
+                      </Link>
+                    )}
                     <Link href="/dashboard" className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent" onClick={() => setIsMenuOpen(false)}>
                       <Home className="w-5 h-5 mr-3" />
                       Dashboard
@@ -218,6 +239,14 @@ const Navigation: React.FC = () => {
                   )}
                   {user?.isEmployer && (
                     <>
+                      <Link
+                        href="/employer/applications"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <FileText className="w-5 h-5 mr-3" />
+                        Applications
+                      </Link>
                       <Link
                         href="/employer/jobs"
                         className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { env } from './src/config/env';
 
-const protectedPaths = ['/dashboard', '/profile', '/account'];
+const protectedPaths = ['/dashboard', '/profile', '/account', '/applications'];
 const employerPaths = ['/employer'];
 
 export function middleware(req: NextRequest) {
