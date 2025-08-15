@@ -7,7 +7,7 @@ async function toJsonSafe(r: Response) {
 
 export async function POST(req: Request) {
   const { email, password } = await req.json().catch(() => ({}));
-  const url = `${env.API_URL}/auth/login.php`;
+  const url = `${env.API_URL}/auth/login`;
   try {
     // Try JSON
     let r = await fetch(url, {

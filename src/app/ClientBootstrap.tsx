@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 
-const reAuth = /^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?(login|register|me)\.php/i;
+const reAuth = /^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?(login|register|me)(\.php)?/i;
 
 export default function ClientBootstrap() {
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function ClientBootstrap() {
       return origOpen.call(this, method, m ? `/api/session/${m[3]}` : url, async ?? true, username ?? null, password ?? null);
     };
 
-    // Raw <form action="https://quickgig.ph/login.php" method="post">
+    // Raw <form action="https://quickgig.ph/login" method="post">
     function onFormSubmit(e: Event) {
       const f = e.target as HTMLFormElement;
       if (!(f instanceof HTMLFormElement)) return;
