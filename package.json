@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run typecheck && npm run lint:ci && next build",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "lint:ci": "eslint . --max-warnings=0",
-    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "check:api": "node tools/check_api.mjs",
     "check:api:soft": "node tools/check_live_api.mjs || true",
     "check:app": "node tools/check_app.mjs",
@@ -50,5 +49,8 @@
   },
   "playwright": {
     "skipBrowserDownload": true
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
