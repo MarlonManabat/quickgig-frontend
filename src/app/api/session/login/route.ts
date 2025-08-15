@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { env } from '@/config/env';
-import { API } from '@/config/api';
-
 async function toJsonSafe(r: Response) {
   const t = await r.text();
   try { return JSON.parse(t); } catch { return t ? { raw: t } : {}; }
@@ -9,7 +7,7 @@ async function toJsonSafe(r: Response) {
 
 export async function POST(req: Request) {
   const { email, password } = await req.json().catch(() => ({}));
-  const url = `${env.API_URL}${API.login}`;
+  const url = `${env.API_URL}/auth/login.php`;
   try {
     // Try JSON
     let r = await fetch(url, {

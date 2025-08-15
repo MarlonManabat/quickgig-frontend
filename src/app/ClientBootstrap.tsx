@@ -43,7 +43,7 @@ export default function ClientBootstrap() {
       return origOpen.call(this, method, url, async ?? true, username ?? null, password ?? null);
     };
 
-    // Intercept raw <form action="https://quickgig.ph/login.php" method="post">
+    // Intercept raw <form> posts to auth endpoints
     function onFormSubmit(e: Event) {
       const f = e.target as HTMLFormElement;
       if (!(f instanceof HTMLFormElement)) return;
