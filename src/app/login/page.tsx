@@ -18,6 +18,7 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'same-origin',
       });
       const data = await res.json().catch(() => ({}));
       if (data?.ok) { router.replace('/dashboard'); return; }
