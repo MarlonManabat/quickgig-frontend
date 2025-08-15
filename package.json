@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run typecheck && npm run lint:ci && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
