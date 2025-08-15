@@ -8,6 +8,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_APPLY ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_SAVED_API:
     String(process.env.NEXT_PUBLIC_ENABLE_SAVED_API ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_SHOW_LOGOUT_ALL:
+    String(process.env.NEXT_PUBLIC_SHOW_LOGOUT_ALL ?? 'false').toLowerCase() === 'true',
   RESEND_API_KEY: process.env.RESEND_API_KEY || '',
   NOTIFY_FROM: process.env.NOTIFY_FROM || 'QuickGig <noreply@quickgig.ph>',
   NOTIFY_ADMIN_EMAIL: process.env.NOTIFY_ADMIN_EMAIL || '',

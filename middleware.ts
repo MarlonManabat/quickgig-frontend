@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { env } from './src/config/env';
 
-const protectedPaths = ['/dashboard', '/profile', '/account'];
+const protectedPaths = ['/dashboard', '/settings/profile', '/settings/account'];
 const employerPaths = ['/employer'];
 
 export function middleware(req: NextRequest) {
@@ -37,8 +37,8 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/profile/:path*',
-    '/account/:path*',
+    '/settings/profile/:path*',
+    '/settings/account/:path*',
     '/employer/:path*',
   ],
 };

@@ -12,6 +12,16 @@ export const API = {
   createJob: '/employer/jobs/create.php',
   updateJob: (id: number | string) => `/employer/jobs/update.php?id=${id}`,
   toggleJob: (id: number | string) => `/employer/jobs/toggle.php?id=${id}`,
+  updateProfile: '/user/profile/update.php',
+  uploadResume: '/user/profile/uploadResume.php',
+  deleteResume: '/user/profile/deleteResume.php',
+  changePassword: '/auth/changePassword.php',
+  requestPasswordReset: '/auth/requestPasswordReset.php',
+  companyGet: '/employer/company/get.php',
+  companyUpdate: '/employer/company/update.php',
+  uploadLogo: '/employer/company/uploadLogo.php',
+  publicUser: (id: string | number) => `/public/user.php?id=${id}`,
+  publicCompany: (slug: string) => `/public/company.php?slug=${encodeURIComponent(slug)}`,
 };
 
 export type JobFilters = {

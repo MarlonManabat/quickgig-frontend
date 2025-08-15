@@ -70,6 +70,12 @@ const Navigation: React.FC = () => {
                 </button>
                 <div className="absolute hidden group-hover:block bg-qg-navy-light rounded-qg-md mt-2 min-w-[150px]">
                   <Link
+                    href="/employer/company"
+                    className="block px-4 py-2 qg-navbar-link hover:bg-qg-navy"
+                  >
+                    Company
+                  </Link>
+                  <Link
                     href="/employer/jobs"
                     className="block px-4 py-2 qg-navbar-link hover:bg-qg-navy"
                   >
@@ -127,7 +133,7 @@ const Navigation: React.FC = () => {
                 
                 <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-qg-navy-light">
                   <Link
-                    href="/profile"
+                    href="/settings/profile"
                     className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                   >
                     <User className="w-4 h-4 mr-2" />
@@ -219,6 +225,14 @@ const Navigation: React.FC = () => {
                   {user?.isEmployer && (
                     <>
                       <Link
+                        href="/employer/company"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Briefcase className="w-5 h-5 mr-3" />
+                        Company
+                      </Link>
+                      <Link
                         href="/employer/jobs"
                         className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                         onClick={() => setIsMenuOpen(false)}
@@ -253,7 +267,7 @@ const Navigation: React.FC = () => {
                     Payment (Beta)
                   </Link>
                   <Link
-                    href="/profile"
+                    href="/settings/profile"
                     className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                     onClick={() => setIsMenuOpen(false)}
                   >
