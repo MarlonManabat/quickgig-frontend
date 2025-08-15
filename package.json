@@ -34,7 +34,8 @@
     "react-dom": "^18",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "webpack-bundle-analyzer": "^4.10.2",
+    "@sentry/nextjs": "^7.108.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.2",

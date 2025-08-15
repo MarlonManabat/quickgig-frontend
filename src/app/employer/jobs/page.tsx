@@ -41,7 +41,14 @@ export default function EmployerJobsPage() {
     }
   };
 
-  if (loading) return <main className="p-4">Loading...</main>;
+  if (loading)
+    return (
+      <main className="p-4 space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-12 bg-gray-200 animate-pulse rounded" />
+        ))}
+      </main>
+    );
   if (error) return <main className="p-4">{error}</main>;
 
   return (

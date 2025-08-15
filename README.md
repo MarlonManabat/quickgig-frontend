@@ -31,6 +31,14 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+## SEO & Monitoring
+
+- Default SEO settings live in `src/config/seo.ts`.
+- App Router metadata is defined in `src/app/layout.tsx`.
+- Pages Router can reuse `<SeoHead>` from `src/components/SeoHead.tsx`.
+- Sitemap and robots files are served from `src/app`.
+- To enable Sentry, set `SENTRY_DSN` and install `@sentry/nextjs`.
+
 ## Authentication
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
