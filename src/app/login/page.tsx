@@ -22,10 +22,13 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Login failed');
-      if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('login_success');
-      router.push('/dashboard');
+      const data = await res.json().catch(() => ({ ok: false, message: 'Invalid response from server' }));
+      if (!data.ok) {
+        setError(data.message || 'Login failed');
+      } else {
+        if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('login_success');
+        router.push('/dashboard');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
