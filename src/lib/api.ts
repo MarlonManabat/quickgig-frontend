@@ -1,10 +1,10 @@
 import { safeJsonParse } from './json';
 import { toast } from './toast';
 import { report } from './report';
+import { env } from '@/config/env';
 import type { Job } from '../../types/jobs';
 
-export const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE || 'https://api.quickgig.ph';
+export const API_BASE = env.NEXT_PUBLIC_API_BASE;
 
 export function get(path: string, init?: RequestInit) {
   return fetch(`${API_BASE}${path}`, { ...init, method: 'GET' });

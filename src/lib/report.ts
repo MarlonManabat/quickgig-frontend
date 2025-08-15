@@ -1,4 +1,5 @@
+import { env } from '@/config/env';
+
 export function report(error: unknown, context?: string) {
-  const env = process.env.NEXT_PUBLIC_ENV || 'local';
-  console.error('[error]', { env, context, error });
+  console.error('[error]', { env: env.NEXT_PUBLIC_ENV, context, error });
 }
