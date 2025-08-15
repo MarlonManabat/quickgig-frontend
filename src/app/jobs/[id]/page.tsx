@@ -6,6 +6,7 @@ import ReportButton from '@/components/ReportButton';
 import type { Job } from '@/types/jobs';
 import { canonical } from '@/lib/canonical';
 import { getUser } from '@/auth/getUser';
+import TrackView from './TrackView';
 
 interface JobPageProps {
   params: { id: string };
@@ -60,6 +61,7 @@ export default async function JobPage({ params }: JobPageProps) {
 
   return (
     <main className="p-4 space-y-4">
+      <TrackView id={job.id} />
       <div>
         <h1 className="text-xl font-semibold">{job.title}</h1>
         <p className="text-sm text-gray-600">

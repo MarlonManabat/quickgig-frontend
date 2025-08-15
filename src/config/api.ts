@@ -51,6 +51,11 @@ export const API = {
 
   // Audit
   adminAuditList: '/admin/audit/list.php', // GET { items:[{at,actor,action,target,meta}] }
+
+  // Metrics
+  metricsTrack: '/metrics/track.php', // POST { event, props, userId?, sessionId?, ua, ip, ref }
+  metricsSummary: '/metrics/summary.php', // GET { range=7|30|90 }
+  metricsTimeseries: '/metrics/timeseries.php', // GET { metric, range }
 };
 
 export type JobFilters = {

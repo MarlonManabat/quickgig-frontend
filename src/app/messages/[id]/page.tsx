@@ -5,6 +5,8 @@ import { MessageList } from '@/components/messages/MessageList';
 import { Composer } from '@/components/messages/Composer';
 import { usePolling } from '@/hooks/usePolling';
 import { Thread } from '@/types/messages';
+import { env } from '@/config/env';
+import { track } from '@/lib/track';
 
 export default function ThreadPage() {
   const params = useParams<{ id: string }>();
@@ -36,6 +38,8 @@ export default function ThreadPage() {
       body: JSON.stringify({ body }),
     }).catch(() => {});
     await load();
+    if (env.NEXT_PUBLIC_ENABLE_ANALYTICS)
+      track('message_send', { conversationId: id });
   }
 
   return (

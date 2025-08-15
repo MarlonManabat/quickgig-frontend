@@ -12,6 +12,7 @@ import JobsFilters from '@/components/jobs/JobsFilters';
 import { getSavedIds, hydrateSavedIds } from '@/lib/savedJobs';
 import AlertModal from '@/components/alerts/AlertModal';
 import { env } from '@/config/env';
+import { track } from '@/lib/track';
 
 function JobsPageContent() {
   const router = useRouter();
@@ -102,6 +103,10 @@ function JobsPageContent() {
 
   useEffect(() => {
     hydrateSavedIds();
+  }, []);
+
+  useEffect(() => {
+    if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('view_jobs');
   }, []);
 
   const totalPages = Math.ceil(total / (filters.limit || 20));

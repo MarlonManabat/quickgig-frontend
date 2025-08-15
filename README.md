@@ -97,6 +97,32 @@ Logged-in users can report a job or profile via a small **Report** link, which
 sends `{ type:'job'|'user', targetId, reason, details? }` to
 `${API.reportCreate}`.
 
+## Metrics
+
+- `NEXT_PUBLIC_ENABLE_ANALYTICS` – enable client event tracking
+- `METRICS_SECRET` – optional shared secret for backend validation
+
+Tracked events:
+
+- `view_home` – homepage viewed
+- `view_jobs` – jobs list viewed
+- `view_job` – job detail viewed `{ id }`
+- `signup_success` – registration completed
+- `login_success` – login completed
+- `apply_success` – job application submitted `{ jobId }`
+- `message_send` – message sent `{ conversationId }`
+- `job_post` – employer created a job
+- `job_publish` – employer published a job
+- `alert_create` – job alert created
+
+Backend endpoints (see `src/config/api.ts`):
+
+- `POST ${API.metricsTrack}` – proxy from `/api/metrics/track`
+- `GET ${API.metricsSummary}` – summary counts
+- `GET ${API.metricsTimeseries}` – timeseries data
+
+The frontend never blocks or fails the UI if the metrics backend is absent; `/api/metrics/track` always returns `{ ok: true }`.
+
 ## Authentication
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.

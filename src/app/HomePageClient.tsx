@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Briefcase, MousePointerClick, Shield } from 'lucide-react';
 import { checkHealth } from '@/lib/api';
+import { track } from '@/lib/track';
+import { env } from '@/config/env';
 
 type ApiStatus = 'loading' | 'ok' | 'error';
 
@@ -13,6 +15,7 @@ export default function HomePageClient() {
   const [status, setStatus] = useState<ApiStatus>('loading');
 
   useEffect(() => {
+    if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('view_home');
     checkHealth()
       .then((res) => setStatus(res.ok ? 'ok' : 'error'))
       .catch((err) => {

@@ -26,6 +26,9 @@ export const env = {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean),
+  NEXT_PUBLIC_ENABLE_ANALYTICS:
+    String(process.env.NEXT_PUBLIC_ENABLE_ANALYTICS ?? 'true').toLowerCase() === 'true',
+  METRICS_SECRET: process.env.METRICS_SECRET || '',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

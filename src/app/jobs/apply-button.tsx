@@ -5,6 +5,7 @@ import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
+import { track } from '@/lib/track';
 
 interface ApplyProps {
   jobId: string;
@@ -67,6 +68,8 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
       }).catch(() => {});
       toast('Application submitted');
       setSubmitted(true);
+      if (env.NEXT_PUBLIC_ENABLE_ANALYTICS)
+        track('apply_success', { jobId });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
         const status = err.response.status;
