@@ -52,7 +52,19 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
     setLoading(true);
     setError(null);
     try {
-      await api.post(API.apply, { jobId, name, email, phone, note });
+      const res = await api.post(API.apply, { jobId, name, email, phone, note });
+      const appId = (res.data && (res.data.id || res.data.applicationId)) || undefined;
+      void fetch('/api/notify/application', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicantEmail: email,
+          applicantName: name,
+          employerEmail: undefined,
+          jobTitle: title,
+          applicationId: appId,
+        }),
+      }).catch(() => {});
       toast('Application submitted');
       setSubmitted(true);
     } catch (err) {

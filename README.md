@@ -121,8 +121,13 @@ Set these in Vercel → Project → Settings → Environment Variables:
 - `JWT_COOKIE_NAME` – name of the auth cookie
 - `NEXT_PUBLIC_ENABLE_APPLY` – enable Apply buttons for jobs
 - `EMPLOYER_EMAILS` – comma-separated list of emails with employer access in dev
+- `RESEND_API_KEY` – Resend API key to enable email notifications
+- `NOTIFY_FROM` – from address for notifications (e.g., `QuickGig <noreply@quickgig.ph>`)
+- `NOTIFY_ADMIN_EMAIL` – fallback email for employer alerts
 
 To enable the Apply flow in production, set `NEXT_PUBLIC_ENABLE_APPLY=true` in your Vercel project settings.
+
+Notifications are optional. Configure `RESEND_API_KEY` and `NOTIFY_FROM` in Vercel to enable email delivery. If these keys are unset, notification requests are skipped and a warning is logged.
 
 API endpoints live in [`src/config/api.ts`](src/config/api.ts); edit them if your backend paths differ.
 
