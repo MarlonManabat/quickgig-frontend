@@ -55,6 +55,18 @@ Use the “Saved only” filter on the Jobs page to view saved jobs.
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
 
+## Profiles & Settings
+
+New routes:
+
+- `/settings/profile` – edit applicant profile and manage resume uploads (PDF, 10 MB max)
+- `/settings/account` – change password and request a reset link
+- `/u/[id]` – public applicant profile
+- `/c/[slug]` – public company page
+
+Uploads are proxied via `/api/upload/resume` and `/api/upload/logo`, forwarding multipart bodies to the backend with auth cookies.
+Backend endpoints for these features are defined in [`src/config/api.ts`](src/config/api.ts).
+
 ## Development
 
 Run the development server and visit the branded home page at
