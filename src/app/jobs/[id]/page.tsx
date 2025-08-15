@@ -2,6 +2,7 @@ import { API } from '@/config/api';
 import { env } from '@/config/env';
 import ApplyButton from '../apply-button';
 import type { Job } from '@/types/jobs';
+import { canonical } from '@/lib/canonical';
 
 interface JobPageProps {
   params: { id: string };
@@ -20,16 +21,16 @@ async function fetchJob(id: string): Promise<Job> {
 export async function generateMetadata({ params }: JobPageProps) {
   try {
     const job = await fetchJob(params.id);
-    return {
-      title: job.title,
-      description: job.description,
-      alternates: { canonical: `/jobs/${params.id}` },
-    };
+      return {
+        title: job.title,
+        description: job.description,
+        alternates: { canonical: canonical(`/jobs/${params.id}`) },
+      };
   } catch {
-    return {
-      title: 'Job not found',
-      alternates: { canonical: `/jobs/${params.id}` },
-    };
+      return {
+        title: 'Job not found',
+        alternates: { canonical: canonical(`/jobs/${params.id}`) },
+      };
   }
 }
 

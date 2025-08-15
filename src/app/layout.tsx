@@ -6,6 +6,8 @@ import { SocketProvider } from "../context/SocketContext";
 import Navigation from "../components/Navigation";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { ToastProvider } from "../components/ToastProvider";
+import { SEO } from "@/config/seo";
+import { canonical } from "@/lib/canonical";
 
 export const metadata: Metadata = {
   title: "QuickGig.ph - Find Gigs Fast in the Philippines",
@@ -19,14 +21,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://quickgig.ph'),
+  metadataBase: new URL(SEO.siteUrl || 'https://quickgig.ph'),
   alternates: {
-    canonical: '/',
+    canonical: canonical(),
   },
   openGraph: {
     title: "QuickGig.ph - Find Gigs Fast in the Philippines",
     description: "Kahit saan sa Pinas, may gig para sa'yo! Connect with opportunities and talent across the Philippines.",
-    url: 'https://quickgig.ph',
+    url: canonical(),
     siteName: 'QuickGig.ph',
     images: [
       {
