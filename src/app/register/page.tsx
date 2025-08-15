@@ -21,7 +21,8 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
-      if (!res.ok) throw new Error('Registration failed');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');

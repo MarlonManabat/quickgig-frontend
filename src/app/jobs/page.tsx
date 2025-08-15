@@ -1,23 +1,48 @@
-import apiClient from '@/lib/apiClient';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import type { Job } from '../../../types/jobs';
 import ApplyButton from './apply-button';
 
-export const dynamic = 'force-dynamic';
+export default function JobsPage() {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-async function fetchJobs(): Promise<Job[]> {
-  try {
-    const res = await apiClient.get(API.jobs, {
-      params: { status: 'active', page: 1, limit: 20 },
-    });
-    return res.data as Job[];
-  } catch {
-    return [];
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await api.get<Job[]>(API.jobs, {
+          params: { status: 'active', page: 1, limit: 20 },
+        });
+        setJobs(res.data);
+      } catch {
+        setError('Failed to load jobs');
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="p-4">
+        <p>Loading jobs...</p>
+      </main>
+    );
   }
-}
 
-export default async function JobsPage() {
-  const jobs = await fetchJobs();
+  if (error) {
+    return (
+      <main className="p-4">
+        <p>{error}</p>
+      </main>
+    );
+  }
+
   if (!jobs.length) {
     return (
       <main className="p-4">
@@ -25,13 +50,19 @@ export default async function JobsPage() {
       </main>
     );
   }
+
   return (
     <main className="p-4 space-y-4">
-      {jobs.map((job: Job) => (
-        <div key={job.id} className="border rounded p-4 flex justify-between items-center">
+      {jobs.map((job) => (
+        <div
+          key={job.id}
+          className="border rounded p-4 flex justify-between items-center"
+        >
           <div>
             <h2 className="font-semibold">{job.title}</h2>
-            <p className="text-sm text-gray-600">{job.company} · {job.location} · {job.rate}</p>
+            <p className="text-sm text-gray-600">
+              {job.company} · {job.location} · {job.rate}
+            </p>
           </div>
           <ApplyButton jobId={job.id} />
         </div>

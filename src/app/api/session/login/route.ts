@@ -11,15 +11,22 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify(body),
   });
   const data = await res.json();
-  if (res.ok && data.token) {
-    const response = NextResponse.json({ ok: true });
-    response.cookies.set(env.JWT_COOKIE_NAME, data.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
-    });
-    return response;
+  if (!res.ok) {
+    return NextResponse.json(data, { status: res.status });
   }
-  return NextResponse.json(data, { status: res.status });
+  const token = data.token || data.accessToken || data.jwt;
+  if (!token) {
+    return NextResponse.json(
+      { message: data.message || 'Missing token' },
+      { status: 400 },
+    );
+  }
+  const response = NextResponse.json({ ok: true });
+  response.cookies.set(env.JWT_COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 30,
+  });
+  return response;
 }

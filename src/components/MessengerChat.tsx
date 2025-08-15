@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { env } from '@/config/env';
 
 interface MessengerChatProps {
   pageId?: string;
@@ -23,8 +22,8 @@ declare global {
 }
 
 export default function MessengerChat({
-  pageId = env.NEXT_PUBLIC_FACEBOOK_PAGE_ID,
-  appId = env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+  pageId = process.env.NEXT_PUBLIC_FACEBOOK_PAGE_ID,
+  appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
   themeColor = '#00B272',
   loggedInGreeting = 'Kumusta! Paano ka namin matutulungan sa QuickGig.ph?',
   loggedOutGreeting = 'Kumusta! May tanong ka ba tungkol sa QuickGig.ph? Message mo kami!',
@@ -138,10 +137,10 @@ export default function MessengerChat({
 }
 
 // Simplified version for specific pages
-export function MessengerChatSimple({ 
+export function MessengerChatSimple({
   className = '',
-  minimized = true 
-}: { 
+  minimized = true
+}: {
   className?: string;
   minimized?: boolean;
 }) {
@@ -158,10 +157,10 @@ export function MessengerChatSimple({
 }
 
 // Chat button for manual trigger
-export function MessengerChatButton({ 
+export function MessengerChatButton({
   className = '',
   text = 'Chat with us'
-}: { 
+}: {
   className?: string;
   text?: string;
 }) {
@@ -184,4 +183,3 @@ export function MessengerChatButton({
     </button>
   );
 }
-

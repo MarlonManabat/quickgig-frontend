@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import { initFacebook } from '@/lib/facebook';
-import { env } from '@/config/env';
 import Button from '@/components/ui/Button';
 
 interface FacebookLoginProps {
@@ -18,11 +17,12 @@ export default function FacebookLogin({
   variant = 'primary',
   size = 'md',
 }: FacebookLoginProps) {
+  const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
   useEffect(() => {
-    if (env.NEXT_PUBLIC_FACEBOOK_APP_ID) {
-      initFacebook(env.NEXT_PUBLIC_FACEBOOK_APP_ID);
+    if (appId) {
+      initFacebook(appId);
     }
-  }, []);
+  }, [appId]);
 
   const handleClick = () => {
     if (onLoginError) onLoginError('Facebook login not implemented');

@@ -1,21 +1,21 @@
-// Environment variable handling
-function getEnv(key: string, fallback?: string) {
-  const value = process.env[key];
-  if (!value && process.env.NODE_ENV === 'development') {
-    console.warn(`Missing environment variable ${key}${fallback ? ", using fallback '" + fallback + "'" : ''}`);
-  }
-  return value ?? fallback ?? '';
-}
-
 export const env = {
-  NEXT_PUBLIC_API_URL: getEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3001'),
-  API_URL: getEnv('API_URL', getEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3001')),
-  JWT_COOKIE_NAME: getEnv('JWT_COOKIE_NAME', 'auth_token'),
-  NEXT_PUBLIC_FACEBOOK_APP_ID: getEnv('NEXT_PUBLIC_FACEBOOK_APP_ID'),
-  NEXT_PUBLIC_FACEBOOK_PAGE_ID: getEnv('NEXT_PUBLIC_FACEBOOK_PAGE_ID'),
-  NEXT_PUBLIC_ENV: getEnv('NEXT_PUBLIC_ENV', 'local'),
+  NEXT_PUBLIC_API_URL:
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  API_URL:
+    process.env.API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    'http://localhost:3001',
+  JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'auth_token',
   NEXT_PUBLIC_ENABLE_APPLY:
-    getEnv('NEXT_PUBLIC_ENABLE_APPLY', 'false').toLowerCase() === 'true',
+    String(process.env.NEXT_PUBLIC_ENABLE_APPLY ?? 'false').toLowerCase() ===
+    'true',
 };
-
-export type Env = typeof env;
+// In dev, warn about missing values (never throw in production)
+if (process.env.NODE_ENV !== 'production') {
+  if (!process.env.NEXT_PUBLIC_API_URL && !process.env.API_URL) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[env] NEXT_PUBLIC_API_URL / API_URL not set. Using http://localhost:3001'
+    );
+  }
+}
