@@ -60,13 +60,30 @@ const Navigation: React.FC = () => {
               <Briefcase className="w-4 h-4 mr-2" />
               Find Work
             </Link>
-            <Link
-              href="/post-job"
-              className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Post Job
-            </Link>
+            {user?.isEmployer && (
+              <div className="relative group">
+                <button
+                  className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                >
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  Employer
+                </button>
+                <div className="absolute hidden group-hover:block bg-qg-navy-light rounded-qg-md mt-2 min-w-[150px]">
+                  <Link
+                    href="/employer/jobs"
+                    className="block px-4 py-2 qg-navbar-link hover:bg-qg-navy"
+                  >
+                    Jobs
+                  </Link>
+                  <Link
+                    href="/employer/jobs/new"
+                    className="block px-4 py-2 qg-navbar-link hover:bg-qg-navy"
+                  >
+                    Post a Job
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-qg-navy-light">
@@ -84,15 +101,6 @@ const Navigation: React.FC = () => {
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Admin
-                  </Link>
-                )}
-                {user?.role === 'Employer' && (
-                  <Link
-                    href="/my-jobs"
-                    className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                  >
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    My Jobs
                   </Link>
                 )}
                 <Link
@@ -186,15 +194,6 @@ const Navigation: React.FC = () => {
                 <Briefcase className="w-5 h-5 mr-3" />
                 Find Work
               </Link>
-              <Link
-                href="/post-job"
-                className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Plus className="w-5 h-5 mr-3" />
-                Post Job
-              </Link>
-
               {isAuthenticated ? (
                 <>
                   <div className="border-t border-qg-navy-light my-4 pt-4">
@@ -217,15 +216,25 @@ const Navigation: React.FC = () => {
                       Admin Dashboard
                     </Link>
                   )}
-                  {user?.role === 'Employer' && (
-                    <Link
-                      href="/my-jobs"
-                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Briefcase className="w-5 h-5 mr-3" />
-                      My Jobs
-                    </Link>
+                  {user?.isEmployer && (
+                    <>
+                      <Link
+                        href="/employer/jobs"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Briefcase className="w-5 h-5 mr-3" />
+                        Employer Jobs
+                      </Link>
+                      <Link
+                        href="/employer/jobs/new"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Plus className="w-5 h-5 mr-3" />
+                        Post a Job
+                      </Link>
+                    </>
                   )}
                   <Link
                     href="/messages"
