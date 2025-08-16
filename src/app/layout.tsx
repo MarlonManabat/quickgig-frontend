@@ -12,7 +12,6 @@ import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
 import { env } from '@/config/env';
 import legacyTheme from '@/theme/legacy';
-import { showApiBadge } from '@/lib/config';
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 import fs from 'fs';
@@ -190,12 +189,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </ToastProvider>
           </SocketProvider>
         </AuthProvider>
-        {!showApiBadge && (
-          <style
-            // Hide any existing API badge class if present
-            dangerouslySetInnerHTML={{ __html: `.api-badge{display:none!important}` }}
-          />
-        )}
       </body>
     </html>
   );
