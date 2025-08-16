@@ -1,16 +1,21 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { env } from '@/config/env';
 
 export function middleware(req: NextRequest) {
-  const url = req.nextUrl;
-
-  // Only guard GET /login (form posts go to /api/session/login)
-  if (req.method === 'GET' && url.pathname === '/login') {
-    const to = url.clone();
-    to.pathname = '/next-login';
-    return NextResponse.rewrite(to);
+  const { pathname, search } = req.nextUrl;
+  if (/^\/(dashboard|settings|messages|payment)(\/|$)/.test(pathname)) {
+    const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
+    if (!token) {
+      const loginUrl = req.nextUrl.clone();
+      loginUrl.pathname = '/login';
+      loginUrl.searchParams.set('next', pathname + search);
+      return NextResponse.redirect(loginUrl);
+    }
   }
   return NextResponse.next();
 }
-export const config = { matcher: ['/login'] };
 
+export const config = {
+  matcher: ['/((?!api/|_next/|legacy/|.*\\..*).*)'],
+};
