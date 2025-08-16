@@ -2,6 +2,7 @@ import 'server-only';
 
 import { promises as fs } from 'fs';
 import path from 'path';
+import { load } from 'cheerio';
 
 const LEGACY_DIR = path.join(process.cwd(), 'public', 'legacy');
 const legacyLogin = ['login', 'php'].join('.');
@@ -47,6 +48,33 @@ function sanitize(html: string): string {
   return out;
 }
 
+function sanitizeBanner(html: string): string {
+  const $ = load(html);
+  $('script').remove();
+  $('[onload],[onclick],[onerror],[onmouseover],[onfocus],[onblur]').each((_, el) => {
+    Object.keys(el.attribs).forEach((attr) => {
+      if (attr.startsWith('on')) $(el).removeAttr(attr);
+    });
+  });
+  return $.root().html() || '';
+}
+
+function injectBanner(html: string): string {
+  const banner = process.env.NEXT_PUBLIC_BANNER_HTML;
+  if (!banner) return html;
+  const safe = sanitizeBanner(banner);
+  const $ = load(html);
+  const slot = $('[data-banner-slot], #banner-slot, #legacy-banner-slot').first();
+  if (slot.length) {
+    slot.html(safe);
+  } else if ($('header').length) {
+    $('header').first().prepend(safe);
+  } else {
+    $.root().prepend(safe);
+  }
+  return $.html();
+}
+
 export async function renderFragment(kind: 'home' | 'login'): Promise<string> {
   const file = path.join(
     LEGACY_DIR,
@@ -54,7 +82,11 @@ export async function renderFragment(kind: 'home' | 'login'): Promise<string> {
   );
   try {
     const raw = await fs.readFile(file, 'utf8');
-    return sanitize(raw);
+    let out = sanitize(raw);
+    if (kind === 'home') {
+      out = injectBanner(out);
+    }
+    return out;
   } catch {
     return '';
   }

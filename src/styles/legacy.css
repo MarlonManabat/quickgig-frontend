@@ -39,8 +39,12 @@ body.legacy-body {
   z-index: 50;
   box-shadow: var(--legacy-shadow-sm);
 }
-.legacy-header nav a {
+.legacy-header .logo img {
+  height: 2.5rem;
   margin-right: var(--legacy-space-4);
+}
+.legacy-header nav a {
+  margin-right: var(--legacy-space-6);
   color: #fff;
 }
 .legacy-header nav a:last-child {
@@ -82,7 +86,7 @@ body.legacy-body {
   background: var(--legacy-color-footer-bg);
   color: #fff;
   text-align: center;
-  padding: var(--legacy-space-6) var(--legacy-space-4);
+  padding: var(--legacy-space-8) var(--legacy-space-4);
   margin-top: var(--legacy-space-8);
 }
 
@@ -93,11 +97,11 @@ body.legacy-body {
   text-align: center;
 }
 .hero .wordmark {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 700;
 }
 .hero .headline {
-  font-size: 2.25rem;
+  font-size: 2.5rem;
   font-weight: 700;
   margin-top: var(--legacy-space-4);
 }
@@ -122,6 +126,7 @@ body.legacy-body {
   padding: var(--legacy-space-3) var(--legacy-space-6);
   border-radius: var(--legacy-radius-full);
   font-weight: 600;
+  outline: none;
 }
 .btn.primary {
   background: var(--legacy-color-cta);
@@ -137,6 +142,9 @@ body.legacy-body {
 .btn.secondary:hover {
   background: var(--legacy-color-cta);
   color: #000;
+}
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px var(--legacy-color-cta);
 }
 
 .features {

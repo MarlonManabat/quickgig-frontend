@@ -15,7 +15,20 @@ import legacyTheme from '@/theme/legacy';
 import { showApiBadge } from '@/lib/config';
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
+import fs from 'fs';
+import path from 'path';
 import '../styles/legacy.css';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const legacyFaviconDir = path.join(process.cwd(), 'public', 'legacy', 'img');
+const legacyFaviconExt = ['ico', 'png', 'svg'].find((ext) =>
+  fs.existsSync(path.join(legacyFaviconDir, `favicon.${ext}`))
+);
+const faviconUrl = legacyFaviconExt
+  ? `/legacy/img/favicon.${legacyFaviconExt}`
+  : '/favicon.png';
 
 export const metadata: Metadata = {
   title: "QuickGig.ph - Find Gigs Fast in the Philippines",
@@ -56,7 +69,7 @@ export const metadata: Metadata = {
     images: ['/logo-main.png'],
     creator: '@QuickGigPH',
   },
-  icons: [{ rel: 'icon', url: '/favicon.png' }],
+  icons: [{ rel: 'icon', url: faviconUrl }],
   manifest: '/manifest.json',
   robots: {
     index: true,
@@ -115,11 +128,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body className={legacy ? 'legacy-body' : 'font-body antialiased bg-bg text-fg'}>
-        {legacy && process.env.NEXT_PUBLIC_BANNER_HTML ? (
-          <div
-            dangerouslySetInnerHTML={{ __html: process.env.NEXT_PUBLIC_BANNER_HTML! }}
-          />
-        ) : null}
         <ClientAuthGuard />
         <ClientBootstrap />
         <AuthProvider>
