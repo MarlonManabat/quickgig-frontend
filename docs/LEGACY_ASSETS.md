@@ -13,3 +13,5 @@ Place the real static assets here:
 - Any `<form>` posting to `login&#46;php` is rewritten to `action="/api/session/login" method="post"`.
 - Toggle the experience with `NEXT_PUBLIC_LEGACY_UI=true|false`.
 - You can add a site banner via `NEXT_PUBLIC_BANNER_HTML`.
+- Banner HTML is sanitized on the server and injected into the legacy header slot.
+- Any `favicon.*` placed under `public/legacy/img` will override the default favicon.
