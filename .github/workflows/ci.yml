@@ -25,6 +25,8 @@ jobs:
           cache: 'npm'
       - name: Install
         run: npm ci
+      - name: Legacy guard
+        run: npm run check:legacy
       - name: Lint
         run: npm run lint
       - name: Typecheck
