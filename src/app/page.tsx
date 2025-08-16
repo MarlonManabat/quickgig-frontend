@@ -2,7 +2,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import React from 'react';
-import { loadFragment, injectLegacyStyles, verifyLegacyAssets } from '@/lib/legacyFragments';
+import LegacyShell from '@/app/(marketing)/LegacyShell';
+import { verifyLegacyAssets } from '@/lib/legacyFragments';
 
 export default function Page() {
   const legacy = process.env.NEXT_PUBLIC_LEGACY_UI === 'true';
@@ -10,7 +11,10 @@ export default function Page() {
 
   if (legacy) {
     const missing = verifyLegacyAssets();
-    if (missing.length) {
+    if (!missing.length) {
+      return <LegacyShell fragment="index" />;
+    }
+    if (strict) {
       // eslint-disable-next-line no-console
       console.error('[legacy] missing assets:', missing.join(', '));
       return (
@@ -19,20 +23,6 @@ export default function Page() {
         </div>
       );
     }
-  }
-
-  if (legacy && strict) {
-    const header = loadFragment('header');
-    const main = loadFragment('index');
-    const footer = loadFragment('footer');
-    const html = injectLegacyStyles(`${header}${main}${footer}`);
-    return <div dangerouslySetInnerHTML={{ __html: html }} />;
-  }
-
-  if (legacy) {
-    const main = loadFragment('index');
-    const html = injectLegacyStyles(main);
-    return <main dangerouslySetInnerHTML={{ __html: html }} />;
   }
 
   // Fallback: existing React home (keep your current implementation below)

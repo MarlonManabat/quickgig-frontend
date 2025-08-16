@@ -10,9 +10,9 @@ const REQUIRED_ASSETS = [
   'index.fragment.html',
   'login.fragment.html',
 ];
-
-function sanitize(html: string): string {
+export function sanitizeLegacyHtml(html: string): string {
   const $ = load(html);
+
   // remove wrapping html/head/body and scripts
   $('html, head, body, script').each((_, el) => {
     const inner = $(el).html() || '';
@@ -31,6 +31,24 @@ function sanitize(html: string): string {
     $(el).attr('action', '/api/session/login');
   });
 
+  // rewrite relative asset URLs to /legacy/
+  $('*[src], *[href]').each((_, el) => {
+    ['src', 'href'].forEach((attr) => {
+      const val = $(el).attr(attr);
+      if (!val) return;
+      if (
+        val.startsWith('/') ||
+        val.startsWith('http') ||
+        val.startsWith('#') ||
+        val.startsWith('data:') ||
+        val.startsWith('mailto:')
+      )
+        return;
+      const cleaned = val.replace(/^\.\/?/, '');
+      $(el).attr(attr, `/legacy/${cleaned}`);
+    });
+  });
+
   return $.root().html() || '';
 }
 
@@ -38,7 +56,7 @@ export function loadFragment(name: 'index' | 'login' | 'header' | 'footer'): str
   try {
     const file = path.join(LEGACY_DIR, `${name}.fragment.html`);
     const raw = readFileSync(file, 'utf8');
-    return sanitize(raw);
+    return sanitizeLegacyHtml(raw);
   } catch {
     return '';
   }
