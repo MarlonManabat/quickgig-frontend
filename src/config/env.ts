@@ -12,6 +12,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_SHOW_LOGOUT_ALL ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_LEGACY_UI:
     String(process.env.NEXT_PUBLIC_LEGACY_UI ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_LEGACY_STRICT_SHELL:
+    String(process.env.NEXT_PUBLIC_LEGACY_STRICT_SHELL ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_SHOW_API_BADGE:
     String(process.env.NEXT_PUBLIC_SHOW_API_BADGE ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_BANNER_HTML: process.env.NEXT_PUBLIC_BANNER_HTML || '',

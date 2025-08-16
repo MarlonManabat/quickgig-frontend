@@ -28,6 +28,7 @@ NEXT_PUBLIC_ENV=local
 3. To preview the legacy marketing shell locally, set:
 ```env
 NEXT_PUBLIC_LEGACY_UI=true
+NEXT_PUBLIC_LEGACY_STRICT_SHELL=false
 NEXT_PUBLIC_SHOW_API_BADGE=false
 NEXT_PUBLIC_BANNER_HTML=
 ```
@@ -378,12 +379,18 @@ To add a payment QR, upload `public/gcash-qr.png` and redeploy.
 
 ### Legacy marketing parity
 
-- Copy your real legacy assets into `public/legacy/` following `docs/LEGACY_ASSETS.md`.
-- Verify locally:
+- Sync fragments and assets:
+
+```bash
+npm run legacy:sync
+```
+
+- Inspect and verify:
 
 ```bash
 npm run legacy:tree
 npm run legacy:verify
+npm run legacy:check
 ```
 
 - Optional: hide the red API badge in Vercel by setting `NEXT_PUBLIC_SHOW_API_BADGE=false`.
