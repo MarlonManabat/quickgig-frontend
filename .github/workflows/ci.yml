@@ -13,6 +13,8 @@ jobs:
           cache: 'npm'
       - name: Install
         run: npm ci
+      - name: Legacy check
+        run: npm run legacy:check
       - name: Build
         run: npm run build
 

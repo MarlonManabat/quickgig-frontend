@@ -1,3 +1,3 @@
-// Alias that renders the actual Next login page
-export { default } from '../login/page';
+// Alias that renders the marketing login page
+export { default } from '../(marketing)/login/page';
 

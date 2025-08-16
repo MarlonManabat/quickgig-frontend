@@ -15,6 +15,7 @@ import legacyTheme from '@/theme/legacy';
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 import '../styles/legacy.css';
+import { showApiBadge } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: "QuickGig.ph - Find Gigs Fast in the Philippines",
@@ -175,7 +176,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </ToastProvider>
           </SocketProvider>
         </AuthProvider>
-        {!require('@/lib/config').showApiBadge && (
+          {!showApiBadge && (
           <style
             // Hide any existing API badge class if present
             dangerouslySetInnerHTML={{ __html: `.api-badge{display:none!important}` }}
