@@ -25,13 +25,20 @@ NEXT_PUBLIC_ENABLE_APPLY=false
 NEXT_PUBLIC_ENV=local
 ```
 
-3. To preview the legacy marketing shell locally, set:
-```env
-NEXT_PUBLIC_LEGACY_UI=true
-NEXT_PUBLIC_LEGACY_STRICT_SHELL=true
-NEXT_PUBLIC_SHOW_API_BADGE=false
-NEXT_PUBLIC_BANNER_HTML=
-```
+3. Legacy marketing UI is **ON by default**. Ensure these files exist:
+
+   - `public/legacy/styles.css`
+   - `public/legacy/index.fragment.html`
+   - `public/legacy/login.fragment.html`
+
+   To override, adjust the flags in `.env.local`:
+
+   ```env
+   NEXT_PUBLIC_LEGACY_UI=true
+   NEXT_PUBLIC_LEGACY_STRICT_SHELL=true
+   NEXT_PUBLIC_SHOW_API_BADGE=false
+   NEXT_PUBLIC_BANNER_HTML=
+   ```
 
 To verify the live API locally, run:
 

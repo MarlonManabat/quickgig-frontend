@@ -1,9 +1,15 @@
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { load } from 'cheerio';
 
 const LEGACY_DIR = path.join(process.cwd(), 'public', 'legacy');
 const legacyLogin = ['login', 'php'].join('.');
+
+const REQUIRED_ASSETS = [
+  'styles.css',
+  'index.fragment.html',
+  'login.fragment.html',
+];
 
 function sanitize(html: string): string {
   const $ = load(html);
@@ -41,4 +47,8 @@ export function loadFragment(name: 'index' | 'login' | 'header' | 'footer'): str
 export function injectLegacyStyles(html: string): string {
   if (html.includes('/legacy/styles.css')) return html;
   return `<link rel="stylesheet" href="/legacy/styles.css">\n${html}`;
+}
+
+export function verifyLegacyAssets(): string[] {
+  return REQUIRED_ASSETS.filter((file) => !existsSync(path.join(LEGACY_DIR, file)));
 }
