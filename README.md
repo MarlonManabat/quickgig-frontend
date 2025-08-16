@@ -348,3 +348,15 @@ Set the following in Vercel → Project → Settings → Environment Variables:
 
 After saving, redeploy via Vercel and verify at [`/system/status`](./src/app/system/status/page.tsx).
 To add a payment QR, upload `public/gcash-qr.png` and redeploy.
+
+### Legacy marketing parity
+
+- Copy your real legacy assets into `public/legacy/` following `docs/LEGACY_ASSETS.md`.
+- Verify locally:
+
+```bash
+npm run legacy:tree
+npm run legacy:verify
+```
+
+- Optional: hide the red API badge in Vercel by setting `NEXT_PUBLIC_SHOW_API_BADGE=false`.
