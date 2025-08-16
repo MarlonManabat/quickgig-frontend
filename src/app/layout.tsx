@@ -115,10 +115,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body className={legacy ? 'legacy-body' : 'font-body antialiased bg-bg text-fg'}>
-        {process.env.NEXT_PUBLIC_BANNER_HTML ? (
+        {legacy && process.env.NEXT_PUBLIC_BANNER_HTML ? (
           <div
-            aria-label="site-banner"
-            dangerouslySetInnerHTML={{ __html: process.env.NEXT_PUBLIC_BANNER_HTML }}
+            dangerouslySetInnerHTML={{ __html: process.env.NEXT_PUBLIC_BANNER_HTML! }}
           />
         ) : null}
         <ClientAuthGuard />
