@@ -21,8 +21,8 @@ Place the real static assets here:
 Run the helper scripts to pull fragments from the live site and check them in:
 
 ```bash
-npm run legacy:sync      # fetch `/` and `/login` plus assets
-npm run legacy:verify    # ensure required fragments exist
+npm run legacy:sync -- --source=https://app.quickgig.ph
+npm run legacy:verify
 npm run legacy:check     # grep for stray login&#46;php references
 ```
 

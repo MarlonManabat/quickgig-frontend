@@ -1,8 +1,9 @@
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
-import { load } from 'cheerio';
+import { load, Element } from 'cheerio';
 
-const BASE = 'https://app.quickgig.ph';
+const arg = process.argv.find((a) => a.startsWith('--source='));
+const BASE = arg ? arg.split('=')[1] : 'https://app.quickgig.ph';
 const OUT_DIR = path.join(process.cwd(), 'public', 'legacy');
 const legacyLogin = ['login', 'php'].join('.');
 
@@ -16,23 +17,25 @@ function rewrite(html: string): Fragment {
   const $ = load(html);
 
   $('form').each((_, el) => {
-    const action = $(el).attr('action') || '';
+    const element = el as Element;
+    const action = element.attribs.action || '';
     if (action.includes(legacyLogin)) {
-      $(el).attr('action', '/api/session/login');
+      element.attribs.action = '/api/session/login';
     }
   });
 
   $('*[src], *[href]').each((_, el) => {
-    const attr = (el as any).attribs.src ? 'src' : 'href';
-    const val = $(el).attr(attr);
+    const element = el as Element;
+    const attr = element.attribs.src ? 'src' : 'href';
+    const val = element.attribs[attr];
     if (!val) return;
     const u = new URL(val, BASE);
-    if (u.pathname.startsWith('/img/')) {
+    if (u.pathname.startsWith('/img/') || u.pathname.startsWith('/fonts/')) {
       assets.add(u.pathname);
-      $(el).attr(attr, `/legacy${u.pathname}`);
+      element.attribs[attr] = `/legacy${u.pathname}`;
     } else if (u.pathname.endsWith('.css')) {
       assets.add(u.pathname);
-      $(el).attr(attr, '/legacy/styles.css');
+      element.attribs[attr] = '/legacy/styles.css';
     }
   });
 
@@ -55,7 +58,28 @@ async function writeFragment(name: string, frag: Fragment) {
   for (const a of Array.from(frag.assets)) await downloadAsset(a);
 }
 
+async function processCss(href: string) {
+  const cssRes = await fetch(new URL(href, BASE));
+  let css = await cssRes.text();
+  const assets = new Set<string>();
+  css = css.replace(/url\(([^)]+)\)/g, (m, p1) => {
+    const cleaned = p1.replace(/["']/g, '').trim();
+    const u = new URL(cleaned, BASE);
+    if (u.pathname.startsWith('/img/') || u.pathname.startsWith('/fonts/')) {
+      assets.add(u.pathname);
+      return `url(/legacy${u.pathname})`;
+    }
+    return `url(${cleaned})`;
+  });
+  await mkdir(OUT_DIR, { recursive: true });
+  await writeFile(path.join(OUT_DIR, 'styles.css'), css);
+  for (const a of Array.from(assets)) await downloadAsset(a);
+}
+
 async function main() {
+  await mkdir(path.join(OUT_DIR, 'img'), { recursive: true });
+  await mkdir(path.join(OUT_DIR, 'fonts'), { recursive: true });
+
   const resIndex = await fetch(`${BASE}/`);
   const htmlIndex = await resIndex.text();
   const $index = load(htmlIndex);
@@ -65,12 +89,7 @@ async function main() {
   const mainHome = rewrite($index('main').first().prop('outerHTML') || '');
 
   const cssHref = $index('link[rel="stylesheet"]').first().attr('href');
-  if (cssHref) {
-    const cssRes = await fetch(new URL(cssHref, BASE));
-    const css = await cssRes.text();
-    await mkdir(OUT_DIR, { recursive: true });
-    await writeFile(path.join(OUT_DIR, 'styles.css'), css);
-  }
+  if (cssHref) await processCss(cssHref);
 
   await writeFragment('header', header);
   await writeFragment('footer', footer);

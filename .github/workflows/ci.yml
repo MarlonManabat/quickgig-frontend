@@ -3,7 +3,19 @@ on:
   push:
   pull_request:
 jobs:
+  legacy-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run legacy:verify
+
   build:
+    needs: [legacy-verify]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +29,4 @@ jobs:
         run: npm run lint
       - name: Typecheck
         run: npm run typecheck
-      - name: Verify legacy fragments
-        run: npm run legacy:verify
 

@@ -28,7 +28,7 @@ NEXT_PUBLIC_ENV=local
 3. To preview the legacy marketing shell locally, set:
 ```env
 NEXT_PUBLIC_LEGACY_UI=true
-NEXT_PUBLIC_LEGACY_STRICT_SHELL=false
+NEXT_PUBLIC_LEGACY_STRICT_SHELL=true
 NEXT_PUBLIC_SHOW_API_BADGE=false
 NEXT_PUBLIC_BANNER_HTML=
 ```
@@ -54,6 +54,8 @@ Protected routes:
 `/dashboard`, `/messages`, `/payment`, `/settings`, `/profile`.
 
 Testing:
+
+In Vercel Preview and Production, set `NEXT_PUBLIC_LEGACY_UI=true` and `NEXT_PUBLIC_LEGACY_STRICT_SHELL=true`.
 
 ```bash
 npm run lint && npm run typecheck
