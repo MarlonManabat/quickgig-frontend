@@ -23,9 +23,10 @@
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/check_links.mjs",
-    "legacy:verify": "node tools/legacy_verify.mjs",
+    "legacy:sync": "node tools/legacy/sync.js",
+    "legacy:verify": "node tools/legacy/verify.js",
     "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
-    "legacy:check": "node tools/legacy_verify.mjs && npm run lint"
+    "legacy:check": "npm run legacy:verify && node tools/legacy/check.js"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
@@ -53,7 +54,7 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=18.17 <21"
+    "node": ">=18"
   },
   "playwright": {
     "skipBrowserDownload": true
