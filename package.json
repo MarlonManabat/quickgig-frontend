@@ -23,7 +23,9 @@
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/check_links.mjs",
-    "legacy:check": "node -e \"const fs=require('fs');['public/legacy/index.fragment.html','public/legacy/login.fragment.html'].forEach(f=>{if(!fs.existsSync(f))process.exitCode=1});\" && echo 'legacy fragments present'"
+    "legacy:verify": "node scripts/legacy-verify.mjs",
+    "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
+    "legacy:check": "npm run legacy:verify && npm run lint"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",

@@ -175,6 +175,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </ToastProvider>
           </SocketProvider>
         </AuthProvider>
+        {!require('@/lib/config').showApiBadge && (
+          <style
+            // Hide any existing API badge class if present
+            dangerouslySetInnerHTML={{ __html: `.api-badge{display:none!important}` }}
+          />
+        )}
       </body>
     </html>
   );
