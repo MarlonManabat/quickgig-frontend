@@ -9,9 +9,9 @@
   width: 100%;
   max-width: 24rem;
   background: rgba(255, 255, 255, 0.7);
-  border-radius: 1rem;
+  border-radius: var(--legacy-radius-lg);
   padding: 1.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--legacy-shadow-sm);
 }
 
 .legacy-login h1 {
@@ -41,27 +41,34 @@
 
 .legacy-login input {
   margin-top: 0.25rem;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  padding: var(--legacy-space-2);
+  border: 1px solid var(--legacy-color-border);
+  border-radius: var(--legacy-radius-md);
+}
+.legacy-login input:focus {
+  outline: 2px solid var(--legacy-color-cta);
+  outline-offset: 2px;
 }
 
 .legacy-login .error-banner {
   background: #fee2e2;
   color: #b91c1c;
   border: 1px solid #fecaca;
-  border-radius: 0.5rem;
+  border-radius: var(--legacy-radius-md);
   padding: 0.5rem;
 }
 
 .legacy-login button {
   width: 100%;
-  background: #facc15;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  background: var(--legacy-color-cta);
+  padding: var(--legacy-space-2);
+  border-radius: var(--legacy-radius-full);
   font-weight: 600;
+  color: #000;
 }
-
+.legacy-login button:hover {
+  background: var(--legacy-color-cta-hover);
+}
 .legacy-login button:disabled {
   opacity: 0.6;
 }
@@ -75,4 +82,3 @@
   color: #0284c7;
   font-weight: 600;
 }
-

@@ -25,6 +25,13 @@ NEXT_PUBLIC_ENABLE_APPLY=false
 NEXT_PUBLIC_ENV=local
 ```
 
+3. To preview the legacy marketing shell locally, set:
+```env
+NEXT_PUBLIC_LEGACY_UI=true
+NEXT_PUBLIC_SHOW_API_BADGE=false
+NEXT_PUBLIC_BANNER_HTML=
+```
+
 To verify the live API locally, run:
 
 ```bash
