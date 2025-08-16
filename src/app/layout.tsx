@@ -10,7 +10,6 @@ import ClientBootstrap from './ClientBootstrap';
 import ClientAuthGuard from './ClientAuthGuard';
 import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
-import { env } from '@/config/env';
 import legacyTheme from '@/theme/legacy';
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
@@ -87,7 +86,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const legacy = env.NEXT_PUBLIC_LEGACY_UI;
+  const legacy = process.env.NEXT_PUBLIC_LEGACY_UI === 'true';
   const legacyVars: CSSProperties | undefined = legacy
     ? ({
         '--legacy-color-bg': legacyTheme.colors.bg,

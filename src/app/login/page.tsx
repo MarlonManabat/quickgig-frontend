@@ -2,7 +2,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import React from 'react';
-import { loadFragment, injectLegacyStyles } from '@/lib/legacyFragments';
+import { loadFragment, injectLegacyStyles, verifyLegacyAssets } from '@/lib/legacyFragments';
 import LegacyLogin from './LegacyLogin';
 import './legacy-login.css';
 
@@ -16,6 +16,17 @@ export default function LoginPage({ searchParams }: Props) {
   const nextUrl = typeof searchParams?.next === 'string' ? searchParams.next : undefined;
 
   if (legacy) {
+    const missing = verifyLegacyAssets();
+    if (missing.length) {
+      // eslint-disable-next-line no-console
+      console.error('[legacy] missing assets:', missing.join(', '));
+      return (
+        <div className="p-4 text-red-600">
+          Missing legacy assets: {missing.join(', ')}
+        </div>
+      );
+    }
+
     const header = strict ? loadFragment('header') : '';
     const footer = strict ? loadFragment('footer') : '';
     const main = loadFragment('login');
