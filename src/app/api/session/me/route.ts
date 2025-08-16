@@ -1,25 +1,37 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { env } from '@/config/env';
 import { API } from '@/config/api';
-import { proxyFetch } from '@/server/proxy';
+import { parseSafe } from '@/server/proxy';
 
-export async function GET() {
+export async function GET(req: Request) {
+  console.info('GET /api/session/me');
   try {
-    const token = cookies().get(env.JWT_COOKIE_NAME)?.value;
-    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-    const { res, data } = await proxyFetch(API.me, { method: 'GET', headers });
-    return NextResponse.json(
-      typeof data === 'object' && data
-        ? { ok: res.ok, ...(data as object) }
-        : { ok: res.ok },
-      { status: 200 }
-    );
-  } catch {
-    return NextResponse.json({ ok: false }, { status: 200 });
+    const res = await fetch(`${env.API_URL}${API.me}`, {
+      method: 'GET',
+      headers: { cookie: req.headers.get('cookie') || '' },
+      credentials: 'include',
+    });
+    const data = await parseSafe(res);
+    if (res.ok) {
+      const user =
+        typeof data === 'object' && data
+          ? (data as Record<string, unknown>)['user'] ?? data
+          : undefined;
+      console.info('GET /api/session/me', res.status);
+      return NextResponse.json(
+        { ok: true, user },
+        { status: res.status },
+      );
+    }
+    console.info('GET /api/session/me', res.status);
+    return NextResponse.json({ ok: false }, { status: res.status });
+  } catch (err) {
+    console.info('GET /api/session/me error', err);
+    return NextResponse.json({ ok: false }, { status: 500 });
   }
 }
 
 export async function OPTIONS() {
   return new Response(null, { status: 200 });
 }
+

@@ -1,37 +1,40 @@
 import { NextResponse } from 'next/server';
 import { API } from '@/config/api';
-import { proxyFetch } from '@/server/proxy';
+import { env } from '@/config/env';
+import { parseSafe } from '@/server/proxy';
 
 export async function POST(req: Request) {
+  console.info('POST /api/session/register');
   const body = await req.json().catch(() => ({}));
   try {
-    const { res, data } = await proxyFetch(API.register, {
+    const res = await fetch(`${env.API_URL}${API.register}`, {
       method: 'POST',
-      body,
-      formFallback: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      credentials: 'include',
     });
-
+    const data = await parseSafe(res);
     const d =
       typeof data === 'object' && data
         ? (data as Record<string, unknown>)
         : ({} as Record<string, unknown>);
-
     if (res.ok) {
-      return NextResponse.json({ ok: true, ...d }, { status: 200 });
+      console.info('POST /api/session/register', res.status);
+      return NextResponse.json({ ok: true, ...d }, { status: res.status });
     }
-
     const message =
       typeof d['message'] === 'string'
         ? (d['message'] as string)
         : typeof d['error'] === 'string'
           ? (d['error'] as string)
           : 'Registration failed';
-
-    return NextResponse.json({ ok: false, message }, { status: 200 });
-  } catch {
+    console.info('POST /api/session/register', res.status, message);
+    return NextResponse.json({ ok: false, message }, { status: res.status });
+  } catch (err) {
+    console.info('POST /api/session/register error', err);
     return NextResponse.json(
       { ok: false, message: 'Auth service unreachable' },
-      { status: 200 }
+      { status: 500 },
     );
   }
 }
@@ -39,3 +42,4 @@ export async function POST(req: Request) {
 export async function OPTIONS() {
   return new Response(null, { status: 200 });
 }
+
