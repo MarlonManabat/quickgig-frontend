@@ -38,6 +38,13 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+## Auth flows
+
+- Same-origin login sets the `auth_token` cookie.
+- `/api/session/me` reads the cookie to power client UI.
+- `src/middleware.ts` redirects unauthenticated users from protected pages.
+- Logging out via `/api/session/logout` clears the cookie.
+
 ## Jobs search & saved jobs
 
 The `/jobs` page offers search, filters and pagination. Filter values are

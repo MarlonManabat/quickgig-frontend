@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import { SocketProvider } from "../context/SocketContext";
-import Navigation from "../components/Navigation";
+import SiteHeader from "../components/SiteHeader";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { ToastProvider } from "../components/ToastProvider";
 import ClientBootstrap from './ClientBootstrap';
@@ -138,8 +138,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <>{children}</>
                 ) : (
                   <>
-                    <Navigation />
-                    <main className="min-h-screen">{children}</main>
+                    <SiteHeader />
+                    <main className="min-h-screen" id="main" tabIndex={-1}>{children}</main>
                     <footer className="qg-footer">
                       <div className="qg-container">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

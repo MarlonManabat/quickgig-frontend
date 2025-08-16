@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { env } from '@/config/env';
 import { parseSafe } from '@/server/proxy';
+import { setAuthCookie } from '@/lib/auth';
 
 export async function POST(req: Request) {
   console.info('POST /api/session/login');
@@ -30,13 +31,7 @@ export async function POST(req: Request) {
               : '';
     if (res.ok && token) {
       const resp = NextResponse.json({ ok: true }, { status: res.status });
-      resp.cookies.set(env.JWT_COOKIE_NAME, token, {
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 30,
-      });
+      setAuthCookie(resp, token);
       console.info('POST /api/session/login', res.status);
       return resp;
     }
