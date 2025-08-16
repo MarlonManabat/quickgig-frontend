@@ -1,5 +1,7 @@
 import { readLegacyFragment, legacyCssHref } from '@/lib/legacy';
+import { parseFragment } from '@/lib/legacy/html';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -9,13 +11,14 @@ export default async function MarketingHome() {
 
   // If we have a fragment, render it; otherwise show the existing React hero as fallback.
   if (html) {
+    const $ = parseFragment(html);
     return (
       <html>
         <head>
           {css ? <link rel="stylesheet" href={css} /> : null}
           <meta name="robots" content="index,follow" />
         </head>
-        <body dangerouslySetInnerHTML={{ __html: html }} />
+        <body dangerouslySetInnerHTML={{ __html: $.html() }} />
       </html>
     );
   }
