@@ -1,0 +1,159 @@
+/* Legacy UI variables and utilities */
+
+html.legacy {
+  --legacy-color-bg: #f8fafc;
+  --legacy-color-text: #0f172a;
+  --legacy-color-header-bg: #0b3d39;
+  --legacy-color-footer-bg: #0b3d39;
+  --legacy-color-cta: #F6C20F;
+  --legacy-color-cta-hover: #FFCC00;
+  --legacy-color-border: #d1d5db;
+  --legacy-shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
+  --legacy-space-1: 0.25rem;
+  --legacy-space-2: 0.5rem;
+  --legacy-space-3: 0.75rem;
+  --legacy-space-4: 1rem;
+  --legacy-space-6: 1.5rem;
+  --legacy-space-8: 2rem;
+  --legacy-space-16: 4rem;
+  --legacy-radius-md: 0.5rem;
+  --legacy-radius-lg: 1rem;
+  --legacy-radius-full: 9999px;
+}
+
+body.legacy-body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--legacy-color-bg);
+  color: var(--legacy-color-text);
+}
+
+.legacy-header {
+  background: var(--legacy-color-header-bg);
+  color: #fff;
+  padding: var(--legacy-space-2) var(--legacy-space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--legacy-shadow-sm);
+}
+.legacy-header nav a {
+  margin-right: var(--legacy-space-4);
+  color: #fff;
+}
+.legacy-header nav a:last-child {
+  margin-right: 0;
+}
+.legacy-header a:hover {
+  text-decoration: underline;
+}
+.legacy-header .auth a {
+  margin-left: var(--legacy-space-4);
+  color: #fff;
+}
+.legacy-header .auth button { margin-left: var(--legacy-space-4); background: none; border: none; color: #fff; cursor: pointer; }
+.legacy-header .auth button:hover { text-decoration: underline; }
+
+.banner-ad {
+  background: var(--legacy-color-cta);
+  color: #000;
+  padding: var(--legacy-space-2) var(--legacy-space-4);
+  position: relative;
+  text-align: center;
+}
+.banner-ad button {
+  position: absolute;
+  right: var(--legacy-space-2);
+  top: var(--legacy-space-2);
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.legacy-main {
+  min-height: 60vh;
+}
+
+.legacy-footer {
+  background: var(--legacy-color-footer-bg);
+  color: #fff;
+  text-align: center;
+  padding: var(--legacy-space-6) var(--legacy-space-4);
+  margin-top: var(--legacy-space-8);
+}
+
+.hero {
+  background: linear-gradient(135deg, #0ea37f, #1b5e55);
+  color: #fff;
+  padding: var(--legacy-space-16) var(--legacy-space-4);
+  text-align: center;
+}
+.hero .wordmark {
+  font-size: 3rem;
+  font-weight: 700;
+}
+.hero .headline {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-top: var(--legacy-space-4);
+}
+.hero .subheadline {
+  margin-top: var(--legacy-space-2);
+  font-size: 1.125rem;
+  opacity: 0.9;
+}
+.hero .cta-group {
+  margin-top: var(--legacy-space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--legacy-space-4);
+  align-items: center;
+}
+@media (min-width: 640px) {
+  .hero .cta-group {
+    flex-direction: row;
+  }
+}
+.btn {
+  padding: var(--legacy-space-3) var(--legacy-space-6);
+  border-radius: var(--legacy-radius-full);
+  font-weight: 600;
+}
+.btn.primary {
+  background: var(--legacy-color-cta);
+  color: #000;
+}
+.btn.primary:hover {
+  background: var(--legacy-color-cta-hover);
+}
+.btn.secondary {
+  border: 2px solid var(--legacy-color-cta);
+  color: var(--legacy-color-cta);
+}
+.btn.secondary:hover {
+  background: var(--legacy-color-cta);
+  color: #000;
+}
+
+.features {
+  display: grid;
+  gap: var(--legacy-space-8);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  padding: var(--legacy-space-16) var(--legacy-space-4);
+  text-align: center;
+}
+.feature .icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: var(--legacy-space-2);
+}
+
+.api-badge {
+  padding: var(--legacy-space-2) 0;
+  text-align: center;
+}
+
