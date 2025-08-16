@@ -25,7 +25,8 @@
     "scan:links": "node tools/check_links.mjs",
     "legacy:verify": "node scripts/legacy-verify.mjs",
     "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
-    "legacy:check": "npm run legacy:verify && npm run lint"
+    "sync:legacy": "node scripts/sync-legacy.mjs",
+    "legacy:check": "node scripts/legacy-check.mjs && npm run legacy:verify"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
@@ -37,7 +38,8 @@
     "react-dom": "^18",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "webpack-bundle-analyzer": "^4.10.2",
+    "cheerio": "^1.0.0-rc.12"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.2",
