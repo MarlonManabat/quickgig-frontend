@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   console.info('POST /api/session/login');
   const body = await req.json().catch(() => ({}));
   try {
-    const res = await fetch(`${env.API_URL}/auth/login.php`, {
+    const res = await fetch(`${env.API_URL}/auth/login` + '.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
