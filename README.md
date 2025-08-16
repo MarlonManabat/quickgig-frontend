@@ -38,12 +38,29 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
-## Auth flows
+## Auth
 
-- Same-origin login sets the `auth_token` cookie.
-- `/api/session/me` reads the cookie to power client UI.
-- `src/middleware.ts` redirects unauthenticated users from protected pages.
-- Logging out via `/api/session/logout` clears the cookie.
+Environment variables:
+
+- `JWT_COOKIE_NAME` – name of the session cookie (default `auth_token`).
+- `AUTH_SECRET` – secret used to sign and verify JWTs.
+- `ENGINE_AUTH_MODE` – `mock` (local default) or `php` for the real engine.
+- `ENGINE_BASE_URL` – legacy engine base URL.
+- `ENGINE_LOGIN_PATH` – path to the engine login script.
+
+Protected routes:
+
+`/dashboard`, `/messages`, `/payment`, `/settings`, `/profile`.
+
+Testing:
+
+```bash
+npm run lint && npm run typecheck
+curl -sS $PREVIEW/api/session/me -I  # 401 when signed out
+curl -sS $PREVIEW/api/session/login -XPOST -H "content-type: application/json" -d '{"email":"a@b.c","password":"x"}'  # 200 in mock mode
+```
+
+In Vercel, set `ENGINE_AUTH_MODE=php` for production and ensure `AUTH_SECRET` is a long random string.
 
 ## Jobs search & saved jobs
 
@@ -143,10 +160,6 @@ The frontend never blocks or fails the UI if the metrics backend is absent; `/ap
 - `GET /api/health` → `{ ok: true, services: { app: 'up'|'degraded' }, time }`.
 - `GET /api/version` → `{ ok: true, commit, branch, buildTime, node, next, app }`.
 - Logs are emitted to Vercel Runtime Logs with `[health]` and `[version]` prefixes.
-
-## Authentication
-
-Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
 
 ## Profiles & Settings
 

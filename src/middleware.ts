@@ -1,21 +1,30 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { env } from '@/config/env';
+import { verifyJwt } from '@/lib/jwt';
+
+const PROTECTED = ['/dashboard', '/messages', '/payment', '/settings', '/profile'];
 
 export function middleware(req: NextRequest) {
-  const { pathname, search } = req.nextUrl;
-  if (/^\/(dashboard|settings|messages|payment)(\/|$)/.test(pathname)) {
-    const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
-    if (!token) {
-      const loginUrl = req.nextUrl.clone();
-      loginUrl.pathname = '/login';
-      loginUrl.searchParams.set('next', pathname + search);
-      return NextResponse.redirect(loginUrl);
-    }
+  const url = new URL(req.url);
+  if (!PROTECTED.some((p) => url.pathname.startsWith(p))) {
+    return NextResponse.next();
   }
-  return NextResponse.next();
+
+  const token = req.cookies.get(process.env.JWT_COOKIE_NAME || 'auth_token')?.value;
+  const ok = token && verifyJwt(token, process.env.AUTH_SECRET || '');
+  if (ok) return NextResponse.next();
+
+  const next = encodeURIComponent(url.pathname + url.search);
+  return NextResponse.redirect(new URL(`/login?next=${next}`, req.url));
 }
 
 export const config = {
-  matcher: ['/((?!api/|_next/|legacy/|.*\\..*).*)'],
+  matcher: [
+    '/dashboard/:path*',
+    '/messages/:path*',
+    '/payment/:path*',
+    '/settings/:path*',
+    '/profile/:path*',
+  ],
 };
+

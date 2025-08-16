@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 interface User {
-  id: string;
   email: string;
   name?: string;
 }
@@ -28,10 +27,7 @@ export default function SessionNav() {
       method: 'POST',
       credentials: 'same-origin',
     });
-    router.push('/');
-    setTimeout(() => {
-      (document.querySelector('main, h1') as HTMLElement | null)?.focus();
-    }, 0);
+    router.refresh();
     setUser(null);
   };
 
@@ -48,20 +44,12 @@ export default function SessionNav() {
     );
   }
 
-  const firstName = user.name ? user.name.split(' ')[0] : null;
-
   return (
     <div className="flex items-center space-x-4">
-      {firstName && (
-        <span className="text-sm">Kumusta, {firstName}</span>
-      )}
       <Link href="/profile" className="text-sm hover:underline">
         Profile
       </Link>
-      <button
-        onClick={logout}
-        className="text-sm hover:underline"
-      >
+      <button onClick={logout} className="text-sm hover:underline">
         Logout
       </button>
     </div>

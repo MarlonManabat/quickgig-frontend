@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { clearAuthCookie } from '@/lib/auth';
+import { clearSessionCookie } from '@/lib/cookies';
 
 export const runtime = 'nodejs';
 
 export async function POST() {
-  console.info('POST /api/session/logout');
-  const res = NextResponse.json({ ok: true });
-  clearAuthCookie(res);
-  console.info('POST /api/session/logout 200');
-  return res;
+  const name = process.env.JWT_COOKIE_NAME || 'auth_token';
+  clearSessionCookie(name);
+  return NextResponse.json({ ok: true });
 }
+

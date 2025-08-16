@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 
 interface Props {
   html: string;
+  nextUrl?: string;
 }
 
-export default function LegacyLogin({ html }: Props) {
+export default function LegacyLogin({ html, nextUrl }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -45,12 +46,14 @@ export default function LegacyLogin({ html }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.value, password: password.value }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        router.push('/dashboard');
+        router.push(nextUrl || '/dashboard');
         return;
       }
       if (errorBanner) {
-        errorBanner.textContent = 'Invalid email or password';
+        const msg = typeof data.message === 'string' ? data.message : 'Invalid email or password';
+        errorBanner.textContent = msg;
         errorBanner.removeAttribute('hidden');
         errorBanner.focus();
         setTimeout(() => email.focus(), 0);
