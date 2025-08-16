@@ -23,14 +23,14 @@
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/check_links.mjs",
-    "legacy:verify": "node scripts/legacy-verify.mjs",
+    "legacy:verify": "node tools/legacy_verify.mjs",
     "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
-    "legacy:check": "npm run legacy:verify && npm run lint"
+    "legacy:check": "node tools/legacy_verify.mjs && npm run lint"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
     "axios": "^1.11.0",
-    "cheerio": "^1.0.0-rc.12",
+    "cheerio": "1.0.0-rc.12",
     "clsx": "^2.1.1",
     "lucide-react": "^0.539.0",
     "next": "14.2.31",
@@ -53,7 +53,7 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": "20.x"
+    "node": ">=18.17 <21"
   },
   "playwright": {
     "skipBrowserDownload": true

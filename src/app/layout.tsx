@@ -12,6 +12,7 @@ import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
 import { env } from '@/config/env';
 import legacyTheme from '@/theme/legacy';
+import { showApiBadge } from '@/lib/config';
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
 import '../styles/legacy.css';
@@ -103,6 +104,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {legacy && (
           <>
+            <link rel="stylesheet" href="/legacy/styles.css" />
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
             <link
@@ -113,6 +115,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body className={legacy ? 'legacy-body' : 'font-body antialiased bg-bg text-fg'}>
+        {process.env.NEXT_PUBLIC_BANNER_HTML ? (
+          <div
+            aria-label="site-banner"
+            dangerouslySetInnerHTML={{ __html: process.env.NEXT_PUBLIC_BANNER_HTML }}
+          />
+        ) : null}
         <ClientAuthGuard />
         <ClientBootstrap />
         <AuthProvider>
@@ -175,7 +183,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </ToastProvider>
           </SocketProvider>
         </AuthProvider>
-        {!require('@/lib/config').showApiBadge && (
+        {!showApiBadge && (
           <style
             // Hide any existing API badge class if present
             dangerouslySetInnerHTML={{ __html: `.api-badge{display:none!important}` }}
