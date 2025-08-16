@@ -50,16 +50,7 @@ export const metadata: Metadata = {
     images: ['/logo-main.png'],
     creator: '@QuickGigPH',
   },
-  icons: {
-    icon: [
-      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
-      { url: '/logo-icon.png', sizes: '192x192', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/logo-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    shortcut: '/favicon.png',
-  },
+  icons: [{ rel: 'icon', url: '/favicon.svg' }],
   manifest: '/manifest.json',
   robots: {
     index: true,
