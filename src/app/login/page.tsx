@@ -7,10 +7,6 @@ export default function LoginPage() {
   const [err, setErr] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
-    console.log('[login] App Router page active');
-  }, []);
-
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErr('');
