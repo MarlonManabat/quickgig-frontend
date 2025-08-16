@@ -39,6 +39,11 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+## Sockets
+
+Socket.io connections are disabled on Vercel preview domains by default. They
+automatically enable on production domains when `NEXT_PUBLIC_ENABLE_SOCKETS=true`.
+
 ## Auth
 
 Environment variables:
