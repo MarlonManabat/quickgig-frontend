@@ -137,6 +137,13 @@ Backend endpoints (see `src/config/api.ts`):
 
 The frontend never blocks or fails the UI if the metrics backend is absent; `/api/metrics/track` always returns `{ ok: true }`.
 
+## Observability
+
+- Toggle the API badge with `NEXT_PUBLIC_SHOW_API_BADGE=true`.
+- `GET /api/health` → `{ ok: true, services: { app: 'up'|'degraded' }, time }`.
+- `GET /api/version` → `{ ok: true, commit, branch, buildTime, node, next, app }`.
+- Logs are emitted to Vercel Runtime Logs with `[health]` and `[version]` prefixes.
+
 ## Authentication
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import SessionNav from './SessionNav';
+import ApiBadge from './ApiBadge';
 
 export default function SiteHeader() {
   return (
@@ -9,6 +10,7 @@ export default function SiteHeader() {
           QuickGig.ph
         </Link>
         <nav aria-label="User session" className="flex items-center space-x-4">
+          <ApiBadge />
           <SessionNav />
         </nav>
       </div>

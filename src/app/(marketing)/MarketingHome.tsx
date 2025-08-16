@@ -1,21 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { env } from '@/config/env';
-
-type ApiStatus = 'loading' | 'ok' | 'error';
 
 export default function MarketingHome() {
-  const [status, setStatus] = useState<ApiStatus>('loading');
-
-  useEffect(() => {
-    if (env.NEXT_PUBLIC_SHOW_API_BADGE) {
-      fetch('/api/health-check')
-        .then((res) => setStatus(res.ok ? 'ok' : 'error'))
-        .catch(() => setStatus('error'));
-    }
-  }, []);
 
   return (
     <div>
@@ -32,13 +19,6 @@ export default function MarketingHome() {
           </Link>
         </div>
       </section>
-      {env.NEXT_PUBLIC_SHOW_API_BADGE && (
-        <div className="api-badge">
-          {status === 'loading'
-            ? 'Checking API…'
-            : `API: ${status === 'ok' ? 'OK' : 'ERROR'}`}
-        </div>
-      )}
       <section className="features">
         <div className="feature">
           <span className="icon">📝</span>Post gig in minutes
