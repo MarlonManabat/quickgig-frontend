@@ -22,7 +22,8 @@
     "test:e2e:smoke": "playwright test -c ./playwright.config.ts --grep @smoke",
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
-    "scan:links": "node tools/check_links.mjs"
+    "scan:links": "node tools/check_links.mjs",
+    "legacy:check": "node -e \"const fs=require('fs');['public/legacy/index.fragment.html','public/legacy/login.fragment.html'].forEach(f=>{if(!fs.existsSync(f))process.exitCode=1});\" && echo 'legacy fragments present'"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",

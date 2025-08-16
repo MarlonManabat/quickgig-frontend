@@ -1,21 +1,32 @@
-import type { Metadata } from 'next';
-import HomePageClient from './HomePageClient';
-import LegacyShell from '@/components/LegacyShell';
-import MarketingHome from './(marketing)/MarketingHome';
-import { env } from '@/config/env';
+import { readLegacyFragment, legacyCssHref } from '@/lib/legacy';
 
-export const metadata: Metadata = {
-  title: 'QuickGig',
-  description: 'Gigs and talent, matched fast.',
-};
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-export default function Page() {
-  if (env.NEXT_PUBLIC_LEGACY_UI) {
+export default async function MarketingHome() {
+  const css = await legacyCssHref();
+  const html = await readLegacyFragment('index.fragment.html');
+
+  // If we have a fragment, render it; otherwise show the existing React hero as fallback.
+  if (html) {
     return (
-      <LegacyShell>
-        <MarketingHome />
-      </LegacyShell>
+      <html>
+        <head>
+          {css ? <link rel="stylesheet" href={css} /> : null}
+          <meta name="robots" content="index,follow" />
+        </head>
+        <body dangerouslySetInnerHTML={{ __html: html }} />
+      </html>
     );
   }
-  return <HomePageClient />;
+
+  // Fallback: current React-based home (keeps site usable if legacy files are missing)
+  return (
+    <main className="px-4 py-12">
+      <div className="mx-auto max-w-4xl text-center">
+        <h1 className="text-4xl font-bold">QuickGig</h1>
+        <p className="mt-4 text-lg">Gigs and talent, matched fast.</p>
+      </div>
+    </main>
+  );
 }
