@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyJwt } from '@/lib/jwt';
 
 const PROTECTED = ['/dashboard', '/messages', '/payment', '/settings', '/profile'];
 
@@ -11,8 +10,7 @@ export function middleware(req: NextRequest) {
   }
 
   const token = req.cookies.get(process.env.JWT_COOKIE_NAME || 'auth_token')?.value;
-  const ok = token && verifyJwt(token, process.env.AUTH_SECRET || '');
-  if (ok) return NextResponse.next();
+  if (token) return NextResponse.next();
 
   const next = encodeURIComponent(url.pathname + url.search);
   return NextResponse.redirect(new URL(`/login?next=${next}`, req.url));

@@ -27,8 +27,8 @@ export default function SessionNav() {
       method: 'POST',
       credentials: 'same-origin',
     });
-    router.refresh();
     setUser(null);
+    router.push('/');
   };
 
   if (!user) {
