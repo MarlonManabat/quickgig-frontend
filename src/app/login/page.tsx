@@ -6,7 +6,12 @@ import { renderFragment } from '@/lib/legacy/renderFragment';
 import LegacyLogin from './LegacyLogin';
 import './legacy-login.css';
 
-export default async function LoginPage() {
+interface Props {
+  searchParams?: { next?: string };
+}
+
+export default async function LoginPage({ searchParams }: Props) {
   const html = await renderFragment('login');
-  return <LegacyLogin html={html} />;
+  const nextUrl = typeof searchParams?.next === 'string' ? searchParams.next : undefined;
+  return <LegacyLogin html={html} nextUrl={nextUrl} />;
 }

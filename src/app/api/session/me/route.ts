@@ -1,16 +1,20 @@
-import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getSessionFromCookies } from '@/lib/auth';
+import { NextResponse } from 'next/server';
+import { verifyJwt } from '@/lib/jwt';
 
 export const runtime = 'nodejs';
 
 export async function GET() {
-  console.info('GET /api/session/me');
-  const session = getSessionFromCookies(cookies());
-  if (!session.user) {
-    console.info('GET /api/session/me 401');
-    return NextResponse.json({ ok: false }, { status: 401 });
+  const name = process.env.JWT_COOKIE_NAME || 'auth_token';
+  const t = cookies().get(name)?.value;
+  if (!t) {
+    return NextResponse.json({ ok: false, user: null }, { status: 401 });
   }
-  console.info('GET /api/session/me 200');
-  return NextResponse.json({ ok: true, user: session.user }, { status: 200 });
+
+  const data = verifyJwt(t, process.env.AUTH_SECRET || '');
+  if (!data) {
+    return NextResponse.json({ ok: false, user: null }, { status: 401 });
+  }
+  return NextResponse.json({ ok: true, user: { email: data.sub } });
 }
+
