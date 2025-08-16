@@ -1,29 +1,18 @@
-import { readLegacyFragment, legacyCssHref } from '@/lib/legacy';
-import { parseFragment } from '@/lib/legacy/html';
-
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
-export default async function MarketingHome() {
-  const css = await legacyCssHref();
-  const html = await readLegacyFragment('index.fragment.html');
+import React from 'react';
+import { loadLegacyFragment } from '@/lib/legacy/fragment';
 
-  // If we have a fragment, render it; otherwise show the existing React hero as fallback.
-  if (html) {
-    const $ = parseFragment(html);
-    return (
-      <html>
-        <head>
-          {css ? <link rel="stylesheet" href={css} /> : null}
-          <meta name="robots" content="index,follow" />
-        </head>
-        <body dangerouslySetInnerHTML={{ __html: $.html() }} />
-      </html>
-    );
+export default async function Page() {
+  const useLegacy = process.env.NEXT_PUBLIC_LEGACY_UI === 'true';
+  if (useLegacy) {
+    const html = await loadLegacyFragment('home');
+    if (html) {
+      return <main dangerouslySetInnerHTML={{ __html: html }} />;
+    }
   }
-
-  // Fallback: current React-based home (keeps site usable if legacy files are missing)
+  // Fallback: existing React home (keep your current implementation below)
   return (
     <main className="px-4 py-12">
       <div className="mx-auto max-w-4xl text-center">
