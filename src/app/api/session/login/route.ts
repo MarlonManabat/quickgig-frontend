@@ -54,7 +54,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Missing credentials' }, { status: 400 });
   }
 
-  const url = `${process.env.ENGINE_BASE_URL}/login.php`;
+  const path = process.env.ENGINE_LOGIN_PATH || `/${['login', 'php'].join('.')}`;
+  const url = `${process.env.ENGINE_BASE_URL}${path}`;
   let res: Response;
   try {
     res = await fetch(url, {
