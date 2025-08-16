@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     siteName: 'QuickGig.ph',
     images: [
       {
-        url: '/logo-main.png',
+        url: '/legacy/img/logo-main.png',
         width: 1200,
         height: 630,
         alt: 'QuickGig.ph - Filipino Freelance Platform',
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "QuickGig.ph - Find Gigs Fast in the Philippines",
     description: "Kahit saan sa Pinas, may gig para sa'yo!",
-    images: ['/logo-main.png'],
+    images: ['/legacy/img/logo-main.png'],
     creator: '@QuickGigPH',
   },
   icons: [{ rel: 'icon', url: faviconUrl }],
@@ -143,7 +143,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                           <div className="col-span-1 md:col-span-2">
                             {/* eslint-disable-next-line @next/next/no-img-element -- logo placeholder */}
-                            <img src="/logo-horizontal.png" alt="QuickGig.ph" className="h-8 mb-4" />
+                            <img src="/legacy/img/logo-horizontal.png" alt="QuickGig.ph" className="h-8 mb-4" />
                             <p className="text-fg opacity-70 mb-4">
                               Ang pinakamabilis na paraan para makahanap ng trabaho at talent sa Pilipinas.
                             </p>

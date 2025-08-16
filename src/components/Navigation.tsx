@@ -33,7 +33,7 @@ const Navigation: React.FC = () => {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3 group">
               <Image
-                src="/logo-main.png"
+                src="/legacy/img/logo-main.png"
                 alt="QuickGig.ph"
                 width={40}
                 height={40}

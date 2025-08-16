@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 jobs:
-  legacy-verify:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -12,23 +12,5 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm ci
+      - run: npm run lint && npm run typecheck
       - run: npm run legacy:verify
-
-  build:
-    needs: [legacy-verify]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Install
-        run: npm ci
-      - name: Legacy guard
-        run: npm run legacy:check
-      - name: Lint
-        run: npm run lint
-      - name: Typecheck
-        run: npm run typecheck
-
