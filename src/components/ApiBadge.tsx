@@ -2,27 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
+import { fetchSession } from '@/lib/session';
 
 const showBadge = process.env.NEXT_PUBLIC_SHOW_API_BADGE === 'true';
 
 export default function ApiBadge() {
-  type Status = 'ok' | 'degraded' | 'error';
-  const [status, setStatus] = useState<Status>('degraded');
+  type Status = 'ok' | 'error' | 'hidden';
+  const [status, setStatus] = useState<Status>('hidden');
 
   async function check() {
-    try {
-      const res = await fetch('/api/health', { credentials: 'same-origin' });
-      const data = await res.json();
-      if (data.ok && data.services?.app === 'up') {
-        setStatus('ok');
-      } else if (data.ok) {
-        setStatus('degraded');
-      } else {
-        setStatus('error');
-      }
-    } catch {
-      setStatus('error');
-    }
+    const res = await fetchSession();
+    if (res.status === 200) setStatus('ok');
+    else if (res.status === 401) setStatus('hidden');
+    else setStatus('error');
   }
 
   useEffect(() => {
@@ -32,21 +24,10 @@ export default function ApiBadge() {
     return () => clearInterval(id);
   }, []);
 
-  if (!showBadge) return null;
+  if (!showBadge || status === 'hidden') return null;
 
-  const color =
-    status === 'ok'
-      ? 'bg-green-500 text-white'
-      : status === 'degraded'
-      ? 'bg-yellow-400 text-black'
-      : 'bg-red-500 text-white';
-
-  const label =
-    status === 'ok'
-      ? 'API: OK'
-      : status === 'degraded'
-      ? 'API: DEGRADED'
-      : 'API: ERROR';
+  const color = status === 'ok' ? 'bg-green-500 text-white' : 'bg-red-500 text-white';
+  const label = status === 'ok' ? 'API: OK' : 'API: ERROR';
 
   return (
     <span

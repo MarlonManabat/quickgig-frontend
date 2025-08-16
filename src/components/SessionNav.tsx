@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { IS_LEGACY_ROUTE } from '@/env/runtime';
+import { fetchSession } from '@/lib/session';
 
 interface User {
   email: string;
@@ -14,12 +16,10 @@ export default function SessionNav() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/session/me', { credentials: 'same-origin' })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.ok && data.user) setUser(data.user as User);
-      })
-      .catch(() => {});
+    if (IS_LEGACY_ROUTE()) return;
+    fetchSession().then((res) => {
+      if (res.ok && res.user) setUser(res.user as User);
+    });
   }, []);
 
   const logout = async () => {
