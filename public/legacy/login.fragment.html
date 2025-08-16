@@ -1,0 +1,17 @@
+<main class="legacy-login">
+  <div class="login-card">
+    <h1>Log In</h1>
+    <p class="subtitle">Welcome back</p>
+    <div class="error-banner" role="alert" tabindex="-1" hidden>Invalid email or password</div>
+    <form class="login-form" action="/api/session/login" method="post">
+      <label>Email
+        <input type="email" name="email" required />
+      </label>
+      <label>Password
+        <input type="password" name="password" required />
+      </label>
+      <button type="submit">Log In</button>
+    </form>
+    <p class="signup-link">Need an account? <a href="/signup">Sign up</a></p>
+  </div>
+</main>
