@@ -2,12 +2,12 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import React from 'react';
-import { loadLegacyFragment } from '@/lib/legacy/fragment';
+import { renderFragment } from '@/lib/legacy/renderFragment';
 
 export default async function Page() {
   const useLegacy = process.env.NEXT_PUBLIC_LEGACY_UI === 'true';
   if (useLegacy) {
-    const html = await loadLegacyFragment('home');
+    const html = await renderFragment('home');
     if (html) {
       return <main dangerouslySetInnerHTML={{ __html: html }} />;
     }
