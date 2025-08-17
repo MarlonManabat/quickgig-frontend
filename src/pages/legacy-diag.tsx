@@ -67,7 +67,7 @@ export default function LegacyDiagPage() {
         <button onClick={() => setLS(null)}>Clear Override</button>
       </div>
       <p>
-        Quick links: <Link href="/?legacy=1">/?legacy=1</Link> · <Link href="/login?legacy=1">/login?legacy=1</Link> · <Link href="/_legacy-diag?diag=1">/_legacy-diag?diag=1</Link>
+        Quick links: <Link href="/?legacy=1">/?legacy=1</Link> · <Link href="/login?legacy=1">/login?legacy=1</Link> · <Link href="/legacy-diag?diag=1">/legacy-diag?diag=1</Link>
       </p>
       {err && <pre style={{color:'crimson'}}>{err}</pre>}
       {!data ? <p>Loading…</p> : (
