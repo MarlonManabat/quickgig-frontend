@@ -7,22 +7,41 @@ const english: Messages = {
   nav_find: "Find work",
   nav_saved: "Saved",
   nav_post: "Post a job",
+  nav_post_job: "Post a job",
   nav_signin: "Sign in",
   nav_signout: "Sign out",
   nav_language: "Language",
   home_hero_title: "Hanap trabaho made simple",
-  home_hero_tag: "Search gigs near you and apply in minutes.",
+  home_hero_cta: "Search gigs near you and apply in minutes.",
   search_placeholder: "Search jobs (keyword, company…)",
   search_filters: "Filters",
+  search_title: "Find work",
+  search_empty: "No results yet. Try different keywords or clearing filters.",
+  search_results_count: "{total} results",
   jobs_featured: "Featured jobs",
   saved_title: "Saved jobs",
+  saved_empty: "You haven’t saved any jobs yet.",
   job_apply: "Apply now",
   job_applied: "Applied",
   job_save: "Save",
   job_saved: "Saved",
+  job_apply_title: "Apply to this job",
+  apply_name: "Full name",
+  apply_email: "Email",
+  apply_resume: "Resume or note",
+  apply_submit: "Submit application",
+  apply_success: "Thanks! Your application was received.",
+  apply_error: "Something went wrong. Please try again.",
   login_title: "Sign in",
-  apply_title: "Apply to this job",
   employer_post: "Post a job",
+  footer_about: "About",
+  footer_terms: "Terms",
+  footer_privacy: "Privacy",
+  footer_copyright: "© {year} QuickGig.ph",
+  err404_title: "Page not found",
+  err404_body: "We couldn’t find that page. Try the homepage.",
+  err500_title: "Something went wrong",
+  err500_body: "Please retry or go back to the homepage.",
   not_found: "Page not found",
 };
 
@@ -31,22 +50,41 @@ const taglish: Messages = {
   nav_find: "Hanap trabaho",
   nav_saved: "Na-save",
   nav_post: "Mag-post ng trabaho",
+  nav_post_job: "Mag-post ng trabaho",
   nav_signin: "Mag-log in",
   nav_signout: "Mag-log out",
   nav_language: "Wika",
   home_hero_title: "Hanap trabaho, walang abala",
-  home_hero_tag: "Mag-search ng gigs malapit sa’yo at mag-apply agad.",
+  home_hero_cta: "Mag-search ng gigs malapit sa’yo at mag-apply agad.",
   search_placeholder: "Maghanap ng trabaho (keyword, company…)",
   search_filters: "Mga filter",
+  search_title: "Hanap trabaho",
+  search_empty: "Wala pang resulta. Subukan ibang keywords o linisin ang filters.",
+  search_results_count: "{total} resulta",
   jobs_featured: "Mga tampok na trabaho",
   saved_title: "Mga na-save na trabaho",
+  saved_empty: "Wala ka pang na-save na trabaho.",
   job_apply: "Mag-apply ngayon",
   job_applied: "Nakapag-apply na",
   job_save: "I-save",
   job_saved: "Na-save",
+  job_apply_title: "Mag-apply sa trabahong ito",
+  apply_name: "Buong pangalan",
+  apply_email: "Email",
+  apply_resume: "Resume o mensahe",
+  apply_submit: "Isumite ang application",
+  apply_success: "Salamat! Natanggap na ang application mo.",
+  apply_error: "May nangyaring mali. Pakisubukang muli.",
   login_title: "Mag-log in",
-  apply_title: "Mag-apply sa trabahong ito",
   employer_post: "Mag-post ng trabaho",
+  footer_about: "Tungkol",
+  footer_terms: "Terms",
+  footer_privacy: "Privacy",
+  footer_copyright: "© {year} QuickGig.ph",
+  err404_title: "Hindi makita ang page",
+  err404_body: "Wala kaming mahanap na ganyang page. Balik sa homepage.",
+  err500_title: "May aberya",
+  err500_body: "Paki-reload o bumalik sa homepage.",
   not_found: "Hindi makita ang page",
 };
 
@@ -62,8 +100,14 @@ export function getVariantRuntime(): keyof Bundle {
   if (typeof window === "undefined") return readVariantFromEnv();
   const u = new URL(window.location.href);
   const q = u.searchParams.get("lang");
-  if (q === "tl") return "taglish";
-  if (q === "en") return "english";
+  if (q === "tl") {
+    window.localStorage.setItem("copyVariant", "taglish");
+    return "taglish";
+  }
+  if (q === "en") {
+    window.localStorage.setItem("copyVariant", "english");
+    return "english";
+  }
   const saved = window.localStorage.getItem("copyVariant");
   if (saved === "taglish" || saved === "english") return saved as keyof Bundle;
   return readVariantFromEnv();
@@ -75,7 +119,8 @@ export function setVariantRuntime(v: "english" | "taglish") {
   }
 }
 
-export function t(key: keyof typeof english): string {
+export function t(key: keyof typeof english, vars?: Record<string, string | number>): string {
   const v = getVariantRuntime();
-  return (bundle[v][key] ?? bundle.english[key] ?? key) as string;
+  const str = (bundle[v][key] ?? bundle.english[key] ?? key) as string;
+  return str.replace(/\{(\w+)\}/g, (_, k) => (vars?.[k] ?? "") as string);
 }

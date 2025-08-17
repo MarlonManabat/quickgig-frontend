@@ -20,17 +20,18 @@ export default function FindWork({ legacyHtml, items=[], total, q, loc, cat, sor
   const hasNext = total ? (page*size < total) : (items.length===size);
   return (
     <ProductShell>
-      <HeadSEO title={`${t('nav_find')} • QuickGig`} />
-      <h1>{t('nav_find')}</h1>
+      <HeadSEO titleKey="search_title" descKey="search_title" />
+      <h1>{t('search_title')}</h1>
       <FilterBar q={q} loc={loc} cat={cat} sort={sort} />
       {items.length ? (
         <>
+          <p style={{margin:'8px 0'}}>{t('search_results_count', { total: total ?? items.length })}</p>
           <JobGrid jobs={items} />
           <Pagination page={page} hasNext={hasNext} hrefBase="/find-work" qs={qs} />
         </>
       ) : (
         <div style={{padding:'24px 0'}}>
-          <p>No results yet. Try different keywords or clearing filters.</p>
+          <p>{t('search_empty')}</p>
         </div>
       )}
     </ProductShell>

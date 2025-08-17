@@ -35,7 +35,7 @@ export default function PostJobPage({ legacyHtml }: { legacyHtml:string }) {
   };
   return (
     <ProductShell>
-      <HeadSEO title={`${t('employer_post')} • QuickGig`} />
+      <HeadSEO titleKey="employer_post" descKey="employer_post" />
       <h1>{t('employer_post')}</h1>
       <p style={{opacity:.8, marginTop:-8}}>Share your opportunity with QuickGig talent.</p>
       <form onSubmit={onSubmit} style={{display:'grid', gap:12, maxWidth:720}}>

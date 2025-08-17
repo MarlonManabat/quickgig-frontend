@@ -8,6 +8,7 @@ import { HeadSEO } from '../../../src/components/HeadSEO';
 import { getJobDetails, type JobDetail } from '../../../src/lib/api';
 import { legacyFlagFromEnv, legacyFlagFromQuery } from '../../../src/lib/legacyFlag';
 import { tokens as T } from '../../../src/theme/tokens';
+import { t } from '../../../src/lib/t';
 
 type Props = { job: JobDetail|null; legacyHtml?: string };
 
@@ -33,7 +34,7 @@ export default function ApplyPage({ job, legacyHtml }: Props) {
 
   return (
     <ProductShell>
-      <HeadSEO title={job ? `Apply • ${job.title} • QuickGig` : 'Apply • QuickGig'} />
+      <HeadSEO title={job ? `${t('job_apply_title')} • ${job.title}` : t('job_apply_title')} descKey="search_title" />
       <section style={{display:'grid', gap:16}}>
         {job ? (
           <header style={{display:'grid', gap:4}}>
@@ -43,7 +44,7 @@ export default function ApplyPage({ job, legacyHtml }: Props) {
             </div>
           </header>
         ) : (
-          <h1>Apply</h1>
+          <h1>{t('job_apply_title')}</h1>
         )}
 
         <ApplyForm jobId={String(job?.id ?? '')} />
@@ -88,15 +89,15 @@ function ApplyForm({ jobId }: { jobId: string }) {
   return (
     <form onSubmit={onSubmit}
       style={{background:'#fff', border:`1px solid ${T.colors.border}`, borderRadius:12, padding:16, display:'grid', gap:12, maxWidth:560}}>
-      {field('Full name',
+      {field(t('apply_name'),
         <input value={name} onChange={e=>setName(e.target.value)} placeholder="Juan Dela Cruz"
                style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
       )}
-      {field('Email',
+      {field(t('apply_email'),
         <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"
                style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
       )}
-      {field('Message (optional)',
+      {field(t('apply_resume'),
         <textarea value={message} onChange={e=>setMessage(e.target.value)} rows={5}
                   placeholder="Short note to the employer"
                   style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`, resize:'vertical'}} />
@@ -106,13 +107,13 @@ function ApplyForm({ jobId }: { jobId: string }) {
         <button type="submit" disabled={disabled}
           style={{padding:'10px 14px', borderRadius:8, background: disabled? '#9aa5b1': T.colors.brand, color:'#fff',
                   border:'none', fontWeight:700, cursor: disabled? 'not-allowed':'pointer'}}>
-          {status==='sending' ? 'Sending…' : 'Submit application'}
+          {status==='sending' ? 'Sending…' : t('apply_submit')}
         </button>
         <Link href="/login" style={{padding:'10px 14px', borderRadius:8, border:`1px solid ${T.colors.border}`, textDecoration:'none'}}>Sign in</Link>
       </div>
 
-      {status==='ok' && <p role="status" style={{color:'green', margin:0}}>Thanks! Your application was received.</p>}
-      {status==='err' && <p role="status" style={{color:'crimson', margin:0}}>Something went wrong. Please try again.</p>}
+      {status==='ok' && <p role="status" style={{color:'green', margin:0}}>{t('apply_success')}</p>}
+      {status==='err' && <p role="status" style={{color:'crimson', margin:0}}>{t('apply_error')}</p>}
     </form>
   );
 }

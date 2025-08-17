@@ -32,11 +32,11 @@ export default function Home({ legacyHtml, jobs }: Props){
   }
   return (
     <ProductShell>
-      <HeadSEO title={t('site_title')} canonical="/" />
+      <HeadSEO titleKey="home_hero_title" descKey="home_hero_cta" canonical="/" />
       <div style={{display:'grid', gap:16}}>
           <Card>
             <h1 style={{fontFamily:T.font.ui, fontSize:28, margin:'0 0 8px'}}>{t('home_hero_title')}</h1>
-            <p style={{color:T.colors.subtle, margin:'0 0 16px'}}>{t('home_hero_tag')}</p>
+            <p style={{color:T.colors.subtle, margin:'0 0 16px'}}>{t('home_hero_cta')}</p>
             <div style={{display:'flex', gap:12}}>
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
               <a href="/find-work"><Button>{t('nav_find')}</Button></a>

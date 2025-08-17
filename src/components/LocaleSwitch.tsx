@@ -6,7 +6,9 @@ export default function LocaleSwitch() {
   function set(lang: "english"|"taglish") {
     setVariantRuntime(lang);
     setV(lang);
-    location.reload();
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', lang === 'taglish' ? 'tl' : 'en');
+    window.location.href = url.toString();
   }
   return (
     <div style={{display:'inline-flex', gap:8, alignItems:'center'}}>
