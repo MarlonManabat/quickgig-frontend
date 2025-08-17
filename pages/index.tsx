@@ -10,6 +10,7 @@ import { JobGrid } from '../src/product/JobCard';
 import { featuredJobs, type JobSummary } from '../src/lib/api';
 import { legacyFlagFromEnv, legacyFlagFromQuery } from '../src/lib/legacyFlag';
 import { t } from '../src/lib/t';
+import { OnboardingBanner } from '../src/product/onboarding/Banner';
 
 type Props = { legacyHtml?: string; jobs: JobSummary[] };
 export async function getStaticProps() {
@@ -33,6 +34,7 @@ export default function Home({ legacyHtml, jobs }: Props){
   return (
     <ProductShell>
       <HeadSEO titleKey="home_hero_title" descKey="home_hero_cta" canonical="/" />
+      <OnboardingBanner />
       <div style={{display:'grid', gap:16}}>
           <Card>
             <h1 style={{fontFamily:T.font.ui, fontSize:28, margin:'0 0 8px'}}>{t('home_hero_title')}</h1>

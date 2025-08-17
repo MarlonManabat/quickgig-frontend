@@ -7,6 +7,7 @@ import { searchJobs, type JobSummary } from '../src/lib/api';
 import FilterBar from '../src/product/ui/FilterBar';
 import Pagination from '../src/product/ui/Pagination';
 import { t } from '../src/lib/t';
+import { OnboardingBanner } from '../src/product/onboarding/Banner';
 
 type Props = {
   legacyHtml?: string;
@@ -21,6 +22,7 @@ export default function FindWork({ legacyHtml, items=[], total, q, loc, cat, sor
   return (
     <ProductShell>
       <HeadSEO titleKey="search_title" descKey="search_title" />
+      <OnboardingBanner />
       <h1>{t('search_title')}</h1>
       <FilterBar q={q} loc={loc} cat={cat} sort={sort} />
       {items.length ? (

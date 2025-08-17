@@ -39,6 +39,12 @@ const fetchJson = async (url) => {
     console.log('account page', rA.status);
   } catch (e) { console.log('account page error', String(e)); }
   try {
+    const prof = await fetch(`${BASE}/api/account/profile`);
+    const p = await prof.json().catch(()=>null);
+    const calc = (pp)=>{ if(!pp) return 0; let s=0; if(pp.name && pp.bio) s+=30; if(pp.email && pp.phone) s+=20; if(pp.roles && pp.roles.length) s+=20; if(pp.resumeUrl) s+=15; return Math.min(100,s); };
+    console.log('completeness', calc(p));
+  } catch (e) { console.log('completeness error', String(e)); }
+  try {
     const rE = await fetch(`${BASE}/employer/jobs`);
     const txt = await rE.text();
     console.log('employer jobs page', rE.status);

@@ -13,6 +13,7 @@ import { useSavedJobs } from '../../src/product/useSavedJobs';
 import { t } from '../../src/lib/t';
 import { isApplied } from '../../src/lib/appliedStore';
 import { useSession } from '../../src/hooks/useSession';
+import { OnboardingBanner } from '../../src/product/onboarding/Banner';
 
 type Props = { job: JobDetail | null; legacyHtml?: string };
 
@@ -56,6 +57,7 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
   return (
     <ProductShell>
       <HeadSEO title={job.title} descKey="search_title" />
+      <OnboardingBanner />
       <article style={{background:'#fff', border:`1px solid ${T.colors.border}`, borderRadius:12, padding:20, display:'grid', gap:12}}>
         <div style={{display:'flex', alignItems:'center', gap:12}}>
           <h1 style={{margin:'0 0 4px'}}>{job.title}</h1>
