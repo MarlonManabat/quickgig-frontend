@@ -13,6 +13,9 @@ import { markApplied } from '../../../src/lib/appliedStore';
 import { toJobSummary } from '../../../src/types/job';
 import { toast } from '../../../src/lib/toast';
 import { useRouter } from 'next/router';
+import { getResume, setResume } from '../../../src/lib/profileStore';
+import { UploadedFile } from '../../../src/types/upload';
+import { toBase64, truncateDataUrl, validate, makeId, MAX_MB } from '../../../src/lib/uploader';
 
 type Props = { job: JobDetail|null; legacyHtml?: string };
 
@@ -72,9 +75,10 @@ function ApplyForm({ job }: { job: JobDetail }) {
   const [email,setEmail] = React.useState('');
   const [phone,setPhone] = React.useState('');
   const [city,setCity] = React.useState('');
-  const [resumeUrl,setResumeUrl] = React.useState('');
   const [message,setMessage] = React.useState('');
   const [status,setStatus] = React.useState<'idle'|'sending'|'ok'|'err'>('idle');
+  const [resume,setResumeState] = React.useState<UploadedFile|null>(null);
+  const resumeInput = React.useRef<HTMLInputElement>(null);
   const disabled = !job?.id || !name || !email || status==='sending';
 
   React.useEffect(() => {
@@ -86,8 +90,8 @@ function ApplyForm({ job }: { job: JobDetail }) {
         setEmail(p.email || '');
         setPhone(p.phone || '');
         setCity(p.city || '');
-        setResumeUrl(p.resumeUrl || '');
       } catch {}
+      try { setResumeState(getResume()); } catch {}
     })();
   }, []);
 
@@ -98,7 +102,7 @@ function ApplyForm({ job }: { job: JobDetail }) {
       const r = await fetch('/api/apply', {
         method:'POST',
         headers:{'content-type':'application/json'},
-        body: JSON.stringify({ jobId: String(job.id), name, email, phone, city, resumeUrl, message }),
+        body: JSON.stringify({ jobId: String(job.id), name, email, phone, city, resume, message }),
       });
       const j = await r.json().catch(()=>({}));
       if (r.ok) {
@@ -112,6 +116,26 @@ function ApplyForm({ job }: { job: JobDetail }) {
     } catch {
       setStatus('err');
     }
+  }
+
+  async function onResumeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const v = validate(f);
+    if (!v.ok) {
+      toast(t(v.reason === 'too_big' ? 'profile.resume.too_big' : 'profile.resume.bad_type', { mb: MAX_MB }));
+      return;
+    }
+    const dataUrl = await toBase64(f);
+    const up: UploadedFile = { id: makeId(), name: f.name, type: f.type, size: f.size, data: truncateDataUrl(dataUrl), createdAt: Date.now() };
+    try {
+      const r = await fetch('/api/upload', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ kind:'resume', file: up }) });
+      if (r.ok) {
+        setResumeState(up);
+        setResume(up);
+        toast(t('profile.resume.saved'));
+      }
+    } catch {}
   }
 
   return (
@@ -133,10 +157,20 @@ function ApplyForm({ job }: { job: JobDetail }) {
         <input value={city} onChange={e=>setCity(e.target.value)} placeholder="Quezon City"
                style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
       )}
-      {field(t('field.resumeUrl'),
-        <input value={resumeUrl} onChange={e=>setResumeUrl(e.target.value)} placeholder="https://..."
-               style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
+      {field(t('profile.resume.title'),
+        <div style={{display:'flex', alignItems:'center', gap:8}}>
+          {resume ? (
+            <>
+              <span>{t('apply.resume_attached',{name: resume.name})}</span>
+              <button type="button" onClick={()=>resumeInput.current?.click()} style={{textDecoration:'underline', background:'none', border:'none', color:T.colors.brand, cursor:'pointer'}}>{t('profile.resume.replace')}</button>
+            </>
+          ) : (
+            <button type="button" onClick={()=>resumeInput.current?.click()} style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`, background:'#fff', cursor:'pointer'}}>{t('profile.resume.replace')}</button>
+          )}
+          <input ref={resumeInput} type="file" accept=".pdf,.doc,.docx" style={{display:'none'}} onChange={onResumeChange} />
+        </div>
       )}
+      <p style={{fontSize:12,color:T.colors.subtle,margin:0}}>{t('apply.resume_optional_hint')}</p>
       {field(t('apply_resume'),
         <textarea value={message} onChange={e=>setMessage(e.target.value)} rows={5}
                   placeholder="Short note to the employer"
