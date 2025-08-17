@@ -26,10 +26,10 @@
     "scan:links": "node tools/check_links.mjs",
     "bootstrap": "node tools/dev/bootstrap.mjs",
     "legacy:sync": "node tools/legacy/sync.js",
-    "legacy:verify": "node tools/legacy/verify.mjs --verify",
+    "legacy:verify": "node tools/legacy_verify.mjs",
     "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
-    "legacy:check": "node tools/legacy/verify.mjs --check",
-    "legacy:import": "node tools/legacy/import_from_dir.mjs",
+    "legacy:check": "node tools/legacy_verify.mjs --pretty",
+    "legacy:import": "node tools/import_from_dir.mjs",
     "test": "tsc src/lib/flags.ts src/lib/legacy/renderLegacy.ts src/lib/legacy/__tests__/sanitize.test.ts --module commonjs --target ES2019 --esModuleInterop --outDir dist-test && node --test dist-test/legacy/__tests__/sanitize.test.js"
   },
   "dependencies": {

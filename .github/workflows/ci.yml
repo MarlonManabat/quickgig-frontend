@@ -13,4 +13,6 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run lint && npm run typecheck
+      - name: Import (dry run – no local files in CI)
+        run: LEGACY_IMPORT_DRY_RUN=true npm run legacy:import -- --from "$HOME/QuickGig Project/frontend/public/legacy"
       - run: npm run legacy:verify

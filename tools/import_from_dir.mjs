@@ -2,6 +2,11 @@ import fs from 'fs';
 import { promises as fsp } from 'fs';
 import path from 'path';
 import cheerio from 'cheerio';
+import { resolveInputPath } from './lib/paths.mjs';
+
+function showHelp() {
+  console.log(`Legacy asset importer\n\nUsage: node tools/import_from_dir.mjs --from "<path>" [--dry-run]\n\nOptions:\n  --from <path>   Source directory containing legacy files\n  --dry-run       Ignore missing source (or set LEGACY_IMPORT_DRY_RUN=true)\n  --help          Show this message\n\nExamples:\n  node tools/import_from_dir.mjs --from "$HOME/Documents/QuickGig Project/frontend/public/legacy"\n  LEGACY_SRC="$HOME/Documents/QuickGig Project/frontend/public/legacy" npm run legacy:import\n  LEGACY_IMPORT_DRY_RUN=true npm run legacy:import -- --from "~/Documents/QuickGig Project/frontend/public/legacy"\n\nNote: wrap the path in quotes if it contains spaces.`);
+}
 
 /** Utility to recursively copy a directory */
 async function copyDir(src, dest, files) {
@@ -20,12 +25,50 @@ async function copyDir(src, dest, files) {
 }
 
 const args = process.argv.slice(2);
-const fromIdx = args.indexOf('--from');
-if (fromIdx === -1 || !args[fromIdx + 1]) {
-  console.error('Missing --from option. Example:\n  node tools/legacy/import_from_dir.mjs --from "../legacy-src"');
+let fromArg;
+let dryRun = process.env.LEGACY_IMPORT_DRY_RUN === 'true';
+for (let i = 0; i < args.length; i++) {
+  const a = args[i];
+  if (a === '--from') {
+    fromArg = args[i + 1];
+    i++;
+  } else if (a === '--dry-run') {
+    dryRun = true;
+  } else if (a === '--help' || a === '-h') {
+    showHelp();
+    process.exit(0);
+  }
+}
+
+if (!fromArg && process.env.LEGACY_SRC) {
+  fromArg = process.env.LEGACY_SRC;
+}
+
+if (!fromArg) {
+  if (dryRun) {
+    console.log('legacy import (dry run): no source specified, skipping');
+    process.exit(0);
+  }
+  console.error('Missing source directory. Use --from "<path>" or set LEGACY_SRC.');
   process.exit(1);
 }
-const srcDir = path.resolve(args[fromIdx + 1]);
+
+const srcDir = resolveInputPath(fromArg);
+if (!fs.existsSync(srcDir)) {
+  if (dryRun) {
+    console.log(`legacy import (dry run): source not found at ${srcDir}, skipping`);
+    process.exit(0);
+  }
+  console.error(`Source directory not found: ${srcDir}`);
+  console.error('Tip: pass --from "<path>" or set LEGACY_SRC');
+  process.exit(1);
+}
+
+const root = process.cwd();
+const legacyDir = path.join(root, 'public', 'legacy');
+await fsp.mkdir(legacyDir, { recursive: true });
+await fsp.mkdir(path.join(legacyDir, 'img'), { recursive: true });
+await fsp.mkdir(path.join(legacyDir, 'fonts'), { recursive: true });
 
 const required = ['styles.css', 'index.fragment.html', 'login.fragment.html'];
 for (const f of required) {
@@ -34,10 +77,6 @@ for (const f of required) {
     process.exit(1);
   }
 }
-
-const root = process.cwd();
-const legacyDir = path.join(root, 'public', 'legacy');
-await fsp.mkdir(legacyDir, { recursive: true });
 
 const imported = [];
 const rewrites = { img: 0, fonts: 0 };
@@ -56,6 +95,8 @@ function sanitizeFragment(html) {
       const val = $(el).attr(attr);
       if (!val) continue;
       if (/^https?:\/\//i.test(val)) continue;
+      if (val.startsWith('/legacy/img/')) continue;
+      if (val.startsWith('/legacy/fonts/')) continue;
       if (val.startsWith('/img/')) {
         $(el).attr(attr, '/legacy' + val);
         rewrites.img++;
@@ -103,8 +144,7 @@ if (fs.existsSync(fontsSrc)) {
   warnings.push('fonts directory missing');
 }
 
-// copy logo root files
-const rootEntries = fs.existsSync(srcDir) ? fs.readdirSync(srcDir) : [];
+const rootEntries = fs.readdirSync(srcDir);
 for (const name of rootEntries) {
   if (/^logo-.*\.png$/.test(name)) {
     const dest = path.join(legacyDir, name);

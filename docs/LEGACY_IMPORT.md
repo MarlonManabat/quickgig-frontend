@@ -1,5 +1,20 @@
 # Legacy asset import
 
+## Quick start
+
+```sh
+# Option A (env var)
+export LEGACY_SRC="$HOME/Documents/QuickGig Project/frontend/public/legacy"
+npm run legacy:import
+npm run legacy:verify
+
+# Option B (flag)
+npm run legacy:import -- --from "$HOME/Documents/QuickGig Project/frontend/public/legacy"
+npm run legacy:verify
+```
+
+Note: wrap the path in quotes if it contains spaces.
+
 ## Prerequisites
 
 Set the following environment variables while validating the legacy UI:
@@ -21,13 +36,6 @@ NEXT_PUBLIC_BANNER_HTML='<div class="mx-auto max-w-6xl px-4 py-2 text-center tex
 
 The banner value must be on a single line or escaped properly if multi-line. Redeploy after changing environment variables.
 
-## Import
-
-```sh
-npm run legacy:import -- --from "$HOME/QuickGig Project/frontend/public/legacy"
-npm run legacy:verify
-```
-
 ## Commit & PR
 
 ```sh
@@ -39,7 +47,8 @@ git push -u origin chore/import-real-legacy
 
 ## Troubleshooting
 
-- Ensure `styles.css`, `index.fragment.html`, and `login.fragment.html` exist in the source directory.
+- **Missing source directory** – ensure the path is correct or set `LEGACY_SRC`; wrap paths with spaces in quotes.
+- **Missing styles.css** – ensure `styles.css`, `index.fragment.html`, and `login.fragment.html` exist in the source directory.
 - Asset paths are rewritten to `/legacy/img/...` and `/legacy/fonts/...` automatically.
 - Missing `img` or `fonts` folders produce warnings but do not stop the import.
 - `logo-icon.png` is copied to `public/favicon.png` if present; absence is not an error.
