@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import ProductShell from '../src/product/layout/ProductShell';
+import ProductShell from '../src/components/layout/ProductShell';
 import { HeadSEO } from '../src/components/HeadSEO';
 import { tokens as T } from '../src/theme/tokens';
 import { searchJobs, type JobSummary } from '../src/lib/api';
@@ -61,10 +61,9 @@ export default function FindWorkPage(props: Props) {
   const prevPage = () => router.push({ pathname: '/find-work', query: { q, location, page: Math.max(1, page - 1) } });
 
   return (
-    <>
+    <ProductShell>
       <HeadSEO title="Find Work • QuickGig" canonical="/find-work" />
-      <ProductShell>
-        <section style={{ display:'grid', gap:16 }}>
+      <section style={{ display:'grid', gap:16 }}>
           <form onSubmit={submit} style={{
             display:'grid', gap:12, gridTemplateColumns:'1fr 1fr auto',
             alignItems:'end', background:'#fff', border:`1px solid ${T.colors.border}`,
@@ -113,8 +112,7 @@ export default function FindWorkPage(props: Props) {
               No jobs found. Try different keywords or locations.
             </div>
           )}
-        </section>
-      </ProductShell>
-    </>
+      </section>
+    </ProductShell>
   );
 }

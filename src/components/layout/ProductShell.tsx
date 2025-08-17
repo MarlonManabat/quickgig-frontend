@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { tokens as T } from '../../theme/tokens';
 import NavBar from '../product/NavBar';
+import Footer from '../Footer';
 
 export default function ProductShell({children}:{children:React.ReactNode}) {
   return (
@@ -12,7 +13,7 @@ export default function ProductShell({children}:{children:React.ReactNode}) {
         <NavBar />
       </header>
       <main style={{display:'grid', gap:16}}>{children}</main>
-      <footer style={{marginTop:'auto', color:T.colors.subtle, fontSize:13}}>© {new Date().getFullYear()} QuickGig</footer>
+      <Footer />
     </div>
   );
 }

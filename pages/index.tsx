@@ -2,7 +2,7 @@ import * as React from 'react';
 import { HeadSEO } from '../src/components/HeadSEO';
 import fs from 'fs';
 import path from 'path';
-import ProductShell from '../src/product/layout/ProductShell';
+import ProductShell from '../src/components/layout/ProductShell';
 import { Card } from '../src/product/ui/Card';
 import { Button } from '../src/product/ui/Button';
 import { tokens as T } from '../src/theme/tokens';
@@ -30,10 +30,9 @@ export default function Home({ legacyHtml, jobs }: Props){
     return (<div dangerouslySetInnerHTML={{__html: legacyHtml}}/>);
   }
   return (
-    <>
+    <ProductShell>
       <HeadSEO title="QuickGig • Find Gigs Fast" canonical="/" />
-      <ProductShell>
-        <div style={{display:'grid', gap:16}}>
+      <div style={{display:'grid', gap:16}}>
           <Card>
             <h1 style={{fontFamily:T.font.ui, fontSize:28, margin:'0 0 8px'}}>Find gigs fast in the Philippines</h1>
             <p style={{color:T.colors.subtle, margin:'0 0 16px'}}>Search flexible work and apply in minutes.</p>
@@ -50,8 +49,7 @@ export default function Home({ legacyHtml, jobs }: Props){
               <JobGrid jobs={jobs}/>
             </section>
           ) : null}
-        </div>
-      </ProductShell>
-    </>
+      </div>
+    </ProductShell>
   );
 }
