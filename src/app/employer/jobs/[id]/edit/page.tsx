@@ -6,6 +6,12 @@ import JobForm, { JobFormData } from '@/components/JobForm';
 import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 
+function unwrapApi<T>(v: unknown): T {
+  return (v && typeof v === 'object' && 'data' in v)
+    ? ((v as { data: T }).data)
+    : (v as T);
+}
+
 interface PageProps {
   params: { id: string };
 }
@@ -22,14 +28,14 @@ export default function EditJobPage({ params }: PageProps) {
   useEffect(() => {
     async function load() {
       try {
-        const res = await api.get<JobDetail>(API.jobById(params.id));
+        const res = unwrapApi<JobDetail>(await api.get<JobDetail>(API.jobById(params.id)));
         setInitial({
-          title: res.data.title || '',
-          description: res.data.description || '',
-          location: res.data.location || '',
-          payRange: res.data.payRange || '',
-          tags: res.data.tags || [],
-          published: res.data.published ?? false,
+          title: res.title || '',
+          description: res.description || '',
+          location: res.location || '',
+          payRange: res.payRange || '',
+          tags: res.tags || [],
+          published: res.published ?? false,
         });
       } finally {
         setLoading(false);
