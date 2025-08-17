@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { tokens as T } from '../theme/tokens';
 import type { JobSummary } from '../lib/api';
 import { useSavedJobs } from './useSavedJobs';
+import { t } from '../lib/t';
 
 export function JobCard({ job }: { job: JobSummary }) {
   const { isSaved, toggle } = useSavedJobs();
@@ -69,7 +70,7 @@ export function JobCard({ job }: { job: JobSummary }) {
             fontWeight: 600,
           }}
         >
-          Apply
+          {t('job_apply')}
         </Link>
       </div>
     </div>

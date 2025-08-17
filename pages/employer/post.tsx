@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import ProductShell from '../../src/components/layout/ProductShell';
 import { HeadSEO } from '../../src/components/HeadSEO';
+import { t } from '../../src/lib/t';
 
 export async function getServerSideProps() {
   try {
@@ -34,8 +35,8 @@ export default function PostJobPage({ legacyHtml }: { legacyHtml:string }) {
   };
   return (
     <ProductShell>
-      <HeadSEO title="Post a job • QuickGig" />
-      <h1>Post a job</h1>
+      <HeadSEO title={`${t('employer_post')} • QuickGig`} />
+      <h1>{t('employer_post')}</h1>
       <p style={{opacity:.8, marginTop:-8}}>Share your opportunity with QuickGig talent.</p>
       <form onSubmit={onSubmit} style={{display:'grid', gap:12, maxWidth:720}}>
         <label>Title<input name="title" required placeholder="e.g., Part-time Barista" /></label>
