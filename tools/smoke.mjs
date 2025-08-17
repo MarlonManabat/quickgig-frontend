@@ -2,7 +2,9 @@
 import { setTimeout as sleep } from 'timers/promises';
 const BASE = process.env.SMOKE_URL || process.env.BASE || '';
 if (!BASE) { console.log('No SMOKE_URL set; skipping smoke'); process.exit(0); }
-const PATHS = ['/', '/find-work', '/login', ...(process.env.SMOKE_JOB_ID ? [`/jobs/${process.env.SMOKE_JOB_ID}`] : [])];
+const PATHS = ['/', '/find-work', '/login',
+  ...(process.env.SMOKE_JOB_ID ? [`/jobs/${process.env.SMOKE_JOB_ID}`, `/jobs/${process.env.SMOKE_JOB_ID}/apply`] : [])
+];
 const fetchJson = async (url) => {
   const r = await fetch(url, { headers:{ 'accept':'text/html' }});
   if (!r.ok) throw new Error(`${r.status} ${url}`);
