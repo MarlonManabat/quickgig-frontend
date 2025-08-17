@@ -32,7 +32,9 @@
     "legacy:import": "node tools/import_from_dir.mjs",
     "test": "tsc src/lib/flags.ts src/lib/legacy/renderLegacy.ts src/lib/legacy/__tests__/sanitize.test.ts --module commonjs --target ES2019 --esModuleInterop --outDir dist-test && node --test dist-test/legacy/__tests__/sanitize.test.js",
     "legacy:verify:strict": "node scripts/legacy-verify-strict.mjs",
-    "smoke:prod": "node scripts/smoke-prod.mjs"
+    "smoke:prod": "node scripts/smoke-prod.mjs",
+    "legacy:font:install": "node scripts/legacy-font-install.mjs",
+    "font:status": "node scripts/font-status.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
