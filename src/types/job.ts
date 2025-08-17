@@ -1,3 +1,5 @@
+import type { ApplicantSummary, ApplicantStatus } from './applicant';
+
 export type JobSummary = {
   id: string | number;
   title: string;
@@ -7,21 +9,15 @@ export type JobSummary = {
   url?: string;
   tags?: string[];
   postedAt?: string;
-  applicants?: number;
+  applicants?: ApplicantSummary[];
+  counts?: Record<ApplicantStatus | 'total', number>;
 };
 
 export type JobDetail = JobSummary & {
   description?: string;
 };
 
-export interface ApplicantSummary {
-  id: string;
-  name: string;
-  email: string;
-  submittedAt: string;
-}
-
 export function toJobSummary(job: JobDetail): JobSummary {
-  const { id, title, company, location, payRange, url, tags, postedAt, applicants } = job;
-  return { id, title, company, location, payRange, url, tags, postedAt, applicants };
+  const { id, title, company, location, payRange, url, tags, postedAt, applicants, counts } = job;
+  return { id, title, company, location, payRange, url, tags, postedAt, applicants, counts };
 }

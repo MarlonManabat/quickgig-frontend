@@ -84,6 +84,26 @@ const fetchJson = async (url) => {
         const txt = await jobsRes.text();
         console.log('authed employer jobs', jobsRes.status);
         if (/Applicants?/i.test(txt)) console.log('mock applicants ok');
+        const apiJobs = await fetch(`${BASE}/api/employer/jobs`, { headers: { cookie } });
+        const jobs = await apiJobs.json().catch(() => []);
+        const jobId = jobs[0]?.id;
+        if (jobId) {
+          const appPage = await fetch(`${BASE}/employer/jobs/${jobId}/applicants`, { headers: { cookie } });
+          const appTxt = await appPage.text();
+          console.log('applicants page', appPage.status);
+          if (/Status/i.test(appTxt)) console.log('applicants page ok');
+          const aid = jobs[0]?.applicants?.[0]?.id;
+          if (aid) {
+            const putRes = await fetch(`${BASE}/api/employer/jobs/${jobId}/applicants/${aid}`, {
+              method: 'PUT',
+              headers: { 'content-type': 'application/json', cookie },
+              body: JSON.stringify({ status: 'shortlist' }),
+            });
+            console.log('update applicant', putRes.status);
+            const upd = await putRes.json().catch(() => ({}));
+            if (upd?.status) console.log('status', upd.status);
+          }
+        }
         const logoutRes = await fetch(`${BASE}/api/session/logout`, { method: 'POST', headers: { cookie } });
         console.log('logout', logoutRes.status);
       }
