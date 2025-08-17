@@ -11,7 +11,7 @@ export function useUnreadCount() {
     try {
       const r = await fetch('/api/messages?count=1');
       const j = await r.json().catch(() => ({}));
-      setCount(j.count || 0);
+      setCount(j.unread ?? j.count ?? 0);
     } catch {
       setCount(0);
     }

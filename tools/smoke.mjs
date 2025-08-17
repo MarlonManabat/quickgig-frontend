@@ -10,6 +10,14 @@ const fetchJson = async (url) => {
   if (!r.ok) throw new Error(`${r.status} ${url}`);
 };
 (async () => {
+  try {
+    const rC = await fetch(`${BASE}/api/messages?count=1`);
+    console.log('messages count', rC.status);
+  } catch (e) { console.log('messages count error', String(e)); }
+  try {
+    const rL = await fetch(`${BASE}/api/messages?latest=1`);
+    console.log('messages latest', rL.status);
+  } catch (e) { console.log('messages latest error', String(e)); }
   for (const p of PATHS) {
     const url = BASE.replace(/\/+$/,'') + p;
     try { await fetchJson(url); console.log('OK', url); }

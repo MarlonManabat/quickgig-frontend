@@ -26,7 +26,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!thread) return res.status(404).json({ error: 'not_found' });
       const toId = thread.participants.find((p) => p !== user.id) || '';
       const body = String((req.body || {}).body || '');
-      sendMessage(thread, user.id, toId, body);
+      const m = sendMessage(thread, user.id, toId, body);
+      if (process.env.MESSAGE_WEBHOOK_URL) {
+        fetch(process.env.MESSAGE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ type: 'message.created', threadId: id, from: user.id, to: toId, jobId: thread.jobId, body, createdAt: m.createdAt }),
+        }).catch(() => {});
+      }
       return res.status(200).json({ ok: true });
     }
     try {
@@ -36,6 +43,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         body: JSON.stringify(req.body),
       });
       const data = await r.json().catch(() => ({}));
+      if (r.ok && process.env.MESSAGE_WEBHOOK_URL) {
+        const body = String((req.body || {}).body || '');
+        fetch(process.env.MESSAGE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ type: 'message.created', threadId: id, from: user.id, to: undefined, jobId: undefined, body, createdAt: new Date().toISOString() }),
+        }).catch(() => {});
+      }
       return res.status(r.status).json(data);
     } catch {
       return res.status(500).json({ error: 'engine_error' });
