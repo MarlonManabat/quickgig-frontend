@@ -57,11 +57,10 @@ export function JobCard({ job }: { job: JobSummary }) {
 }
 
 export function JobGrid({ jobs }: { jobs: JobSummary[] }) {
-  if (!jobs.length) return null;
   return (
-    <section style={{display:'grid', gap:16, gridTemplateColumns:'repeat(auto-fill, minmax(240px, 1fr))'}}>
+    <div style={{display:'grid', gap:12, gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))'}}>
       {jobs.map(j => <JobCard key={String(j.id)} job={j} />)}
-    </section>
+    </div>
   );
 }
 
