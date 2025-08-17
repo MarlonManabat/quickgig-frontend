@@ -188,3 +188,66 @@ export async function featuredJobs(limit = 8): Promise<JobSummary[]> {
   return [];
 }
 
+export type JobSearchParams = {
+  q?: string;
+  location?: string;
+  page?: number;
+  limit?: number;
+};
+
+/** Search jobs by q/location. Attempts several endpoints & shapes, returns a normalized page. */
+export async function searchJobs(
+  { q = '', location = '', page = 1, limit = 20 }: JobSearchParams
+): Promise<{ items: JobSummary[]; total?: number; page: number; limit: number; }> {
+  const qs = new URLSearchParams();
+  if (q) qs.set('q', q);
+  if (location) qs.set('location', location);
+  qs.set('page', String(page));
+  qs.set('limit', String(limit));
+  const paths = [
+    `/jobs?${qs}`,
+    `/public/jobs?${qs}`,
+    `/search/jobs?${qs}`,
+  ];
+  for (const p of paths) {
+    try {
+      const data = await getJSON<unknown>(p);
+      const arr: unknown[] =
+        Array.isArray(data) ? data
+        : Array.isArray((data as { items?: unknown[] }).items) ? (data as { items?: unknown[] }).items!
+        : Array.isArray((data as { data?: unknown[] }).data) ? (data as { data?: unknown[] }).data!
+        : [];
+      const items = arr.map((j): JobSummary => {
+        interface LooseJob {
+          id?: string | number;
+          jobId?: string | number;
+          slug?: string;
+          title?: string;
+          name?: string;
+          company?: { name?: string } | string;
+          org?: string;
+          location?: { name?: string } | string;
+          city?: string;
+          payRange?: string;
+          salary?: string;
+          url?: string;
+        }
+        const job = j as LooseJob;
+        return {
+          id: job.id ?? job.jobId ?? job.slug ?? String(Math.random()).slice(2),
+          title: job.title ?? job.name ?? 'Untitled',
+          company: typeof job.company === 'string' ? job.company : job.company?.name ?? job.org ?? undefined,
+          location: typeof job.location === 'string' ? job.location : job.location?.name ?? job.city ?? undefined,
+          payRange: job.payRange ?? job.salary ?? undefined,
+          url: job.url ?? (typeof job.id !== 'undefined' ? `/jobs/${job.id}` : undefined),
+        };
+      });
+      const total = typeof (data as { total?: number }).total === 'number' ? (data as { total?: number }).total
+        : typeof (data as { count?: number }).count === 'number' ? (data as { count?: number }).count
+        : undefined;
+      return { items, total, page, limit };
+    } catch { /* try next */ }
+  }
+  return { items: [], page, limit };
+}
+

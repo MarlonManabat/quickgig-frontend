@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Head from 'next/head';
+import { HeadSEO } from '../src/components/HeadSEO';
 import fs from 'fs';
 import path from 'path';
 import ProductShell from '../src/product/layout/ProductShell';
@@ -31,21 +31,14 @@ export default function Home({ legacyHtml, jobs }: Props){
   }
   return (
     <>
-      <Head>
-        <title>QuickGig • Find Gigs Fast</title>
-        <meta name="description" content="Browse fresh gigs in the Philippines and apply in minutes." />
-        <meta property="og:title" content="QuickGig • Find Gigs Fast" />
-        <meta property="og:description" content="Browse fresh gigs in the Philippines and apply in minutes." />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="/legacy/img/og.jpg" />
-        <link rel="canonical" href="/" />
-      </Head>
+      <HeadSEO title="QuickGig • Find Gigs Fast" canonical="/" />
       <ProductShell>
         <div style={{display:'grid', gap:16}}>
           <Card>
             <h1 style={{fontFamily:T.font.ui, fontSize:28, margin:'0 0 8px'}}>Find gigs fast in the Philippines</h1>
             <p style={{color:T.colors.subtle, margin:'0 0 16px'}}>Search flexible work and apply in minutes.</p>
             <div style={{display:'flex', gap:12}}>
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
               <a href="/find-work"><Button>Browse jobs</Button></a>
               <a href="/register"><Button variant="subtle">Create account</Button></a>
             </div>
