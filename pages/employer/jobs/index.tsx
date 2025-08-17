@@ -24,6 +24,14 @@ export const getServerSideProps = requireAuthSSR(['employer', 'admin'], async ({
 const statuses: ApplicantStatus[] = ['new', 'shortlist', 'interview', 'hired', 'rejected'];
 
 export default function EmployerJobsPage({ jobs }: Props) {
+  const copyEmails = async (jobId: string | number) => {
+    try {
+      const r = await fetch(`/api/employer/jobs/${jobId}/emails.txt`);
+      const txt = await r.text();
+      await navigator.clipboard.writeText(txt);
+      alert(t('copied_to_clipboard'));
+    } catch {}
+  };
   return (
     <ProductShell>
       <HeadSEO titleKey="jobs_title" descKey="jobs_title" />
@@ -40,7 +48,7 @@ export default function EmployerJobsPage({ jobs }: Props) {
           </thead>
           <tbody>
             {jobs.map((job) => (
-              <tr key={job.id}>
+              <tr key={job.id} className="job-row">
                 <td style={{ padding: 8 }}>{job.title}</td>
                 <td style={{ padding: 8 }}>{job.postedAt ? new Date(job.postedAt).toLocaleDateString() : '-'}</td>
                 <td style={{ padding: 8 }}>
@@ -57,6 +65,10 @@ export default function EmployerJobsPage({ jobs }: Props) {
                 </td>
                 <td style={{ padding: 8 }}>
                   <Link href={`/employer/jobs/${job.id}/applicants`}>{t('view_applicants')}</Link>
+                  <span className="job-row-actions" style={{ marginLeft: 8 }}>
+                    <a href={`/api/employer/jobs/${job.id}/applicants.csv`} style={{ marginRight: 4 }}>{t('export_csv')}</a>
+                    <button onClick={() => copyEmails(job.id)}>{t('copy_emails')}</button>
+                  </span>
                 </td>
               </tr>
             ))}
@@ -65,6 +77,10 @@ export default function EmployerJobsPage({ jobs }: Props) {
       ) : (
         <p>No jobs yet.</p>
       )}
+      <style jsx>{`
+        .job-row-actions { visibility: hidden; }
+        tr.job-row:hover .job-row-actions { visibility: visible; }
+      `}</style>
     </ProductShell>
   );
 }
