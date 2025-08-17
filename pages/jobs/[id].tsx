@@ -37,7 +37,7 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
   if (!job) {
     return (
       <ProductShell>
-        <HeadSEO title={`${t('not_found')} • QuickGig`} />
+        <HeadSEO titleKey="not_found" descKey="search_title" />
         <div style={{background:'#fff', border:`1px solid ${T.colors.border}`, padding:16, borderRadius:8}}>
           {t('not_found')}
         </div>
@@ -48,7 +48,7 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
   const saved = isSaved(String(job.id));
   return (
     <ProductShell>
-      <HeadSEO title={`${job.title} • QuickGig`} />
+      <HeadSEO title={job.title} descKey="search_title" />
       <article style={{background:'#fff', border:`1px solid ${T.colors.border}`, borderRadius:12, padding:20, display:'grid', gap:12}}>
         <div style={{display:'flex', alignItems:'center', gap:12}}>
           <h1 style={{margin:'0 0 4px'}}>{job.title}</h1>

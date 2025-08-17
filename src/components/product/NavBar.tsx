@@ -22,7 +22,7 @@ export default function NavBar() {
       <Link href="/" style={linkStyle(is('/'))}>Home</Link>
       <Link href="/find-work" style={linkStyle(is('/find-work'))}>{t('nav_find')}</Link>
       <Link href="/saved" style={linkStyle(is('/saved'))}>{t('nav_saved')}</Link>
-      <Link href="/employer/post" style={linkStyle(is('/employer/post'))}>{t('nav_post')}</Link>
+      <Link href="/employer/post" style={linkStyle(is('/employer/post'))}>{t('nav_post_job')}</Link>
       <div style={{flex:1}} />
       <Link href="/login" style={linkStyle(is('/login'))}>{t('nav_signin')}</Link>
       <span style={{marginLeft:12}}><LocaleSwitch /></span>

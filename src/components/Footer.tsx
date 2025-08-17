@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { tokens as T } from '../theme/tokens';
 import Link from 'next/link';
+import { t } from '../lib/t';
 
 export default function Footer() {
   return (
@@ -11,11 +12,11 @@ export default function Footer() {
       color: T.colors.subtle
     }}>
       <div style={{display:'flex', gap:12, flexWrap:'wrap', alignItems:'center', justifyContent:'space-between'}}>
-        <div>© {new Date().getFullYear()} QuickGig.ph</div>
+        <div>{t('footer_copyright', { year: new Date().getFullYear() })}</div>
         <nav style={{display:'flex', gap:12}}>
-          <Link href="/find-work">Find work</Link>
-          <Link href="/login">Sign in</Link>
-          <Link href="/__health">Health</Link>
+          <Link href="/about">{t('footer_about')}</Link>
+          <Link href="/terms">{t('footer_terms')}</Link>
+          <Link href="/privacy">{t('footer_privacy')}</Link>
         </nav>
       </div>
     </footer>

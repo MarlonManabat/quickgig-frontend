@@ -4,6 +4,7 @@ import { HeadSEO } from '../src/components/HeadSEO';
 import { useSavedJobs } from '../src/product/useSavedJobs';
 import { JobGrid } from '../src/product/JobCard';
 import { searchJobs, type JobSummary } from '../src/lib/api';
+import { t } from '../src/lib/t';
 
 export default function SavedPage() {
   const { ids } = useSavedJobs();
@@ -24,9 +25,9 @@ export default function SavedPage() {
   }, [ids]);
   return (
     <ProductShell>
-      <HeadSEO title="Saved Jobs • QuickGig" />
-      <h1>Saved jobs</h1>
-      {!ids.length ? <p>You haven’t saved any jobs yet.</p> : <JobGrid jobs={jobs} />}
+      <HeadSEO titleKey="saved_title" descKey="saved_title" />
+      <h1>{t('saved_title')}</h1>
+      {!ids.length ? <p>{t('saved_empty')}</p> : <JobGrid jobs={jobs} />}
     </ProductShell>
   );
 }

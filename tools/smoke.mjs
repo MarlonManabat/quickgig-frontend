@@ -40,4 +40,19 @@ const fetchJson = async (url) => {
   } catch (e) {
     console.log('404-check error', String(e));
   }
+
+  // Optional locale smoke checks
+  const check = async (path, re, label) => {
+    try {
+      const r = await fetch(BASE.replace(/\/+$/,'') + path);
+      const txt = await r.text();
+      if (re.test(txt)) console.log('\u2705', label);
+      else console.log('\u26a0\ufe0f', label, 'missing');
+    } catch (e) {
+      console.log('\u26a0\ufe0f', label, String(e));
+    }
+  };
+  await check('/?lang=tl', /Hanap|Trabaho|Mag-apply/i, 'home tl');
+  await check('/find-work?lang=tl&q=zzzzzz', /Wala pang resulta/i, 'find-work tl empty');
+  await check('/saved?lang=en', /Saved jobs/i, 'saved en');
 })();
