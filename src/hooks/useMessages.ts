@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usePolling } from './usePolling';
 import { useAuth } from '@/context/AuthContext';
 import type { Message } from '@/types/messages';
@@ -19,6 +19,17 @@ export function useUnreadCount() {
   useEffect(() => {
     if (isAuthenticated) fetchCount();
   }, [isAuthenticated]);
+  useEffect(() => {
+    const onMsg = (e: Event) => {
+      const m = (e as CustomEvent<Message>).detail;
+      const w = window as unknown as { _activeThread?: string };
+      if (m.threadId !== w._activeThread) {
+        setCount((c) => c + 1);
+      }
+    };
+    window.addEventListener('qg-message', onMsg);
+    return () => window.removeEventListener('qg-message', onMsg);
+  }, []);
   usePolling(fetchCount, 20000, { enabled: isAuthenticated });
   return count;
 }
@@ -26,6 +37,11 @@ export function useUnreadCount() {
 export function useThread(id: string) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
+  const markRead = useCallback(async () => {
+    try {
+      await fetch(`/api/messages/${id}`, { method: 'PUT' });
+    } catch {}
+  }, [id]);
   useEffect(() => {
     if (!id || !user) return;
     let alive = true;
@@ -38,10 +54,21 @@ export function useThread(id: string) {
         if (alive) setMessages([]);
       }
     })();
+    const w = window as unknown as { _activeThread?: string };
+    w._activeThread = id;
+    const handler = (e: Event) => {
+      const m = (e as CustomEvent<Message>).detail;
+      if (m.threadId !== id) return;
+      setMessages((msgs) => [...msgs, m]);
+      if (m.toId === user.id) markRead();
+    };
+    window.addEventListener('qg-message', handler);
     return () => {
       alive = false;
+      window.removeEventListener('qg-message', handler);
+      if (w._activeThread === id) delete w._activeThread;
     };
-  }, [id, user]);
+  }, [id, user, markRead]);
   const send = async (body: string) => {
     const temp: Message = {
       id: `tmp-${Date.now()}`,
@@ -59,11 +86,6 @@ export function useThread(id: string) {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ body }),
       });
-    } catch {}
-  };
-  const markRead = async () => {
-    try {
-      await fetch(`/api/messages/${id}`, { method: 'PUT' });
     } catch {}
   };
   return { messages, send, markRead };
