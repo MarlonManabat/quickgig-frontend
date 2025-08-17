@@ -5,12 +5,16 @@ import type { JobSummary } from '../lib/api';
 import { useSavedJobs } from './useSavedJobs';
 import { t } from '../lib/t';
 import { isApplied } from '../lib/appliedStore';
+import { useAuth } from '@/context/AuthContext';
+import { env } from '@/config/env';
 
 export function JobCard({ job }: { job: JobSummary }) {
   const { isSaved, toggle } = useSavedJobs();
   const saved = isSaved(String(job.id));
   const applied = isApplied(String(job.id));
   const badge = applied ? t('applied_badge') : saved ? t('saved_badge') : null;
+  const { user } = useAuth();
+  const showMsg = env.NEXT_PUBLIC_ENABLE_MESSAGES && user?.role === 'applicant' && job.employerId;
   return (
     <div
       style={{
@@ -92,6 +96,22 @@ export function JobCard({ job }: { job: JobSummary }) {
         >
           {t('job_apply')}
         </Link>
+        {showMsg && (
+          <Link
+            href={`/messages/new?to=${job.employerId}&jobId=${job.id}&title=${encodeURIComponent(job.title)}`}
+            style={{
+              padding: '8px 12px',
+              borderRadius: 8,
+              background: '#eee',
+              color: T.colors.text,
+              textDecoration: 'none',
+              fontWeight: 600,
+              marginLeft: 8,
+            }}
+          >
+            {t('messages.to_employer')}
+          </Link>
+        )}
       </div>
     </div>
   );

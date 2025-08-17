@@ -11,6 +11,7 @@ export type JobSummary = {
   postedAt?: string;
   applicants?: ApplicantSummary[];
   counts?: Record<ApplicantStatus | 'total', number>;
+  employerId?: string;
 };
 
 export type JobDetail = JobSummary & {
