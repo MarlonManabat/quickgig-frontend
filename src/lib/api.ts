@@ -117,6 +117,11 @@ export type JobSummary = {
   payRange?: string;
   url?: string;
 };
+export type JobDetail = JobSummary & {
+  description?: string;
+  tags?: string[];
+  postedAt?: string;
+};
 
 const BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/+$/,''); // '' => same-origin
 
@@ -249,5 +254,43 @@ export async function searchJobs(
     } catch { /* try next */ }
   }
   return { items: [], page, limit };
+}
+
+/** Normalize various job detail payload shapes to JobDetail */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function normDetail(j: any): JobDetail {
+  const id = j?.id ?? j?.jobId ?? j?.slug ?? String(Math.random()).slice(2);
+  return {
+    id,
+    title: j?.title ?? j?.name ?? 'Untitled',
+    company: j?.company?.name ?? j?.company ?? j?.org ?? undefined,
+    location: j?.location?.name ?? j?.location ?? j?.city ?? undefined,
+    payRange: j?.payRange ?? j?.salary ?? undefined,
+    url: j?.url ?? (typeof id !== 'undefined' ? `/jobs/${id}` : undefined),
+    description: j?.description ?? j?.desc ?? j?.body ?? undefined,
+    tags: Array.isArray(j?.tags) ? j.tags : undefined,
+    postedAt: j?.postedAt ?? j?.createdAt ?? j?.publishedAt ?? undefined,
+  };
+}
+
+/** Fetch a single job detail by id across a few endpoints/envelopes. */
+export async function getJobDetails(id: string | number): Promise<JobDetail | null> {
+  const paths = [
+    `/jobs/${id}`,
+    `/public/jobs/${id}`,
+    `/job/${id}`,
+  ];
+  for (const p of paths) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data = await getJSON<any>(p);
+      const obj =
+        (data && !Array.isArray(data) && typeof data === 'object') ? (
+          data.data ?? data.item ?? data.job ?? data
+        ) : null;
+      if (obj) return normDetail(obj);
+    } catch {/* try next */}
+  }
+  return null;
 }
 
