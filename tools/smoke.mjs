@@ -92,6 +92,19 @@ const fetchJson = async (url) => {
           const appTxt = await appPage.text();
           console.log('applicants page', appPage.status);
           if (/Status/i.test(appTxt)) console.log('applicants page ok');
+          try {
+            const csvRes = await fetch(`${BASE}/api/employer/jobs/${jobId}/applicants.csv`, { headers: { cookie } });
+            console.log('applicants.csv', csvRes.status, csvRes.headers.get('content-type'));
+          } catch (e) {
+            console.log('applicants.csv error', String(e));
+          }
+          try {
+            const emailsRes = await fetch(`${BASE}/api/employer/jobs/${jobId}/emails.txt`, { headers: { cookie } });
+            const emailsTxt = await emailsRes.text().catch(() => '');
+            console.log('emails.txt', emailsRes.status, emailsTxt.includes('@'));
+          } catch (e) {
+            console.log('emails.txt error', String(e));
+          }
           const aid = jobs[0]?.applicants?.[0]?.id;
           if (aid) {
             const putRes = await fetch(`${BASE}/api/employer/jobs/${jobId}/applicants/${aid}`, {
@@ -102,6 +115,16 @@ const fetchJson = async (url) => {
             console.log('update applicant', putRes.status);
             const upd = await putRes.json().catch(() => ({}));
             if (upd?.status) console.log('status', upd.status);
+            try {
+              const bulkRes = await fetch(`${BASE}/api/employer/jobs/${jobId}/applicants/bulk`, {
+                method: 'PUT',
+                headers: { 'content-type': 'application/json', cookie },
+                body: JSON.stringify({ ids: [aid], status: 'shortlist' }),
+              });
+              console.log('bulk update', bulkRes.status);
+            } catch (e) {
+              console.log('bulk update error', String(e));
+            }
           }
         }
         const logoutRes = await fetch(`${BASE}/api/session/logout`, { method: 'POST', headers: { cookie } });

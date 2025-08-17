@@ -42,8 +42,52 @@ export function setStatus(jobId: string | number, applicantId: string, status: A
   const applicant = job.applicants.find(a => a.id === applicantId);
   if (!applicant) return undefined;
   applicant.status = status;
+  recomputeCounts(job);
   save(data);
   return applicant;
+}
+
+export function updateNotes(jobId: string | number, applicantId: string, notes: string): ApplicantSummary | undefined {
+  const data = load();
+  const job = data.find(j => String(j.id) === String(jobId));
+  if (!job || !job.applicants) return undefined;
+  const applicant = job.applicants.find(a => a.id === applicantId);
+  if (!applicant) return undefined;
+  applicant.notes = notes;
+  save(data);
+  return applicant;
+}
+
+export function bulkSetStatus(jobId: string | number, ids: string[], status: ApplicantStatus): ApplicantSummary[] {
+  const data = load();
+  const job = data.find(j => String(j.id) === String(jobId));
+  if (!job || !job.applicants) return [];
+  const updated: ApplicantSummary[] = [];
+  job.applicants.forEach(a => {
+    if (ids.includes(a.id)) {
+      a.status = status;
+      updated.push(a);
+    }
+  });
+  recomputeCounts(job);
+  save(data);
+  return updated;
+}
+
+function recomputeCounts(job: JobSummary) {
+  const counts: Record<ApplicantStatus | 'total', number> = {
+    total: 0,
+    new: 0,
+    shortlist: 0,
+    interview: 0,
+    hired: 0,
+    rejected: 0,
+  };
+  (job.applicants || []).forEach(a => {
+    counts[a.status] = (counts[a.status] || 0) + 1;
+    counts.total += 1;
+  });
+  job.counts = counts;
 }
 
 export function ensureSeed() {
@@ -73,5 +117,6 @@ export function ensureSeed() {
       ],
     },
   ];
+  jobs.forEach(recomputeCounts);
   save(jobs);
 }
