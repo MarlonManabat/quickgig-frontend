@@ -108,3 +108,83 @@ export async function fetchJobs(): Promise<Job[]> {
   return apiFetch<Job[]>('/jobs');
 }
 
+// --- Minimal API client for product home ---
+export type JobSummary = {
+  id: string | number;
+  title: string;
+  company?: string;
+  location?: string;
+  payRange?: string;
+  url?: string;
+};
+
+const BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/+$/,''); // '' => same-origin
+
+async function getJSON<T>(path: string, init?: RequestInit): Promise<T> {
+  const url = (BASE ? BASE : '') + path;
+  const r = await fetch(url, { ...init, headers: { 'accept':'application/json', ...(init?.headers||{}) } });
+  if (!r.ok) throw new Error(`GET ${path} ${r.status}`);
+  return r.json() as Promise<T>;
+}
+
+export async function health(): Promise<{ ok: boolean }> {
+  try { await getJSON('/_health'); return { ok: true }; } catch { return { ok: false }; }
+}
+
+/** Try several endpoints (any can work); map to JobSummary[]; swallow errors and return [] */
+export async function featuredJobs(limit = 8): Promise<JobSummary[]> {
+  const candidates = [
+    `/jobs?limit=${limit}&featured=1`,
+    `/jobs/featured?limit=${limit}`,
+    `/public/jobs?limit=${limit}&featured=1`,
+  ];
+  for (const p of candidates) {
+    try {
+      const data = await getJSON<unknown>(p);
+      // Normalize common shapes
+      const arr: unknown[] = Array.isArray(data)
+        ? data
+        : Array.isArray((data as { items?: unknown[] }).items)
+        ? (data as { items?: unknown[] }).items!
+        : Array.isArray((data as { data?: unknown[] }).data)
+        ? (data as { data?: unknown[] }).data!
+        : [];
+      if (!arr.length) continue;
+      return arr.slice(0, limit).map((j): JobSummary => {
+        interface LooseJob {
+          id?: string | number;
+          jobId?: string | number;
+          slug?: string;
+          title?: string;
+          name?: string;
+          company?: string | { name?: string };
+          org?: string;
+          location?: string | { name?: string };
+          city?: string;
+          payRange?: string;
+          salary?: string;
+          url?: string;
+        }
+        const job = j as LooseJob;
+        const company =
+          typeof job.company === 'string'
+            ? job.company
+            : job.company?.name;
+        const location =
+          typeof job.location === 'string'
+            ? job.location
+            : (job.location as { name?: string } | undefined)?.name ?? job.city;
+        return {
+          id: job.id ?? job.jobId ?? job.slug ?? String(Math.random()).slice(2),
+          title: job.title ?? job.name ?? 'Untitled',
+          company: company ?? job.org ?? undefined,
+          location: location ?? undefined,
+          payRange: job.payRange ?? job.salary ?? undefined,
+          url: job.url ?? (typeof job.id !== 'undefined' ? `/jobs/${job.id}` : undefined),
+        };
+      });
+    } catch { /* try next shape */ }
+  }
+  return [];
+}
+
