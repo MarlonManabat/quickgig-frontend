@@ -9,6 +9,7 @@ import { tokens as T } from '../src/theme/tokens';
 import { JobGrid } from '../src/product/JobCard';
 import { featuredJobs, type JobSummary } from '../src/lib/api';
 import { legacyFlagFromEnv, legacyFlagFromQuery } from '../src/lib/legacyFlag';
+import { t } from '../src/lib/t';
 
 type Props = { legacyHtml?: string; jobs: JobSummary[] };
 export async function getStaticProps() {
@@ -31,21 +32,21 @@ export default function Home({ legacyHtml, jobs }: Props){
   }
   return (
     <ProductShell>
-      <HeadSEO title="QuickGig • Find Gigs Fast" canonical="/" />
+      <HeadSEO title={t('site_title')} canonical="/" />
       <div style={{display:'grid', gap:16}}>
           <Card>
-            <h1 style={{fontFamily:T.font.ui, fontSize:28, margin:'0 0 8px'}}>Find gigs fast in the Philippines</h1>
-            <p style={{color:T.colors.subtle, margin:'0 0 16px'}}>Search flexible work and apply in minutes.</p>
+            <h1 style={{fontFamily:T.font.ui, fontSize:28, margin:'0 0 8px'}}>{t('home_hero_title')}</h1>
+            <p style={{color:T.colors.subtle, margin:'0 0 16px'}}>{t('home_hero_tag')}</p>
             <div style={{display:'flex', gap:12}}>
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-              <a href="/find-work"><Button>Browse jobs</Button></a>
+              <a href="/find-work"><Button>{t('nav_find')}</Button></a>
               <a href="/register"><Button variant="subtle">Create account</Button></a>
             </div>
           </Card>
           {/* Featured jobs */}
           {jobs?.length ? (
             <section>
-              <h2 style={{margin:'8px 0 12px', fontSize:20}}>Featured jobs</h2>
+              <h2 style={{margin:'8px 0 12px', fontSize:20}}>{t('jobs_featured')}</h2>
               <JobGrid jobs={jobs}/>
             </section>
           ) : null}

@@ -9,6 +9,7 @@ import { legacyFlagFromEnv, legacyFlagFromQuery } from '../../src/lib/legacyFlag
 import { getJobDetails, type JobDetail } from '../../src/lib/api';
 import { tokens as T } from '../../src/theme/tokens';
 import { useSavedJobs } from '../../src/product/useSavedJobs';
+import { t } from '../../src/lib/t';
 
 type Props = { job: JobDetail | null; legacyHtml?: string };
 
@@ -36,9 +37,9 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
   if (!job) {
     return (
       <ProductShell>
-        <HeadSEO title="Job not found • QuickGig" />
+        <HeadSEO title={`${t('not_found')} • QuickGig`} />
         <div style={{background:'#fff', border:`1px solid ${T.colors.border}`, padding:16, borderRadius:8}}>
-          Job not found.
+          {t('not_found')}
         </div>
       </ProductShell>
     );
@@ -67,7 +68,7 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
           <div style={{color:T.colors.subtle}}>No description provided.</div>
         )}
         <div style={{display:'flex', gap:8}}>
-          <Link href="/login" style={{padding:'10px 14px', borderRadius:8, background:T.colors.brand, color:'#fff', textDecoration:'none', fontWeight:700}}>Apply now</Link>
+          <Link href="/login" style={{padding:'10px 14px', borderRadius:8, background:T.colors.brand, color:'#fff', textDecoration:'none', fontWeight:700}}>{t('job_apply')}</Link>
           <Link href="/find-work" style={{padding:'10px 14px', borderRadius:8, border:`1px solid ${T.colors.border}`, background:'#fff', textDecoration:'none'}}>Back to search</Link>
         </div>
       </article>

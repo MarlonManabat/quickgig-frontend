@@ -7,6 +7,7 @@ import { Card } from '../src/product/ui/Card';
 import { Input } from '../src/product/ui/Input';
 import { Button } from '../src/product/ui/Button';
 import { legacyFlagFromEnv, legacyFlagFromQuery } from '../src/lib/legacyFlag';
+import { t } from '../src/lib/t';
 
 type Props = { legacyHtml?: string };
 export async function getStaticProps() {
@@ -23,15 +24,15 @@ export default function Login({ legacyHtml }: Props){
   if(useLegacy && legacyHtml){ return (<div dangerouslySetInnerHTML={{__html: legacyHtml}}/>); }
   return (
     <>
-      <Head><title>Log in • QuickGig</title></Head>
+      <Head><title>{t('login_title')} • QuickGig</title></Head>
       <ProductShell>
         <Card style={{maxWidth:520, margin:'0 auto'}}>
-          <h2 style={{marginTop:0}}>Log in</h2>
+          <h2 style={{marginTop:0}}>{t('login_title')}</h2>
           <form method="post" action="/api/auth">
             <div style={{display:'grid', gap:12}}>
               <label>Email<Input name="email" type="email" required/></label>
               <label>Password<Input name="password" type="password" required/></label>
-              <Button type="submit">Log in</Button>
+              <Button type="submit">{t('login_title')}</Button>
             </div>
           </form>
           <p style={{marginTop:12}}><a href="/register">Need an account?</a></p>

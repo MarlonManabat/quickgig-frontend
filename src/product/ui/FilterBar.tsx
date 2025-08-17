@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
+import { t } from '../../lib/t';
 
 type Props = {
   q?: string; loc?: string; cat?: string; sort?: string;
@@ -19,7 +20,7 @@ export default function FilterBar({ q='', loc='', cat='', sort='relevant' }: Pro
   }
   return (
     <form onSubmit={(e)=>{e.preventDefault(); push(state);}} style={{display:'grid', gap:12, gridTemplateColumns:'1fr 1fr 1fr 1fr auto'}}>
-      <input placeholder="Search keywords" value={state.q} onChange={e=>set(s=>({...s,q:e.target.value}))}/>
+      <input placeholder={t('search_placeholder')} value={state.q} onChange={e=>set(s=>({...s,q:e.target.value}))}/>
       <input placeholder="Location" value={state.loc} onChange={e=>set(s=>({...s,loc:e.target.value}))}/>
       <select value={state.cat} onChange={e=>set(s=>({...s,cat:e.target.value}))}>
         {cats.map(c=><option key={c} value={c}>{c||'All categories'}</option>)}

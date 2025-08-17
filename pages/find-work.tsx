@@ -6,6 +6,7 @@ import { JobGrid } from '../src/product/JobCard';
 import { searchJobs, type JobSummary } from '../src/lib/api';
 import FilterBar from '../src/product/ui/FilterBar';
 import Pagination from '../src/product/ui/Pagination';
+import { t } from '../src/lib/t';
 
 type Props = {
   legacyHtml?: string;
@@ -19,8 +20,8 @@ export default function FindWork({ legacyHtml, items=[], total, q, loc, cat, sor
   const hasNext = total ? (page*size < total) : (items.length===size);
   return (
     <ProductShell>
-      <HeadSEO title="Find Gigs • QuickGig" />
-      <h1>Find work</h1>
+      <HeadSEO title={`${t('nav_find')} • QuickGig`} />
+      <h1>{t('nav_find')}</h1>
       <FilterBar q={q} loc={loc} cat={cat} sort={sort} />
       {items.length ? (
         <>
