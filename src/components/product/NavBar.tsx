@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { tokens as T } from '../../theme/tokens';
 import { t } from '../../lib/t';
+import { env } from '@/config/env';
 import dynamic from 'next/dynamic';
 import { legacyFlagFromEnv } from '../../lib/legacyFlag';
 import { useSession } from '../../hooks/useSession';
@@ -56,6 +57,11 @@ export default function NavBar() {
             )}
             <Link href="/account" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>{t('navbar_account')}</Link>
             <Link href="/account/profile" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>{t('profile.title')}</Link>
+            {env.NEXT_PUBLIC_ENABLE_ALERTS && (
+              <Link href="/alerts" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>
+                {t('alerts.title')}
+              </Link>
+            )}
             {session.role === 'employer' && (
               <Link href="/employer/jobs" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>{t('my_jobs')}</Link>
             )}

@@ -35,6 +35,26 @@ const fetchJson = async (url) => {
   } catch (e) { console.log('saved page error', String(e)); }
 
   try {
+    const rA = await fetch(`${BASE}/api/alerts`);
+    const j = await rA.json().catch(() => []);
+    console.log('alerts count', Array.isArray(j) ? j.length : 0);
+  } catch (e) { console.log('alerts count error', String(e)); }
+  try {
+    const c = await fetch(`${BASE}/api/alerts`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ q: 'demo', freq: 'daily', size: 12 }),
+    });
+    console.log('alerts create', c.status);
+    const a = await c.json().catch(() => ({}));
+    const id = a.id;
+    if (id) {
+      const d = await fetch(`${BASE}/api/alerts/${id}`, { method: 'DELETE' });
+      console.log('alerts delete', d.status);
+    }
+  } catch (e) { console.log('alerts api error', String(e)); }
+
+  try {
     const rA = await fetch(`${BASE}/account`);
     console.log('account page', rA.status);
   } catch (e) { console.log('account page error', String(e)); }
