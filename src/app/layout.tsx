@@ -16,6 +16,7 @@ import type { CSSProperties } from 'react';
 import fs from 'fs';
 import path from 'path';
 import '../styles/legacy.css';
+import { legacyEnabled, getOverrideSource } from '@/lib/legacy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -86,7 +87,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const legacy = process.env.NEXT_PUBLIC_LEGACY_UI === 'true';
+  const legacy = legacyEnabled();
+  if (legacy) {
+    console.info('LEGACY_UI:on', { source: getOverrideSource() });
+  }
   const legacyVars: CSSProperties | undefined = legacy
     ? ({
         '--legacy-color-bg': legacyTheme.colors.bg,
