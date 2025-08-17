@@ -39,6 +39,9 @@ export default function ThreadPage({ thread, session }: Props) {
   const { messages, send, markRead } = useThread(tid);
   React.useEffect(() => { if (tid !== 'new') markRead(); }, [tid, markRead]);
   const [body, setBody] = React.useState('');
+  const bottomRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLTextAreaElement>(null);
+  React.useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
   const onSend = async () => {
     if (!body.trim()) return;
     if (tid === 'new') {
@@ -58,28 +61,38 @@ export default function ThreadPage({ thread, session }: Props) {
         setTid(nid);
         router.replace(`/messages/${nid}`);
       }
-      setBody('');
-      return;
+    } else {
+      await send(body);
     }
-    await send(body);
     setBody('');
+    inputRef.current?.focus();
+    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 0);
+  };
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      onSend();
+    }
   };
   return (
     <ProductShell>
       <HeadSEO title={thread?.title || t('messages.title')} noIndex />
-      <div style={{ maxHeight: '60vh', overflowY: 'auto', border: '1px solid #ddd', padding: 8 }}>
+      <div style={{ overflow: 'auto', maxHeight: 'calc(100vh - 220px)', border: '1px solid #ddd', padding: 8 }}>
         {messages.map((m) => (
           <MessageBubble key={m.id} message={m} selfId={session?.id || ''} />
         ))}
+        <div ref={bottomRef} />
       </div>
-      <div style={{ marginTop: 8, display: 'flex', gap: 4 }}>
+      <div style={{ marginTop: 8, display: 'flex', gap: 4, position: 'sticky', bottom: 0, backdropFilter: 'blur(6px)', background: '#fff', padding: 8 }}>
         <textarea
+          ref={inputRef}
           value={body}
           onChange={(e) => setBody(e.target.value)}
+          onKeyDown={onKeyDown}
           placeholder={t('messages.placeholder')}
           style={{ flex: 1 }}
         />
-        <button onClick={onSend}>{t('messages.send')}</button>
+        <button onClick={onSend} disabled={!body.trim()}>{t('messages.send')}</button>
       </div>
     </ProductShell>
   );

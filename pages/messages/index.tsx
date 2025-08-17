@@ -26,12 +26,13 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 };
 
 export default function MessagesPage({ threads, session }: Props) {
+  const me = session?.id || '';
   return (
     <ProductShell>
       <HeadSEO titleKey="messages.title" noIndex />
       <h1>{t('messages.title')}</h1>
       {threads.length ? (
-        threads.map((th) => <ThreadItem key={th.id} thread={th} selfId={session?.id || ''} />)
+        threads.map((th) => <ThreadItem key={th.id} thread={th} selfId={me} />)
       ) : (
         <p>{t('messages.empty')}</p>
       )}

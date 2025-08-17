@@ -34,3 +34,10 @@ export function markRead(threadId:string, userId:string){
   const ms:Message[]=read(MKEY,[]); ms.forEach(m=>{ if(m.threadId===threadId && m.toId===userId) m.read=true; }); write(MKEY,ms);
 }
 export function unreadCount(userId:string){ const ts:Thread[]=read(TKEY,[]); return ts.filter(t=>t.unreadFor?.includes(userId)).length; }
+
+export function latestMessage(userId:string){
+  const ms:Message[]=read(MKEY,[]);
+  const m=ms.filter(x=>x.toId===userId && x.fromId!==userId)
+    .sort((a,b)=>b.createdAt.localeCompare(a.createdAt))[0];
+  return m||null;
+}
