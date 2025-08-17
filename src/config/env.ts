@@ -38,6 +38,8 @@ export const env = {
   NEXT_PUBLIC_ENABLE_ANALYTICS:
     String(process.env.NEXT_PUBLIC_ENABLE_ANALYTICS ?? 'true').toLowerCase() === 'true',
   METRICS_SECRET: process.env.METRICS_SECRET || '',
+  NEXT_PUBLIC_ENABLE_ONBOARDING:
+    String(process.env.NEXT_PUBLIC_ENABLE_ONBOARDING ?? 'true').toLowerCase() !== 'false',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

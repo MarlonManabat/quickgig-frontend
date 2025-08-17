@@ -8,6 +8,7 @@ import { useSavedJobs } from '../src/product/useSavedJobs';
 import { searchJobs, type JobSummary } from '../src/lib/api';
 import { listApplied } from '../src/lib/appliedStore';
 import { t } from '../src/lib/t';
+import { OnboardingBanner } from '../src/product/onboarding/Banner';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   return { props: {} };
@@ -35,6 +36,7 @@ export default function AccountPage() {
   return (
     <>
       <HeadSEO titleKey="nav_account" descKey="nav_account_desc" />
+      <OnboardingBanner />
       <Tabs>
         <DashboardShell
           title={t('nav_account')}

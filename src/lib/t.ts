@@ -104,6 +104,19 @@ const english: Messages = {
   'messages.open': 'Open',
   'messages.to_employer': 'Message employer',
   'messages.to_applicant': 'Message applicant',
+  'onboarding.title': 'Complete your profile',
+  'onboarding.subtitle': 'Finish these steps to start applying.',
+  'onboarding.progress': '{score}% complete',
+  'onboarding.cta_profile_basic': 'Add basic info',
+  'onboarding.cta_profile_contact': 'Add contact info',
+  'onboarding.cta_roles': 'Add roles or skills',
+  'onboarding.cta_resume': 'Add resume link',
+  'onboarding.cta_first_save': 'Save a job',
+  'onboarding.cta_first_apply': 'Apply to a job',
+  'onboarding.done_title': 'Profile complete!',
+  'onboarding.done_body': 'Great job. You’re ready to apply.',
+  'onboarding.banner_title': 'Complete your profile to get hired faster.',
+  'onboarding.banner_cta': 'Complete profile',
 };
 
 const taglish: Messages = {
@@ -208,6 +221,19 @@ const taglish: Messages = {
   'messages.open': 'Buksan',
   'messages.to_employer': 'Message employer',
   'messages.to_applicant': 'Message applicant',
+  'onboarding.title': 'Kumpletuhin ang profile mo',
+  'onboarding.subtitle': 'Tapusin ang mga steps para mas mabilis mag-apply.',
+  'onboarding.progress': '{score}% kumpleto',
+  'onboarding.cta_profile_basic': 'Magdagdag ng basic info',
+  'onboarding.cta_profile_contact': 'Ilagay ang contact info',
+  'onboarding.cta_roles': 'Magdagdag ng roles o skills',
+  'onboarding.cta_resume': 'Ilagay ang resume link',
+  'onboarding.cta_first_save': 'Mag-save ng job',
+  'onboarding.cta_first_apply': 'Mag-apply sa job',
+  'onboarding.done_title': 'Kumpleto na ang profile!',
+  'onboarding.done_body': 'Ready ka nang mag-apply sa mga trabaho.',
+  'onboarding.banner_title': 'Kumpletuhin ang profile mo para mas mabilis ma-hire.',
+  'onboarding.banner_cta': 'Kumpletuhin',
 };
 
 const bundle: Bundle = { english, taglish };

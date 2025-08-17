@@ -5,6 +5,7 @@ import { t } from '../../lib/t';
 import dynamic from 'next/dynamic';
 import { legacyFlagFromEnv } from '../../lib/legacyFlag';
 import { useSession } from '../../hooks/useSession';
+import { useOnboarding } from '../../product/onboarding/useOnboarding';
 const LocaleSwitch = dynamic(() => import('../LocaleSwitch'), { ssr: false });
 
 const linkStyle = (active: boolean): React.CSSProperties => ({
@@ -21,6 +22,8 @@ export default function NavBar() {
   const is = (p: string) => pathname === p || (p !== '/' && pathname.startsWith(p));
   const legacy = legacyFlagFromEnv();
   const { session, logout } = useSession();
+  const { enabled, completeness } = useOnboarding();
+  const incomplete = enabled && completeness.score < 100;
   const onLogout = async () => {
     await logout();
     push('/');
@@ -30,16 +33,27 @@ export default function NavBar() {
       <Link href="/" style={linkStyle(is('/'))}>Home</Link>
       <Link href="/find-work" style={linkStyle(is('/find-work'))}>{t('nav_find')}</Link>
       {!legacy && <Link href="/saved" style={linkStyle(is('/saved'))}>{t('nav_saved')}</Link>}
-      {!legacy && <Link href="/account" style={linkStyle(is('/account'))}>{t('nav_account')}</Link>}
+      {!legacy && (
+        <Link href="/account" style={{...linkStyle(is('/account')), position:'relative'}}>
+          {t('nav_account')}
+          {incomplete && <span style={{position:'absolute', top:4, right:-2, width:8, height:8, borderRadius:'50%', background:T.colors.brand}} />}
+        </Link>
+      )}
       {!legacy && <Link href="/employer/jobs" style={linkStyle(is('/employer'))}>{t('employer_title')}</Link>}
       <Link href="/employer/post" style={linkStyle(is('/employer/post'))}>{t('nav_post_job')}</Link>
       <div style={{flex:1}} />
       {session ? (
         <details style={{ position: 'relative' }}>
-          <summary style={{ listStyle: 'none', cursor: 'pointer', width: 32, height: 32, borderRadius: '50%', background: T.colors.brand, color: '#fff', display: 'grid', placeItems: 'center' }}>
+          <summary style={{ listStyle: 'none', cursor: 'pointer', width: 32, height: 32, borderRadius: '50%', background: T.colors.brand, color: '#fff', display: 'grid', placeItems: 'center', position:'relative' }}>
             {session.name?.charAt(0).toUpperCase()}
+            {incomplete && <span style={{position:'absolute', top:0, right:0, width:8, height:8, borderRadius:'50%', background:T.colors.brand}} />}
           </summary>
           <div style={{ position: 'absolute', right: 0, marginTop: 4, background: '#fff', border: `1px solid ${T.colors.border}`, borderRadius: 8, boxShadow: '0 2px 6px rgba(0,0,0,0.1)', minWidth: 160 }}>
+            {incomplete && (
+              <Link href="/account/onboarding" onClick={()=>console.log('onboard_nav_cta')} style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>
+                {t('onboarding.banner_cta')} ({Math.round(completeness.score)}%)
+              </Link>
+            )}
             <Link href="/account" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>{t('navbar_account')}</Link>
             <Link href="/account/profile" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>{t('profile.title')}</Link>
             {session.role === 'employer' && (
