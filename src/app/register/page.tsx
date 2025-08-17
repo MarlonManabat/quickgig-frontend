@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { env } from '@/config/env';
 import { track } from '@/lib/track';
 import { register } from '@/lib/auth/client';
+import Link from 'next/link';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function RegisterPage() {
             {loading ? 'Creating account…' : 'Sign Up'}
           </button>
         </form>
-        <p className="text-sm mt-3">Already have an account? <a className="text-sky-600 font-semibold" href="/login">Login</a></p>
+        <p className="text-sm mt-3">Already have an account? <Link className="text-sky-600 font-semibold" href="/login">Login</Link></p>
       </div>
     </div>
   );
