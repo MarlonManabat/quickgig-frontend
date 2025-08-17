@@ -26,9 +26,10 @@
     "scan:links": "node tools/check_links.mjs",
     "bootstrap": "node tools/dev/bootstrap.mjs",
     "legacy:sync": "node tools/legacy/sync.js",
-    "legacy:verify": "node tools/legacy/verify.mjs",
+    "legacy:verify": "node tools/legacy/verify.mjs --verify",
     "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
-    "legacy:check": "node tools/legacy/verify.mjs --pretty"
+    "legacy:check": "node tools/legacy/verify.mjs --check",
+    "legacy:import": "node tools/legacy/import_from_dir.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
