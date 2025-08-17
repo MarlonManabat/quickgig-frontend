@@ -2,27 +2,13 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import React from 'react';
-import LegacyShell from '@/app/(marketing)/LegacyShell';
-import { verifyLegacyAssets } from '@/lib/legacyFragments';
+import { legacyUI } from '@/lib/flags';
+import { renderLegacyHome } from '@/lib/legacy/renderLegacy';
 
-export default function Page() {
-  const legacy = process.env.NEXT_PUBLIC_LEGACY_UI === 'true';
-  const strict = process.env.NEXT_PUBLIC_LEGACY_STRICT_SHELL === 'true';
-
-  if (legacy) {
-    const missing = verifyLegacyAssets();
-    if (!missing.length) {
-      return <LegacyShell fragment="index" />;
-    }
-    if (strict) {
-      // eslint-disable-next-line no-console
-      console.error('[legacy] missing assets:', missing.join(', '));
-      return (
-        <div className="p-4 text-red-600">
-          Missing legacy assets: {missing.join(', ')}
-        </div>
-      );
-    }
+export default async function Page() {
+  if (legacyUI) {
+    const html = await renderLegacyHome();
+    return <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />;
   }
 
   // Fallback: existing React home (keep your current implementation below)

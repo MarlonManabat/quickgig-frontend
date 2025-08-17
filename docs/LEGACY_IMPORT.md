@@ -9,6 +9,18 @@ export NEXT_PUBLIC_LEGACY_UI=true
 export NEXT_PUBLIC_LEGACY_STRICT_SHELL=true # optional
 ```
 
+## Render the legacy shell
+
+```env
+# Flags
+NEXT_PUBLIC_LEGACY_UI=true
+NEXT_PUBLIC_LEGACY_STRICT_SHELL=true
+NEXT_PUBLIC_SHOW_API_BADGE=false
+NEXT_PUBLIC_BANNER_HTML='<div class="mx-auto max-w-6xl px-4 py-2 text-center text-sm rounded-xl border border-[var(--legacy-cta-outline)] shadow-[var(--legacy-shadow)]" style="background:radial-gradient(100% 120% at 0% 0%, var(--legacy-bg-start), var(--legacy-bg-end));color:var(--legacy-hero-text)"><strong>Heads up:</strong> Beta preview of the new QuickGig.ph experience.</div>'
+```
+
+The banner value must be on a single line or escaped properly if multi-line. Redeploy after changing environment variables.
+
 ## Import
 
 ```sh
