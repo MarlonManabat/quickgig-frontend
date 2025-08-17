@@ -5,11 +5,13 @@ export function HeadSEO({
   description = 'Browse flexible gigs in the Philippines and apply in minutes.',
   image = '/legacy/img/og.jpg',
   canonical = '',
+  noIndex = false,
 }: {
   title: string;
   description?: string;
   image?: string;
   canonical?: string;
+  noIndex?: boolean;
 }) {
   return (
     <Head>
@@ -20,6 +22,7 @@ export function HeadSEO({
       <meta property="og:type" content="website" />
       <meta property="og:image" content={image} />
       {canonical ? <link rel="canonical" href={canonical} /> : null}
+      {noIndex ? <meta name="robots" content="noindex" /> : null}
       <meta name="twitter:card" content="summary_large_image" />
     </Head>
   );

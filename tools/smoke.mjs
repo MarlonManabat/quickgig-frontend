@@ -16,4 +16,12 @@ const fetchJson = async (url) => {
     catch (e) { console.log('WARN', String(e)); }
     await sleep(250);
   }
+  // Soft-check a guaranteed-404 path; do not fail build
+  try {
+    const url404 = BASE.replace(/\/+$/,'') + '/definitely-not-here-404';
+    const r404 = await fetch(url404);
+    console.log('404-check', r404.status);
+  } catch (e) {
+    console.log('404-check error', String(e));
+  }
 })();
