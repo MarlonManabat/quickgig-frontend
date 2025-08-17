@@ -25,7 +25,7 @@ function useDiagAllowed() {
 
 type SelfTest = {
   env: Record<string,string | undefined>;
-  files: Record<string, { exists:boolean; size?:number; sha256?:string; first200?:string }>;
+  files: Record<string, { exists:boolean; url?:string; httpStatus?:number; size?:number; sha256?:string; first200?:string }>;
   alerts: string[];
 };
 
@@ -75,7 +75,28 @@ export default function LegacyDiagPage() {
           <h2>Environment</h2>
           <pre>{JSON.stringify(data.env, null, 2)}</pre>
           <h2>Files</h2>
-          <pre>{JSON.stringify(data.files, null, 2)}</pre>
+          <table style={{borderCollapse:'collapse', width:'100%'}}>
+            <thead>
+              <tr>
+                <th style={{textAlign:'left', borderBottom:'1px solid #ddd', padding:'6px'}}>Path</th>
+                <th style={{textAlign:'left', borderBottom:'1px solid #ddd', padding:'6px'}}>Exists</th>
+                <th style={{textAlign:'left', borderBottom:'1px solid #ddd', padding:'6px'}}>HTTP</th>
+                <th style={{textAlign:'left', borderBottom:'1px solid #ddd', padding:'6px'}}>Size</th>
+                <th style={{textAlign:'left', borderBottom:'1px solid #ddd', padding:'6px'}}>SHA256</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(data.files).map(([k,v])=>(
+                <tr key={k}>
+                  <td style={{padding:'6px'}}><code>{k}</code>{v.url ? <> — <a href={v.url} target="_blank" rel="noreferrer">open</a></> : null}</td>
+                  <td style={{padding:'6px'}}>{v.exists ? '✅' : '❌'}</td>
+                  <td style={{padding:'6px'}}>{v.httpStatus ?? '-'}</td>
+                  <td style={{padding:'6px'}}>{typeof v.size==='number' ? v.size : '-'}</td>
+                  <td style={{padding:'6px', wordBreak:'break-all'}}>{v.sha256 ?? '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           {data.alerts.length > 0 ? (
             <div style={{background:'#fff3cd', padding:12, border:'1px solid #ffeeba', borderRadius:8}}>
               <strong>Alerts:</strong>
