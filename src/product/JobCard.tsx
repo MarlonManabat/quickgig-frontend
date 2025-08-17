@@ -2,8 +2,11 @@ import * as React from 'react';
 import Link from 'next/link';
 import { tokens as T } from '../theme/tokens';
 import type { JobSummary } from '../lib/api';
+import { useSavedJobs } from './useSavedJobs';
 
 export function JobCard({ job }: { job: JobSummary }) {
+  const { isSaved, toggle } = useSavedJobs();
+  const saved = isSaved(String(job.id));
   return (
     <div
       style={{
@@ -14,8 +17,25 @@ export function JobCard({ job }: { job: JobSummary }) {
         borderRadius: T.radius.lg,
         padding: 16,
         boxShadow: T.shadow.sm,
+        position: 'relative',
       }}
     >
+      <button
+        aria-label={saved ? 'Unsave job' : 'Save job'}
+        onClick={() => toggle(String(job.id))}
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          border: 'none',
+          background: 'transparent',
+          cursor: 'pointer',
+          fontSize: 18,
+        }}
+        title={saved ? 'Unsave' : 'Save'}
+      >
+        {saved ? '♥' : '♡'}
+      </button>
       <Link
         href={`/jobs/${job.id}`}
         style={{ fontWeight: 600, textDecoration: 'none', color: T.colors.text }}

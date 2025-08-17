@@ -8,6 +8,7 @@ import { HeadSEO } from '../../src/components/HeadSEO';
 import { legacyFlagFromEnv, legacyFlagFromQuery } from '../../src/lib/legacyFlag';
 import { getJobDetails, type JobDetail } from '../../src/lib/api';
 import { tokens as T } from '../../src/theme/tokens';
+import { useSavedJobs } from '../../src/product/useSavedJobs';
 
 type Props = { job: JobDetail | null; legacyHtml?: string };
 
@@ -25,6 +26,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) 
 };
 
 export default function JobDetailsPage({ job, legacyHtml }: Props) {
+  const { isSaved, toggle } = useSavedJobs();
   const [useLegacy, setUseLegacy] = React.useState(false);
   React.useEffect(() => {
     try { setUseLegacy(legacyFlagFromEnv() || legacyFlagFromQuery(new URL(window.location.href).searchParams)); } catch {}
@@ -42,11 +44,20 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
     );
   }
 
+  const saved = isSaved(String(job.id));
   return (
     <ProductShell>
       <HeadSEO title={`${job.title} • QuickGig`} />
       <article style={{background:'#fff', border:`1px solid ${T.colors.border}`, borderRadius:12, padding:20, display:'grid', gap:12}}>
-        <h1 style={{margin:'0 0 4px'}}>{job.title}</h1>
+        <div style={{display:'flex', alignItems:'center', gap:12}}>
+          <h1 style={{margin:'0 0 4px'}}>{job.title}</h1>
+          <button
+            aria-label={saved ? 'Unsave job' : 'Save job'}
+            onClick={() => toggle(String(job.id))}
+            style={{border:'none', background:'transparent', cursor:'pointer', fontSize:22}}
+            title={saved ? 'Unsave' : 'Save'}
+          >{saved ? '♥' : '♡'}</button>
+        </div>
         <div style={{color:T.colors.subtle}}>
           {job.company ? `${job.company} • ` : ''}{job.location || 'Anywhere'}{job.payRange ? ` • ${job.payRange}`:''}
         </div>

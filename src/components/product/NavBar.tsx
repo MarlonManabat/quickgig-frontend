@@ -18,6 +18,7 @@ export default function NavBar() {
     <nav style={{display:'flex', gap:8, alignItems:'center', padding:'8px 0'}}>
       <Link href="/" style={linkStyle(is('/'))}>Home</Link>
       <Link href="/find-work" style={linkStyle(is('/find-work'))}>Find Work</Link>
+      <Link href="/saved" style={linkStyle(is('/saved'))}>Saved</Link>
       <div style={{flex:1}} />
       <Link href="/login" style={linkStyle(is('/login'))}>Sign in</Link>
     </nav>
