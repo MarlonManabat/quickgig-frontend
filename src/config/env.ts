@@ -26,7 +26,8 @@ export const env = {
     process.env.EMPLOYER_EMAILS?.split(',').map((e) => e.trim()).filter(Boolean) || [],
   ALERTS_DIGEST_SECRET: process.env.ALERTS_DIGEST_SECRET || '',
   NEXT_PUBLIC_ENABLE_ALERTS:
-    String(process.env.NEXT_PUBLIC_ENABLE_ALERTS ?? 'false').toLowerCase() === 'true',
+    String(process.env.NEXT_PUBLIC_ENABLE_ALERTS ?? 'true').toLowerCase() === 'true',
+  ALERTS_WEBHOOK_URL: process.env.ALERTS_WEBHOOK_URL || '',
   NEXT_PUBLIC_ENABLE_REPORTS:
     String(process.env.NEXT_PUBLIC_ENABLE_REPORTS ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_ADMIN:
