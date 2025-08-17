@@ -28,8 +28,12 @@ export default function NavBar() {
   const { session, logout } = useSession();
   const { enabled, completeness } = useOnboarding();
   const incomplete = enabled && completeness.score < 100;
-  const [avatar, setAvatar] = React.useState<UploadedFile|null>(null);
-  React.useEffect(()=>{ try { setAvatar(getAvatar()); } catch {} },[]);
+  const [avatar, setAvatar] = React.useState<UploadedFile | null>(null);
+  React.useEffect(() => {
+    try {
+      setAvatar(getAvatar());
+    } catch {}
+  }, []);
   const onLogout = async () => {
     await logout();
     push('/');
@@ -51,8 +55,8 @@ export default function NavBar() {
       {session ? (
         <details style={{ position: 'relative' }}>
           <summary style={{ listStyle: 'none', cursor: 'pointer', width: 32, height: 32, borderRadius: '50%', background: T.colors.brand, color: '#fff', display: 'grid', placeItems: 'center', position:'relative', overflow:'hidden' }}>
-            {avatar?.data ? (
-              <img src={avatar.data} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />
+            {avatar?.url ? (
+              <img src={avatar.url} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />
             ) : (
               session.name?.charAt(0).toUpperCase()
             )}

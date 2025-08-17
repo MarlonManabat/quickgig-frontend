@@ -9,5 +9,6 @@ export type ApplicantProfile = {
   expectedRate?: string;    // e.g., "₱800/day"
   bio?: string;
   resumeUrl?: string;       // GDrive/Dropbox link for now
+  avatarUrl?: string;
   updatedAt: string;
 };

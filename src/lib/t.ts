@@ -140,6 +140,11 @@ const english: Messages = {
   'profile.avatar.saved': 'Avatar saved',
   'apply.resume_attached': 'Attached: {name}',
   'apply.resume_optional_hint': 'Resume is optional—you can attach now or later.',
+  'upload.uploading': 'Uploading…',
+  'upload.canceled': 'Upload canceled',
+  'upload.too_big': 'File too large (max {n}MB)',
+  'upload.bad_type': 'Unsupported file type',
+  'upload.view_resume': 'View resume',
 };
 
 const taglish: Messages = {
@@ -280,6 +285,11 @@ const taglish: Messages = {
   'profile.avatar.saved': 'Na-save ang avatar',
   'apply.resume_attached': 'Naka-attach: {name}',
   'apply.resume_optional_hint': 'Optional lang ang resume—puwede mong i-attach ngayon o sa susunod.',
+  'upload.uploading': 'Nag-a-upload…',
+  'upload.canceled': 'Kinansela ang upload',
+  'upload.too_big': 'Masyadong malaki ang file (max {n}MB)',
+  'upload.bad_type': 'Hindi suportadong file type',
+  'upload.view_resume': 'Tingnan ang resume',
 };
 
 const bundle: Bundle = { english, taglish };

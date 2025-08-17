@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { UploadedFile } from '@/types/upload';
+// legacy endpoint retained for backwards compatibility
 
 const MODE = process.env.ENGINE_MODE || 'mock';
 const BASE = process.env.ENGINE_BASE_URL || '';
@@ -7,9 +7,10 @@ const BASE = process.env.ENGINE_BASE_URL || '';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
   try {
-    const { kind, file } = req.body as { kind: 'resume' | 'avatar'; file: UploadedFile };
+    const { kind, file } = req.body as { kind: 'resume' | 'avatar'; file: Record<string, unknown> };
     if (MODE === 'mock') {
-      return res.status(200).json({ ok: true, id: file.id, url: `/api/upload/${file.id}` });
+      const id = file?.id || 'mock';
+      return res.status(200).json({ ok: true, id, url: `/api/upload/${id}` });
     }
     const r = await fetch(`${BASE}/upload`, {
       method: 'POST',

@@ -8,6 +8,7 @@ import { requireAuthSSR } from '@/lib/auth';
 import UploadField from '../../src/components/product/UploadField';
 import { getResume, setResume, getAvatar, setAvatar } from '../../src/lib/profileStore';
 import { UploadedFile } from '@/types/upload';
+import { ACCEPT_STRING } from '@/lib/upload';
 
 export const getServerSideProps = requireAuthSSR();
 
@@ -77,10 +78,9 @@ export default function ProfilePage(){
         {field(t('field.barangay'), <input value={profile.barangay||''} onChange={e=>update('barangay',e.target.value)} style={{padding:'10px 12px', borderRadius:8, border:'1px solid #ccc'}} />)}
         {field(t('field.roles'), <input value={rolesText} onChange={e=>setRolesText(e.target.value)} placeholder="e.g. Barista, Cook" style={{padding:'10px 12px', borderRadius:8, border:'1px solid #ccc'}} />)}
         {field(t('field.expectedRate'), <input value={profile.expectedRate||''} onChange={e=>update('expectedRate',e.target.value)} placeholder="₱800/day" style={{padding:'10px 12px', borderRadius:8, border:'1px solid #ccc'}} />)}
-        {field(t('field.resumeUrl'), <input value={profile.resumeUrl||''} onChange={e=>update('resumeUrl',e.target.value)} placeholder="https://..." style={{padding:'10px 12px', borderRadius:8, border:'1px solid #ccc'}} />)}
         {field(t('field.bio'), <textarea value={profile.bio||''} onChange={e=>update('bio',e.target.value)} rows={4} style={{padding:'10px 12px', borderRadius:8, border:'1px solid #ccc', resize:'vertical'}} />)}
-        <UploadField label={t('profile.resume.title')} accept=".pdf,.doc,.docx" kind="resume" file={resume} onSaved={f=>{ setResumeState(f); setResume(f); }} />
-        <UploadField label={t('profile.avatar.title')} accept="image/*" kind="avatar" file={avatar} onSaved={f=>{ setAvatarState(f); setAvatar(f); }} />
+        <UploadField label={t('profile.resume.title')} accept={ACCEPT_STRING} kind="resume" file={resume} onSaved={f=>{ setResumeState(f); setResume(f); update('resumeUrl', f?.url || ''); }} />
+        <UploadField label={t('profile.avatar.title')} accept="image/*" kind="avatar" file={avatar} onSaved={f=>{ setAvatarState(f); setAvatar(f); update('avatarUrl', f?.url || ''); }} />
         <div>
           <button type="submit" style={{padding:'10px 14px', borderRadius:8, background:'#0069d1', color:'#fff', border:'none', fontWeight:700}}>{t('action.save')}</button>
         </div>
