@@ -41,6 +41,7 @@ export default function NavBar() {
           </summary>
           <div style={{ position: 'absolute', right: 0, marginTop: 4, background: '#fff', border: `1px solid ${T.colors.border}`, borderRadius: 8, boxShadow: '0 2px 6px rgba(0,0,0,0.1)', minWidth: 160 }}>
             <Link href="/account" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>{t('navbar_account')}</Link>
+            <Link href="/account/profile" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>{t('profile.title')}</Link>
             {session.role === 'employer' && (
               <Link href="/employer/jobs" style={{ display: 'block', padding: '6px 12px', textDecoration: 'none', color: T.colors.text }}>{t('my_jobs')}</Link>
             )}

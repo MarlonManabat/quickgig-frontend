@@ -70,9 +70,26 @@ function ApplyForm({ job }: { job: JobDetail }) {
   const router = useRouter();
   const [name,setName] = React.useState('');
   const [email,setEmail] = React.useState('');
+  const [phone,setPhone] = React.useState('');
+  const [city,setCity] = React.useState('');
+  const [resumeUrl,setResumeUrl] = React.useState('');
   const [message,setMessage] = React.useState('');
   const [status,setStatus] = React.useState<'idle'|'sending'|'ok'|'err'>('idle');
   const disabled = !job?.id || !name || !email || status==='sending';
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch('/api/account/profile');
+        const p = await r.json();
+        setName(p.name || '');
+        setEmail(p.email || '');
+        setPhone(p.phone || '');
+        setCity(p.city || '');
+        setResumeUrl(p.resumeUrl || '');
+      } catch {}
+    })();
+  }, []);
 
   async function onSubmit(e:React.FormEvent) {
     e.preventDefault();
@@ -81,7 +98,7 @@ function ApplyForm({ job }: { job: JobDetail }) {
       const r = await fetch('/api/apply', {
         method:'POST',
         headers:{'content-type':'application/json'},
-        body: JSON.stringify({ jobId: String(job.id), name, email, message }),
+        body: JSON.stringify({ jobId: String(job.id), name, email, phone, city, resumeUrl, message }),
       });
       const j = await r.json().catch(()=>({}));
       if (r.ok) {
@@ -100,12 +117,24 @@ function ApplyForm({ job }: { job: JobDetail }) {
   return (
     <form onSubmit={onSubmit}
       style={{background:'#fff', border:`1px solid ${T.colors.border}`, borderRadius:12, padding:16, display:'grid', gap:12, maxWidth:560}}>
-      {field(t('apply_name'),
+      {field(t('field.name'),
         <input value={name} onChange={e=>setName(e.target.value)} placeholder="Juan Dela Cruz"
                style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
       )}
-      {field(t('apply_email'),
+      {field(t('field.email'),
         <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"
+               style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
+      )}
+      {field(t('field.phone'),
+        <input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="0999-000-0000"
+               style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
+      )}
+      {field(t('field.city'),
+        <input value={city} onChange={e=>setCity(e.target.value)} placeholder="Quezon City"
+               style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
+      )}
+      {field(t('field.resumeUrl'),
+        <input value={resumeUrl} onChange={e=>setResumeUrl(e.target.value)} placeholder="https://..."
                style={{padding:'10px 12px', borderRadius:8, border:`1px solid ${T.colors.border}`}} />
       )}
       {field(t('apply_resume'),

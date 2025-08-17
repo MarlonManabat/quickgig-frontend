@@ -133,5 +133,24 @@ const fetchJson = async (url) => {
     } catch (e) {
       console.log('auth flow error', String(e));
     }
+
+    // applicant profile API
+    try {
+      const profGet = await fetch(`${BASE}/api/account/profile`);
+      const txt = await profGet.text();
+      console.log('profile get', profGet.status, /email/i.test(txt));
+    } catch (e) {
+      console.log('profile get error', String(e));
+    }
+    try {
+      const profPut = await fetch(`${BASE}/api/account/profile`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ phone: '0999-000-0000' })
+      });
+      console.log('profile put', profPut.status);
+    } catch (e) {
+      console.log('profile put error', String(e));
+    }
   }
 })();
