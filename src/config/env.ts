@@ -16,6 +16,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_LEGACY_STRICT_SHELL ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_SHOW_API_BADGE:
     String(process.env.NEXT_PUBLIC_SHOW_API_BADGE ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_MESSAGES:
+    String(process.env.NEXT_PUBLIC_ENABLE_MESSAGES ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_BANNER_HTML: process.env.NEXT_PUBLIC_BANNER_HTML || '',
   RESEND_API_KEY: process.env.RESEND_API_KEY || '',
   NOTIFY_FROM: process.env.NOTIFY_FROM || 'QuickGig <noreply@quickgig.ph>',

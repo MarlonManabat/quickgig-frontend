@@ -9,6 +9,7 @@ import NotificationDropdown from './NotificationDropdown';
 import WalletDisplay from './WalletDisplay';
 import Button from './ui/Button';
 import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard, Bell } from 'lucide-react';
+import { useUnreadCount } from '@/hooks/useMessages';
 import { env } from '@/config/env';
 import { isAdmin } from '@/auth/isAdmin';
 
@@ -16,6 +17,7 @@ const Navigation: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const unread = useUnreadCount();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -111,13 +113,18 @@ const Navigation: React.FC = () => {
                     Admin
                   </Link>
                 )}
-                <Link
-                  href="/messages"
-                  className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Messages
-                </Link>
+                {env.NEXT_PUBLIC_ENABLE_MESSAGES && (
+                  <Link
+                    href="/messages"
+                    className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Messages
+                    {unread > 0 && (
+                      <span className="ml-1 text-xs bg-red-500 text-white rounded-full px-1">{unread}</span>
+                    )}
+                  </Link>
+                )}
 
                 <Link
                   href="/payment"
@@ -261,14 +268,19 @@ const Navigation: React.FC = () => {
                       </Link>
                     </>
                   )}
-                  <Link
-                    href="/messages"
-                    className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <MessageCircle className="w-5 h-5 mr-3" />
-                    Messages
-                  </Link>
+                  {env.NEXT_PUBLIC_ENABLE_MESSAGES && (
+                    <Link
+                      href="/messages"
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <MessageCircle className="w-5 h-5 mr-3" />
+                      Messages
+                      {unread > 0 && (
+                        <span className="ml-1 text-xs bg-red-500 text-white rounded-full px-1">{unread}</span>
+                      )}
+                    </Link>
+                  )}
                     <Link
                       href="/payment"
                       className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"

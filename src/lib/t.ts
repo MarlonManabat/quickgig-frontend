@@ -95,6 +95,13 @@ const english: Messages = {
   'field.bio': 'Bio',
   'action.save': 'Save',
   'saved_success': 'Saved',
+  'messages.title': 'Messages',
+  'messages.empty': 'No messages yet.',
+  'messages.send': 'Send',
+  'messages.placeholder': 'Type a message…',
+  'messages.unread': 'Unread',
+  'messages.to_employer': 'Message employer',
+  'messages.to_applicant': 'Message applicant',
 };
 
 const taglish: Messages = {
@@ -190,6 +197,13 @@ const taglish: Messages = {
   'field.bio': 'Bio',
   'action.save': 'I-save',
   'saved_success': 'Na-save',
+  'messages.title': 'Mga Mensahe',
+  'messages.empty': 'Wala pang mensahe.',
+  'messages.send': 'Ipadala',
+  'messages.placeholder': 'Mag-type ng mensahe…',
+  'messages.unread': 'Di nabasa',
+  'messages.to_employer': 'Message employer',
+  'messages.to_applicant': 'Message applicant',
 };
 
 const bundle: Bundle = { english, taglish };

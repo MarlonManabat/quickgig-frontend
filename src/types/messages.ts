@@ -1,14 +1,21 @@
 export type Message = {
-  from?: string;
-  body?: string;
-};
-
-export type Conversation = {
   id: string;
-  title?: string;
-  unread?: boolean;
+  threadId: string;
+  fromId: string;            // user id
+  toId: string;              // user id
+  jobId?: string;
+  body: string;
+  createdAt: string;         // ISO
+  read?: boolean;
 };
 
 export type Thread = {
-  messages: Message[];
+  id: string;
+  participants: string[];    // [employerId, applicantId]
+  jobId?: string;
+  lastMessageAt: string;
+  unreadFor?: string[];      // user ids with unread
+  title?: string;            // e.g., "Job Title · Employer"
 };
+
+export type Conversation = Thread;

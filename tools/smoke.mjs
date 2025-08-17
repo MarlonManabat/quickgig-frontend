@@ -40,6 +40,29 @@ const fetchJson = async (url) => {
     }
   } catch (e) { console.log('employer jobs page error', String(e)); }
 
+  try {
+    const rM = await fetch(`${BASE}/api/messages`);
+    console.log('messages api', rM.status);
+    if (process.env.ENGINE_AUTH_MODE === 'mock' && rM.ok) {
+      const rC = await fetch(`${BASE}/api/messages`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ toId: 'other', jobId: 'demo', title: 'Demo' }),
+      });
+      console.log('messages create', rC.status);
+      const j = await rC.json().catch(() => ({}));
+      const tid = j.thread?.id;
+      if (tid) {
+        const rS = await fetch(`${BASE}/api/messages/${tid}`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ body: 'hello' }),
+        });
+        console.log('messages send', rS.status);
+      }
+    }
+  } catch (e) { console.log('messages api error', String(e)); }
+
   if (process.env.SMOKE_POST_JOB === '1') {
     try {
       const rP = await fetch(`${BASE}/employer/post`);

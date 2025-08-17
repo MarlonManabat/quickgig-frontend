@@ -5,6 +5,8 @@ import { t } from '../../../../src/lib/t';
 import type { ApplicantSummary, ApplicantStatus } from '../../../../src/types/applicant';
 import { requireAuthSSR } from '@/lib/auth';
 import type { Session } from '../../../../src/types/user';
+import Link from 'next/link';
+import { env } from '@/config/env';
 
 interface Props { applicants: ApplicantSummary[]; id: string; session: Session }
 
@@ -158,6 +160,15 @@ export default function ApplicantsPage({ applicants, id }: Props) {
                   </select>
                 </td>
                 <td style={{ padding: 8 }}>
+                  {env.NEXT_PUBLIC_ENABLE_MESSAGES && (
+                    <Link
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      href={`/messages/new?to=${a.id}&jobId=${id}&title=${encodeURIComponent((a as any).jobTitle || '')}`}
+                      style={{ marginRight: 8 }}
+                    >
+                      {t('messages.to_applicant')}
+                    </Link>
+                  )}
                   {a.resumeUrl && (
                     <a href={a.resumeUrl} target="_blank" rel="noopener noreferrer" style={{ marginRight: 8 }}>
                       View resume
