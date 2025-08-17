@@ -1,5 +1,27 @@
 import * as React from 'react';
+import Link from 'next/link';
 import { legacyEnabled, getOverrideSource } from '../lib/legacy';
+
+/**
+ * Access rules:
+ * - Non-production: always accessible.
+ * - Production: accessible if URL has ?diag=1 OR NEXT_PUBLIC_ENABLE_LEGACY_DIAG === "true".
+ */
+function useDiagAllowed() {
+  const [allowed, setAllowed] = React.useState<boolean>(false);
+  React.useEffect(() => {
+    const env = String(process.env.NEXT_PUBLIC_ENABLE_LEGACY_DIAG || '').toLowerCase() === 'true';
+    try {
+      const url = new URL(window.location.href);
+      const qp = url.searchParams.get('diag') === '1';
+      const isProd = process.env.NODE_ENV === 'production';
+      setAllowed(!isProd || qp || env);
+    } catch {
+      setAllowed(true);
+    }
+  }, []);
+  return allowed;
+}
 
 type SelfTest = {
   env: Record<string,string | undefined>;
@@ -8,12 +30,14 @@ type SelfTest = {
 };
 
 export default function LegacyDiagPage() {
+  const allowed = useDiagAllowed();
   const [data, setData] = React.useState<SelfTest | null>(null);
   const [err, setErr] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    if (!allowed) return;
     fetch('/api/legacy-selftest').then(r => r.json()).then(setData).catch(e => setErr(String(e)));
-  }, []);
+  }, [allowed]);
 
   const on = legacyEnabled();
   const src = getOverrideSource();
@@ -23,6 +47,15 @@ export default function LegacyDiagPage() {
     else localStorage.setItem('legacy_ui', v);
     location.reload();
   };
+
+  if (!allowed) {
+    return (
+      <main style={{fontFamily:'ui-sans-serif, system-ui', padding:'24px', maxWidth:900, margin:'0 auto'}}>
+        <h1 style={{fontSize:28, fontWeight:700}}>Diagnostics disabled</h1>
+        <p>Append <code>?diag=1</code> to the URL (or set <code>NEXT_PUBLIC_ENABLE_LEGACY_DIAG=true</code>) to view this page in production.</p>
+      </main>
+    );
+  }
 
   return (
     <main style={{fontFamily:'ui-sans-serif, system-ui', padding:'24px', maxWidth:900, margin:'0 auto'}}>
@@ -34,7 +67,7 @@ export default function LegacyDiagPage() {
         <button onClick={() => setLS(null)}>Clear Override</button>
       </div>
       <p>
-        Quick links: <a href="/?legacy=1">/?legacy=1</a> · <a href="/login?legacy=1">/login?legacy=1</a>
+        Quick links: <Link href="/?legacy=1">/?legacy=1</Link> · <Link href="/login?legacy=1">/login?legacy=1</Link> · <Link href="/_legacy-diag?diag=1">/_legacy-diag?diag=1</Link>
       </p>
       {err && <pre style={{color:'crimson'}}>{err}</pre>}
       {!data ? <p>Loading…</p> : (
