@@ -37,7 +37,7 @@
     "font:status": "node scripts/font-status.mjs",
     "postbuild": "node tools/print_routes.mjs",
     "smoke:urls": "node -e \"const u=process.env.BASE||\"http://localhost:3000\"; const f=async (p)=>{const r=await fetch(u+p,{method:\"HEAD\"}); console.log(p, r.status, r.headers.get(\"content-type\")||\"-\");}; (async()=>{for(const p of [\"/__health\",\"/\",\"/?legacy=1\",\"/login\",\"/legacy/styles.css\",\"/legacy/fonts/LegacySans.woff2\"]) await f(p)})()\"",
-    "smoke:product": "node tools/smoke_product.mjs"
+    "smoke:product": "node tools/smoke.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
