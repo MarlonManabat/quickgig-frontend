@@ -33,9 +33,10 @@
     "test": "tsc src/lib/flags.ts src/lib/legacy/renderLegacy.ts src/lib/legacy/__tests__/sanitize.test.ts --module commonjs --target ES2019 --esModuleInterop --outDir dist-test && node --test dist-test/legacy/__tests__/sanitize.test.js",
     "legacy:verify:strict": "node scripts/legacy-verify-strict.mjs",
     "smoke:prod": "node scripts/smoke-prod.mjs",
-    "legacy:font:install": "node scripts/legacy-font-install.mjs",
+    "legacy:font:install": "node tools/install_legacy_font.mjs",
     "font:status": "node scripts/font-status.mjs",
-    "postbuild": "node tools/print_routes.mjs"
+    "postbuild": "node tools/print_routes.mjs",
+    "smoke:urls": "node -e \"const u=process.env.BASE||\"http://localhost:3000\"; const f=async (p)=>{const r=await fetch(u+p,{method:\"HEAD\"}); console.log(p, r.status, r.headers.get(\"content-type\")||\"-\");}; (async()=>{for(const p of [\"/__health\",\"/\",\"/?legacy=1\",\"/login\",\"/legacy/styles.css\",\"/legacy/fonts/LegacySans.woff2\"]) await f(p)})()\""
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
