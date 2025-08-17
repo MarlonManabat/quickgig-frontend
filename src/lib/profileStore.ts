@@ -2,8 +2,8 @@ import { ApplicantProfile } from '@/types/profile';
 import { UploadedFile } from '@/types/upload';
 
 const KEY='qq_profile';
-const RESUME_KEY='profile:resume:v1';
-const AVATAR_KEY='profile:avatar:v1';
+const RESUME_KEY='profile:resume:v2';
+const AVATAR_KEY='profile:avatar:v2';
 
 export function getProfile(seed: Partial<ApplicantProfile>): ApplicantProfile {
   const now = new Date().toISOString();
@@ -20,7 +20,16 @@ export function saveProfile(p: ApplicantProfile){ p.updatedAt=new Date().toISOSt
 
 export function getResume(): UploadedFile | null {
   if (typeof window === 'undefined') return null;
-  try { return JSON.parse(localStorage.getItem(RESUME_KEY) || 'null'); } catch { return null; }
+  try {
+    const raw = localStorage.getItem(RESUME_KEY) || localStorage.getItem('profile:resume:v1');
+    const p = raw ? JSON.parse(raw) : null;
+    if (!p) return null;
+    if (p.url) return p;
+    if (p.data) return { name: p.name, url: p.data, contentType: p.type, size: p.size };
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export function setResume(f: UploadedFile | null): void {
@@ -31,7 +40,16 @@ export function setResume(f: UploadedFile | null): void {
 
 export function getAvatar(): UploadedFile | null {
   if (typeof window === 'undefined') return null;
-  try { return JSON.parse(localStorage.getItem(AVATAR_KEY) || 'null'); } catch { return null; }
+  try {
+    const raw = localStorage.getItem(AVATAR_KEY) || localStorage.getItem('profile:avatar:v1');
+    const p = raw ? JSON.parse(raw) : null;
+    if (!p) return null;
+    if (p.url) return p;
+    if (p.data) return { name: p.name, url: p.data, contentType: p.type, size: p.size };
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export function setAvatar(f: UploadedFile | null): void {
