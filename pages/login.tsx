@@ -11,7 +11,7 @@ type Props = { legacyHtml?: string };
 export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
     const pub = path.join(process.cwd(), 'public', 'legacy');
-    const frag = fs.readFileSync(path.join(pub, 'index.fragment.html'), 'utf8');
+    const frag = fs.readFileSync(path.join(pub, 'login.fragment.html'), 'utf8');
     const legacyHtml =
 `<link rel="preload" as="font" href="/legacy/fonts/LegacySans.woff2" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/legacy/styles.css">
@@ -22,7 +22,7 @@ ${frag}`;
   }
 };
 
-export default function Home({ legacyHtml }: Props){
+export default function Login({ legacyHtml }: Props){
   const [useLegacy, setUseLegacy] = React.useState(() => legacyFlagFromEnv());
   React.useEffect(() => {
     try {
@@ -32,14 +32,14 @@ export default function Home({ legacyHtml }: Props){
   }, []);
   return (
     <>
-      <Head><title>QuickGig</title></Head>
+      <Head><title>Log In · QuickGig</title></Head>
       {useLegacy && legacyHtml ? (
         <main dangerouslySetInnerHTML={{ __html: legacyHtml }} />
       ) : (
         <main style={{ padding: 24, fontFamily: 'ui-sans-serif,system-ui' }}>
-          <h1>QuickGig</h1>
-          <p>Root page is live. Turn on the legacy shell via <code>NEXT_PUBLIC_LEGACY_UI=true</code> or visit
-            <a href="/?legacy=1">/?legacy=1</a>.
+          <h1>Log In</h1>
+          <p>Turn on legacy via <code>NEXT_PUBLIC_LEGACY_UI=true</code> or
+            <a href="/login?legacy=1">/login?legacy=1</a>.
           </p>
         </main>
       )}
