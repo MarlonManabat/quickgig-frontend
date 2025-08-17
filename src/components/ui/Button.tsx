@@ -1,74 +1,18 @@
-'use client';
-
-import React from 'react';
-import { cn } from '@/lib/utils';
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  children: React.ReactNode;
-  loading?: boolean;
+import * as React from 'react';
+import { tokens as T } from '../../theme/tokens';
+type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary'|'outline'|'ghost'|string; full?: boolean; size?: string; };
+export function Button({ variant='primary', full, style, ...props }: Props){
+  const base: React.CSSProperties = {
+    display:'inline-flex', alignItems:'center', justifyContent:'center',
+    gap:8, padding:'10px 14px', borderRadius:T.radius.md, fontWeight:600,
+    border:'1px solid transparent', cursor:'pointer', width: full ? '100%' : undefined,
+    transition:'transform .02s ease, background .2s ease, border-color .2s ease'
+  };
+  const map: Record<string, React.CSSProperties> = {
+    primary:{ background:T.colors.brand, color:'#fff' },
+    outline:{ background:'#fff', color:T.colors.text, borderColor:T.colors.border },
+    ghost:  { background:'transparent', color:T.colors.text }
+  };
+  return <button style={{...base, ...(map[variant]||{}), ...style}} onMouseDown={e=>((e.currentTarget.style.transform='translateY(1px)'))} onMouseUp={e=>((e.currentTarget.style.transform='translateY(0)'))} {...props} />;
 }
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'primary', size = 'md', children, loading, disabled, ...props }, ref) => {
-    const baseClasses = 'inline-flex items-center justify-center gap-2 font-heading font-semibold transition-all duration-qg-fast focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg disabled:opacity-50 disabled:cursor-not-allowed';
-
-    const variants = {
-      primary: 'bg-primary text-fg hover:bg-primary/90 focus:ring-primary',
-      secondary: 'bg-secondary text-fg hover:bg-secondary/90 focus:ring-secondary',
-      outline: 'border border-primary text-primary hover:bg-primary hover:text-fg focus:ring-primary',
-      ghost: 'bg-transparent text-primary hover:bg-primary/10 focus:ring-primary',
-    };
-    
-    const sizes = {
-      sm: 'px-3 py-1.5 text-sm rounded-qg-sm',
-      md: 'px-6 py-3 text-base rounded-qg-md',
-      lg: 'px-8 py-4 text-lg rounded-qg-lg',
-    };
-
-    return (
-      <button
-        className={cn(
-          baseClasses,
-          variants[variant],
-          sizes[size],
-          loading && 'cursor-wait',
-          className
-        )}
-        disabled={disabled || loading}
-        ref={ref}
-        {...props}
-      >
-        {loading && (
-          <svg
-            className="animate-spin -ml-1 mr-2 h-4 w-4"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-        )}
-        {children}
-      </button>
-    );
-  }
-);
-
-Button.displayName = 'Button';
-
 export default Button;
-
