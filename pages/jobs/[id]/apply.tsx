@@ -9,6 +9,10 @@ import { getJobDetails, type JobDetail } from '../../../src/lib/api';
 import { legacyFlagFromEnv, legacyFlagFromQuery } from '../../../src/lib/legacyFlag';
 import { tokens as T } from '../../../src/theme/tokens';
 import { t } from '../../../src/lib/t';
+import { markApplied } from '../../../src/lib/appliedStore';
+import { toJobSummary } from '../../../src/types/job';
+import { toast } from '../../../src/lib/toast';
+import { useRouter } from 'next/router';
 
 type Props = { job: JobDetail|null; legacyHtml?: string };
 
@@ -47,7 +51,7 @@ export default function ApplyPage({ job, legacyHtml }: Props) {
           <h1>{t('job_apply_title')}</h1>
         )}
 
-        <ApplyForm jobId={String(job?.id ?? '')} />
+        {job && <ApplyForm job={job} />}
       </section>
     </ProductShell>
   );
@@ -62,12 +66,13 @@ function field(label:string, el:React.ReactNode) {
   );
 }
 
-function ApplyForm({ jobId }: { jobId: string }) {
+function ApplyForm({ job }: { job: JobDetail }) {
+  const router = useRouter();
   const [name,setName] = React.useState('');
   const [email,setEmail] = React.useState('');
   const [message,setMessage] = React.useState('');
   const [status,setStatus] = React.useState<'idle'|'sending'|'ok'|'err'>('idle');
-  const disabled = !jobId || !name || !email || status==='sending';
+  const disabled = !job?.id || !name || !email || status==='sending';
 
   async function onSubmit(e:React.FormEvent) {
     e.preventDefault();
@@ -76,11 +81,17 @@ function ApplyForm({ jobId }: { jobId: string }) {
       const r = await fetch('/api/apply', {
         method:'POST',
         headers:{'content-type':'application/json'},
-        body: JSON.stringify({ jobId, name, email, message }),
+        body: JSON.stringify({ jobId: String(job.id), name, email, message }),
       });
       const j = await r.json().catch(()=>({}));
-      if (r.ok) setStatus('ok'); else setStatus('err');
-      if (!r.ok) console.error('apply failed', j);
+      if (r.ok) {
+        markApplied(String(job.id), toJobSummary(job));
+        toast(t('apply_success'));
+        router.push(`/jobs/${job.id}#applied`);
+      } else {
+        setStatus('err');
+        console.error('apply failed', j);
+      }
     } catch {
       setStatus('err');
     }

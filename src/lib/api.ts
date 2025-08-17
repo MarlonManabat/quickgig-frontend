@@ -3,6 +3,7 @@ import { toast } from './toast';
 import { report } from './report';
 import { env } from '@/config/env';
 import type { Job } from '../../types/jobs';
+import type { JobSummary, JobDetail } from '../types/job';
 
 export const API_BASE = env.NEXT_PUBLIC_API_URL;
 
@@ -109,19 +110,7 @@ export async function fetchJobs(): Promise<Job[]> {
 }
 
 // --- Minimal API client for product home ---
-export type JobSummary = {
-  id: string | number;
-  title: string;
-  company?: string;
-  location?: string;
-  payRange?: string;
-  url?: string;
-  tags?: string[];
-};
-export type JobDetail = JobSummary & {
-  description?: string;
-  postedAt?: string;
-};
+export type { JobSummary, JobDetail } from '../types/job';
 
 export type SearchParams = {
   q?: string;
