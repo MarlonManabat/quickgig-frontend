@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { UploadedFile } from '@/types/upload';
 
 type ApplyPayload = {
   jobId: string;
   name: string;
   email: string;
   message?: string;
-  // in the future: resumeUrl?: string;
+  resume?: UploadedFile;
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

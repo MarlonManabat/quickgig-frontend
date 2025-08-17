@@ -1,3 +1,4 @@
+import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { tokens as T } from '../../theme/tokens';
@@ -7,6 +8,8 @@ import dynamic from 'next/dynamic';
 import { legacyFlagFromEnv } from '../../lib/legacyFlag';
 import { useSession } from '../../hooks/useSession';
 import { useOnboarding } from '../../product/onboarding/useOnboarding';
+import { getAvatar } from '../../lib/profileStore';
+import { UploadedFile } from '@/types/upload';
 const LocaleSwitch = dynamic(() => import('../LocaleSwitch'), { ssr: false });
 
 const linkStyle = (active: boolean): React.CSSProperties => ({
@@ -25,6 +28,8 @@ export default function NavBar() {
   const { session, logout } = useSession();
   const { enabled, completeness } = useOnboarding();
   const incomplete = enabled && completeness.score < 100;
+  const [avatar, setAvatar] = React.useState<UploadedFile|null>(null);
+  React.useEffect(()=>{ try { setAvatar(getAvatar()); } catch {} },[]);
   const onLogout = async () => {
     await logout();
     push('/');
@@ -45,8 +50,12 @@ export default function NavBar() {
       <div style={{flex:1}} />
       {session ? (
         <details style={{ position: 'relative' }}>
-          <summary style={{ listStyle: 'none', cursor: 'pointer', width: 32, height: 32, borderRadius: '50%', background: T.colors.brand, color: '#fff', display: 'grid', placeItems: 'center', position:'relative' }}>
-            {session.name?.charAt(0).toUpperCase()}
+          <summary style={{ listStyle: 'none', cursor: 'pointer', width: 32, height: 32, borderRadius: '50%', background: T.colors.brand, color: '#fff', display: 'grid', placeItems: 'center', position:'relative', overflow:'hidden' }}>
+            {avatar?.data ? (
+              <img src={avatar.data} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />
+            ) : (
+              session.name?.charAt(0).toUpperCase()
+            )}
             {incomplete && <span style={{position:'absolute', top:0, right:0, width:8, height:8, borderRadius:'50%', background:T.colors.brand}} />}
           </summary>
           <div style={{ position: 'absolute', right: 0, marginTop: 4, background: '#fff', border: `1px solid ${T.colors.border}`, borderRadius: 8, boxShadow: '0 2px 6px rgba(0,0,0,0.1)', minWidth: 160 }}>

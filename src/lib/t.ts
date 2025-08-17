@@ -36,7 +36,7 @@ const english: Messages = {
   apply_email: "Email",
   apply_resume: "Resume or note",
   apply_submit: "Submit application",
-  apply_success: "Thanks! Your application was received.",
+  apply_success: "Application sent",
   apply_error: "Something went wrong. Please try again.",
   login_title: "Sign in",
   login_email: "Email",
@@ -129,6 +129,17 @@ const english: Messages = {
   'onboarding.done_body': 'Great job. You’re ready to apply.',
   'onboarding.banner_title': 'Complete your profile to get hired faster.',
   'onboarding.banner_cta': 'Complete profile',
+  'profile.resume.title': 'Resume',
+  'profile.resume.hint': 'Upload resume (PDF or DOC) up to {mb}MB.',
+  'profile.resume.replace': 'Replace',
+  'profile.resume.remove': 'Remove',
+  'profile.resume.too_big': 'File too big. Max {mb}MB.',
+  'profile.resume.bad_type': 'Unsupported file type.',
+  'profile.resume.saved': 'Resume saved',
+  'profile.avatar.title': 'Avatar',
+  'profile.avatar.saved': 'Avatar saved',
+  'apply.resume_attached': 'Attached: {name}',
+  'apply.resume_optional_hint': 'Resume is optional—you can attach now or later.',
 };
 
 const taglish: Messages = {
@@ -165,7 +176,7 @@ const taglish: Messages = {
   apply_email: "Email",
   apply_resume: "Resume o mensahe",
   apply_submit: "Isumite ang application",
-  apply_success: "Salamat! Natanggap na ang application mo.",
+  apply_success: "Na-send ang application mo",
   apply_error: "May nangyaring mali. Pakisubukang muli.",
   login_title: "Mag-log in",
   login_email: "Email",
@@ -258,6 +269,17 @@ const taglish: Messages = {
   'onboarding.done_body': 'Ready ka nang mag-apply sa mga trabaho.',
   'onboarding.banner_title': 'Kumpletuhin ang profile mo para mas mabilis ma-hire.',
   'onboarding.banner_cta': 'Kumpletuhin',
+  'profile.resume.title': 'Resume',
+  'profile.resume.hint': 'Mag-upload ng resume (PDF o DOC) hanggang {mb}MB.',
+  'profile.resume.replace': 'Palitan',
+  'profile.resume.remove': 'Tanggalin',
+  'profile.resume.too_big': 'Masyadong malaki ang file. Max {mb}MB.',
+  'profile.resume.bad_type': 'Di suportadong file type.',
+  'profile.resume.saved': 'Na-save ang resume',
+  'profile.avatar.title': 'Avatar',
+  'profile.avatar.saved': 'Na-save ang avatar',
+  'apply.resume_attached': 'Naka-attach: {name}',
+  'apply.resume_optional_hint': 'Optional lang ang resume—puwede mong i-attach ngayon o sa susunod.',
 };
 
 const bundle: Bundle = { english, taglish };
