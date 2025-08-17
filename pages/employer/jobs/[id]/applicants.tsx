@@ -1,19 +1,20 @@
 import * as React from 'react';
-import type { GetServerSideProps } from 'next';
 import DashboardShell from '../../../../src/components/product/DashboardShell';
 import { HeadSEO } from '../../../../src/components/HeadSEO';
 import { Table, Th, Td, Tr } from '../../../../src/components/product/Table';
 import { listApplicants } from '../../../../src/lib/apiEmployer';
 import { t } from '../../../../src/lib/t';
 import type { ApplicantSummary } from '../../../../src/types/job';
+import { requireAuthSSR } from '@/lib/auth';
+import type { Session } from '../../../../src/types/user';
 
-interface Props { applicants: ApplicantSummary[]; }
+interface Props { applicants: ApplicantSummary[]; session: Session; }
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) => {
+export const getServerSideProps = requireAuthSSR(['employer', 'admin'], async ({ params }) => {
   const id = String(params?.id || '');
   const applicants = await listApplicants(id);
-  return { props: { applicants } };
-};
+  return { applicants };
+});
 
 function relTime(d: string) {
   const diff = Date.now() - new Date(d).getTime();
@@ -25,11 +26,12 @@ function relTime(d: string) {
   return `${days}d ago`;
 }
 
-export default function ApplicantsPage({ applicants }: Props) {
+export default function ApplicantsPage({ applicants, session }: Props) {
   return (
     <>
       <HeadSEO titleKey="employer_applicants_title" descKey="employer_title" />
       <DashboardShell title={t('employer_applicants_title')}>
+        <p>Hi, {session?.name}!</p>
         {applicants.length ? (
           <Table>
             <thead>

@@ -4,17 +4,18 @@ import fs from 'fs';
 import ProductShell from '../../src/components/layout/ProductShell';
 import { HeadSEO } from '../../src/components/HeadSEO';
 import { t } from '../../src/lib/t';
+import { requireAuthSSR } from '@/lib/auth';
 
-export async function getServerSideProps() {
+export const getServerSideProps = requireAuthSSR(['employer', 'admin'], async () => {
   try {
     const pub = path.join(process.cwd(), 'public', 'legacy');
     const frag = fs.readFileSync(path.join(pub, 'index.fragment.html'), 'utf8');
     const legacyHtml = `<link rel="preload" as="font" href="/legacy/fonts/LegacySans.woff2" type="font/woff2" crossOrigin><link rel="stylesheet" href="/legacy/styles.css" />` + frag;
-    return { props: { legacyHtml } };
+    return { legacyHtml };
   } catch {
-    return { props: { legacyHtml: '' } };
+    return { legacyHtml: '' };
   }
-}
+});
 
 export default function PostJobPage({ legacyHtml }: { legacyHtml:string }) {
   const [submitting, setSubmitting] = React.useState(false);
