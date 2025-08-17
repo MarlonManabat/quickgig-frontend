@@ -82,6 +82,19 @@ const english: Messages = {
   err500_title: "Something went wrong",
   err500_body: "Please retry or go back to the homepage.",
   not_found: "Page not found",
+  'profile.title': 'My Profile',
+  'profile.subtitle': 'Manage your details',
+  'field.name': 'Name',
+  'field.email': 'Email',
+  'field.phone': 'Phone',
+  'field.city': 'City',
+  'field.barangay': 'Barangay',
+  'field.roles': 'Roles',
+  'field.expectedRate': 'Expected rate',
+  'field.resumeUrl': 'Resume URL',
+  'field.bio': 'Bio',
+  'action.save': 'Save',
+  'saved_success': 'Saved',
 };
 
 const taglish: Messages = {
@@ -164,6 +177,19 @@ const taglish: Messages = {
   err500_title: "May aberya",
   err500_body: "Paki-reload o bumalik sa homepage.",
   not_found: "Hindi makita ang page",
+  'profile.title': 'Ang Aking Profile',
+  'profile.subtitle': 'Ayusin ang detalye mo',
+  'field.name': 'Pangalan',
+  'field.email': 'Email',
+  'field.phone': 'Telepono',
+  'field.city': 'Lungsod',
+  'field.barangay': 'Barangay',
+  'field.roles': 'Mga role',
+  'field.expectedRate': 'Inaasahang bayad',
+  'field.resumeUrl': 'Resume URL',
+  'field.bio': 'Bio',
+  'action.save': 'I-save',
+  'saved_success': 'Na-save',
 };
 
 const bundle: Bundle = { english, taglish };
