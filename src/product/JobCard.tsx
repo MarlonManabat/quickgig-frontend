@@ -4,10 +4,13 @@ import { tokens as T } from '../theme/tokens';
 import type { JobSummary } from '../lib/api';
 import { useSavedJobs } from './useSavedJobs';
 import { t } from '../lib/t';
+import { isApplied } from '../lib/appliedStore';
 
 export function JobCard({ job }: { job: JobSummary }) {
   const { isSaved, toggle } = useSavedJobs();
   const saved = isSaved(String(job.id));
+  const applied = isApplied(String(job.id));
+  const badge = applied ? t('applied_badge') : saved ? t('saved_badge') : null;
   return (
     <div
       style={{
@@ -21,6 +24,23 @@ export function JobCard({ job }: { job: JobSummary }) {
         position: 'relative',
       }}
     >
+      {badge && (
+        <span
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            background: T.colors.brand,
+            color: '#fff',
+            padding: '2px 6px',
+            borderRadius: 6,
+            fontSize: 12,
+            fontWeight: 600,
+          }}
+        >
+          {badge}
+        </span>
+      )}
       <button
         aria-label={saved ? 'Unsave job' : 'Save job'}
         onClick={() => toggle(String(job.id))}

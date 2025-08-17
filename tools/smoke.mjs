@@ -2,7 +2,7 @@
 import { setTimeout as sleep } from 'timers/promises';
 const BASE = process.env.SMOKE_URL || process.env.BASE || '';
 if (!BASE) { console.log('No SMOKE_URL set; skipping smoke'); process.exit(0); }
-const PATHS = ['/', '/find-work', '/login',
+const PATHS = ['/', '/find-work', '/login', '/account', '/employer/jobs',
   ...(process.env.SMOKE_JOB_ID ? [`/jobs/${process.env.SMOKE_JOB_ID}`, `/jobs/${process.env.SMOKE_JOB_ID}/apply`] : [])
 ];
 const fetchJson = async (url) => {
@@ -25,6 +25,20 @@ const fetchJson = async (url) => {
     const rS = await fetch(`${BASE}/saved`);
     console.log('saved page', rS.status);
   } catch (e) { console.log('saved page error', String(e)); }
+
+  try {
+    const rA = await fetch(`${BASE}/account`);
+    console.log('account page', rA.status);
+  } catch (e) { console.log('account page error', String(e)); }
+  try {
+    const rE = await fetch(`${BASE}/employer/jobs`);
+    const txt = await rE.text();
+    console.log('employer jobs page', rE.status);
+    if (process.env.ENGINE_MODE === 'mock') {
+      if (/Applicants?/i.test(txt)) console.log('mock applicants ok');
+      else console.log('mock applicants missing');
+    }
+  } catch (e) { console.log('employer jobs page error', String(e)); }
 
   if (process.env.SMOKE_POST_JOB === '1') {
     try {
