@@ -1,53 +1,73 @@
-import { promises as fs } from 'fs';
+import fs from 'fs';
 import path from 'path';
 
-const legacyDir = path.join(process.cwd(), 'public', 'legacy');
-const requiredFiles = [
+const pretty = process.argv.includes('--pretty');
+const root = process.cwd();
+const legacyDir = path.join(root, 'public', 'legacy');
+
+const required = [
   'styles.css',
   'index.fragment.html',
   'login.fragment.html',
 ];
+const optional = [
+  path.join('img', 'logo-main.png'),
+  path.join('img', 'logo-horizontal.png'),
+  path.join('img', 'logo-icon.png'),
+];
 
-async function checkExists(file) {
-  try {
-    await fs.access(file);
-    return true;
-  } catch {
-    return false;
-  }
+function exists(rel) {
+  return fs.existsSync(path.join(legacyDir, rel));
 }
 
-async function main() {
-  let ok = true;
+const missing = [];
+for (const f of required) {
+  if (!exists(f)) missing.push(f);
+}
 
-  for (const rel of requiredFiles) {
-    const file = path.join(legacyDir, rel);
-    if (!(await checkExists(file))) {
-      console.error(`[legacy:verify] Missing required file: public/legacy/${rel}`);
-      ok = false;
-    }
-  }
+const warnings = [];
+for (const f of optional) {
+  if (!exists(f)) warnings.push(f);
+}
+const fontsDir = path.join(legacyDir, 'fonts');
+if (
+  !fs.existsSync(fontsDir) ||
+  fs.readdirSync(fontsDir).filter((f) => !f.startsWith('.')).length === 0
+) {
+  warnings.push('fonts/*');
+}
 
-  const favicon = path.join(process.cwd(), 'public', 'favicon.png');
-  if (!(await checkExists(favicon))) {
-    console.warn('[legacy:verify] Warning: public/favicon.png missing');
-  }
-
+if (pretty) {
   for (const frag of ['index.fragment.html', 'login.fragment.html']) {
-    const file = path.join(legacyDir, frag);
-    try {
-      const content = await fs.readFile(file, 'utf8');
-      const preview = content.slice(0, 200).replace(/\s+/g, ' ').trim();
-      console.log(`[legacy:verify] ${frag}: ${preview}`);
-    } catch (err) {
-      /* already handled missing */
+    const p = path.join(legacyDir, frag);
+    if (fs.existsSync(p)) {
+      const preview = fs.readFileSync(p, 'utf8').slice(0, 200).replace(/\s+/g, ' ').trim();
+      console.log(`\n${frag}: ${preview}`);
     }
   }
-
-  if (!ok) {
-    process.exit(1);
-  }
-  console.log("[legacy:verify] OK");
+  const rows = [
+    ...required.map((f) => ({ file: `public/legacy/${f}`, status: missing.includes(f) ? 'missing' : 'ok' })),
+    ...optional.map((f) => ({ file: `public/legacy/${f}`, status: warnings.includes(f) ? 'warn' : 'ok' })),
+    { file: 'public/legacy/fonts/*', status: warnings.includes('fonts/*') ? 'warn' : 'ok' },
+  ];
+  console.log();
+  console.table(rows);
+  process.exit(0);
 }
 
-main();
+if (warnings.length) {
+  for (const w of warnings) {
+    console.warn(`Warning: public/legacy/${w} missing`);
+  }
+}
+
+if (missing.length) {
+  for (const m of missing) {
+    console.error(`Missing required file: public/legacy/${m}`);
+  }
+  console.error('\nLegacy assets: FAIL');
+  process.exit(1);
+}
+
+console.log('Legacy assets: PASS');
+process.exit(0);
