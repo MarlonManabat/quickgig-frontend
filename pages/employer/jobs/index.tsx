@@ -1,5 +1,4 @@
 import * as React from 'react';
-import type { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import DashboardShell from '../../../src/components/product/DashboardShell';
 import { HeadSEO } from '../../../src/components/HeadSEO';
@@ -7,19 +6,22 @@ import { Table, Th, Td, Tr } from '../../../src/components/product/Table';
 import { listMyJobs } from '../../../src/lib/apiEmployer';
 import { t } from '../../../src/lib/t';
 import type { JobSummary } from '../../../src/types/job';
+import { requireAuthSSR } from '@/lib/auth';
+import type { Session } from '../../../src/types/user';
 
-interface Props { jobs: JobSummary[]; }
+interface Props { jobs: JobSummary[]; session: Session; }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+export const getServerSideProps = requireAuthSSR(['employer', 'admin'], async () => {
   const jobs = await listMyJobs();
-  return { props: { jobs } };
-};
+  return { jobs };
+});
 
-export default function EmployerJobs({ jobs }: Props) {
+export default function EmployerJobs({ jobs, session }: Props) {
   return (
     <>
       <HeadSEO titleKey="employer_jobs_title" descKey="employer_title" />
       <DashboardShell title={t('employer_jobs_title')}>
+        <p>Hi, {session?.name}!</p>
         {jobs.length ? (
           <Table>
             <thead>

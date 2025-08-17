@@ -69,4 +69,26 @@ const fetchJson = async (url) => {
   await check('/?lang=tl', /Hanap|Trabaho|Mag-apply/i, 'home tl');
   await check('/find-work?lang=tl&q=zzzzzz', /Wala pang resulta/i, 'find-work tl empty');
   await check('/saved?lang=en', /Saved jobs/i, 'saved en');
+  if (process.env.ENGINE_AUTH_MODE === 'mock') {
+    try {
+      const loginRes = await fetch(`${BASE}/api/session/login`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: 'boss@biz.com', password: 'x' }),
+        redirect: 'manual'
+      });
+      console.log('login', loginRes.status);
+      const cookie = loginRes.headers.get('set-cookie') || '';
+      if (loginRes.ok) {
+        const jobsRes = await fetch(`${BASE}/employer/jobs`, { headers: { cookie } });
+        const txt = await jobsRes.text();
+        console.log('authed employer jobs', jobsRes.status);
+        if (/Applicants?/i.test(txt)) console.log('mock applicants ok');
+        const logoutRes = await fetch(`${BASE}/api/session/logout`, { method: 'POST', headers: { cookie } });
+        console.log('logout', logoutRes.status);
+      }
+    } catch (e) {
+      console.log('auth flow error', String(e));
+    }
+  }
 })();

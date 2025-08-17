@@ -1,6 +1,7 @@
 import * as React from 'react';
 import type { GetServerSideProps } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import path from 'path';
 import fs from 'fs';
 import ProductShell from '../../src/components/layout/ProductShell';
@@ -10,6 +11,8 @@ import { getJobDetails, type JobDetail } from '../../src/lib/api';
 import { tokens as T } from '../../src/theme/tokens';
 import { useSavedJobs } from '../../src/product/useSavedJobs';
 import { t } from '../../src/lib/t';
+import { isApplied } from '../../src/lib/appliedStore';
+import { useSession } from '../../src/hooks/useSession';
 
 type Props = { job: JobDetail | null; legacyHtml?: string };
 
@@ -28,10 +31,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) 
 
 export default function JobDetailsPage({ job, legacyHtml }: Props) {
   const { isSaved, toggle } = useSavedJobs();
+  const { session } = useSession();
+  const [applied, setApplied] = React.useState(false);
   const [useLegacy, setUseLegacy] = React.useState(false);
+  const router = useRouter();
   React.useEffect(() => {
-    try { setUseLegacy(legacyFlagFromEnv() || legacyFlagFromQuery(new URL(window.location.href).searchParams)); } catch {}
+    try { setUseLegacy(legacyFlagFromEnv() || legacyFlagFromQuery(new URL(window.location.href).searchParams)); } catch {} 
   }, []);
+  React.useEffect(() => { if (job) setApplied(isApplied(job.id)); }, [job]);
   if (useLegacy && legacyHtml) return <div dangerouslySetInnerHTML={{__html: legacyHtml}} />;
 
   if (!job) {
@@ -62,6 +69,11 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
         <div style={{color:T.colors.subtle}}>
           {job.company ? `${job.company} • ` : ''}{job.location || 'Anywhere'}{job.payRange ? ` • ${job.payRange}`:''}
         </div>
+        {applied && !session && (
+          <p style={{background:'#fffbe6', border:`1px solid ${T.colors.border}`, padding:12, borderRadius:8}}>
+            Gusto mo i-save ang application? <Link href={`/login?next=${encodeURIComponent(router.asPath)}`}><strong>Mag-sign in</strong></Link> para ma-track.
+          </p>
+        )}
         {job.description ? (
           <div style={{whiteSpace:'pre-wrap', lineHeight:1.6}}>{job.description}</div>
         ) : (
