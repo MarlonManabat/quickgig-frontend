@@ -27,18 +27,19 @@ function JobsPageContent() {
 
   // read filters from URL
   useEffect(() => {
+    const params = search ?? new URLSearchParams();
     const f: JobFilters = {
-      q: search.get('q') || undefined,
-      location: search.get('location') || undefined,
-      category: search.get('category') || undefined,
-      type: search.get('type') || undefined,
-      remote: search.get('remote') === '1',
-      minSalary: search.get('minSalary') ? Number(search.get('minSalary')) : undefined,
-      maxSalary: search.get('maxSalary') ? Number(search.get('maxSalary')) : undefined,
-      sort: (search.get('sort') as JobFilters['sort']) || undefined,
-      page: search.get('page') ? Number(search.get('page')) : 1,
-      limit: search.get('limit') ? Number(search.get('limit')) : 20,
-      savedOnly: search.get('saved') === '1',
+      q: params.get('q') || undefined,
+      location: params.get('location') || undefined,
+      category: params.get('category') || undefined,
+      type: params.get('type') || undefined,
+      remote: params.get('remote') === '1',
+      minSalary: params.get('minSalary') ? Number(params.get('minSalary')) : undefined,
+      maxSalary: params.get('maxSalary') ? Number(params.get('maxSalary')) : undefined,
+      sort: (params.get('sort') as JobFilters['sort']) || undefined,
+      page: params.get('page') ? Number(params.get('page')) : 1,
+      limit: params.get('limit') ? Number(params.get('limit')) : 20,
+      savedOnly: params.get('saved') === '1',
     };
     setFilters(f);
   }, [search]);

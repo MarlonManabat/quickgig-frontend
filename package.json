@@ -30,7 +30,8 @@
     "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
     "legacy:check": "node tools/legacy_verify.mjs --pretty",
     "legacy:import": "node tools/import_from_dir.mjs",
-    "test": "tsc src/lib/flags.ts src/lib/legacy/renderLegacy.ts src/lib/legacy/__tests__/sanitize.test.ts --module commonjs --target ES2019 --esModuleInterop --outDir dist-test && node --test dist-test/legacy/__tests__/sanitize.test.js"
+    "test": "tsc src/lib/flags.ts src/lib/legacy/renderLegacy.ts src/lib/legacy/__tests__/sanitize.test.ts --module commonjs --target ES2019 --esModuleInterop --outDir dist-test && node --test dist-test/legacy/__tests__/sanitize.test.js",
+    "legacy:verify:strict": "node scripts/legacy-verify-strict.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
