@@ -25,6 +25,13 @@ const fetchJson = async (url) => {
     const rS = await fetch(`${BASE}/saved`);
     console.log('saved page', rS.status);
   } catch (e) { console.log('saved page error', String(e)); }
+
+  if (process.env.SMOKE_POST_JOB === '1') {
+    try {
+      const rP = await fetch(`${BASE}/employer/post`);
+      console.log('post-job page', rP.status);
+    } catch (e) { console.log('post-job page error', String(e)); }
+  }
   // Soft-check a guaranteed-404 path; do not fail build
   try {
     const url404 = BASE.replace(/\/+$/,'') + '/definitely-not-here-404';

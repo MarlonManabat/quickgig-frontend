@@ -19,6 +19,7 @@ export default function NavBar() {
       <Link href="/" style={linkStyle(is('/'))}>Home</Link>
       <Link href="/find-work" style={linkStyle(is('/find-work'))}>Find Work</Link>
       <Link href="/saved" style={linkStyle(is('/saved'))}>Saved</Link>
+      <Link href="/employer/post" style={linkStyle(is('/employer/post'))}>Post a job</Link>
       <div style={{flex:1}} />
       <Link href="/login" style={linkStyle(is('/login'))}>Sign in</Link>
     </nav>
