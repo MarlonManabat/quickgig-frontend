@@ -1,31 +1,47 @@
-import { env } from '@/config/env';
+type MailPayload = {
+  kind: 'apply' | 'interview' | 'digest';
+  to: string;
+  from: string;
+  subject?: string;
+  ics?: string | null;
+  data?: Record<string, unknown>;
+};
 
-type SendArgs = { to: string; subject: string; html: string };
+export async function sendMail(msg: MailPayload) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return { ok: true, skipped: 'no_api_key' };
 
-export async function sendMail({ to, subject, html }: SendArgs) {
-  if (!env.RESEND_API_KEY) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('[notify] RESEND_API_KEY missing, skipping email to', to);
-    }
-    return { ok: true, skipped: 'email' as const };
-  }
+  const subject =
+    msg.subject ??
+    (msg.kind === 'apply'
+      ? 'New Job Application'
+      : msg.kind === 'interview'
+      ? 'Interview Update'
+      : 'Daily QuickGig Digest');
+
+  // Minimal Resend call; keep optional and fail-soft.
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${key}`,
     },
     body: JSON.stringify({
-      from: env.NOTIFY_FROM,
-      to,
+      from: msg.from,
+      to: [msg.to],
       subject,
-      html,
+      text:
+        msg.kind === 'digest'
+          ? 'See today’s summary in your admin dashboard.'
+          : 'You have a new update in QuickGig.',
+      // Keep simple for now; templates can come later
     }),
   });
+
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    console.warn('[notify] email send failed', res.status, text);
-    return { ok: false as const, status: res.status, body: text };
+    const txt = await res.text().catch(() => '');
+    throw new Error(`Resend error: ${res.status} ${txt}`);
   }
-  return { ok: true as const };
+  return { ok: true };
 }
+

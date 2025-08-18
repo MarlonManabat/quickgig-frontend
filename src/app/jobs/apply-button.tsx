@@ -6,7 +6,6 @@ import { API } from '@/config/api';
 import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
 import { track } from '@/lib/track';
-import { prefersEmail } from '@/lib/prefs';
 
 interface ApplyProps {
   jobId: string;
@@ -56,21 +55,13 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
     try {
       const res = await api.post(API.apply, { jobId, name, email, phone, note });
       const appId = (res.data && (res.data.id || res.data.applicationId)) || undefined;
-      if (prefersEmail('apply')) {
-        void fetch('/api/notify/application', {
+      if (process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true') {
+        // fire-and-forget; do not block UI
+        fetch('/api/notify/application', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            applicantEmail: email,
-            applicantName: name,
-            employerEmail: undefined,
-            jobTitle: title,
-            applicationId: appId,
-          }),
+          body: JSON.stringify({ jobId, applicantId: appId }),
         }).catch(() => {});
-      } else {
-        // eslint-disable-next-line no-console -- best effort log
-        console.log('[notify:skipped by prefs]');
       }
       toast('Application submitted');
       setSubmitted(true);
