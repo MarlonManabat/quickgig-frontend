@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import Checkout from './payments/Checkout';
+import { flags } from '@/lib/flags';
 
 export interface JobFormData {
   title: string;
@@ -110,6 +112,11 @@ export default function JobForm({ initial, onSubmit }: JobFormProps) {
       >
         {initial ? 'Update Job' : 'Create Job'}
       </button>
+      {flags.payments && (
+        <div className="mt-4">
+          <Checkout amount={0} />
+        </div>
+      )}
     </form>
   );
 }

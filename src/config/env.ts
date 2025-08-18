@@ -102,6 +102,14 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_STATUS_PAGE:
     String(process.env.NEXT_PUBLIC_ENABLE_STATUS_PAGE ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_PAYMENTS:
+    String(process.env.NEXT_PUBLIC_ENABLE_PAYMENTS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_GCASH:
+    String(process.env.NEXT_PUBLIC_ENABLE_GCASH ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_STRIPE:
+    String(process.env.NEXT_PUBLIC_ENABLE_STRIPE ?? 'false').toLowerCase() === 'true',
+  STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || '',
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {
