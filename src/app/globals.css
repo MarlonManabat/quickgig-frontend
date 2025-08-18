@@ -10,6 +10,8 @@
   --color-secondary: #FFD451;
   --bg: #0C1720;
   --fg: #F8FAFC;
+  --muted: #64748B;
+  --accent: #FFD451;
   --hero-start: #0B3C49;
   --hero-end: #0C1720;
   --background: var(--bg);

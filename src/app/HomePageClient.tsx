@@ -45,6 +45,7 @@ export default function HomePageClient() {
                 variant="secondary"
                 className="text-lg"
                 data-cta="signup"
+                data-testid="primary-cta"
               >
                 Simulan Na!
               </Button>

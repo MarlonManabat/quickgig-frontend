@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { env } from '@/config/env';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -46,10 +47,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             type={type}
             id={inputId}
             className={cn(
-              'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
-              'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
+              env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+                ? 'block w-full px-4 py-3 border border-muted rounded-md bg-fg text-bg'
+                : 'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+              env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+                ? 'focus:ring-2 focus:ring-primary focus:border-primary'
+                : 'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
               'placeholder:text-gray-400',
-              error && 'border-red-300 focus:border-red-500 focus:ring-red-500/20',
+              error &&
+                (env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+                  ? 'border-red-500'
+                  : 'border-red-300 focus:border-red-500 focus:ring-red-500/20'),
               icon && iconPosition === 'left' && 'pl-10',
               icon && iconPosition === 'right' && 'pr-10',
               className
@@ -87,13 +95,20 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         <textarea
           id={textareaId}
-            className={cn(
-              'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
-              'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
-              'placeholder:text-gray-400 resize-vertical min-h-[100px]',
-              error && 'border-red-300 focus:border-red-500 focus:ring-red-500/20',
-              className
-            )}
+          className={cn(
+            env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+              ? 'block w-full px-4 py-3 border border-muted rounded-md bg-fg text-bg'
+              : 'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+            env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+              ? 'focus:ring-2 focus:ring-primary focus:border-primary'
+              : 'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
+            'placeholder:text-gray-400 resize-vertical min-h-[100px]',
+            error &&
+              (env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+                ? 'border-red-500'
+                : 'border-red-300 focus:border-red-500 focus:ring-red-500/20'),
+            className
+          )}
           ref={ref}
           {...props}
         />
@@ -122,10 +137,16 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <select
           id={selectId}
           className={cn(
-            'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
-            'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
-            'bg-white cursor-pointer',
-            error && 'border-red-300 focus:border-red-500 focus:ring-red-500/20',
+            env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+              ? 'block w-full px-4 py-3 border border-muted rounded-md bg-fg text-bg cursor-pointer'
+              : 'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+            env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+              ? 'focus:ring-2 focus:ring-primary focus:border-primary'
+              : 'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
+            error &&
+              (env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+                ? 'border-red-500'
+                : 'border-red-300 focus:border-red-500 focus:ring-red-500/20'),
             className
           )}
           ref={ref}

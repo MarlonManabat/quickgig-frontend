@@ -10,6 +10,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_SAVED_API ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_SHOW_LOGOUT_ALL:
     String(process.env.NEXT_PUBLIC_SHOW_LOGOUT_ALL ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_APP_SHELL_V2:
+    String(process.env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2 ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_APPLICANT_APPS:
     String(process.env.NEXT_PUBLIC_ENABLE_APPLICANT_APPS ?? 'true').toLowerCase() === 'true',
 

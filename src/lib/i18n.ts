@@ -49,6 +49,14 @@ const strings = {
     add_to_calendar: 'Add to calendar',
     navbar: {
       settings: 'Settings',
+      home: 'Home',
+      jobs: 'Browse Jobs',
+      login: 'Log in',
+      signup: 'Sign up',
+    },
+    footer: {
+      about: 'About',
+      privacy: 'Privacy',
     },
     notifications: {
       title: 'Notifications',
@@ -218,6 +226,14 @@ const strings = {
     add_to_calendar: 'Add to calendar',
     navbar: {
       settings: 'Settings',
+      home: 'Home',
+      jobs: 'Hanap Trabaho',
+      login: 'Mag-Login',
+      signup: 'Sign Up',
+    },
+    footer: {
+      about: 'Tungkol',
+      privacy: 'Privacy',
     },
     notifications: {
       title: 'Notifications',
