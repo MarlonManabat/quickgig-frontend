@@ -45,6 +45,23 @@ To verify the live API locally, run:
 ```bash
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
+
+## Preview checklist
+
+Before merging, verify these optional flags on a Vercel preview:
+
+- `NEXT_PUBLIC_ENABLE_SECURITY_HEADERS=true` → confirm security headers present.
+- `NEXT_PUBLIC_ENABLE_RATE_LIMITING=true` → exceeding the window returns `429`.
+- `NEXT_PUBLIC_CANONICAL_HOST=https://quickgig.ph` → pages render a canonical link.
+- `NEXT_PUBLIC_NOINDEX=true` → pages include `<meta name="robots" content="noindex, nofollow">`.
+- `NEXT_PUBLIC_ENABLE_CONSENT=true` and `NEXT_PUBLIC_ENABLE_ANALYTICS=true` → consent banner shows and analytics fire only after consent.
+- `NEXT_PUBLIC_ENABLE_PWA=true` → manifest served and theme color meta applied.
+
+Run the smoke script to sanity check the deployment:
+
+```bash
+SMOKE_URL=$PREVIEW node tools/smoke_prod.mjs
+```
 ## Production-safe S3 uploads
 
 Uploads are feature-flagged and validated server-side. To enable in preview or prod, set:
