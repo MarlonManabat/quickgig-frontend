@@ -1,4 +1,4 @@
-const base = process.env.SMOKE_URL || 'http://localhost:3000';
+const base = process.env.SMOKE_BASE_URL || 'http://localhost:3000';
 if (process.env.NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT !== 'true') {
   console.log('skipped');
   process.exit(0);

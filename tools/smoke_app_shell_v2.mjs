@@ -1,4 +1,4 @@
-const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
+const base = process.env.SMOKE_BASE_URL || process.env.BASE || 'http://localhost:3000';
 if (process.env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2 !== 'true') {
   console.log('[smoke] app shell v2 disabled');
   process.exit(0);

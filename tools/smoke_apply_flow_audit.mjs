@@ -6,7 +6,7 @@ if (process.env.NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT !== 'true') {
   process.exit(0);
 }
 
-const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
+const base = process.env.SMOKE_BASE_URL || process.env.BASE || 'http://localhost:3000';
 const env = {
   ...process.env,
   BASE: base,
