@@ -12,6 +12,15 @@ export const env = {
     String(process.env.NEXT_PUBLIC_SHOW_LOGOUT_ALL ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_APPLICANT_APPS:
     String(process.env.NEXT_PUBLIC_ENABLE_APPLICANT_APPS ?? 'true').toLowerCase() === 'true',
+
+  NEXT_PUBLIC_ENABLE_ENGINE_AUTH:
+    String(process.env.NEXT_PUBLIC_ENABLE_ENGINE_AUTH ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_ENGINE_PROFILE:
+    String(process.env.NEXT_PUBLIC_ENABLE_ENGINE_PROFILE ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_ENGINE_APPS:
+    String(process.env.NEXT_PUBLIC_ENABLE_ENGINE_APPS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_ENGINE_APPLY:
+    String(process.env.NEXT_PUBLIC_ENABLE_ENGINE_APPLY ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_SETTINGS:
     String(process.env.NEXT_PUBLIC_ENABLE_SETTINGS ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_DEFAULT_LANG:

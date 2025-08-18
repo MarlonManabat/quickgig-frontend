@@ -68,6 +68,33 @@ automatically falls back to existing mock or legacy flows.
 
 ## Flags
 
+## Staging auth & engine flows
+
+Engine-backed auth and data wiring is gated behind flags and off by default.
+
+```
+NEXT_PUBLIC_ENABLE_ENGINE_AUTH=false
+NEXT_PUBLIC_ENABLE_ENGINE_PROFILE=false
+NEXT_PUBLIC_ENABLE_ENGINE_APPS=false
+NEXT_PUBLIC_ENABLE_ENGINE_APPLY=false
+```
+
+Enable in `.env.local` along with `ENGINE_MODE=php` to exercise real engine
+login, profile and applications. Verify with:
+
+```
+node tools/smoke_engine_auth.mjs
+```
+
+To instantly revert to mock mode, set `ENGINE_MODE=mock` or flip the flags
+back to `false`.
+
+Troubleshooting:
+
+- Ensure the `auth_token` cookie is present after login.
+- A missing cookie or 401 responses usually indicate CORS or credential issues.
+- If the engine times out or returns 5xx, the app falls back to mock flows.
+
 - `NEXT_PUBLIC_ENABLE_INTERVIEWS_UI` – enable interview scheduling UI. When enabled, the app uses `/api/interviews` and `/api/interviews/[id]` for creating and updating interviews. Optional helpers:
   - `NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD` – default method (`video`, `phone`, `in_person`).
   - `NEXT_PUBLIC_INTERVIEW_SLOT_MINUTES` – default duration in minutes.
