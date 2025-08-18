@@ -1,15 +1,16 @@
 export type UploadResult = { url: string };
 export type PutProgress = { loaded: number; total?: number };
 
-export async function presign(key: string, type: string) {
+export async function presign(name: string, type: string, size: number) {
   const r = await fetch('/api/upload', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key, type }),
+    body: JSON.stringify({ name, type, size }),
   });
-  const j = await r.json();
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 429) throw new Error('rate_limited');
   if (!r.ok || !j?.ok) throw new Error(j?.error || 'Presign failed');
-  return j as { ok: true; url: string; maxMb: number };
+  return j as { ok: true; url: string; key: string; maxMb: number };
 }
 
 export async function putFile(url: string, file: File, onProgress?: (p: PutProgress) => void, signal?: AbortSignal) {

@@ -18,7 +18,6 @@ import { UploadedFile } from '../../../src/types/upload';
 import { toBase64, truncateDataUrl, makeId } from '../../../src/lib/baseUpload';
 import { validateFile, MAX_MB } from '../../../src/lib/uploadPolicy';
 import { presign, putFile } from '../../../src/lib/uploader';
-import { makeUploadKey } from '../../../src/lib/uploadKey';
 
 type Props = { job: JobDetail|null; legacyHtml?: string };
 
@@ -130,16 +129,15 @@ function ApplyForm({ job }: { job: JobDetail }) {
       return;
     }
     if (process.env.NEXT_PUBLIC_ENABLE_S3_UPLOADS === 'true') {
-      const key = makeUploadKey('resumes', f.name);
       try {
-        const { url } = await presign(key, f.type);
+        const { url, key } = await presign(f.name, f.type, f.size);
         await putFile(url, f);
         const up: UploadedFile = { key, url: url.split('?')[0], type: f.type, size: f.size };
         setResumeState(up);
         setResume(up);
         toast(t('profile.resume.saved'));
-      } catch {
-        toast(t('upload.failed'));
+      } catch (e) {
+        toast((e as Error).message === 'rate_limited' ? t('upload.rate_limited') : t('upload.failed'));
       }
     } else {
       const dataUrl = await toBase64(f);

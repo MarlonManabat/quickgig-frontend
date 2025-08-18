@@ -141,10 +141,16 @@ const english: Messages = {
   'upload.upload': 'Upload',
   'upload.uploading': 'Uploading…',
   'upload.failed': 'Upload failed',
+  'upload.rate_limited': 'Too many uploads. Please wait.',
   'upload.too_big': 'File too large',
   'upload.bad_type': 'Unsupported file type',
   'apply.resume_attached': 'Attached: {name}',
   'apply.resume_optional_hint': 'Resume is optional—you can attach now or later.',
+  'toast.close': 'Close',
+  'error.generic': 'Something went wrong',
+  'error.try_again': 'Try again',
+  'error.go_home': 'Go home',
+  'skip_to_content': 'Skip to content',
 };
 
 const taglish: Messages = {
@@ -290,6 +296,12 @@ const taglish: Messages = {
   'upload.bad_type': 'Hindi suportadong file type',
   'apply.resume_attached': 'Naka-attach: {name}',
   'apply.resume_optional_hint': 'Optional lang ang resume—puwede mong i-attach ngayon o sa susunod.',
+  'upload.rate_limited': 'Sobra na ang uploads. Pahinga muna.',
+  'toast.close': 'Isara',
+  'error.generic': 'May nangyaring mali',
+  'error.try_again': 'Subukang muli',
+  'error.go_home': 'Uwi sa home',
+  'skip_to_content': 'Laktawan sa content',
 };
 
 const bundle: Bundle = { english, taglish };
