@@ -18,16 +18,33 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       console.log('[smoke] settings check failed');
     }
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true') {
-    for (const p of ['/interviews', '/employer/interviews']) {
+    if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true') {
+      for (const p of ['/interviews', '/employer/interviews']) {
+        try {
+          const r = await fetchImpl(base + p, { redirect: 'manual' });
+          console.log('[smoke] interviews', p, r.status);
+        } catch {
+          console.log('[smoke] interviews failed', p);
+        }
+      }
       try {
-        const r = await fetchImpl(base + p, { redirect: 'manual' });
-        console.log('[smoke] interviews', p, r.status);
+        const r = await fetchImpl(base + '/api/interviews?appId=demo');
+        console.log('[smoke] api interviews GET', r.status);
       } catch {
-        console.log('[smoke] interviews failed', p);
+        console.log('[smoke] api interviews GET failed');
+      }
+      try {
+        const r = await fetchImpl(base + '/api/interviews', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ appId: 'demo', jobId: 'demo', employerId: 'e', applicantId: 'a', method: 'video', whenISO: new Date().toISOString(), durationMins: 30 }),
+        });
+        const j = await r.json().catch(() => ({}));
+        console.log('[smoke] api interviews POST', r.status, j.ok);
+      } catch {
+        console.log('[smoke] api interviews POST failed');
       }
     }
-  }
   if (process.env.SMOKE_APPS === '1') {
     try {
       const r3 = await fetchImpl(base + '/api/applications/TEST');

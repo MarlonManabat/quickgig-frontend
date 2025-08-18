@@ -6,7 +6,9 @@ import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
 import { t } from '@/lib/i18n';
 import type { ApplicationDetail, ApplicationEvent, ApplicationStatus } from '@/types/applications';
-import type { Interview } from '@/types/interviews';
+import type { Interview } from '@/src/types/interview';
+import InterviewForm from '@/product/interviews/InterviewForm';
+import { interviewsEnabled } from '@/src/lib/interviews';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
   if (!env.NEXT_PUBLIC_ENABLE_APPLICATION_DETAIL) return { notFound: true } as const;
@@ -75,7 +77,7 @@ export default function ApplicationDetailPage({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [interviews, setInterviews] = useState<Interview[]>([]);
-  const [choice, setChoice] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetch(`/api/applications/${id}`)
@@ -88,10 +90,10 @@ export default function ApplicationDetailPage({ id }: { id: string }) {
         setError(true);
         setLoading(false);
       });
-    if (env.NEXT_PUBLIC_ENABLE_INTERVIEWS) {
-      fetch(`/api/applications/${id}/interviews`)
-        .then((r) => (r.ok ? r.json() : []))
-        .then((d) => setInterviews(d as Interview[]))
+    if (interviewsEnabled()) {
+      fetch(`/api/interviews?appId=${id}`)
+        .then((r) => (r.ok ? r.json() : { interviews: [] }))
+        .then((d) => setInterviews(d.interviews || []))
         .catch(() => setInterviews([]));
     }
   }, [id]);
@@ -114,45 +116,11 @@ export default function ApplicationDetailPage({ id }: { id: string }) {
     }
   };
 
-  const respond = async (iv: Interview, action: 'accept' | 'decline') => {
-    try {
-      const body: { id: string; action: 'accept' | 'decline'; slot?: { at: string } } = {
-        id: iv.id,
-        action,
-      };
-      if (action === 'accept') body.slot = { at: choice };
-      const r = await fetch(`/api/applications/${id}/interviews`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (!r.ok) throw new Error('fail');
-      const updated = (await r.json()) as Interview;
-      setInterviews(interviews.map((i) => (i.id === iv.id ? updated : i)));
-      if (app) {
-        setApp({
-          ...app,
-          events: [
-            {
-              at: new Date().toISOString(),
-              type: 'note',
-              note: action === 'accept' ? 'Applicant accepted interview' : 'Declined interview',
-            },
-            ...app.events,
-          ],
-        });
-      }
-      toast(action === 'accept' ? t('interview_confirmed') : t('invite_declined'));
-    } catch {
-      toast(t('withdraw_error'));
-    }
-  };
-
-  const makeIcs = (at: string, title: string) => {
-    const start = new Date(at);
-    const end = new Date(start.getTime() + 30 * 60 * 1000);
-    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
-    return `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${fmt(start)}\nDTEND:${fmt(end)}\nSUMMARY:${title}\nEND:VEVENT\nEND:VCALENDAR`;
+  const refreshInterviews = () => {
+    fetch(`/api/interviews?appId=${id}`)
+      .then((r) => (r.ok ? r.json() : { interviews: [] }))
+      .then((d) => setInterviews(d.interviews || []))
+      .catch(() => setInterviews([]));
   };
 
   if (loading) {
@@ -192,66 +160,36 @@ export default function ApplicationDetailPage({ id }: { id: string }) {
             {t('withdraw_application')}
           </button>
         )}
-        {env.NEXT_PUBLIC_ENABLE_INTERVIEWS && interviews.length > 0 && (
-          <div className="border p-4 rounded">
-            {(() => {
-              const proposed = interviews.find((i) => i.status === 'proposed');
-              const accepted = interviews.find((i) => i.status === 'accepted');
-              if (proposed) {
-                return (
-                  <div>
-                    <h3 className="font-semibold mb-2">{t('interview')}</h3>
-                    {proposed.location && <div className="mb-2">{proposed.location}</div>}
-                    <div className="mb-2 space-y-1">
-                      {proposed.slots.map((s, i) => (
-                        <label key={i} className="block text-sm">
-                          <input
-                            type="radio"
-                            name="slot"
-                            value={s.at}
-                            onChange={(e) => setChoice(e.target.value)}
-                            className="mr-2"
-                          />
-                          {new Date(s.at).toLocaleString()}
-                        </label>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        disabled={!choice}
-                        onClick={() => respond(proposed, 'accept')}
-                        className="bg-green-500 text-white px-2 py-1 rounded disabled:opacity-50"
-                      >
-                        {t('accept')}
-                      </button>
-                      <button
-                        onClick={() => respond(proposed, 'decline')}
-                        className="bg-red-500 text-white px-2 py-1 rounded"
-                      >
-                        {t('decline')}
-                      </button>
-                    </div>
-                  </div>
-                );
-              }
-              if (accepted) {
-                const ics = makeIcs(accepted.chosen?.at || accepted.slots[0].at, app.jobTitle);
-                return (
-                  <div>
-                    <h3 className="font-semibold mb-2">{t('interview')}</h3>
-                    <div className="mb-2">{new Date(accepted.chosen?.at || '').toLocaleString()}</div>
-                    <a
-                      href={`webcal:data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`}
-                      className="text-blue-600 underline"
-                    >
-                      {t('add_to_calendar')}
-                    </a>
-                  </div>
-                );
-              }
-              return null;
-            })()}
-          </div>
+        {interviewsEnabled() && (
+          <section className="border p-4 rounded space-y-2">
+          <h3 className="font-semibold mb-2">{t('interviews.section_title')}</h3>
+          {interviews.map((iv) => (
+            <div key={iv.id} className="flex items-center justify-between text-sm">
+              <span>{new Date(iv.whenISO).toLocaleString()}</span>
+              <span className="capitalize px-2 py-1 bg-gray-100 rounded">
+                {iv.status}
+              </span>
+            </div>
+          ))}
+          <button
+            onClick={() => setShowForm((v) => !v)}
+            className="bg-green-500 text-white px-2 py-1 rounded text-sm"
+          >
+            {t('interviews.propose_cta')}
+          </button>
+          {showForm && (
+            <InterviewForm
+              appId={id}
+              jobId={app.jobId}
+              employerId=""
+              applicantId=""
+              onDone={() => {
+                setShowForm(false);
+                refreshInterviews();
+              }}
+            />
+          )}
+        </section>
         )}
         <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-4">
