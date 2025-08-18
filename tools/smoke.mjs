@@ -13,6 +13,19 @@ if (beta || isProd) {
   process.env.NEXT_PUBLIC_ENABLE_SECURITY_AUDIT = 'true';
 }
 (async () => {
+  const api = (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+  const mode = process.env.ENGINE_MODE || 'mock';
+  if (isProd && mode !== 'mock') {
+    try {
+      const h = await fetchImpl(api + '/health', { method: 'HEAD' });
+      if (h.status < 200 || h.status >= 400)
+        bail(`API health check failed ${h.status}`);
+    } catch {
+      bail('API health check unreachable');
+    }
+  } else {
+    console.log('[smoke] api health skipped');
+  }
   const r1 = await fetchImpl(base + '/', { method: 'HEAD', redirect: 'manual' });
   if (r1.status < 200 || r1.status >= 400) bail(`HEAD / expected 2xx; got ${r1.status}`);
   if (r1.headers.get('location')) bail('HEAD / should not redirect');

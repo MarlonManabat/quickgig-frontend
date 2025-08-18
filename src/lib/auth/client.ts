@@ -1,24 +1,37 @@
 'use client';
 
-async function json(res: Response) { return res.json().catch(() => ({})); }
+import { fetchJson } from '@/lib/http';
 
-export async function login(email: string, password: string) {
-  const r = await fetch('/api/session/login', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }), credentials: 'same-origin',
-  });
-  return json(r);
+interface AuthResponse {
+  ok?: boolean;
+  message?: string;
+  [key: string]: unknown;
 }
 
-export async function register(payload: { email: string; password: string; name?: string }) {
-  const r = await fetch('/api/session/register', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload), credentials: 'same-origin',
+export async function login(
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
+  return fetchJson<AuthResponse>('/api/session/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
   });
-  return json(r);
 }
 
-export async function me() {
-  const r = await fetch('/api/session/me', { credentials: 'same-origin' });
-  return json(r);
+export async function register(payload: {
+  email: string;
+  password: string;
+  name?: string;
+}): Promise<AuthResponse> {
+  return fetchJson<AuthResponse>('/api/session/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function me(): Promise<any> {
+  return fetchJson<any>('/api/session/me');
 }

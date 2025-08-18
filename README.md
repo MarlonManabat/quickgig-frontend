@@ -47,6 +47,15 @@ curl https://staging.quickgig.ph/api/profile
 curl https://staging.quickgig.ph/api/applications
 ```
 
+## Signup Network Troubleshooting
+
+If signup requests fail:
+
+- Ensure the API sends CORS headers allowing `https://app.quickgig.ph`.
+- The API must be served over **HTTPS**; browsers block insecure endpoints.
+- Cookies are only sent when `NEXT_PUBLIC_ENABLE_ENGINE_AUTH=true`.
+- Verify DNS for `api.quickgig.ph` resolves correctly.
+
 ## Staging engine cutover
 
 The app targets a PHP engine in staging but keeps mock flows as a safety net.
