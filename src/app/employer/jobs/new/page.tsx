@@ -1,25 +1,19 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import JobForm, { JobFormData } from '@/components/JobForm';
-import { api } from '@/lib/apiClient';
-import { API } from '@/config/api';
-import { env } from '@/config/env';
-import { track } from '@/lib/track';
+import { createJobDraft } from '@/lib/employerStore';
 
 export default function NewJobPage() {
   const router = useRouter();
-
-  const handleSubmit = async (data: JobFormData) => {
-    await api.post(API.createJob, data);
-    if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('job_post');
-    router.push('/employer/jobs');
-  };
-
-  return (
-    <main className="p-4 space-y-4">
-      <h1 className="text-xl font-semibold">Post a Job</h1>
-      <JobForm onSubmit={handleSubmit} />
-    </main>
-  );
+  useEffect(() => {
+    createJobDraft()
+      .then((job) => {
+        router.replace(`/employer/jobs/${job.id}/edit`);
+      })
+      .catch(() => {
+        router.replace('/employer/jobs');
+      });
+  }, [router]);
+  return <main className="p-4">Creating draft...</main>;
 }

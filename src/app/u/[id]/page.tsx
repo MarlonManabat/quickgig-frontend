@@ -33,15 +33,8 @@ export default async function PublicProfilePage({ params }: { params: { id: stri
         </ul>
       )}
       {data.bio && <p>{data.bio}</p>}
-      {data.resumeUrl && (
-        <a
-          href={data.resumeUrl}
-          className="text-qg-accent"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Download Resume
-        </a>
+      {(data.resumeUrl || data.resumeKey) && (
+        <ResumeButton url={data.resumeUrl} resumeKey={data.resumeKey} />
       )}
       {me ? <ReportButton type="user" targetId={data.id || params.id} /> : null}
     </main>
@@ -54,4 +47,36 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     return { title: `${data.name} — QuickGig Profile` };
   }
   return { title: 'QuickGig Profile' };
+}
+
+function ResumeButton({
+  url,
+  resumeKey,
+}: {
+  url?: string;
+  resumeKey?: string;
+}) {
+  'use client';
+  const signEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_FILE_SIGNING === 'true' && !!resumeKey;
+  const handle = async () => {
+    if (signEnabled && resumeKey) {
+      try {
+        const res = await fetch(`/api/files/sign?key=${encodeURIComponent(resumeKey)}`);
+        if (res.ok) {
+          const json = await res.json();
+          window.location.href = json.url;
+          return;
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    if (url) window.open(url, '_blank');
+  };
+  return (
+    <button onClick={handle} className="text-qg-accent">
+      Download Resume
+    </button>
+  );
 }

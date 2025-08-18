@@ -3,15 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import JobForm, { JobFormData } from '@/components/JobForm';
-import { api } from '@/lib/apiClient';
-import { API } from '@/config/api';
+import { getJob, updateJob } from '@/lib/employerStore';
 
 interface PageProps {
   params: { id: string };
-}
-
-interface JobDetail extends Partial<JobFormData> {
-  published?: boolean;
 }
 
 export default function EditJobPage({ params }: PageProps) {
@@ -22,15 +17,17 @@ export default function EditJobPage({ params }: PageProps) {
   useEffect(() => {
     async function load() {
       try {
-        const res = await api.get<JobDetail>(API.jobById(params.id));
-        setInitial({
-          title: res.data.title || '',
-          description: res.data.description || '',
-          location: res.data.location || '',
-          payRange: res.data.payRange || '',
-          tags: res.data.tags || [],
-          published: res.data.published ?? false,
-        });
+        const job = await getJob(params.id);
+        if (job) {
+          setInitial({
+            title: job.title,
+            description: job.description,
+            location: job.location || '',
+            payRange: job.payRange || '',
+            tags: job.tags || [],
+            published: job.status === 'published',
+          });
+        }
       } finally {
         setLoading(false);
       }
@@ -39,7 +36,11 @@ export default function EditJobPage({ params }: PageProps) {
   }, [params.id]);
 
   const handleSubmit = async (data: JobFormData) => {
-    await api.patch(API.updateJob(params.id), data);
+    const { published, ...rest } = data;
+    await updateJob(params.id, {
+      ...rest,
+      status: published ? 'published' : 'draft',
+    });
     router.push('/employer/jobs');
   };
 

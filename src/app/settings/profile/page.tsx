@@ -17,6 +17,7 @@ interface ProfileData {
   bio: string;
   resumeUrl?: string;
   resumeName?: string;
+  resumeKey?: string;
 }
 
 export default function ProfileSettingsPage() {
@@ -28,7 +29,7 @@ export default function ProfileSettingsPage() {
     skills: '',
     bio: '',
   });
-  const [resume, setResume] = useState<{ name: string; url?: string } | null>(null);
+  const [resume, setResume] = useState<{ name: string; url?: string; key?: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -44,8 +45,8 @@ export default function ProfileSettingsPage() {
           skills: Array.isArray(d.skills) ? d.skills.join(', ') : d.skills || '',
           bio: d.bio || '',
         });
-        if (d.resumeUrl || d.resume) {
-          setResume({ name: d.resumeName || 'Resume', url: d.resumeUrl || d.resume });
+        if (d.resumeUrl || d.resume || d.resumeKey) {
+          setResume({ name: d.resumeName || 'Resume', url: d.resumeUrl || d.resume, key: d.resumeKey });
         }
       } catch {
         /* ignore */
@@ -112,6 +113,22 @@ export default function ProfileSettingsPage() {
     }
   };
 
+  const handleView = async () => {
+    if (resume?.key && process.env.NEXT_PUBLIC_ENABLE_FILE_SIGNING === 'true') {
+      try {
+        const res = await fetch(`/api/files/sign?key=${encodeURIComponent(resume.key)}`);
+        if (res.ok) {
+          const json = await res.json();
+          window.open(json.url, '_blank');
+          return;
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+    if (resume?.url) window.open(resume.url, '_blank');
+  };
+
   return (
     <main className="p-4 space-y-6 max-w-2xl">
       <h1 className="text-xl font-semibold">Profile Settings</h1>
@@ -135,16 +152,9 @@ export default function ProfileSettingsPage() {
         {resume ? (
           <div className="space-y-2">
             <p>{resume.name}</p>
-            {resume.url && (
-              <a
-                href={resume.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-qg-accent"
-              >
-                View
-              </a>
-            )}
+            <button onClick={handleView} className="text-qg-accent">
+              View
+            </button>
             <div className="space-x-2">
               <label className="text-qg-accent cursor-pointer">
                 <span>Replace</span>

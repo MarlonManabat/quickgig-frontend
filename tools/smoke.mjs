@@ -22,5 +22,21 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       console.log('applications check skipped');
     }
   }
+  if (process.env.SMOKE_EMPLOYER === '1') {
+    try {
+      const r4 = await fetchImpl(base + '/api/company');
+      if (r4.status !== 200) bail(`GET /api/company ${r4.status}`);
+    } catch (e) {
+      bail('company check failed');
+    }
+    if (process.env.SMOKE_SIGN === '1') {
+      try {
+        const r5 = await fetchImpl(base + '/api/files/sign?key=nonexistent');
+        if (r5.status !== 404) console.log('sign check unexpected', r5.status);
+      } catch {
+        console.log('sign check skipped');
+      }
+    }
+  }
   console.log('Smoke OK');
 })();
