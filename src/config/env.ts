@@ -94,6 +94,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS:
     String(process.env.NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_BULK_REJECTION_QA:
+    String(process.env.NEXT_PUBLIC_ENABLE_BULK_REJECTION_QA ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY:
     String(process.env.NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_STATUS_PAGE:

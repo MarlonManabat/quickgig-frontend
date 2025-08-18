@@ -182,11 +182,14 @@ const strings = {
       interviewRemindersTitle: 'Interview Reminders QA',
       inviteSent: 'Invite sent',
       reminderSent: 'Reminder sent',
+      bulkRejectionTitle: 'Bulk Rejection Email QA',
     },
     email: {
       apply_subject: 'New application received',
       interview_subject: 'Interview update',
       digest_subject: 'Daily QuickGig digest',
+      bulkRejectionGreeting: 'Hi',
+      bulkRejectionBody: 'Thanks for applying to',
     },
   },
   tl: {
@@ -370,11 +373,14 @@ const strings = {
       interviewRemindersTitle: 'Interview Reminders QA',
       inviteSent: 'Na-send ang invite',
       reminderSent: 'Na-send ang reminder',
+      bulkRejectionTitle: 'Bulk Rejection Email QA',
     },
     email: {
       apply_subject: 'May bagong application',
       interview_subject: 'Update sa interview',
       digest_subject: 'Daily QuickGig digest',
+      bulkRejectionGreeting: 'Hi',
+      bulkRejectionBody: 'Salamat sa pag-apply sa',
     },
   },
 };
