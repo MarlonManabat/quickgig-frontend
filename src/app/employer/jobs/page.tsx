@@ -2,27 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { api } from '@/lib/apiClient';
-import { API } from '@/config/api';
-import { env } from '@/config/env';
-import { track } from '@/lib/track';
-
-interface MyJob {
-  id: number | string;
-  title: string;
-  published: boolean;
-  updatedAt: string;
-}
+import { listJobs, publishJob, pauseJob, EmployerJob } from '@/lib/employerStore';
+import { toast } from '@/lib/toast';
 
 export default function EmployerJobsPage() {
-  const [jobs, setJobs] = useState<MyJob[]>([]);
+  const [jobs, setJobs] = useState<EmployerJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
     try {
-      const res = await api.get<MyJob[]>(API.myJobs);
-      setJobs(res.data);
+      const res = await listJobs();
+      setJobs(res);
     } catch {
       setError('Failed to load jobs');
     } finally {
@@ -34,13 +25,18 @@ export default function EmployerJobsPage() {
     load();
   }, []);
 
-  const toggle = async (id: number | string, published: boolean) => {
+  const toggle = async (job: EmployerJob) => {
     try {
-      await api.post(API.toggleJob(id), { published: !published });
+      if (job.status === 'published') {
+        await pauseJob(job.id);
+        toast('Job paused');
+      } else {
+        await publishJob(job.id);
+        toast('Job published');
+      }
       await load();
-      if (!published && env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('job_publish');
     } catch {
-      // ignore
+      toast('Failed to update');
     }
   };
 
@@ -49,7 +45,15 @@ export default function EmployerJobsPage() {
 
   return (
     <main className="p-4">
-      <h1 className="text-xl font-semibold mb-4">My Jobs</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-semibold">My Jobs</h1>
+        <Link
+          href="/employer/jobs/new"
+          className="bg-qg-accent text-white px-3 py-1 rounded"
+        >
+          New job (draft)
+        </Link>
+      </div>
       <table className="min-w-full text-sm border">
         <thead>
           <tr className="border-b">
@@ -63,7 +67,7 @@ export default function EmployerJobsPage() {
           {jobs.map((job) => (
             <tr key={job.id} className="border-b">
               <td className="p-2">{job.title}</td>
-              <td className="p-2">{job.published ? 'Published' : 'Draft'}</td>
+              <td className="p-2 capitalize">{job.status}</td>
               <td className="p-2">{new Date(job.updatedAt).toLocaleDateString()}</td>
               <td className="p-2 space-x-2">
                 <Link
@@ -73,10 +77,10 @@ export default function EmployerJobsPage() {
                   Edit
                 </Link>
                 <button
-                  onClick={() => toggle(job.id, job.published)}
+                  onClick={() => toggle(job)}
                   className="text-qg-accent"
                 >
-                  {job.published ? 'Unpublish' : 'Publish'}
+                  {job.status === 'published' ? 'Pause' : 'Publish'}
                 </button>
               </td>
             </tr>

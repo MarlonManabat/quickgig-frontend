@@ -6,4 +6,5 @@ export interface Job {
   rate?: string;
   description: string;
   tags?: string[];
+  status?: 'draft' | 'published' | 'paused';
 }

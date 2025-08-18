@@ -75,7 +75,7 @@ const Navigation: React.FC = () => {
                     href="/employer/company"
                     className="block px-4 py-2 qg-navbar-link hover:bg-qg-navy"
                   >
-                    Company
+                    Kumpanya
                   </Link>
                   <Link
                     href="/employer/jobs"
@@ -247,7 +247,7 @@ const Navigation: React.FC = () => {
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <Briefcase className="w-5 h-5 mr-3" />
-                        Company
+                        Kumpanya
                       </Link>
                       <Link
                         href="/employer/jobs"

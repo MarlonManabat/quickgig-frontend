@@ -24,6 +24,12 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_REPORTS ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_ADMIN:
     String(process.env.NEXT_PUBLIC_ENABLE_ADMIN ?? 'true').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_EMPLOYER_PROFILES:
+    String(process.env.NEXT_PUBLIC_ENABLE_EMPLOYER_PROFILES ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_JOB_DRAFTS:
+    String(process.env.NEXT_PUBLIC_ENABLE_JOB_DRAFTS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_FILE_SIGNING:
+    String(process.env.NEXT_PUBLIC_ENABLE_FILE_SIGNING ?? 'false').toLowerCase() === 'true',
   ADMIN_EMAILS: (process.env.ADMIN_EMAILS || '')
     .split(',')
     .map((s) => s.trim())
