@@ -133,6 +133,10 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_STRIPE ?? 'false').toLowerCase() === 'true',
   STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || '',
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+  NEXT_PUBLIC_ENABLE_MONITORING:
+    String(process.env.NEXT_PUBLIC_ENABLE_MONITORING ?? 'false').toLowerCase() === 'true',
+  SENTRY_DSN: process.env.SENTRY_DSN || '',
+  MIXPANEL_TOKEN: process.env.MIXPANEL_TOKEN || '',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

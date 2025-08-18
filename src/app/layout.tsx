@@ -96,6 +96,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-bg text-fg">
         <ClientBootstrap />
+        {env.NEXT_PUBLIC_ENABLE_MONITORING && (
+          <span data-testid="monitoring-flag" className="hidden" />
+        )}
         <AuthProvider>
           <SocketProvider>
             <ToastProvider>

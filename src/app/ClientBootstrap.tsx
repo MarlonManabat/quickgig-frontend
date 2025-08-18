@@ -1,10 +1,12 @@
 'use client';
 import { useEffect } from 'react';
+import { initMonitoring } from '@/lib/monitoring';
 
 const reAuth = /^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?(login|register|me)\.php/i;
 
 export default function ClientBootstrap() {
   useEffect(() => {
+    initMonitoring();
     // Intercept fetch
     const origFetch = window.fetch;
     window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {

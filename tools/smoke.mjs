@@ -20,6 +20,15 @@ if (beta || isProd) {
   if (![301,302,307,308].includes(r2.status)) bail(`HEAD /app expected redirect; got ${r2.status}`);
   const loc = r2.headers.get('location') || '';
   if (loc !== '/' && loc !== base + '/') bail(`HEAD /app location must be root; got ${loc}`);
+  const home = await fetchImpl(base + '/');
+  const homeTxt = await home.text();
+  if (process.env.NEXT_PUBLIC_ENABLE_MONITORING === 'true') {
+    if (/data-testid="monitoring-flag"/.test(homeTxt)) console.log('[smoke] monitoring on');
+    else console.log('[smoke] monitoring missing');
+  } else {
+    if (/data-testid="monitoring-flag"/.test(homeTxt)) console.log('[smoke] monitoring off unexpected');
+    else console.log('[smoke] monitoring off ok');
+  }
   if (process.env.NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY === 'true') {
     try {
       const mod = await import('./linkMapSanity.mjs');
