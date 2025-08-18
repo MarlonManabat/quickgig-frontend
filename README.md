@@ -183,23 +183,20 @@ Disabled by default. To exercise end-to-end locally:
 
 The ICS helper is lightweight and uses no external packages.
 
-## Account Settings (flagged)
+## Account Settings & Preferences (flagged)
 
-Disabled by default. Enable locally by adding to `.env.local`:
+Disabled by default. Configure via environment:
 
-```env
-NEXT_PUBLIC_ENABLE_SETTINGS=true
+```
+NEXT_PUBLIC_ENABLE_SETTINGS=false
+NEXT_PUBLIC_DEFAULT_LANG=en
+NEXT_PUBLIC_DEFAULT_EMAIL_PREFS=ops_only   # ops_only | all | none
+NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY=weekly # daily | weekly
 ```
 
-When enabled, a `/settings` page appears for authenticated users allowing them to choose language, email preferences per category, in-app notification toggles, and session controls.
+Enable locally by setting `NEXT_PUBLIC_ENABLE_SETTINGS=true`. When also running with `ENGINE_MODE=php`, settings are persisted through the engine; otherwise they fall back to a localStorage mock and behave identically.
 
-| Feature | OFF (default) | ON |
-| --- | --- | --- |
-| Settings page | hidden | `/settings` available |
-| Locale default | `NEXT_PUBLIC_DEFAULT_LANG` | user selection persisted |
-| Email sends | all allowed | gated by user prefs |
-| Toast/badge notifications | always | gated by user toggles |
-
+Roll back any time by turning the flag off.
 ## Notifications Center (flagged)
 
 Disabled by default. Enable locally by adding to `.env.local`:

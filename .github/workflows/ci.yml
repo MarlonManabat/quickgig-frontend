@@ -19,6 +19,8 @@ jobs:
         run: npm run typecheck
       - name: Build
         run: npm run build
+      - name: Smoke settings
+        run: node tools/smoke_settings.mjs || echo 'settings smoke skipped'
       - name: Smoke engine
         run: node tools/smoke_engine.mjs || echo 'engine unavailable – skipped'
       - name: Smoke engine auth

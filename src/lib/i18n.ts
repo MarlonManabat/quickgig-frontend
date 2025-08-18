@@ -101,9 +101,10 @@ const strings = {
         alerts: 'Alerts',
         admin: 'Admin digests',
       },
-      emailPref: { all: 'All', ops: 'Ops-only', none: 'None' },
+      emailPref: { all: 'All', ops: 'Ops-only', ops_only: 'Ops-only', none: 'None' },
+      alerts: { label: 'Digest frequency', daily: 'Daily', weekly: 'Weekly' },
       notify: {
-        label: 'In-app notifications',
+        label: 'Enable notifications',
         message: 'Messages',
         application: 'Applications',
         interview: 'Interviews',
@@ -114,6 +115,8 @@ const strings = {
       danger: { label: 'Danger zone', delete: 'Delete my account' },
       confirm: { delete: 'Delete account?' },
       save: 'Save changes',
+      unsaved: 'Unsaved changes',
+      banner: { prompt: 'Complete your settings', dismiss: 'Dismiss' },
       toast: {
         saved: 'Settings saved',
         error: 'Failed to save',
@@ -267,9 +270,10 @@ const strings = {
         alerts: 'Alerts',
         admin: 'Admin digests',
       },
-      emailPref: { all: 'All', ops: 'Ops-only', none: 'None' },
+      emailPref: { all: 'Lahat', ops: 'Ops lang', ops_only: 'Ops lang', none: 'Wala' },
+      alerts: { label: 'Digest frequency', daily: 'Araw-araw', weekly: 'Lingguhan' },
       notify: {
-        label: 'In-app notifications',
+        label: 'I-enable ang notifications',
         message: 'Messages',
         application: 'Applications',
         interview: 'Interviews',
@@ -280,6 +284,8 @@ const strings = {
       danger: { label: 'Danger zone', delete: 'Delete my account' },
       confirm: { delete: 'Delete account?' },
       save: 'Save changes',
+      unsaved: 'May di naka-save',
+      banner: { prompt: 'Kumpletuhin ang settings mo', dismiss: 'Itago' },
       toast: {
         saved: 'Nasave',
         error: 'Failed to save',

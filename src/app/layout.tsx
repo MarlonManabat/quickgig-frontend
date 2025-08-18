@@ -6,6 +6,7 @@ import { SocketProvider } from "../context/SocketContext";
 import Navigation from "../components/Navigation";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { ToastProvider } from "../components/ToastProvider";
+import SettingsBanner from "../components/SettingsBanner";
 import ClientBootstrap from '@/app/ClientBootstrap';
 import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
@@ -94,6 +95,7 @@ export default function RootLayout({
             <ToastProvider>
               <ErrorBoundary>
                 <Navigation />
+                <SettingsBanner />
                 <main className="min-h-screen">
                   {children}
                 </main>
