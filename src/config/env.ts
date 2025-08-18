@@ -42,6 +42,12 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_EMPLOYER_APPLICANT_DRILLDOWN ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_INTERVIEWS:
     String(process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_INTERVIEWS_UI:
+    String(process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD:
+    (process.env.NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD as 'video' | 'phone' | 'in_person') || 'video',
+  NEXT_PUBLIC_INTERVIEW_SLOT_MINUTES:
+    parseInt(process.env.NEXT_PUBLIC_INTERVIEW_SLOT_MINUTES || '30', 10),
   ADMIN_EMAILS: (process.env.ADMIN_EMAILS || '')
     .split(',')
     .map((s) => s.trim())

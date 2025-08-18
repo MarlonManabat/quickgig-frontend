@@ -134,6 +134,14 @@ const Navigation: React.FC = () => {
                 >
                   Applications
                 </Link>
+                {env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI && (
+                  <Link
+                    href={user?.isEmployer ? '/employer/interviews' : '/interviews'}
+                    className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                  >
+                    Interviews
+                  </Link>
+                )}
 
                 <Link
                   href="/payment"
@@ -311,6 +319,15 @@ const Navigation: React.FC = () => {
                   >
                     Applications
                   </Link>
+                  {env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI && (
+                    <Link
+                      href={user?.isEmployer ? '/employer/interviews' : '/interviews'}
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Interviews
+                    </Link>
+                  )}
                     <Link
                       href="/payment"
                       className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"

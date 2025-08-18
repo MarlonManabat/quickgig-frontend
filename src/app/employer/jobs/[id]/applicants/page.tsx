@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { t } from '@/lib/i18n';
 import type { ApplicationSummary } from '@/types/application';
+import InterviewForm from '@/components/interviews/InterviewForm';
 
 const STATUSES = ['new','reviewing','shortlisted','interviewing','rejected','hired','withdrawn'];
 
@@ -15,6 +16,7 @@ export default function ApplicantsList({ params }: { params: { id: string } }) {
     search ? search.get('status')?.split(',').filter(Boolean) || [] : [],
   );
   const [query, setQuery] = useState(search ? search.get('query') || '' : '');
+  const [showForm, setShowForm] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/applications')
@@ -66,11 +68,31 @@ export default function ApplicantsList({ params }: { params: { id: string } }) {
       </div>
       <ul className="space-y-2">
         {filtered.map((a) => (
-          <li key={a.id} className="border p-2 rounded">
-            {a.id} - {a.status}
+          <li key={a.id} className="border p-2 rounded flex justify-between items-center">
+            <span>
+              {a.id} - {a.status}
+            </span>
+            <button
+              onClick={() => setShowForm(a.id)}
+              className="text-sm text-blue-600"
+            >
+              {t('interviews.invite')}
+            </button>
           </li>
         ))}
       </ul>
+      {showForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded shadow">
+            <InterviewForm
+              jobId={id}
+              applicantId={showForm}
+              onCreated={() => setShowForm(null)}
+              onClose={() => setShowForm(null)}
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 }
