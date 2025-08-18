@@ -618,6 +618,9 @@ When disabled or misconfigured, the app skips sends without affecting user flows
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
 
+### Auth Proxy
+Auth routes `/api/session/*` run on **Node runtime** and stream upstream responses; this avoids CORS and Buffer/Edge issues on Vercel.
+
 ## Profiles & Settings
 
 New routes:
