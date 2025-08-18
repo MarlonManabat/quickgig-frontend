@@ -153,17 +153,32 @@ if (beta || isProd) {
     }
   }
   if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_PAYMENTS === 'true') {
-    try {
-      const r = await fetchImpl(base + '/api/payments/mock', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ amount: 1, method: 'gcash' }),
-      });
-      const j = await r.json().catch(() => ({}));
-      if (r.status === 200 && j.ok) console.log('[smoke] payments ok');
-      else console.log('[smoke] payments', r.status);
-    } catch {
-      console.log('[smoke] payments check failed');
+    if (process.env.NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE === 'true') {
+      try {
+        const r = await fetchImpl(base + '/api/payments/live', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ amount: 1, method: 'stripe' }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.status === 200 && j.ok) console.log('[smoke] payments live ok');
+        else console.log('[smoke] payments live', r.status);
+      } catch {
+        console.log('[smoke] payments live check failed');
+      }
+    } else {
+      try {
+        const r = await fetchImpl(base + '/api/payments/mock', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ amount: 1, method: 'gcash' }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.status === 200 && j.ok) console.log('[smoke] payments ok');
+        else console.log('[smoke] payments', r.status);
+      } catch {
+        console.log('[smoke] payments check failed');
+      }
     }
   } else {
     console.log('[smoke] payments skipped');

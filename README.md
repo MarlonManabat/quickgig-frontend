@@ -308,6 +308,7 @@ Notes: mock/test only, no live applicant impact.
 - `NEXT_PUBLIC_ENABLE_PAYMENTS` – master switch for payments UI.
 - `NEXT_PUBLIC_ENABLE_GCASH` – enable GCash option.
 - `NEXT_PUBLIC_ENABLE_STRIPE` – enable Stripe card option.
+- `NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE` – switch to live Stripe/GCash keys.
 
 Enable locally by setting in `.env.local`:
 
@@ -315,13 +316,37 @@ Enable locally by setting in `.env.local`:
 NEXT_PUBLIC_ENABLE_PAYMENTS=true
 NEXT_PUBLIC_ENABLE_GCASH=true
 NEXT_PUBLIC_ENABLE_STRIPE=true
-STRIPE_PUBLISHABLE_KEY=pk_test_xxx
-STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_TEST_PUBLISHABLE_KEY=pk_test_xxx
+STRIPE_TEST_SECRET_KEY=sk_test_xxx
 ```
 
 With flags on, checkout flows show GCash QR upload and Stripe sandbox card (4242 4242 4242 4242).
 
 Rollback: set `NEXT_PUBLIC_ENABLE_PAYMENTS=false` and redeploy.
+
+### Payments Live Rollout
+
+- `NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE` – use production Stripe and GCash credentials.
+- `STRIPE_PUBLISHABLE_KEY` / `STRIPE_SECRET_KEY` – live Stripe keys.
+- `GCASH_MERCHANT_ID` / `GCASH_API_KEY` – GCash production credentials.
+
+Enable locally by setting in `.env.local` along with the flags above:
+
+```
+NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE=true
+STRIPE_PUBLISHABLE_KEY=pk_live_xxx
+STRIPE_SECRET_KEY=sk_live_xxx
+GCASH_MERCHANT_ID=your_id
+GCASH_API_KEY=your_key
+```
+
+Testing:
+
+```
+BASE=http://localhost:3000 NEXT_PUBLIC_ENABLE_PAYMENTS=true NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE=true npm run smoke
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE=false` to return to sandbox mode.
 
 ## Staging auth & engine flows
 
