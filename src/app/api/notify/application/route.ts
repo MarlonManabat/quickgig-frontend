@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sendMail } from '@/server/mailer';
 import { env } from '@/config/env';
+import { prefersEmail } from '@/lib/prefs';
 
 export async function POST(req: Request) {
   const { applicantEmail, applicantName, employerEmail, jobTitle } = await req.json();
@@ -8,11 +9,16 @@ export async function POST(req: Request) {
   const toEmployer = employerEmail || env.NOTIFY_ADMIN_EMAIL;
 
   if (applicantEmail) {
-    await sendMail({
-      to: applicantEmail,
-      subject: `We received your application for ${safeJob}`,
-      html: `<p>Hi ${applicantName || ''},</p><p>Thanks for applying for <b>${safeJob}</b>. We’ll be in touch.</p>`,
-    }).catch(() => {});
+    if (prefersEmail('apply')) {
+      await sendMail({
+        to: applicantEmail,
+        subject: `We received your application for ${safeJob}`,
+        html: `<p>Hi ${applicantName || ''},</p><p>Thanks for applying for <b>${safeJob}</b>. We’ll be in touch.</p>`,
+      }).catch(() => {});
+    } else {
+      // eslint-disable-next-line no-console -- best effort log
+      console.log('[notify:skipped by prefs]');
+    }
   }
 
   if (toEmployer) {

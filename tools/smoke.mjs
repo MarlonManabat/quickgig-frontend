@@ -9,6 +9,15 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   if (![301,302,307,308].includes(r2.status)) bail(`HEAD /app expected redirect; got ${r2.status}`);
   const loc = r2.headers.get('location') || '';
   if (loc !== '/' && loc !== base + '/') bail(`HEAD /app location must be root; got ${loc}`);
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_SETTINGS === 'true') {
+    try {
+      const s = await fetchImpl(base + '/settings');
+      if (s.status === 200) console.log('[smoke] settings ok');
+      else console.log('[smoke] settings', s.status);
+    } catch {
+      console.log('[smoke] settings check failed');
+    }
+  }
   if (process.env.SMOKE_APPS === '1') {
     try {
       const r3 = await fetchImpl(base + '/api/applications/TEST');

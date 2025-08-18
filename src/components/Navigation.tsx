@@ -11,6 +11,7 @@ import Button from './ui/Button';
 import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard, Bell } from 'lucide-react';
 import { env } from '@/config/env';
 import { isAdmin } from '@/auth/isAdmin';
+import { t } from '@/lib/i18n';
 
 const Navigation: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -156,6 +157,15 @@ const Navigation: React.FC = () => {
                       >
                         <Bell className="w-4 h-4 mr-2" />
                         <span className="hidden xl:inline">Alerts</span>
+                      </Link>
+                    )}
+                    {env.NEXT_PUBLIC_ENABLE_SETTINGS && (
+                      <Link
+                        href="/settings"
+                        className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        <span className="hidden xl:inline">{t('navbar.settings')}</span>
                       </Link>
                     )}
                     <Link
@@ -317,6 +327,16 @@ const Navigation: React.FC = () => {
                       >
                         <Bell className="w-5 h-5 mr-3" />
                         Alerts
+                      </Link>
+                    )}
+                    {env.NEXT_PUBLIC_ENABLE_SETTINGS && (
+                      <Link
+                        href="/settings"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Settings className="w-5 h-5 mr-3" />
+                        {t('navbar.settings')}
                       </Link>
                     )}
                     <Link

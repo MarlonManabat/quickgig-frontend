@@ -1,3 +1,5 @@
+import { getPrefs } from './prefs';
+
 const strings = {
   en: {
     dashboard: 'Dashboard',
@@ -13,7 +15,7 @@ const strings = {
     notes_optional: 'Notes (optional)',
     submit: 'Submit',
     cancel: 'Cancel',
-    report_thanks: 'Thanks! We\'ll check it.',
+    report_thanks: "Thanks! We'll check it.",
     admin_reports: 'Reports',
     resolve: 'Resolve',
     pause_job: 'Pause job',
@@ -45,6 +47,25 @@ const strings = {
     interview_confirmed: 'Interview confirmed',
     invite_declined: 'Invite declined',
     add_to_calendar: 'Add to calendar',
+    navbar: {
+      settings: 'Settings',
+    },
+    settings: {
+      title: 'Account Settings',
+      language: {
+        label: 'Language',
+      },
+      emails: {
+        label: 'Email notifications',
+        all: 'All',
+        ops_only: 'Operational only',
+        none: 'None',
+      },
+      saved: 'Save',
+      toast: {
+        saved: 'Saved',
+      },
+    },
   },
   tl: {
     dashboard: 'Dashboard',
@@ -92,10 +113,65 @@ const strings = {
     interview_confirmed: 'Kumpirmado ang interview',
     invite_declined: 'Tinanggihan ang imbitasyon',
     add_to_calendar: 'Add to calendar',
+    navbar: {
+      settings: 'Settings',
+    },
+    settings: {
+      title: 'Settings',
+      language: {
+        label: 'Language',
+      },
+      emails: {
+        label: 'Email notifications',
+        all: 'Lahat',
+        ops_only: 'Ops lang',
+        none: 'Wala',
+      },
+      saved: 'Save',
+      toast: {
+        saved: 'Nasave',
+      },
+    },
   },
 };
 
-export function t(key: keyof typeof strings['en']): string {
-  const lang = (process.env.NEXT_PUBLIC_LANG || 'en') as 'en' | 'tl';
-  return strings[lang][key] || strings.en[key] || key;
+function copyVariant(): 'english' | 'taglish' {
+  let variant = getPrefs().copy;
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('lang');
+    if (q === 'english' || q === 'taglish') {
+      variant = q;
+      try {
+        localStorage.setItem('copyV', q);
+      } catch {
+        // ignore
+      }
+    } else {
+      const legacy = localStorage.getItem('copyV');
+      if (legacy === 'english' || legacy === 'taglish') variant = legacy;
+    }
+  }
+  return variant;
+}
+
+function currentLang(): 'en' | 'tl' {
+  return copyVariant() === 'taglish' ? 'tl' : 'en';
+}
+
+export function t(key: string): string {
+  const lang = currentLang();
+  const parts = key.split('.');
+  let node: unknown = strings[lang] as unknown;
+  for (const p of parts) {
+    node = (node as Record<string, unknown>)[p];
+    if (node === undefined) break;
+  }
+  if (typeof node === 'string') return node;
+  node = strings.en as unknown;
+  for (const p of parts) {
+    node = (node as Record<string, unknown>)[p];
+    if (node === undefined) break;
+  }
+  return typeof node === 'string' ? node : key;
 }
