@@ -19,6 +19,29 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       console.log('[smoke] settings check failed');
     }
   }
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER === 'true') {
+    try {
+      const n = await fetchImpl(base + '/notifications');
+      const txt = await n.text();
+      if (n.status === 200 && /Notifications/i.test(txt)) console.log('[smoke] notifications ok');
+      else console.log('[smoke] notifications', n.status);
+    } catch {
+      console.log('[smoke] notifications check failed');
+    }
+    try {
+      await fetchImpl(base + '/api/notifications/mark-all-read', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const after = await fetchImpl(base + '/api/notifications?size=0');
+      const j = await after.json().catch(() => ({}));
+      if (after.status === 200 && j.unread === 0) console.log('[smoke] mark-all-read ok');
+      else console.log('[smoke] mark-all-read', after.status);
+    } catch {
+      console.log('[smoke] mark-all-read failed');
+    }
+  }
     if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true') {
       for (const p of ['/interviews', '/employer/interviews']) {
         try {

@@ -98,6 +98,20 @@ Vercel Cron setup:
 Create an alert from the **Create Alert from filters** button on `/jobs` and
 manage them in `/settings/alerts`.
 
+## Notifications Center (flagged)
+
+Disabled by default. Enable locally by adding to `.env.local`:
+
+```env
+NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER=true
+NOTIFS_POLL_MS=30000
+NOTIFS_PAGE_SIZE=20
+```
+
+When enabled, a bell appears in the navbar with unread counts and a `/notifications` page lists all messages, applications, interviews, alerts and admin notices. In `ENGINE_MODE=mock`, notifications are stored in a signed `notifs` cookie; with `ENGINE_AUTH_MODE=php` requests proxy to `${ENGINE_BASE_URL}/api/notifications`.
+
+If `NEXT_PUBLIC_ENABLE_SOCKETS` is true the center uses SSE for live updates; otherwise it polls every `NOTIFS_POLL_MS` milliseconds.
+
 ## Reports & Admin Moderation
 
 - `NEXT_PUBLIC_ENABLE_REPORTS` — show reporting UI on jobs and profiles.

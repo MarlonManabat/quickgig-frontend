@@ -50,6 +50,29 @@ const strings = {
     navbar: {
       settings: 'Settings',
     },
+    notifications: {
+      title: 'Notifications',
+      viewAll: 'View all',
+      tabs: {
+        all: 'All',
+        message: 'Messages',
+        application: 'Applications',
+        interview: 'Interviews',
+        alert: 'Alerts',
+        admin: 'Admin',
+      },
+      empty: {
+        all: 'No notifications',
+        message: 'No messages',
+        application: 'No applications',
+        interview: 'No interviews',
+        alert: 'No alerts',
+        admin: 'No admin notices',
+      },
+      markRead: 'Mark read',
+      markAllRead: 'Mark all as read',
+      toast: { marked: 'Marked as read', markedAll: 'Marked all as read' },
+    },
     settings: {
       title: 'Account Settings',
       language: {
@@ -171,6 +194,29 @@ const strings = {
     add_to_calendar: 'Add to calendar',
     navbar: {
       settings: 'Settings',
+    },
+    notifications: {
+      title: 'Notifications',
+      viewAll: 'View all',
+      tabs: {
+        all: 'Lahat',
+        message: 'Messages',
+        application: 'Applications',
+        interview: 'Interviews',
+        alert: 'Alerts',
+        admin: 'Admin',
+      },
+      empty: {
+        all: 'Walang notifications',
+        message: 'Walang messages',
+        application: 'Walang applications',
+        interview: 'Walang interviews',
+        alert: 'Walang alerts',
+        admin: 'Walang admin notices',
+      },
+      markRead: 'Mark read',
+      markAllRead: 'Mark all as read',
+      toast: { marked: 'Marked as read', markedAll: 'Marked all as read' },
     },
     settings: {
       title: 'Settings',
