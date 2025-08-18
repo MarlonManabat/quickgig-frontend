@@ -103,6 +103,7 @@ export default function EmployerApplicantPage({ params }: { params: { id: string
         setApp({ ...app, events: [{ at: new Date().toISOString(), type: 'note', note: 'Proposed interview' }, ...app.events] });
       }
       toast(t('saved'));
+      toast('Will send soon');
     } catch {
       toast(t('withdraw_error'));
     }

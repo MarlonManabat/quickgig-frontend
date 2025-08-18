@@ -496,4 +496,4 @@ export async function updateInterviewStatus(
   return (await res.json()) as Interview;
 }
 
-export { readJobs };
+export { readJobs, readReports };

@@ -7,6 +7,7 @@ import { toast } from '@/lib/toast';
 import { t } from '@/lib/i18n';
 import type { ApplicationDetail, ApplicationEvent, ApplicationStatus } from '@/types/applications';
 import type { Interview } from '@/types/interviews';
+import { makeIcs } from '@/lib/notify';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
   if (!env.NEXT_PUBLIC_ENABLE_APPLICATION_DETAIL) return { notFound: true } as const;
@@ -143,16 +144,10 @@ export default function ApplicationDetailPage({ id }: { id: string }) {
         });
       }
       toast(action === 'accept' ? t('interview_confirmed') : t('invite_declined'));
+      toast('Will send soon');
     } catch {
       toast(t('withdraw_error'));
     }
-  };
-
-  const makeIcs = (at: string, title: string) => {
-    const start = new Date(at);
-    const end = new Date(start.getTime() + 30 * 60 * 1000);
-    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
-    return `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${fmt(start)}\nDTEND:${fmt(end)}\nSUMMARY:${title}\nEND:VEVENT\nEND:VCALENDAR`;
   };
 
   if (loading) {
@@ -235,7 +230,17 @@ export default function ApplicationDetailPage({ id }: { id: string }) {
                 );
               }
               if (accepted) {
-                const ics = makeIcs(accepted.chosen?.at || accepted.slots[0].at, app.jobTitle);
+                const ics = makeIcs({
+                  uid: `iv-${accepted.id}`,
+                  title: app.jobTitle,
+                  startISO: accepted.chosen?.at || accepted.slots[0].at,
+                  durationMin: 30,
+                  location: accepted.location,
+                  url:
+                    typeof window !== 'undefined'
+                      ? window.location.href
+                      : undefined,
+                });
                 return (
                   <div>
                     <h3 className="font-semibold mb-2">{t('interview')}</h3>
