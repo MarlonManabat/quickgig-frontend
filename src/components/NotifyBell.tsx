@@ -52,7 +52,7 @@ export default function NotifyBell() {
               {t('notify.openAll')}
             </Link>
           </div>
-          <ul className="max-h-80 overflow-y-auto">
+          <ul data-testid="notify-list" className="max-h-80 overflow-y-auto">
             {items.length === 0 && (
               <li className="p-4 text-sm text-center">{t('notify.empty.all')}</li>
             )}

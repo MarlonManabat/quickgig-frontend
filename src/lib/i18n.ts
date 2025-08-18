@@ -183,6 +183,11 @@ const strings = {
       inviteSent: 'Invite sent',
       reminderSent: 'Reminder sent',
       bulkRejectionTitle: 'Bulk Rejection Email QA',
+      notifyCenterTitle: 'Notifications Center QA',
+      toastJobReceived: 'Application received',
+      toastStatusChanged: 'Status changed',
+      toastNewApplicant: 'New applicant',
+      toastNewMessage: 'New message',
     },
     email: {
       apply_subject: 'New application received',
@@ -374,6 +379,11 @@ const strings = {
       inviteSent: 'Na-send ang invite',
       reminderSent: 'Na-send ang reminder',
       bulkRejectionTitle: 'Bulk Rejection Email QA',
+      notifyCenterTitle: 'Notifications Center QA',
+      toastJobReceived: 'Nareceive ang application',
+      toastStatusChanged: 'Nagbago ang status',
+      toastNewApplicant: 'May bagong applicant',
+      toastNewMessage: 'May bagong message',
     },
     email: {
       apply_subject: 'May bagong application',

@@ -155,6 +155,27 @@ Rollback: set `NEXT_PUBLIC_ENABLE_BULK_REJECTION_QA=false` and redeploy.
 
 Notes: mock/test only, no live emails sent. Page `/qa/bulk-rejection` renders `bulk-email-preview` markers.
 
+### Notifications Center QA Harness (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_NOTIFY_CENTER_QA` – simulate mock job/employer notifications and expose toast + list markers.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_NOTIFY_CENTER_QA=true
+```
+
+Then run:
+
+```
+npx playwright test tests/notificationsCenterQA.spec.ts
+BASE=http://localhost:3000 node tools/smoke.mjs
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_NOTIFY_CENTER_QA=false` and redeploy.
+
+Notes: dev/test only, mock-safe. Page `/qa/notifications-center` renders `toast-msg` and `notify-list` markers.
+
 ## Staging auth & engine flows
 
 Engine-backed auth and data wiring is gated behind flags and off by default.

@@ -1,0 +1,10 @@
+{
+  "job": [
+    { "id": "job-rec", "title": "Application received", "kind": "application" },
+    { "id": "job-status", "title": "Status changed", "kind": "application" }
+  ],
+  "employer": [
+    { "id": "emp-new", "title": "New applicant", "kind": "admin" },
+    { "id": "emp-msg", "title": "New message", "kind": "message" }
+  ]
+}

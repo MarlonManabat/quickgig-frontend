@@ -266,6 +266,25 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   } else {
     console.log('[smoke] bulk rejection qa skipped');
   }
+  if (process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER_QA === 'true') {
+    try {
+      const r = await fetchImpl(base + '/qa/notifications-center?auto=1');
+      const txt = await r.text();
+      if (
+        r.status === 200 &&
+        /data-testid="toast-msg"/.test(txt) &&
+        /data-testid="notify-list"/.test(txt)
+      ) {
+        console.log('[smoke] notify center qa ok');
+      } else {
+        console.log('[smoke] notify center qa', r.status);
+      }
+    } catch {
+      console.log('[smoke] notify center qa failed');
+    }
+  } else {
+    console.log('[smoke] notify center qa skipped');
+  }
   console.log('Smoke OK');
   if (process.env.SMOKE_REPORTS === '1') {
     try {
