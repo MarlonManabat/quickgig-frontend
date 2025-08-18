@@ -33,6 +33,18 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       console.log('[smoke] status check failed');
     }
   }
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_SECURITY_AUDIT === 'true') {
+    try {
+      const r = await fetchImpl(base + '/status/ping');
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 200 && j.pong) console.log('[smoke] ping ok');
+      else console.log('[smoke] ping', r.status);
+    } catch {
+      console.log('[smoke] ping check failed');
+    }
+  } else {
+    console.log('[smoke] ping skipped');
+  }
   const runEngine = process.argv.includes('--engine');
   if (runEngine) {
     try {

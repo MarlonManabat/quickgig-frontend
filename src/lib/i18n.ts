@@ -102,6 +102,7 @@ const strings = {
       engine_ok: 'Engine reachable',
       db_ok: 'DB reachable',
       timestamp: 'Timestamp',
+      uptime: 'Uptime',
     },
     settings: {
       title: 'Account Settings',
@@ -302,6 +303,7 @@ const strings = {
       engine_ok: 'Engine ok',
       db_ok: 'DB ok',
       timestamp: 'Oras',
+      uptime: 'Uptime',
     },
     settings: {
       title: 'Settings',
