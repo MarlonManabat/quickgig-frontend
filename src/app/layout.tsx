@@ -10,6 +10,8 @@ import SettingsBanner from "../components/SettingsBanner";
 import ClientBootstrap from '@/app/ClientBootstrap';
 import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
+import AppShellV2 from '@/components/layouts/AppShellV2';
+import { env } from '@/config/env';
 
 export const metadata: Metadata = {
   title: "QuickGig.ph - Find Gigs Fast in the Philippines",
@@ -94,12 +96,14 @@ export default function RootLayout({
           <SocketProvider>
             <ToastProvider>
               <ErrorBoundary>
-                <Navigation />
-                <SettingsBanner />
-                <main className="min-h-screen">
-                  {children}
-                </main>
-                <footer className="qg-footer">
+                {env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2 ? (
+                  <AppShellV2>{children}</AppShellV2>
+                ) : (
+                  <>
+                    <Navigation />
+                    <SettingsBanner />
+                    <main className="min-h-screen">{children}</main>
+                    <footer className="qg-footer">
               <div className="qg-container">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                   <div className="col-span-1 md:col-span-2">
@@ -142,7 +146,9 @@ export default function RootLayout({
                   </div>
                 </div>
               </div>
-                </footer>
+                    </footer>
+                  </>
+                )}
               </ErrorBoundary>
             </ToastProvider>
           </SocketProvider>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { env } from '@/config/env';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -39,7 +40,9 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'bg-bg text-fg rounded-qg-lg shadow-qg-md transition-all duration-qg-normal',
+          env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
+            ? 'bg-fg text-bg rounded-lg shadow-qg-md transition-all duration-qg-normal'
+            : 'bg-bg text-fg rounded-qg-lg shadow-qg-md transition-all duration-qg-normal',
           hover && 'hover:shadow-qg-lg hover:-translate-y-1 cursor-pointer',
           paddingClasses[padding],
           className
@@ -54,11 +57,19 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, children, variant = 'default', ...props }, ref) => {
-    const variants = {
+    const v1Variants = {
       default: 'bg-bg text-fg',
       primary: 'bg-primary text-fg',
       accent: 'bg-secondary text-fg',
-    };
+    } as const;
+
+    const v2Variants = {
+      default: 'bg-fg text-bg',
+      primary: 'bg-primary text-fg',
+      accent: 'bg-secondary text-bg',
+    } as const;
+
+    const variants = env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2 ? v2Variants : v1Variants;
 
     return (
       <div
@@ -106,11 +117,19 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
 
 const CardTag = React.forwardRef<HTMLSpanElement, CardTagProps>(
   ({ className, children, variant = 'default', ...props }, ref) => {
-    const variants = {
+    const tagV1 = {
       default: 'bg-bg text-fg border border-fg',
       primary: 'bg-primary text-fg',
       accent: 'bg-secondary text-fg',
-    };
+    } as const;
+
+    const tagV2 = {
+      default: 'bg-fg text-bg border border-bg',
+      primary: 'bg-primary text-fg',
+      accent: 'bg-secondary text-bg',
+    } as const;
+
+    const variants = env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2 ? tagV2 : tagV1;
 
     return (
       <span

@@ -13,6 +13,8 @@ const config: Config = {
         secondary: 'var(--color-secondary)',
         bg: 'var(--bg)',
         fg: 'var(--fg)',
+        muted: 'var(--muted)',
+        accent: 'var(--accent)',
         background: 'var(--bg)',
         foreground: 'var(--fg)',
         // QuickGig Brand Colors

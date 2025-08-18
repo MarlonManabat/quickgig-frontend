@@ -68,6 +68,18 @@ automatically falls back to existing mock or legacy flows.
 
 ## Flags
 
+### App Shell V2 (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_APP_SHELL_V2` – opt-in new header/footer and tokens matching app.quickgig.ph. UI only, no route changes.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_APP_SHELL_V2=true
+```
+
+Rollback: remove or set `NEXT_PUBLIC_ENABLE_APP_SHELL_V2=false` and redeploy.
+
 ## Staging auth & engine flows
 
 Engine-backed auth and data wiring is gated behind flags and off by default.
