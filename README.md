@@ -9,6 +9,23 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 - No Vercel domain is attached to `app.quickgig.ph`. This avoids DNS conflicts and preserves the working app.
 - Rollback: revert this PR to restore any previous behavior.
 
+## Auth Proxy
+
+Login and signup requests hit same-origin Next.js API routes:
+
+- `POST /api/session/login`
+- `POST /api/session/register`
+
+These proxy to `${NEXT_PUBLIC_API_URL}/login.php` and `/register.php`. The `NEXT_PUBLIC_API_URL`
+defaults to `https://quickgig.ph`, and `Set-Cookie` headers are forwarded so credentials work
+without CORS.
+
+## Vercel Builds
+
+`npm run build` runs `tools/postbuild_smoke_gate.mjs`. Vercel preview and production builds
+detect `VERCEL` and skip smoke tests by default. To run smoke locally or in CI, set
+`RUN_SMOKE=1` and optionally `SMOKE_BASE_URL=http://127.0.0.1:3000` before invoking the build.
+
 ## Setup
 
 1. Install dependencies:
@@ -17,9 +34,9 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
    ```
 2. Copy `.env.example` to `.env.local` and adjust as needed. Sensible
    defaults are included for local development:
-   ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-API_URL=http://localhost:3001
+```env
+NEXT_PUBLIC_API_URL=https://quickgig.ph
+API_URL=https://quickgig.ph
 JWT_COOKIE_NAME=auth_token
 NEXT_PUBLIC_ENABLE_APPLY=false
 NEXT_PUBLIC_ENV=local
@@ -672,11 +689,7 @@ Login, signup, and other protected pages call the external API at
 
 ### Smoke checks
 
-  The app defaults to a local API if `NEXT_PUBLIC_API_URL` is unset:
-
-```env
-  NEXT_PUBLIC_API_URL=http://localhost:3001
-```
+  The app defaults to `https://quickgig.ph` if `NEXT_PUBLIC_API_URL` is unset.
 
 Verify the production root and API:
 

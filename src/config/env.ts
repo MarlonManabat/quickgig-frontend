@@ -4,9 +4,9 @@ const BETA =
 
 export const env = {
   NEXT_PUBLIC_API_URL:
-    process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
+    process.env.NEXT_PUBLIC_API_URL || 'https://quickgig.ph',
   API_URL:
-    process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
+    process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://quickgig.ph',
   JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'auth_token',
   NEXT_PUBLIC_ENABLE_BETA_RELEASE: BETA,
   NEXT_PUBLIC_ENABLE_APPLY:
