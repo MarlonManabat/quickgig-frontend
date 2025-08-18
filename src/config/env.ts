@@ -66,6 +66,17 @@ export const env = {
   NOTIFS_PAGE_SIZE: parseInt(process.env.NOTIFS_PAGE_SIZE || '20', 10),
   NEXT_PUBLIC_ENABLE_SOCKETS:
     String(process.env.NEXT_PUBLIC_ENABLE_SOCKETS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_NOTIFY_CENTER:
+    String(process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_NOTIFY_SRC_MESSAGES:
+    String(process.env.NEXT_PUBLIC_NOTIFY_SRC_MESSAGES ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_NOTIFY_SRC_INTERVIEWS:
+    String(process.env.NEXT_PUBLIC_NOTIFY_SRC_INTERVIEWS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_NOTIFY_SRC_ALERTS:
+    String(process.env.NEXT_PUBLIC_NOTIFY_SRC_ALERTS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_NOTIFY_SRC_ADMIN:
+    String(process.env.NEXT_PUBLIC_NOTIFY_SRC_ADMIN ?? 'false').toLowerCase() === 'true',
+  EVENTS_POLL_MS: parseInt(process.env.EVENTS_POLL_MS || '5000', 10),
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {
