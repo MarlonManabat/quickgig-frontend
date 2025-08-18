@@ -138,6 +138,11 @@ const english: Messages = {
   'profile.resume.saved': 'Resume saved',
   'profile.avatar.title': 'Avatar',
   'profile.avatar.saved': 'Avatar saved',
+  'upload.upload': 'Upload',
+  'upload.uploading': 'Uploading…',
+  'upload.failed': 'Upload failed',
+  'upload.too_big': 'File too large',
+  'upload.bad_type': 'Unsupported file type',
   'apply.resume_attached': 'Attached: {name}',
   'apply.resume_optional_hint': 'Resume is optional—you can attach now or later.',
 };
@@ -278,6 +283,11 @@ const taglish: Messages = {
   'profile.resume.saved': 'Na-save ang resume',
   'profile.avatar.title': 'Avatar',
   'profile.avatar.saved': 'Na-save ang avatar',
+  'upload.upload': 'Mag-upload',
+  'upload.uploading': 'Nag-a-upload…',
+  'upload.failed': 'Bagsak ang upload',
+  'upload.too_big': 'Masyadong malaki ang file',
+  'upload.bad_type': 'Hindi suportadong file type',
   'apply.resume_attached': 'Naka-attach: {name}',
   'apply.resume_optional_hint': 'Optional lang ang resume—puwede mong i-attach ngayon o sa susunod.',
 };

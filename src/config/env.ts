@@ -41,6 +41,11 @@ export const env = {
   METRICS_SECRET: process.env.METRICS_SECRET || '',
   NEXT_PUBLIC_ENABLE_ONBOARDING:
     String(process.env.NEXT_PUBLIC_ENABLE_ONBOARDING ?? 'true').toLowerCase() !== 'false',
+  NEXT_PUBLIC_ENABLE_S3_UPLOADS:
+    String(process.env.NEXT_PUBLIC_ENABLE_S3_UPLOADS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_MAX_UPLOAD_MB: Number(process.env.NEXT_PUBLIC_MAX_UPLOAD_MB || 2),
+  ALLOWED_UPLOAD_MIME:
+    (process.env.ALLOWED_UPLOAD_MIME || '').split(',').map((s) => s.trim()).filter(Boolean),
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {
