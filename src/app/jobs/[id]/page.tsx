@@ -2,11 +2,11 @@ import { API } from '@/config/api';
 import { env } from '@/config/env';
 import ApplyButton from '../apply-button';
 import SaveJobButton from '@/components/SaveJobButton';
-import ReportButton from '@/components/ReportButton';
 import type { Job } from '@/types/jobs';
 import { canonical } from '@/lib/canonical';
 import { getUser } from '@/auth/getUser';
 import TrackView from './TrackView';
+import ReportJob from './ReportJob';
 
 interface JobPageProps {
   params: { id: string };
@@ -61,7 +61,7 @@ export default async function JobPage({ params }: JobPageProps) {
 
   return (
     <main className="p-4 space-y-4">
-      <TrackView id={job.id} />
+      <TrackView id={job.id} isEmployer={user?.isEmployer} />
       <div>
         <h1 className="text-xl font-semibold">{job.title}</h1>
         <p className="text-sm text-gray-600">
@@ -85,9 +85,7 @@ export default async function JobPage({ params }: JobPageProps) {
           ))}
         </ul>
       ) : null}
-      {user ? (
-        <ReportButton type="job" targetId={job.id} />
-      ) : null}
+      {user ? <ReportJob id={String(job.id)} /> : null}
     </main>
   );
 }

@@ -103,13 +103,22 @@ const Navigation: React.FC = () => {
                     Dashboard
                   </Link>
                 {isAdmin(user) && env.NEXT_PUBLIC_ENABLE_ADMIN && (
-                  <Link
-                    href="/admin"
-                    className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Admin
-                  </Link>
+                  <>
+                    <Link
+                      href="/admin"
+                      className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Admin
+                    </Link>
+                    <Link
+                      href="/admin/reports"
+                      className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Reports
+                    </Link>
+                  </>
                 )}
                 <Link
                   href="/messages"
@@ -230,14 +239,24 @@ const Navigation: React.FC = () => {
                     </Link>
                   
                   {isAdmin(user) && env.NEXT_PUBLIC_ENABLE_ADMIN && (
-                    <Link
-                      href="/admin"
-                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Settings className="w-5 h-5 mr-3" />
-                      Admin Dashboard
-                    </Link>
+                    <>
+                      <Link
+                        href="/admin"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Settings className="w-5 h-5 mr-3" />
+                        Admin Dashboard
+                      </Link>
+                      <Link
+                        href="/admin/reports"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Settings className="w-5 h-5 mr-3" />
+                        Reports
+                      </Link>
+                    </>
                   )}
                   {user?.isEmployer && (
                     <>
