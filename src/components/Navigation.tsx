@@ -29,7 +29,7 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <nav className="qg-navbar bg-qg-navy shadow-qg-lg sticky top-0 z-50">
+    <nav data-testid="navbar" className="qg-navbar bg-qg-navy shadow-qg-lg sticky top-0 z-50">
       <div className="qg-container">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}

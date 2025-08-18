@@ -9,6 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
   loading?: boolean;
+  'data-testid'?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

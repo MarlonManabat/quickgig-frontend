@@ -13,6 +13,10 @@ import { canonical } from "@/lib/canonical";
 import AppShellV2 from '@/components/layouts/AppShellV2';
 import { env } from '@/config/env';
 
+if (process.env.NODE_ENV !== 'production' && env.NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY) {
+  import('../../tools/linkMapSanity').then((m) => m.linkMapSanity?.());
+}
+
 export const metadata: Metadata = {
   title: "QuickGig.ph - Find Gigs Fast in the Philippines",
   description: "Kahit saan sa Pinas, may gig para sa'yo! Connect with opportunities and talent across the Philippines. Find work or hire skilled professionals quickly and easily.",
@@ -103,7 +107,7 @@ export default function RootLayout({
                     <Navigation />
                     <SettingsBanner />
                     <main className="min-h-screen">{children}</main>
-                    <footer className="qg-footer">
+                    <footer data-testid="footer" className="qg-footer">
               <div className="qg-container">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                   <div className="col-span-1 md:col-span-2">

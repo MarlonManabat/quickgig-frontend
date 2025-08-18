@@ -92,6 +92,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS:
     String(process.env.NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY:
+    String(process.env.NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY ?? 'false').toLowerCase() === 'true',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {
