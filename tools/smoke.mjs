@@ -2,13 +2,15 @@ const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000
 const fetchImpl = globalThis.fetch;
 const bail = (m)=>{ console.error(m); process.exit(1); };
 const beta = process.env.NEXT_PUBLIC_ENABLE_BETA_RELEASE === 'true';
-if (beta) {
+const isProd = process.env.NODE_ENV === 'production';
+if (beta || isProd) {
   process.env.NEXT_PUBLIC_ENABLE_EMAILS = 'true';
   process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER = 'true';
   process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS = 'true';
   process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_INVITES = 'true';
   process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS = 'true';
   process.env.NEXT_PUBLIC_ENABLE_PAYMENTS = 'true';
+  process.env.NEXT_PUBLIC_ENABLE_SECURITY_AUDIT = 'true';
 }
 (async () => {
   const r1 = await fetchImpl(base + '/', { method: 'HEAD', redirect: 'manual' });

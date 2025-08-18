@@ -12,12 +12,20 @@ export const flags = {
   stripe: env.NEXT_PUBLIC_ENABLE_STRIPE,
 };
 
-if (flags.beta) {
+const enableCore = () => {
   flags.emails = true;
   flags.notifyCenter = true;
   flags.interviews = true;
   flags.interviewInvites = true;
   flags.interviewReminders = true;
   flags.payments = true;
+};
+
+if (process.env.NODE_ENV === 'production') {
+  enableCore();
+}
+
+if (flags.beta) {
+  enableCore();
 }
 
