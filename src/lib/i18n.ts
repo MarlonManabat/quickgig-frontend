@@ -95,6 +95,112 @@ const strings = {
   },
 };
 
+export const emailCopy = {
+  en: {
+    apply: {
+      subject: 'We received your application for {{title}}',
+      body: [
+        'Hi {{applicantName}}',
+        'Thanks for applying to {{title}} at {{company}}.',
+        'View your application: {{applyUrl}}',
+      ],
+      employer: {
+        subject: 'New application for {{title}}',
+        body: [
+          'Hello, {{applicantName}} applied for {{title}}.',
+          'Review applications: {{manageUrl}}',
+        ],
+      },
+    },
+    interview: {
+      proposed: {
+        subject: 'Interview proposed for {{title}}',
+        body: [
+          'Hello, interview proposed for {{title}}.',
+          'Slots: {{slots}}',
+          'Method: {{method}} {{location}}',
+          'View details: {{detailUrl}}',
+        ],
+      },
+      accepted: {
+        subject: 'Interview accepted for {{title}}',
+        body: [
+          'Confirmed interview at {{when}} ({{tz}}).',
+          'See details: {{detailUrl}}',
+        ],
+      },
+      declined: {
+        subject: 'Interview declined for {{title}}',
+        body: [
+          'Interview for {{title}} was declined.',
+          'View details: {{detailUrl}}',
+        ],
+      },
+    },
+    admin: {
+      digest: {
+        subject: 'Daily digest',
+        body: [
+          'New jobs: {{jobs}}',
+          'New applications: {{applications}}',
+          'New reports: {{reports}}',
+        ],
+      },
+    },
+  },
+  tl: {
+    apply: {
+      subject: 'Natanggap namin ang application mo',
+      body: [
+        'Hello, salamat sa pag-apply sa {{title}}.',
+        'Tingnan dito: {{applyUrl}}',
+      ],
+      employer: {
+        subject: 'May bagong application sa trabaho mo',
+        body: [
+          'Hello, may bagong applicant para sa {{title}}.',
+          'I-manage dito: {{manageUrl}}',
+        ],
+      },
+    },
+    interview: {
+      proposed: {
+        subject: 'May proposal sa interview para sa {{title}}',
+        body: [
+          'Hello, may proposed na interview para sa {{title}}.',
+          'Mga slot: {{slots}}',
+          'Method: {{method}} {{location}}',
+          'Tingnan ang detalye: {{detailUrl}}',
+        ],
+      },
+      accepted: {
+        subject: 'Kumpirmadong interview sa {{when}}',
+        body: [
+          'Kumpirmadong interview sa {{when}} ({{tz}}).',
+          'Detalye: {{detailUrl}}',
+        ],
+      },
+      declined: {
+        subject: 'Tinanggihan ang interview para sa {{title}}',
+        body: [
+          'Tinanggihan ng applicant ang interview para sa {{title}}.',
+          'Tingnan ang detalye: {{detailUrl}}',
+        ],
+      },
+    },
+    admin: {
+      digest: {
+        subject: 'Daily digest',
+        body: [
+          'Jobs: {{jobs}}',
+          'Applications: {{applications}}',
+          'Reports: {{reports}}',
+        ],
+      },
+    },
+  },
+} as const;
+
 export function t(key: keyof typeof strings['en']): string {
   const lang = (process.env.NEXT_PUBLIC_LANG || 'en') as 'en' | 'tl';
   return strings[lang][key] || strings.en[key] || key;

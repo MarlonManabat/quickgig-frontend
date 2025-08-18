@@ -1,27 +1,44 @@
 import { NextResponse } from 'next/server';
-import { sendMail } from '@/server/mailer';
-import { env } from '@/config/env';
+import { sendEmail, renderEmail } from '@/lib/notify';
+
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 export async function POST(req: Request) {
-  const { applicantEmail, applicantName, employerEmail, jobTitle } = await req.json();
-  const safeJob = String(jobTitle || 'your application');
-  const toEmployer = employerEmail || env.NOTIFY_ADMIN_EMAIL;
+  const {
+    applicantEmail,
+    applicantName,
+    employerEmail,
+    jobTitle,
+    applicationId,
+    jobId,
+    lang,
+  } = await req.json();
 
+  const langCode: 'en' | 'tl' = lang === 'tl' ? 'tl' : 'en';
+  const applyUrl = applicationId ? `${BASE}/applications/${applicationId}` : BASE;
+  const manageUrl =
+    jobId && applicationId
+      ? `${BASE}/employer/jobs/${jobId}/applicants/${applicationId}`
+      : `${BASE}/employer`;
+
+  const tasks: Promise<unknown>[] = [];
   if (applicantEmail) {
-    await sendMail({
-      to: applicantEmail,
-      subject: `We received your application for ${safeJob}`,
-      html: `<p>Hi ${applicantName || ''},</p><p>Thanks for applying for <b>${safeJob}</b>. We’ll be in touch.</p>`,
-    }).catch(() => {});
+    const e = renderEmail(
+      'apply:applicant',
+      { title: jobTitle, company: '', applicantName, applyUrl },
+      langCode,
+    );
+    tasks.push(sendEmail(applicantEmail, e.subject, e.html, e.text));
   }
-
+  const toEmployer = employerEmail || process.env.NOTIFY_ADMIN_EMAIL;
   if (toEmployer) {
-    await sendMail({
-      to: toEmployer,
-      subject: `New application for ${safeJob}`,
-      html: `<p>You have a new application for <b>${safeJob}</b>.</p>`,
-    }).catch(() => {});
+    const e = renderEmail(
+      'apply:employer',
+      { title: jobTitle, applicantName, manageUrl },
+      'en',
+    );
+    tasks.push(sendEmail(toEmployer, e.subject, e.html, e.text));
   }
-
+  void Promise.allSettled(tasks);
   return NextResponse.json({ ok: true });
 }

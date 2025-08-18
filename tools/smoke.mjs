@@ -62,6 +62,34 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       bail('interviews check failed');
     }
   }
+  if (process.env.SMOKE_EMAIL === '1') {
+    try {
+      const d = await fetchImpl(base + '/api/admin/digest');
+      if (d.status !== 200) bail('digest failed');
+      const a = await fetchImpl(base + '/api/notify/application', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          applicantEmail: 'dev@quickgig.test',
+          applicantName: 'Dev',
+          jobTitle: 'Test',
+          applicationId: 'TEST',
+          jobId: 'TEST',
+          lang: 'en',
+        }),
+      });
+      if (a.status !== 200) bail('apply notify failed');
+      const slot = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+      const iv = await fetchImpl(base + '/api/employer/jobs/TEST/applicants/TEST/interviews', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ method: 'phone', slots: [{ at: slot }], applicantEmail: 'dev@quickgig.test' }),
+      });
+      if (iv.status !== 200) bail('interview notify failed');
+    } catch {
+      bail('email check failed');
+    }
+  }
   console.log('Smoke OK');
   if (process.env.SMOKE_REPORTS === '1') {
     try {

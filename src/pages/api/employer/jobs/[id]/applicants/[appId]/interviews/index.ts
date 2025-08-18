@@ -1,9 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { listInterviews } from '@/lib/applicantStore';
 import { createInterviewInvite, updateInterviewStatus } from '@/lib/employerStore';
+import { sendEmail, renderEmail } from '@/lib/notify';
 
 const MODE = process.env.ENGINE_MODE || 'mock';
 const BASE = process.env.ENGINE_BASE_URL || '';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 const throttle: Record<string, number> = {};
 
 export default async function handler(
@@ -20,6 +22,26 @@ export default async function handler(
       body: req.method === 'POST' || req.method === 'PATCH' ? JSON.stringify(req.body) : undefined,
     });
     const text = await r.text();
+    if (req.method === 'POST' && r.ok) {
+      const email = req.body?.applicantEmail || process.env.NOTIFY_ADMIN_EMAIL;
+      if (email) {
+        const slots = ((req.body?.slots as { at: string }[]) || [])
+          .map((s) => new Date(s.at).toLocaleString())
+          .join(', ');
+        const e = renderEmail(
+          'interview:proposed',
+          {
+            title: req.body?.title || jobId,
+            slots,
+            method: req.body?.method,
+            location: req.body?.location || '',
+            detailUrl: `${SITE}/applications/${appId}`,
+          },
+          (req.body?.lang === 'tl' ? 'tl' : 'en'),
+        );
+        void sendEmail(email, e.subject, e.html, e.text);
+      }
+    }
     res.status(r.status).send(text);
     return;
   }
@@ -48,6 +70,24 @@ export default async function handler(
         }).catch(() => {});
       }
       res.status(200).json(interview);
+      const email = req.body?.applicantEmail || process.env.NOTIFY_ADMIN_EMAIL;
+      if (email) {
+        const slots = ((req.body?.slots as { at: string }[]) || [])
+          .map((s) => new Date(s.at).toLocaleString())
+          .join(', ');
+        const e = renderEmail(
+          'interview:proposed',
+          {
+            title: req.body?.title || jobId,
+            slots,
+            method: req.body?.method,
+            location: req.body?.location || '',
+            detailUrl: `${SITE}/applications/${appId}`,
+          },
+          (req.body?.lang === 'tl' ? 'tl' : 'en'),
+        );
+        void sendEmail(email, e.subject, e.html, e.text);
+      }
       return;
     } catch {
       res.status(400).json({ error: 'Unable to create' });

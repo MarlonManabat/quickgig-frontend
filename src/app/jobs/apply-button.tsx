@@ -55,6 +55,10 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
     try {
       const res = await api.post(API.apply, { jobId, name, email, phone, note });
       const appId = (res.data && (res.data.id || res.data.applicationId)) || undefined;
+      const lang =
+        (typeof window !== 'undefined' && window.localStorage.getItem('copyV') === 'taglish')
+          ? 'tl'
+          : 'en';
       void fetch('/api/notify/application', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,8 +68,12 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
           employerEmail: undefined,
           jobTitle: title,
           applicationId: appId,
+          jobId,
+          lang,
         }),
-      }).catch(() => {});
+      })
+        .then(() => toast('Will send soon'))
+        .catch((err) => console.error(err));
       toast('Application submitted');
       setSubmitted(true);
       if (env.NEXT_PUBLIC_ENABLE_ANALYTICS)

@@ -1,34 +1,36 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { listReports, listJobs } from '@/lib/employerStore';
+import { readJobs, readReports } from '@/lib/employerStore';
+import { readApps } from '@/lib/applicantStore';
+import { renderEmail, sendEmail } from '@/lib/notify';
+import type { JobReport } from '@/types/metrics';
 
-const RATE = new Map<string, number>();
+const MODE = process.env.ENGINE_MODE || 'mock';
+let last = 0;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const secret = req.query.secret;
-  if (secret !== process.env.ALERTS_DIGEST_SECRET) { res.status(401).end(); return; }
-  const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || '';
-  const now = Date.now();
-  const last = RATE.get(ip) || 0;
-  if (now - last < 10000) { res.status(429).json({ error: 'slow down' }); return; }
-  RATE.set(ip, now);
-  const since = now - 24 * 60 * 60 * 1000;
-  const reports = (await listReports()).filter(r => Date.parse(r.createdAt) >= since);
-  const jobs = await listJobs();
-  let views = 0;
-  let applies = 0;
-  for (const j of jobs) {
-    if (j.metrics && Date.parse(j.metrics.updatedAt) >= since) {
-      views += j.metrics.views || 0;
-      applies += j.metrics.applies || 0;
-    }
+  if (req.method !== 'GET') {
+    res.status(405).end();
+    return;
   }
-  const digest = { reports: reports.length, views, applies };
-  if (process.env.ALERTS_WEBHOOK_URL) {
-    fetch(process.env.ALERTS_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ type: 'digest', ...digest }),
-    }).catch(() => {});
+  const since = Date.now() - 24 * 60 * 60 * 1000;
+  let jobs = 0;
+  let applications = 0;
+  let reports = 0;
+  if (MODE === 'mock') {
+    try {
+      jobs = readJobs().filter((j) => new Date(j.updatedAt).getTime() > since).length;
+    } catch {}
+    try {
+      applications = readApps().filter((a) => new Date(a.updatedAt).getTime() > since).length;
+    } catch {}
+    try {
+      reports = readReports().filter((r: JobReport) => new Date(r.createdAt).getTime() > since).length;
+    } catch {}
   }
-  res.status(200).json(digest);
+  if (process.env.NOTIFY_ADMIN_EMAIL && Date.now() - last > 20 * 60 * 1000) {
+    last = Date.now();
+    const e = renderEmail('digest:admin', { jobs, applications, reports }, 'en');
+    void sendEmail(process.env.NOTIFY_ADMIN_EMAIL, e.subject, e.html, e.text);
+  }
+  res.status(200).json({ ok: true, jobs, applications, reports });
 }
