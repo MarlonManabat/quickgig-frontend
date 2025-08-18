@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { flags } from '@/lib/flags';
 
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as {
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   }
 
   const data = { jobId, applicantId };
-  const EMAILS_ON = process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true';
+  const EMAILS_ON = flags.emails;
 
   if (!EMAILS_ON) {
     return NextResponse.json({ ok: true, skipped: 'emails_disabled' });

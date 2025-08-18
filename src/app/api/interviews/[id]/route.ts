@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { update, interviewsEnabled, listAll } from '@/src/lib/interviews';
 import { sendMail } from '@/server/mailer';
+import { flags } from '@/lib/flags';
 
 const MODE = process.env.ENGINE_MODE || 'mock';
 const BASE = process.env.ENGINE_BASE_URL || '';
@@ -53,7 +54,7 @@ export async function PATCH(req: Request, ctx: { params: { id: string } }) {
         body: JSON.stringify(iv),
       }).catch(() => {});
     }
-    if (process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true') {
+    if (flags.emails) {
       sendMail({ kind: 'interview', to: process.env.NOTIFY_ADMIN_EMAIL || '', from: process.env.NOTIFY_FROM || '' }).catch(
         () => {},
       );

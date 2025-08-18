@@ -6,6 +6,7 @@ import { API } from '@/config/api';
 import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
 import { track } from '@/lib/track';
+import { flags } from '@/lib/flags';
 
 interface ApplyProps {
   jobId: string;
@@ -55,7 +56,7 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
     try {
       const res = await api.post(API.apply, { jobId, name, email, phone, note });
       const appId = (res.data && (res.data.id || res.data.applicationId)) || undefined;
-      if (process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true') {
+      if (flags.emails) {
         // fire-and-forget; do not block UI
         fetch('/api/notify/application', {
           method: 'POST',

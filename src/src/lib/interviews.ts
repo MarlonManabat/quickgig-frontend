@@ -1,4 +1,5 @@
 import type { Interview, InterviewStatus } from '../types/interview';
+import { flags } from '@/lib/flags';
 
 const KEY = 'qg_interviews_v1';
 const MODE = process.env.ENGINE_MODE || 'mock';
@@ -116,5 +117,5 @@ export async function update(id: string, patch: Partial<Pick<Interview, 'whenISO
 }
 
 export function interviewsEnabled() {
-  return process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true';
+  return flags.interviews;
 }

@@ -1,9 +1,14 @@
+const BETA =
+  String(process.env.NEXT_PUBLIC_ENABLE_BETA_RELEASE ?? 'false').toLowerCase() ===
+  'true';
+
 export const env = {
   NEXT_PUBLIC_API_URL:
     process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
   API_URL:
     process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
   JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'auth_token',
+  NEXT_PUBLIC_ENABLE_BETA_RELEASE: BETA,
   NEXT_PUBLIC_ENABLE_APPLY:
     String(process.env.NEXT_PUBLIC_ENABLE_APPLY ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_SAVED_API:
@@ -36,6 +41,8 @@ export const env = {
   RESEND_API_KEY: process.env.RESEND_API_KEY || '',
   NOTIFY_FROM: process.env.NOTIFY_FROM || 'QuickGig <noreply@quickgig.ph>',
   NOTIFY_ADMIN_EMAIL: process.env.NOTIFY_ADMIN_EMAIL || '',
+  NEXT_PUBLIC_ENABLE_EMAILS:
+    BETA || String(process.env.NEXT_PUBLIC_ENABLE_EMAILS ?? 'false').toLowerCase() === 'true',
   EMPLOYER_EMAILS:
     process.env.EMPLOYER_EMAILS?.split(',').map((e) => e.trim()).filter(Boolean) || [],
   ALERTS_DIGEST_SECRET: process.env.ALERTS_DIGEST_SECRET || '',
@@ -58,9 +65,18 @@ export const env = {
   NEXT_PUBLIC_ENABLE_EMPLOYER_APPLICANT_DRILLDOWN:
     String(process.env.NEXT_PUBLIC_ENABLE_EMPLOYER_APPLICANT_DRILLDOWN ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_INTERVIEWS:
-    String(process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS ?? 'false').toLowerCase() === 'true',
+    BETA || String(process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS ?? 'false').toLowerCase() ===
+    'true',
   NEXT_PUBLIC_ENABLE_INTERVIEWS_UI:
     String(process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_INTERVIEW_INVITES:
+    BETA ||
+    String(process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_INVITES ?? 'false').toLowerCase() ===
+      'true',
+  NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS:
+    BETA ||
+    String(process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS ?? 'false').toLowerCase() ===
+      'true',
   NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD:
     (process.env.NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD as 'video' | 'phone' | 'in_person') || 'video',
   NEXT_PUBLIC_INTERVIEW_SLOT_MINUTES:
@@ -74,12 +90,15 @@ export const env = {
   METRICS_SECRET: process.env.METRICS_SECRET || '',
   ALERTS_WEBHOOK_URL: process.env.ALERTS_WEBHOOK_URL || '',
   NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER:
-    String(process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER ?? 'false').toLowerCase() === 'true',
+    BETA ||
+    String(process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER ?? 'false').toLowerCase() ===
+      'true',
   NOTIFS_POLL_MS: parseInt(process.env.NOTIFS_POLL_MS || '30000', 10),
   NOTIFS_PAGE_SIZE: parseInt(process.env.NOTIFS_PAGE_SIZE || '20', 10),
   NEXT_PUBLIC_ENABLE_SOCKETS:
     String(process.env.NEXT_PUBLIC_ENABLE_SOCKETS ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_NOTIFY_CENTER:
+    BETA ||
     String(process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_NOTIFY_SRC_MESSAGES:
     String(process.env.NEXT_PUBLIC_NOTIFY_SRC_MESSAGES ?? 'false').toLowerCase() === 'true',
@@ -107,7 +126,7 @@ export const env = {
   NEXT_PUBLIC_ENABLE_I18N_POLISH:
     String(process.env.NEXT_PUBLIC_ENABLE_I18N_POLISH ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_PAYMENTS:
-    String(process.env.NEXT_PUBLIC_ENABLE_PAYMENTS ?? 'false').toLowerCase() === 'true',
+    BETA || String(process.env.NEXT_PUBLIC_ENABLE_PAYMENTS ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_GCASH:
     String(process.env.NEXT_PUBLIC_ENABLE_GCASH ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_STRIPE:
