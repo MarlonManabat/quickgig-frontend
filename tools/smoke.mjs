@@ -251,6 +251,21 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   } else {
     console.log('[smoke] interview reminders qa skipped');
   }
+  if (process.env.NEXT_PUBLIC_ENABLE_BULK_REJECTION_QA === 'true') {
+    try {
+      const r = await fetchImpl(base + '/qa/bulk-rejection?auto=1');
+      const txt = await r.text();
+      if (r.status === 200 && /data-testid="bulk-email-preview"/.test(txt)) {
+        console.log('[smoke] bulk rejection qa ok');
+      } else {
+        console.log('[smoke] bulk rejection qa', r.status);
+      }
+    } catch {
+      console.log('[smoke] bulk rejection qa failed');
+    }
+  } else {
+    console.log('[smoke] bulk rejection qa skipped');
+  }
   console.log('Smoke OK');
   if (process.env.SMOKE_REPORTS === '1') {
     try {

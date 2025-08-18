@@ -134,6 +134,27 @@ Rollback: set `NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS_QA=false` and redeploy.
 
 Notes: dev/test only, mock-safe. Page `/qa/interview-reminders` renders `invite-sent` and `reminder-sent` markers.
 
+### Bulk Rejection Email Dry-Run Harness (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_BULK_REJECTION_QA` – generate mock bulk rejection emails and expose test markers.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_BULK_REJECTION_QA=true
+```
+
+Then run:
+
+```
+npx playwright test tests/bulkRejectionEmailHarness.spec.ts
+BASE=http://localhost:3000 node tools/smoke.mjs
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_BULK_REJECTION_QA=false` and redeploy.
+
+Notes: mock/test only, no live emails sent. Page `/qa/bulk-rejection` renders `bulk-email-preview` markers.
+
 ## Staging auth & engine flows
 
 Engine-backed auth and data wiring is gated behind flags and off by default.
