@@ -14,10 +14,10 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_APPLICANT_APPS ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_SETTINGS:
     String(process.env.NEXT_PUBLIC_ENABLE_SETTINGS ?? 'false').toLowerCase() === 'true',
-  NEXT_PUBLIC_DEFAULT_LANGUAGE:
-    (process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE as 'en' | 'tl') || 'en',
+  NEXT_PUBLIC_DEFAULT_LANG:
+    (process.env.NEXT_PUBLIC_DEFAULT_LANG as 'en' | 'tl') || 'en',
   NEXT_PUBLIC_DEFAULT_EMAIL_PREFS:
-    (process.env.NEXT_PUBLIC_DEFAULT_EMAIL_PREFS as 'none' | 'alerts_only' | 'all') || 'none',
+    (process.env.NEXT_PUBLIC_DEFAULT_EMAIL_PREFS as 'ops_only' | 'all' | 'none') || 'ops_only',
   NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY:
     (process.env.NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY as 'off' | 'daily' | 'weekly') || 'weekly',
   RESEND_API_KEY: process.env.RESEND_API_KEY || '',

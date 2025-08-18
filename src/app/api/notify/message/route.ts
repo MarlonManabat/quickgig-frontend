@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { sendMail } from '@/server/mailer';
-import { prefersEmail } from '@/lib/prefs';
 import { unsign } from '@/lib/signedCookie';
-import type { UserSettings } from '@/types/settings';
+import type { Settings } from '@/types/settings';
+import { defaultsFromEnv, mergeSettings } from '@/lib/settings';
 
 export async function POST(req: Request) {
   const EMAILS_ON = process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true';
@@ -19,25 +19,7 @@ export async function POST(req: Request) {
       kind?: 'apply' | 'interview' | 'digest' | 'marketing';
     } | null;
     if (body) {
-      if (
-        body.kind === 'marketing'
-          ? (() => {
-              try {
-                const raw = cookies().get('settings')?.value;
-                if (raw) {
-                  const v = unsign(raw);
-                  if (v) {
-                    const s = JSON.parse(Buffer.from(v, 'base64').toString('utf8')) as UserSettings;
-                    return s.email.marketingAllowed;
-                  }
-                }
-              } catch {
-                /* ignore */
-              }
-              return true;
-            })()
-          : !body.kind || body.kind === 'digest' || prefersEmail(body.kind)
-      ) {
+      if (!body.kind || allow(body.kind)) {
         const kind:
           | 'apply'
           | 'interview'
@@ -62,4 +44,30 @@ export async function POST(req: Request) {
     // ignore
   }
   return NextResponse.json({ ok: true });
+}
+
+function allow(kind: 'apply' | 'interview' | 'digest' | 'marketing'): boolean {
+  try {
+    const raw = cookies().get('settings_v1')?.value;
+    let s = defaultsFromEnv();
+    if (raw) {
+      const v = unsign(raw);
+      if (v) {
+        const parsed = JSON.parse(Buffer.from(v, 'base64').toString('utf8')) as Settings;
+        s = mergeSettings(s, parsed);
+      }
+    }
+    const map = {
+      apply: s.email.applications,
+      interview: s.email.interviews,
+      digest: s.email.admin,
+      marketing: s.email.admin,
+    } as const;
+    const pref = map[kind];
+    if (pref === 'none') return false;
+    if (pref === 'ops_only' && kind === 'digest') return false;
+    return true;
+  } catch {
+    return true;
+  }
 }

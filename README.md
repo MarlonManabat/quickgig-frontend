@@ -37,9 +37,9 @@ BASE=https://api.quickgig.ph node tools/check_live_api.mjs
   - `NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD` – default method (`video`, `phone`, `in_person`).
   - `NEXT_PUBLIC_INTERVIEW_SLOT_MINUTES` – default duration in minutes.
   - `INTERVIEWS_WEBHOOK_URL` – POST webhook on create/update (best effort).
-- `NEXT_PUBLIC_ENABLE_SETTINGS` – enable account settings page under `/settings`. Stores preferences in a signed `settings` cookie mirrored to `localStorage` for instant reloads. In `ENGINE_AUTH_MODE=php`, requests proxy to `${ENGINE_BASE_URL}/api/settings`.
-- `NEXT_PUBLIC_DEFAULT_LANGUAGE` – default language (`en` or `tl`) used when no user settings exist.
-- `NEXT_PUBLIC_DEFAULT_EMAIL_PREFS` – initial email preference (`none`, `alerts_only`, `all`).
+- `NEXT_PUBLIC_ENABLE_SETTINGS` – enable account settings page under `/settings`. Stores preferences in a signed `settings_v1` cookie mirrored to `localStorage` for instant reloads. In `ENGINE_AUTH_MODE=php`, requests proxy to `${ENGINE_BASE_URL}/api/settings`.
+- `NEXT_PUBLIC_DEFAULT_LANG` – default language (`en` or `tl`) used when no user settings exist.
+- `NEXT_PUBLIC_DEFAULT_EMAIL_PREFS` – initial email preference (`ops_only`, `all`, `none`).
 - `NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY` – default alerts digest frequency (`off`, `daily`, `weekly`).
 
 ### Language smoke test
@@ -97,6 +97,23 @@ Vercel Cron setup:
 
 Create an alert from the **Create Alert from filters** button on `/jobs` and
 manage them in `/settings/alerts`.
+
+## Account Settings (flagged)
+
+Disabled by default. Enable locally by adding to `.env.local`:
+
+```env
+NEXT_PUBLIC_ENABLE_SETTINGS=true
+```
+
+When enabled, a `/settings` page appears for authenticated users allowing them to choose language, email preferences per category, in-app notification toggles, and session controls.
+
+| Feature | OFF (default) | ON |
+| --- | --- | --- |
+| Settings page | hidden | `/settings` available |
+| Locale default | `NEXT_PUBLIC_DEFAULT_LANG` | user selection persisted |
+| Email sends | all allowed | gated by user prefs |
+| Toast/badge notifications | always | gated by user toggles |
 
 ## Notifications Center (flagged)
 

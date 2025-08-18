@@ -18,6 +18,23 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
     } catch {
       console.log('[smoke] settings check failed');
     }
+    try {
+      const api = await fetchImpl(base + '/api/settings');
+      const j = await api.json().catch(() => ({}));
+      if (api.status === 200 && j.lang) console.log('[smoke] api settings ok');
+      else console.log('[smoke] api settings', api.status);
+      await fetchImpl(base + '/api/settings', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: { applications: 'none' } }),
+      });
+      const after = await fetchImpl(base + '/api/settings');
+      const j2 = await after.json().catch(() => ({}));
+      if (j2.email && j2.email.applications === 'none') console.log('[smoke] api settings patch ok');
+      else console.log('[smoke] api settings patch', after.status);
+    } catch {
+      console.log('[smoke] api settings failed');
+    }
   }
   if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER === 'true') {
     try {
