@@ -59,6 +59,22 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       console.log('[smoke] mark-all-read failed');
     }
   }
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER === 'true') {
+    try {
+      const r = await fetchImpl(base + '/api/notify/index');
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 200 && typeof j.counts?.total === 'number') console.log('[smoke] notify index ok');
+      else console.log('[smoke] notify index', r.status);
+      const before = j.counts?.total || 0;
+      await fetchImpl(base + '/api/notify/mock', { method: 'POST' });
+      const r2 = await fetchImpl(base + '/api/notify/index');
+      const j2 = await r2.json().catch(() => ({}));
+      if (r2.status === 200 && j2.counts?.total === before + 1) console.log('[smoke] notify increment ok');
+      else console.log('[smoke] notify increment', r2.status);
+    } catch {
+      console.log('[smoke] notify failed');
+    }
+  }
     if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true') {
       for (const p of ['/interviews', '/employer/interviews']) {
         try {

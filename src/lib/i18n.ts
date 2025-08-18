@@ -73,6 +73,20 @@ const strings = {
       markAllRead: 'Mark all as read',
       toast: { marked: 'Marked as read', markedAll: 'Marked all as read' },
     },
+    notify: {
+      heading: 'Notifications',
+      openAll: 'Open all notifications',
+      markRead: 'Mark read',
+      markAll: 'Mark all read',
+      tabs: { all: 'All', message: 'Messages', interview: 'Interviews', alert: 'Alerts', admin: 'Admin' },
+      empty: {
+        all: 'No notifications',
+        message: 'No messages',
+        interview: 'No interviews',
+        alert: 'No alerts',
+        admin: 'No admin notices',
+      },
+    },
     settings: {
       title: 'Account Settings',
       language: {
@@ -224,6 +238,20 @@ const strings = {
       markRead: 'Mark read',
       markAllRead: 'Mark all as read',
       toast: { marked: 'Marked as read', markedAll: 'Marked all as read' },
+    },
+    notify: {
+      heading: 'Notifications',
+      openAll: 'Buksan lahat ng notifications',
+      markRead: 'Mark read',
+      markAll: 'Mark all read',
+      tabs: { all: 'Lahat', message: 'Messages', interview: 'Interviews', alert: 'Alerts', admin: 'Admin' },
+      empty: {
+        all: 'Wala ka pang notifications',
+        message: 'Walang messages',
+        interview: 'Walang interviews',
+        alert: 'Walang alerts',
+        admin: 'Walang admin notices',
+      },
     },
     settings: {
       title: 'Settings',

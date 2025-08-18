@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import NotificationsBell from './NotificationsBell';
+import NotifyBell from './NotifyBell';
+import { NotifyProvider } from '@/app/notify/store';
 import WalletDisplay from './WalletDisplay';
 import Button from './ui/Button';
 import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard, Bell } from 'lucide-react';
@@ -153,6 +155,11 @@ const Navigation: React.FC = () => {
                 
                 {/* Notification Dropdown */}
                 {env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER && <NotificationsBell />}
+                {env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER && (
+                  <NotifyProvider>
+                    <NotifyBell />
+                  </NotifyProvider>
+                )}
                 
                 {/* Wallet Display */}
                 <WalletDisplay />

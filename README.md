@@ -146,11 +146,19 @@ Disabled by default. Enable locally by adding to `.env.local`:
 NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER=true
 NOTIFS_POLL_MS=30000
 NOTIFS_PAGE_SIZE=20
+
+# unified notifications (new)
+NEXT_PUBLIC_ENABLE_NOTIFY_CENTER=true
+NEXT_PUBLIC_NOTIFY_SRC_MESSAGES=true   # toggle others as needed
+NEXT_PUBLIC_ENABLE_SOCKETS=true
+EVENTS_POLL_MS=5000
 ```
 
 When enabled, a bell appears in the navbar with unread counts and a `/notifications` page lists all messages, applications, interviews, alerts and admin notices. In `ENGINE_MODE=mock`, notifications are stored in a signed `notifs` cookie; with `ENGINE_AUTH_MODE=php` requests proxy to `${ENGINE_BASE_URL}/api/notifications`.
 
-If `NEXT_PUBLIC_ENABLE_SOCKETS` is true the center uses SSE for live updates; otherwise it polls every `NOTIFS_POLL_MS` milliseconds.
+The unified center exposes `/api/notify/index` returning `{ items, counts }`. Trigger a mock event with `POST /api/notify/mock` then re-fetch `/api/notify/index` to see counts increment.
+
+If `NEXT_PUBLIC_ENABLE_SOCKETS` is true the center uses SSE for live updates; otherwise it polls every `NOTIFS_POLL_MS` milliseconds (or `EVENTS_POLL_MS` for the new API).
 
 ## Reports & Admin Moderation
 
