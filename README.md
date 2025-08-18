@@ -197,6 +197,28 @@ NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY=weekly # daily | weekly
 Enable locally by setting `NEXT_PUBLIC_ENABLE_SETTINGS=true`. When also running with `ENGINE_MODE=php`, settings are persisted through the engine; otherwise they fall back to a localStorage mock and behave identically.
 
 Roll back any time by turning the flag off.
+## Hiring Decisions (flagged)
+
+Disabled by default. Configure via environment:
+
+```env
+NEXT_PUBLIC_ENABLE_HIRING=false
+NEXT_PUBLIC_ENABLE_HIRING_EMAILS=false
+```
+
+Enable locally by setting `NEXT_PUBLIC_ENABLE_HIRING=true`. With `ENGINE_MODE=php` the app proxies hiring actions to the engine; otherwise a mock store is used. The basic flow:
+
+1. Employer posts an offer with optional start date, rate and notes.
+2. Applicant accepts or declines the offer.
+3. Employer may mark the applicant hired or not selected.
+
+To smoke test locally after enabling the flag:
+
+```bash
+node tools/smoke_hiring.mjs
+```
+
+Roll back any time by turning the flag off.
 ## Notifications Center (flagged)
 
 Disabled by default. Enable locally by adding to `.env.local`:

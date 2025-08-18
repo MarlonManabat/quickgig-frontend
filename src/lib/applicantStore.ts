@@ -1,4 +1,8 @@
-import type { ApplicationSummary } from '@/types/application';
+import type {
+  ApplicationSummary,
+  ApplicationStatus,
+  OfferTerms,
+} from '@/types/application';
 import type { ApplicationDetail, ApplicationEvent } from '@/types/applications';
 import type { Interview, InterviewSlot } from '@/types/interviews';
 import { readInterviews, writeInterviews } from './interviewStore';
@@ -39,6 +43,16 @@ function writeDetails(details: Record<string, ApplicationDetail>) {
     window.localStorage.setItem(DETAIL_KEY, JSON.stringify(details));
   } else {
     memoryDetails = details;
+  }
+}
+
+function updateSummary(id: string, status: ApplicationStatus, updatedAt: string) {
+  const apps = readApps();
+  const idx = apps.findIndex((a) => a.id === id);
+  if (idx !== -1) {
+    apps[idx].status = status;
+    apps[idx].updatedAt = updatedAt;
+    writeApps(apps);
   }
 }
 
@@ -170,6 +184,93 @@ export async function appendEvent(
   });
   if (!res.ok) throw new Error(`engine ${res.status}`);
   return (await res.json()) as ApplicationDetail;
+}
+
+export function mockCreateOffer(id: string, terms: OfferTerms): ApplicationDetail {
+  const details = readDetails();
+  const app = details[id];
+  if (!app) throw new Error('not found');
+  const at = new Date().toISOString();
+  const event: ApplicationEvent = {
+    at,
+    type: 'offer_made',
+    by: 'employer',
+    meta: terms,
+  } as ApplicationEvent;
+  app.status = 'offer_made';
+  app.events = [event, ...app.events];
+  details[id] = app;
+  writeDetails(details);
+  updateSummary(id, 'offer_made', at);
+  return app;
+}
+
+export function mockAcceptOffer(id: string): ApplicationDetail {
+  const details = readDetails();
+  const app = details[id];
+  if (!app) throw new Error('not found');
+  const at = new Date().toISOString();
+  const event: ApplicationEvent = {
+    at,
+    type: 'offer_accepted',
+    by: 'applicant',
+  } as ApplicationEvent;
+  app.status = 'offer_accepted';
+  app.events = [event, ...app.events];
+  details[id] = app;
+  writeDetails(details);
+  updateSummary(id, 'offer_accepted', at);
+  return app;
+}
+
+export function mockDeclineOffer(id: string): ApplicationDetail {
+  const details = readDetails();
+  const app = details[id];
+  if (!app) throw new Error('not found');
+  const at = new Date().toISOString();
+  const event: ApplicationEvent = {
+    at,
+    type: 'offer_declined',
+    by: 'applicant',
+  } as ApplicationEvent;
+  app.status = 'offer_declined';
+  app.events = [event, ...app.events];
+  details[id] = app;
+  writeDetails(details);
+  updateSummary(id, 'offer_declined', at);
+  return app;
+}
+
+export function mockMarkHired(id: string): ApplicationDetail {
+  const details = readDetails();
+  const app = details[id];
+  if (!app) throw new Error('not found');
+  const at = new Date().toISOString();
+  const event: ApplicationEvent = { at, type: 'hired', by: 'employer' };
+  app.status = 'hired';
+  app.events = [event, ...app.events];
+  details[id] = app;
+  writeDetails(details);
+  updateSummary(id, 'hired', at);
+  return app;
+}
+
+export function mockMarkNotSelected(id: string): ApplicationDetail {
+  const details = readDetails();
+  const app = details[id];
+  if (!app) throw new Error('not found');
+  const at = new Date().toISOString();
+  const event: ApplicationEvent = {
+    at,
+    type: 'not_selected',
+    by: 'employer',
+  } as ApplicationEvent;
+  app.status = 'not_selected';
+  app.events = [event, ...app.events];
+  details[id] = app;
+  writeDetails(details);
+  updateSummary(id, 'not_selected', at);
+  return app;
 }
 
 export async function listInterviews(appId: string, cookie?: string): Promise<Interview[]> {
