@@ -9,7 +9,7 @@ import { env } from '@/config/env';
 import { track } from '@/lib/track';
 
 export default function ThreadPage() {
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>()!;
   const id = params.id;
   const [thread, setThread] = useState<Thread>({ messages: [] });
 
