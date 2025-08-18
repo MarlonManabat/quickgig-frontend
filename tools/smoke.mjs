@@ -1,5 +1,24 @@
+const VERCEL_ENV = process.env.VERCEL_ENV;
+if (VERCEL_ENV !== 'production') {
+  console.log('skip: non-prod env');
+  process.exit(0);
+}
+if (!process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL.trim() === '') {
+  console.log('skip: no API URL');
+  process.exit(0);
+}
 const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
-const fetchImpl = globalThis.fetch;
+const TIMEOUT = 5000;
+const fetchImpl = async (url, init) => {
+  try {
+    return await globalThis.fetch(url, { ...init, signal: AbortSignal.timeout(TIMEOUT) });
+  } catch (err) {
+    const msg = err.name === 'AbortError' ? `timeout after ${TIMEOUT}ms` : err.message || err;
+    console.error(`[smoke] fetch failed for ${url}: ${msg}`);
+    if (VERCEL_ENV === 'production') process.exit(1);
+    throw err;
+  }
+};
 const bail = (m)=>{ console.error(m); process.exit(1); };
 const beta = process.env.NEXT_PUBLIC_ENABLE_BETA_RELEASE === 'true';
 const isProd = process.env.NODE_ENV === 'production';

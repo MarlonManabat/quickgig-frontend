@@ -31,6 +31,13 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+### Vercel Preview
+
+Preview deployments skip smoke and live API checks unless both
+`VERCEL_ENV=production` and `NEXT_PUBLIC_API_URL` are set. To exercise the API
+in a preview, provide `NEXT_PUBLIC_API_URL`; otherwise the checks log `skip` and
+exit successfully.
+
 ### Quick Start: Staging
 
 1. Copy `.env.staging.example` to `.env.local`.
