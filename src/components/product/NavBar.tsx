@@ -52,7 +52,7 @@ export default function NavBar() {
         <details style={{ position: 'relative' }}>
           <summary style={{ listStyle: 'none', cursor: 'pointer', width: 32, height: 32, borderRadius: '50%', background: T.colors.brand, color: '#fff', display: 'grid', placeItems: 'center', position:'relative', overflow:'hidden' }}>
             {avatar?.data ? (
-              <img src={avatar.data} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />
+              <img src={avatar.url} alt="" style={{width:'100%',height:'100%',objectFit:'cover'}} />
             ) : (
               session.name?.charAt(0).toUpperCase()
             )}

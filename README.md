@@ -45,6 +45,27 @@ To verify the live API locally, run:
 ```bash
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
+## S3 uploads (optional)
+
+Feature-flagged uploads generate a signed URL using the server-only AWS SDK. Set these env vars and toggle the flag:
+
+```
+NEXT_PUBLIC_ENABLE_S3_UPLOADS=true
+NEXT_PUBLIC_MAX_UPLOAD_MB=2
+ALLOWED_UPLOAD_MIME=image/png,image/jpeg,application/pdf
+S3_BUCKET=your-bucket
+S3_REGION=ap-southeast-1
+S3_ACCESS_KEY_ID=AKIA...
+S3_SECRET_ACCESS_KEY=...
+```
+
+Get a presigned URL:
+
+```
+curl -X POST localhost:3000/api/upload -d '{"key":"uploads/test.txt","type":"text/plain"}' -H 'content-type: application/json'
+```
+
+Use the returned URL to PUT the file from the browser.
 
 ## Sockets
 

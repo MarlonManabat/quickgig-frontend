@@ -15,7 +15,10 @@ import { toast } from '../../../src/lib/toast';
 import { useRouter } from 'next/router';
 import { getResume, setResume } from '../../../src/lib/profileStore';
 import { UploadedFile } from '../../../src/types/upload';
-import { toBase64, truncateDataUrl, validate, makeId, MAX_MB } from '../../../src/lib/uploader';
+import { toBase64, truncateDataUrl, makeId } from '../../../src/lib/baseUpload';
+import { validateFile, MAX_MB } from '../../../src/lib/uploadPolicy';
+import { presign, putFile } from '../../../src/lib/uploader';
+import { makeUploadKey } from '../../../src/lib/uploadKey';
 
 type Props = { job: JobDetail|null; legacyHtml?: string };
 
@@ -121,21 +124,30 @@ function ApplyForm({ job }: { job: JobDetail }) {
   async function onResumeChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    const v = validate(f);
+    const v = validateFile(f);
     if (!v.ok) {
-      toast(t(v.reason === 'too_big' ? 'profile.resume.too_big' : 'profile.resume.bad_type', { mb: MAX_MB }));
+      toast(t(v.reason === 'too_big' ? 'upload.too_big' : 'upload.bad_type', { mb: MAX_MB }));
       return;
     }
-    const dataUrl = await toBase64(f);
-    const up: UploadedFile = { id: makeId(), name: f.name, type: f.type, size: f.size, data: truncateDataUrl(dataUrl), createdAt: Date.now() };
-    try {
-      const r = await fetch('/api/upload', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ kind:'resume', file: up }) });
-      if (r.ok) {
+    if (process.env.NEXT_PUBLIC_ENABLE_S3_UPLOADS === 'true') {
+      const key = makeUploadKey('resumes', f.name);
+      try {
+        const { url } = await presign(key, f.type);
+        await putFile(url, f);
+        const up: UploadedFile = { key, url: url.split('?')[0], type: f.type, size: f.size };
         setResumeState(up);
         setResume(up);
         toast(t('profile.resume.saved'));
+      } catch {
+        toast(t('upload.failed'));
       }
-    } catch {}
+    } else {
+      const dataUrl = await toBase64(f);
+      const up: UploadedFile = { key: makeId(), url: truncateDataUrl(dataUrl), type: f.type, size: f.size };
+      setResumeState(up);
+      setResume(up);
+      toast(t('profile.resume.saved'));
+    }
   }
 
   return (
@@ -161,7 +173,7 @@ function ApplyForm({ job }: { job: JobDetail }) {
         <div style={{display:'flex', alignItems:'center', gap:8}}>
           {resume ? (
             <>
-              <span>{t('apply.resume_attached',{name: resume.name})}</span>
+              <span>{t('apply.resume_attached',{name: resume.url.split('/').pop()})}</span>
               <button type="button" onClick={()=>resumeInput.current?.click()} style={{textDecoration:'underline', background:'none', border:'none', color:T.colors.brand, cursor:'pointer'}}>{t('profile.resume.replace')}</button>
             </>
           ) : (

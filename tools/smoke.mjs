@@ -39,15 +39,21 @@ const fetchJson = async (url) => {
     const j = await rA.json().catch(() => []);
     console.log('alerts count', Array.isArray(j) ? j.length : 0);
   } catch (e) { console.log('alerts count error', String(e)); }
-  try {
-    const u = await fetch(`${BASE}/api/upload`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ kind: 'resume', file: { id: 'x', name: 'x.txt', type: 'text/plain', size: 1, createdAt: Date.now(), data: '' } })
-    });
-    const jU = await u.json().catch(() => ({}));
-    console.log('upload api', u.status, jU?.ok);
-  } catch (e) { console.log('upload api error', String(e)); }
+  if (process.env.NEXT_PUBLIC_ENABLE_S3_UPLOADS !== 'true') {
+    console.log('upload: skipped (flag off)');
+  } else {
+    try {
+      const u = await fetch(`${BASE}/api/upload`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ key: 'uploads/test.txt', type: 'text/plain' })
+      });
+      const jU = await u.json().catch(() => ({}));
+      console.log('upload', u.status, jU?.url ? 'ok' : 'no url');
+    } catch (e) {
+      console.log('upload error', String(e));
+    }
+  }
   try {
     const c = await fetch(`${BASE}/api/alerts`, {
       method: 'POST',

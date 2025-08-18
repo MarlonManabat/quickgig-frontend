@@ -37,7 +37,8 @@
     "font:status": "node scripts/font-status.mjs",
     "postbuild": "node tools/print_routes.mjs",
     "smoke:urls": "node -e \"const u=process.env.BASE||\"http://localhost:3000\"; const f=async (p)=>{const r=await fetch(u+p,{method:\"HEAD\"}); console.log(p, r.status, r.headers.get(\"content-type\")||\"-\");}; (async()=>{for(const p of [\"/__health\",\"/\",\"/?legacy=1\",\"/login\",\"/legacy/styles.css\",\"/legacy/fonts/LegacySans.woff2\"]) await f(p)})()\"",
-    "smoke:product": "node tools/smoke.mjs"
+    "smoke:product": "node tools/smoke.mjs",
+    "smoke:upload": "node tools/smoke_upload.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
@@ -50,7 +51,9 @@
     "react-dom": "^18",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "webpack-bundle-analyzer": "^4.10.2",
+    "@aws-sdk/client-s3": "^3.620.0",
+    "@aws-sdk/s3-request-presigner": "^3.620.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.2",
@@ -62,7 +65,8 @@
     "eslint-config-next": "14.2.31",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "eslint-plugin-jsx-a11y": "^6.8.0"
   },
   "engines": {
     "node": ">=18"
