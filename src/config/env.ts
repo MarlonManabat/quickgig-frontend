@@ -131,8 +131,14 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_GCASH ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_STRIPE:
     String(process.env.NEXT_PUBLIC_ENABLE_STRIPE ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE:
+    String(process.env.NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE ?? 'false').toLowerCase() === 'true',
+  STRIPE_TEST_PUBLISHABLE_KEY: process.env.STRIPE_TEST_PUBLISHABLE_KEY || '',
+  STRIPE_TEST_SECRET_KEY: process.env.STRIPE_TEST_SECRET_KEY || '',
   STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY || '',
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+  GCASH_MERCHANT_ID: process.env.GCASH_MERCHANT_ID || '',
+  GCASH_API_KEY: process.env.GCASH_API_KEY || '',
   NEXT_PUBLIC_ENABLE_MONITORING:
     String(process.env.NEXT_PUBLIC_ENABLE_MONITORING ?? 'false').toLowerCase() === 'true',
   SENTRY_DSN: process.env.SENTRY_DSN || '',
