@@ -68,8 +68,12 @@ export default function ApplicantsList({ params }: { params: { id: string } }) {
       </div>
       <ul className="space-y-2">
         {filtered.map((a) => (
-          <li key={a.id} className="border p-2 rounded flex justify-between items-center">
-            <span>
+          <li
+            key={a.id}
+            className="border p-2 rounded flex justify-between items-center"
+            data-testid={`app-${a.id}`}
+          >
+            <span data-testid={`status-${a.status}`}>
               {a.id} - {a.status}
             </span>
             <button
