@@ -28,6 +28,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
+            data-testid="toast-msg"
             className="bg-red-500 text-white px-4 py-2 rounded shadow"
           >
             {t.message}
