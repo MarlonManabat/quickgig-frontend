@@ -1,0 +1,12 @@
+import type { Metadata } from 'next';
+import HomePageClient from './HomePageClient';
+
+export const metadata: Metadata = {
+  title: 'QuickGig',
+  description: 'Gigs and talent, matched fast.',
+};
+
+export default async function Page() {
+  return <HomePageClient />;
+}
+

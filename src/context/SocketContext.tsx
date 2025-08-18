@@ -1,8 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { Socket } from 'socket.io-client';
-import { getSocket } from '@/lib/socket';
+import { io, Socket } from 'socket.io-client';
+import { useAuth } from './AuthContext';
+import { API_BASE } from '@/lib/api';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -29,25 +30,43 @@ interface SocketProviderProps {
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    let active = true;
-    let localSocket: Socket | null = null;
-    getSocket().then((s) => {
-      if (!active || !s) return;
-      localSocket = s;
-      setSocket(s);
-      setIsConnected(s.connected);
-      s.on('connect', () => setIsConnected(true));
-      s.on('disconnect', () => setIsConnected(false));
-    });
-    return () => {
-      active = false;
-      localSocket?.close();
-      setSocket(null);
-      setIsConnected(false);
-    };
-  }, []);
+    if (isAuthenticated && user) {
+      const newSocket = io(API_BASE, { withCredentials: true, transports: ['websocket', 'polling'] });
+
+      newSocket.on('connect', () => {
+        console.log('Connected to server');
+        setIsConnected(true);
+      });
+
+      newSocket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        setIsConnected(false);
+      });
+
+      newSocket.on('connect_error', (error) => {
+        console.error('Connection error:', error);
+        setIsConnected(false);
+      });
+
+      setSocket(newSocket);
+
+      return () => {
+        newSocket.close();
+        setSocket(null);
+        setIsConnected(false);
+      };
+    } else {
+      // Clean up socket if user is not authenticated
+      if (socket) {
+        socket.close();
+        setSocket(null);
+        setIsConnected(false);
+      }
+    }
+  }, [isAuthenticated, user, socket]);
 
   const joinChat = (chatRoomId: string) => {
     if (socket && isConnected) {

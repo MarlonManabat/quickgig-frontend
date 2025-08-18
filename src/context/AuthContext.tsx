@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { IS_LEGACY_ROUTE } from '@/env/runtime';
 import { User, LoginData, SignupData, UpdateUserData } from '@/types';
 import { api } from '@/lib/apiClient';
 import { login as loginApi, register as registerApi, me as meApi } from '@/lib/auth/client';
@@ -46,10 +45,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (IS_LEGACY_ROUTE()) {
-      setLoading(false);
-      return;
-    }
     fetchMe().finally(() => setLoading(false));
   }, []);
 

@@ -8,7 +8,7 @@
     "start": "next start -p 3000",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc --noEmit",
     "check:api": "node tools/check_api.mjs",
     "check:api:soft": "node tools/check_live_api.mjs || true",
     "check:app": "node tools/check_app.mjs",
@@ -16,38 +16,17 @@
     "check:app:soft": "node tools/check_live_app.mjs || true",
     "check:dns:app": "node tools/check_dns_app.mjs",
     "check:jobs": "node tools/check_jobs_api.mjs || true",
-    "check:legacy": "node tools/check_no_socket_on_legacy.mjs",
     "smoke": "node tools/smoke.mjs",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test -c ./playwright.config.ts --grep @smoke",
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
-    "scan:links": "node tools/check_links.mjs",
-    "bootstrap": "node tools/dev/bootstrap.mjs",
-    "legacy:sync": "node tools/legacy/sync.js",
-    "legacy:verify": "node tools/legacy_verify.mjs",
-    "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
-    "legacy:check": "node tools/legacy_verify.mjs --pretty",
-    "legacy:import": "node tools/import_from_dir.mjs",
-    "test": "tsc src/lib/flags.ts src/lib/legacy/renderLegacy.ts src/lib/legacy/__tests__/sanitize.test.ts --module commonjs --target ES2019 --esModuleInterop --outDir dist-test && node --test dist-test/legacy/__tests__/sanitize.test.js",
-    "legacy:verify:strict": "node scripts/legacy-verify-strict.mjs",
-    "smoke:prod": "node scripts/smoke-prod.mjs",
-    "legacy:font:install": "node tools/install_legacy_font.mjs",
-    "font:status": "node scripts/font-status.mjs",
-    "prepare": "husky install || true",
-    "postbuild": "node tools/print_routes.mjs",
-    "smoke:urls": "node -e \"const u=process.env.BASE||\"http://localhost:3000\"; const f=async (p)=>{const r=await fetch(u+p,{method:\"HEAD\"}); console.log(p, r.status, r.headers.get(\"content-type\")||\"-\");}; (async()=>{for(const p of [\"/__health\",\"/\",\"/?legacy=1\",\"/login\",\"/legacy/styles.css\",\"/legacy/fonts/LegacySans.woff2\"]) await f(p)})()\"",
-    "smoke:product": "node tools/smoke.mjs",
-    "routes:print": "node tools/print_routes.mjs",
-    "smoke:status": "node tools/smoke_status.mjs",
-    "smoke:messages": "node tools/smoke_messages.mjs",
-    "smoke:upload": "node tools/smoke_upload.mjs"
+    "scan:links": "node tools/check_links.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
     "axios": "^1.11.0",
-    "cheerio": "1.0.0-rc.12",
     "clsx": "^2.1.1",
     "lucide-react": "^0.539.0",
     "next": "14.2.31",
@@ -55,9 +34,7 @@
     "react-dom": "^18",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1",
-    "webpack-bundle-analyzer": "^4.10.2",
-    "@aws-sdk/client-s3": "^3.620.0",
-    "@aws-sdk/s3-request-presigner": "^3.620.0"
+    "webpack-bundle-analyzer": "^4.10.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.2",
@@ -69,19 +46,12 @@
     "eslint-config-next": "14.2.31",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "eslint-plugin-jsx-a11y": "^6.8.0"
+    "typescript": "^5"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x"
   },
   "playwright": {
     "skipBrowserDownload": true
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,json,md}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
   }
 }
