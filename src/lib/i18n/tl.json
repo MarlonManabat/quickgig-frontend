@@ -1,0 +1,20 @@
+{
+  "marketing": {
+    "home": {
+      "tagline": "Bilis ang next gig mo.",
+      "features": {
+        "post": "Mag-post ng gig nang mabilis",
+        "apply": "Mag-apply sa isang tap",
+        "secure": "Secure ang usapan at updates"
+      },
+      "cta": {
+        "primary": "Simulan na",
+        "secondary": "Hanap trabaho"
+      }
+    },
+    "about": {
+      "heading": "Tungkol sa QuickGig",
+      "body": "Kinokonekta ng QuickGig ang mga gig worker at employer nang mabilis."
+    }
+  }
+}

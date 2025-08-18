@@ -114,6 +114,26 @@ Rollback: set `NEXT_PUBLIC_ENABLE_SECURITY_AUDIT=false` and redeploy.
 
 Notes: works in mock and php engine modes; logs request metrics to console.
 
+### Localization & Content Polish (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_I18N_POLISH` – refine EN/Taglish strings and marketing copy on landing pages.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_I18N_POLISH=true
+```
+
+Then run:
+
+```
+BASE=http://localhost:3000 npm run smoke
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_I18N_POLISH=false` and redeploy.
+
+Notes: polish-only, safe rollback by disabling flag.
+
 ### Apply Flow Happy Path Audit (Flagged)
 
 - `NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT` – run snapshot tests for the Apply flow in mock mode. Dev/test only.

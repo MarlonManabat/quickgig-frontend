@@ -1,0 +1,20 @@
+{
+  "marketing": {
+    "home": {
+      "tagline": "Fast-track your next gig.",
+      "features": {
+        "post": "Post gigs in minutes",
+        "apply": "Apply with one tap",
+        "secure": "Secure messaging & updates"
+      },
+      "cta": {
+        "primary": "Get started",
+        "secondary": "Browse jobs"
+      }
+    },
+    "about": {
+      "heading": "About QuickGig",
+      "body": "QuickGig connects gig workers with employers fast."
+    }
+  }
+}
