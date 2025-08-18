@@ -94,6 +94,26 @@ Rollback: set `NEXT_PUBLIC_ENABLE_STATUS_PAGE=false` and redeploy.
 
 Notes: internal health check, not for SEO.
 
+### Apply Flow Happy Path Audit (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT` – run snapshot tests for the Apply flow in mock mode. Dev/test only.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT=true
+```
+
+Then run:
+
+```
+BASE=http://localhost:3000 npm run smoke
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT=false` and redeploy.
+
+Notes: mock mode only; ensures Apply happy path UI renders.
+
 ## Staging auth & engine flows
 
 Engine-backed auth and data wiring is gated behind flags and off by default.

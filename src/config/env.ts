@@ -14,6 +14,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2 ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_APPLICANT_APPS:
     String(process.env.NEXT_PUBLIC_ENABLE_APPLICANT_APPS ?? 'true').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT:
+    String(process.env.NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT ?? 'false').toLowerCase() === 'true',
 
   NEXT_PUBLIC_ENABLE_ENGINE_AUTH:
     String(process.env.NEXT_PUBLIC_ENABLE_ENGINE_AUTH ?? 'false').toLowerCase() === 'true',
