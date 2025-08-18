@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import type { GetServerSideProps } from 'next';
-import type { ApplicationSummary, ApplicationStatus } from '@/types/application';
-import { fetchApplications, patchApplicationStatus } from '@/lib/applicationsApi';
-import { toast } from '@/lib/toast';
+import type { ApplicationSummary } from '@/types/application';
+import { fetchApplications } from '@/lib/applicationsApi';
 import { env } from '@/config/env';
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
@@ -33,41 +32,18 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   return { props: {} } as const;
 };
 
-const statuses: ApplicationStatus[] = [
-  'applied',
-  'viewed',
-  'shortlisted',
-  'rejected',
-  'hired',
-];
+const statuses = ['applied', 'viewed', 'shortlisted', 'rejected', 'hired'] as const;
 
 type SortKey = 'newest' | 'oldest' | 'updated';
 
 export default function ApplicationsPage() {
   const [apps, setApps] = useState<ApplicationSummary[]>([]);
-  const [statusFilter, setStatusFilter] = useState<'all' | ApplicationStatus>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | (typeof statuses)[number]>('all');
   const [sort, setSort] = useState<SortKey>('newest');
 
   useEffect(() => {
     fetchApplications().then(setApps).catch(() => {});
   }, []);
-
-  const changeStatus = async (id: string, status: ApplicationStatus) => {
-    const prev = apps;
-    setApps((a) =>
-      a.map((app) =>
-        app.id === id ? { ...app, status, updatedAt: new Date().toISOString() } : app,
-      ),
-    );
-    try {
-      const updated = await patchApplicationStatus(id, status);
-      setApps((a) => a.map((app) => (app.id === id ? updated : app)));
-      toast('Status updated');
-    } catch {
-      toast('Failed to update status');
-      setApps(prev);
-    }
-  };
 
   const filtered = apps.filter((a) =>
     statusFilter === 'all' ? true : a.status === statusFilter,
@@ -93,7 +69,7 @@ export default function ApplicationsPage() {
             <select
               value={statusFilter}
               onChange={(e) =>
-                setStatusFilter(e.target.value as 'all' | ApplicationStatus)
+                setStatusFilter(e.target.value as 'all' | (typeof statuses)[number])
               }
               className="border rounded p-2 text-sm"
             >
@@ -131,24 +107,14 @@ export default function ApplicationsPage() {
               {sorted.map((app) => (
                 <tr key={app.id} className="border-t">
                   <td className="py-2">
-                    <Link href={`/jobs/${app.jobId}`}>{app.jobTitle}</Link>
+                    <Link href={`/applications/${app.id}`}>{app.jobTitle}</Link>
                   </td>
                   <td className="py-2">{app.company}</td>
                   <td className="py-2">{app.location}</td>
                   <td className="py-2">
-                    <select
-                      value={app.status}
-                      onChange={(e) =>
-                        changeStatus(app.id, e.target.value as ApplicationStatus)
-                      }
-                      className="border rounded p-1 text-xs"
-                    >
-                      {statuses.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
+                    <span className="px-2 py-1 rounded bg-gray-200 text-gray-800 text-xs">
+                      {app.status}
+                    </span>
                   </td>
                   <td className="py-2">
                     {Math.round(

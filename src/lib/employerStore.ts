@@ -1,5 +1,11 @@
 import type { CompanyProfile } from '@/types/company';
 import type { JobMetrics, JobReport } from '@/types/metrics';
+import type {
+  ApplicationDetail,
+  ApplicationEvent,
+  ApplicationStatus,
+} from '@/types/applications';
+import { seedMockApps } from './applicantStore';
 
 export interface EmployerJob {
   id: string;
@@ -19,6 +25,8 @@ const REPORTS_KEY = 'reports';
 let memoryCompany: CompanyProfile | null = null;
 let memoryJobs: EmployerJob[] | null = null;
 let memoryReports: JobReport[] | null = null;
+const DETAIL_KEY = 'app-details';
+let memoryAppDetails: Record<string, ApplicationDetail> | null = null;
 
 function readCompany(): CompanyProfile | null {
   if (typeof window !== 'undefined' && window.localStorage) {
@@ -49,6 +57,22 @@ function writeJobs(jobs: EmployerJob[]) {
     window.localStorage.setItem(JOBS_KEY, JSON.stringify(jobs));
   } else {
     memoryJobs = jobs;
+  }
+}
+
+function readAppDetails(): Record<string, ApplicationDetail> {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const raw = window.localStorage.getItem(DETAIL_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, ApplicationDetail>) : {};
+  }
+  return memoryAppDetails || {};
+}
+
+function writeAppDetails(details: Record<string, ApplicationDetail>) {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.setItem(DETAIL_KEY, JSON.stringify(details));
+  } else {
+    memoryAppDetails = details;
   }
 }
 
@@ -310,6 +334,86 @@ export async function resolveReport(
   if (!res.ok) throw new Error(`engine ${res.status}`);
   const json = (await res.json()) as { report: JobReport };
   return json.report;
+}
+
+export async function getApplicationDetail(
+  jobId: string,
+  appId: string,
+  cookie?: string,
+): Promise<ApplicationDetail | null> {
+  if (MODE === 'mock') {
+    seedMockApps();
+    const details = readAppDetails();
+    const app = details[appId];
+    return app && app.jobId === jobId ? app : null;
+  }
+  const res = await fetch(`${BASE}/api/employer/jobs/${jobId}/applications/${appId}`, {
+    headers: { Cookie: cookie || '' },
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as ApplicationDetail;
+}
+
+export async function updateApplicationStatus(
+  jobId: string,
+  appId: string,
+  status: ApplicationStatus,
+  note?: string,
+  cookie?: string,
+): Promise<ApplicationDetail> {
+  if (MODE === 'mock') {
+    const details = readAppDetails();
+    const app = details[appId];
+    if (!app) throw new Error('not found');
+    const event: ApplicationEvent = {
+      at: new Date().toISOString(),
+      type: status,
+      by: 'employer',
+      note,
+    };
+    app.status = status;
+    app.events = [event, ...app.events];
+    details[appId] = app;
+    writeAppDetails(details);
+    return app;
+  }
+  const res = await fetch(`${BASE}/api/employer/jobs/${jobId}/applications/${appId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Cookie: cookie || '' },
+    body: JSON.stringify({ status, note }),
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as ApplicationDetail;
+}
+
+export async function appendEmployerNote(
+  jobId: string,
+  appId: string,
+  note: string,
+  cookie?: string,
+): Promise<ApplicationDetail> {
+  const event: ApplicationEvent = {
+    at: new Date().toISOString(),
+    type: 'note',
+    by: 'employer',
+    note,
+  };
+  if (MODE === 'mock') {
+    const details = readAppDetails();
+    const app = details[appId];
+    if (!app) throw new Error('not found');
+    app.events = [event, ...app.events];
+    details[appId] = app;
+    writeAppDetails(details);
+    return app;
+  }
+  const res = await fetch(`${BASE}/api/employer/jobs/${jobId}/applications/${appId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Cookie: cookie || '' },
+    body: JSON.stringify({ note }),
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as ApplicationDetail;
 }
 
 export { readJobs };
