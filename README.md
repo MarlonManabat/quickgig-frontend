@@ -31,6 +31,13 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+## Flags
+
+- `NEXT_PUBLIC_ENABLE_INTERVIEWS_UI` – enable interview scheduling UI. When enabled, the app uses `/api/interviews` and `/api/interviews/[id]` for creating and updating interviews. Optional helpers:
+  - `NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD` – default method (`video`, `phone`, `in_person`).
+  - `NEXT_PUBLIC_INTERVIEW_SLOT_MINUTES` – default duration in minutes.
+  - `INTERVIEWS_WEBHOOK_URL` – POST webhook on create/update (best effort).
+
 ## Jobs search & saved jobs
 
 The `/jobs` page offers search, filters and pagination. Filter values are

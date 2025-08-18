@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import HeadSEO from '@/components/HeadSEO';
 import { env } from '@/config/env';
@@ -11,18 +11,32 @@ import {
   appendEmployerNote,
   getApplicationDetail,
 } from '@/lib/employerStore';
-import InterviewForm from '@/components/interviews/InterviewForm';
+import InterviewForm from '@/product/interviews/InterviewForm';
+import type { Interview } from '@/src/types/interview';
+import { interviewsEnabled } from '@/src/lib/interviews';
 
 export default function EmployerApplicantPage({ params }: { params: { id: string; appId: string } }) {
   const { id: jobId, appId } = params;
   const [app, setApp] = useState<ApplicationDetail | null>(null);
   const [note, setNote] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<Interview | null>(null);
+  const [interviews, setInterviews] = useState<Interview[]>([]);
 
-  useEffect(() => {
-    if (!env.NEXT_PUBLIC_ENABLE_EMPLOYER_APPLICANT_DRILLDOWN) return;
-    getApplicationDetail(jobId, appId).then(setApp).catch(() => setApp(null));
-  }, [jobId, appId]);
+  const refresh = useCallback(() => {
+    fetch(`/api/interviews?appId=${appId}`)
+      .then((r) => (r.ok ? r.json() : { interviews: [] }))
+      .then((d) => setInterviews(d.interviews || []))
+      .catch(() => setInterviews([]));
+  }, [appId]);
+
+    useEffect(() => {
+      if (!env.NEXT_PUBLIC_ENABLE_EMPLOYER_APPLICANT_DRILLDOWN) return;
+      getApplicationDetail(jobId, appId).then(setApp).catch(() => setApp(null));
+      if (interviewsEnabled()) {
+        refresh();
+      }
+    }, [jobId, appId, refresh]);
 
   const changeStatus = async (s: ApplicationStatus) => {
     if (!app) return;
@@ -38,20 +52,31 @@ export default function EmployerApplicantPage({ params }: { params: { id: string
     }
   };
 
-  const saveNote = async () => {
-    if (!note.trim()) return;
-    try {
-      const updated = await appendEmployerNote(jobId, appId, note.trim());
-      setApp(updated);
-      setNote('');
-      toast(t('saved'));
-    } catch {
-      toast(t('withdraw_error'));
-    }
-  };
-
-
-
+    const saveNote = async () => {
+      if (!note.trim()) return;
+      try {
+        const updated = await appendEmployerNote(jobId, appId, note.trim());
+        setApp(updated);
+        setNote('');
+        toast(t('saved'));
+      } catch {
+        toast(t('withdraw_error'));
+      }
+    };
+    const updateInterview = async (id: string, patch: Partial<Interview>) => {
+      try {
+        const r = await fetch(`/api/interviews/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patch),
+        });
+        if (!r.ok) throw new Error('fail');
+        toast(t('interviews.toast_updated'));
+        refresh();
+      } catch {
+        toast(t('withdraw_error'));
+      }
+    };
   if (!env.NEXT_PUBLIC_ENABLE_EMPLOYER_APPLICANT_DRILLDOWN) return null;
   if (!app) {
     return (
@@ -111,16 +136,49 @@ export default function EmployerApplicantPage({ params }: { params: { id: string
               {t('add_note')}
             </button>
           </div>
-          {env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI && (
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-green-500 text-white px-2 py-1 rounded text-sm"
-            >
-              {t('interviews.invite')}
-            </button>
+          </div>
+          {interviewsEnabled() && (
+            <div className="space-y-2">
+              <h3 className="font-semibold">{t('interviews.section_title')}</h3>
+              <ul className="space-y-2">
+                {interviews.map((iv) => (
+                  <li key={iv.id} className="flex items-center justify-between text-sm">
+                    <span>{new Date(iv.whenISO).toLocaleString()}</span>
+                    <span className="capitalize px-2 py-1 bg-gray-100 rounded">{iv.status}</span>
+                    {iv.status === 'proposed' && (
+                      <span className="space-x-1">
+                        <button
+                          onClick={() => updateInterview(iv.id, { status: 'accepted' })}
+                          className="bg-green-500 text-white px-2 py-1 rounded"
+                        >
+                          {t('interviews.accept_cta')}
+                        </button>
+                        <button
+                          onClick={() => updateInterview(iv.id, { status: 'declined' })}
+                          className="bg-red-500 text-white px-2 py-1 rounded"
+                        >
+                          {t('interviews.decline_cta')}
+                        </button>
+                        <button
+                          onClick={() => setEditing(iv)}
+                          className="px-2 py-1 border rounded"
+                        >
+                          {t('interviews.reschedule_cta')}
+                        </button>
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => setShowForm(true)}
+                className="bg-green-500 text-white px-2 py-1 rounded text-sm"
+              >
+                {t('interviews.propose_cta')}
+              </button>
+            </div>
           )}
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
             <h3 className="font-semibold mb-2">Timeline</h3>
             <ul className="space-y-2">
@@ -144,18 +202,24 @@ export default function EmployerApplicantPage({ params }: { params: { id: string
           </div>
         </div>
       </main>
-      {showForm && (
+      {(showForm || editing) && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded shadow">
             <InterviewForm
+              appId={appId}
               jobId={jobId}
+              employerId=""
               applicantId={appId}
-              onCreated={() => setShowForm(false)}
-              onClose={() => setShowForm(false)}
+              initial={editing || undefined}
+              onDone={() => {
+                setShowForm(false);
+                setEditing(null);
+                refresh();
+              }}
             />
           </div>
         </div>
       )}
-    </>
-  );
-}
+      </>
+    );
+  }
