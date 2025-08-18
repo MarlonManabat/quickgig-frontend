@@ -1,5 +1,9 @@
 import type { ApplicationSummary } from '@/types/application';
 import type { ApplicationDetail, ApplicationEvent } from '@/types/applications';
+import type { Interview, InterviewSlot } from '@/types/interviews';
+import { readInterviews, writeInterviews } from './interviewStore';
+
+const cache: Record<string, Interview[]> = {};
 
 const LS_KEY = 'apps';
 const DETAIL_KEY = 'app-details';
@@ -166,6 +170,78 @@ export async function appendEvent(
   });
   if (!res.ok) throw new Error(`engine ${res.status}`);
   return (await res.json()) as ApplicationDetail;
+}
+
+export async function listInterviews(appId: string, cookie?: string): Promise<Interview[]> {
+  if (MODE === 'mock') {
+    const map = readInterviews();
+    const arr = map[appId] || [];
+    cache[appId] = arr;
+    return arr;
+  }
+  const res = await fetch(`${BASE}/api/applications/${appId}/interviews`, {
+    headers: { Cookie: cookie || '' },
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  const list = (await res.json()) as Interview[];
+  cache[appId] = list;
+  return list;
+}
+
+export async function respondInterview(
+  interviewId: string,
+  action: 'accept' | 'decline',
+  slot?: InterviewSlot,
+  cookie?: string,
+): Promise<Interview> {
+  if (MODE === 'mock') {
+    const map = readInterviews();
+    let foundAppId: string | null = null;
+    let idx = -1;
+    for (const [aid, arr] of Object.entries(map)) {
+      const i = arr.findIndex((x) => x.id === interviewId);
+      if (i !== -1) {
+        foundAppId = aid;
+        idx = i;
+        break;
+      }
+    }
+    if (!foundAppId || idx === -1) throw new Error('not found');
+    const interview = map[foundAppId][idx];
+    interview.status = action === 'accept' ? 'accepted' : 'declined';
+    if (action === 'accept' && slot) interview.chosen = slot;
+    interview.updatedAt = new Date().toISOString();
+    map[foundAppId][idx] = interview;
+    writeInterviews(map);
+    const details = readDetails();
+    const app = details[foundAppId];
+    if (app) {
+      const event: ApplicationEvent = {
+        at: interview.updatedAt,
+        type: action === 'accept' ? 'accepted' : 'rejected',
+        by: 'applicant',
+      } as ApplicationEvent;
+      app.events = [event, ...app.events];
+      details[foundAppId] = app;
+      writeDetails(details);
+    }
+    return interview;
+  }
+  let appId: string | undefined;
+  for (const [aid, arr] of Object.entries(cache)) {
+    if (arr.some((i) => i.id === interviewId)) {
+      appId = aid;
+      break;
+    }
+  }
+  if (!appId) throw new Error('not found');
+  const res = await fetch(`${BASE}/api/applications/${appId}/interviews`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Cookie: cookie || '' },
+    body: JSON.stringify({ id: interviewId, action, slot }),
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as Interview;
 }
 
 export { readApps };
