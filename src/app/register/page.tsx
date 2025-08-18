@@ -19,8 +19,8 @@ export default function RegisterPage() {
     if (!name || !email || !password) { setError('All fields are required'); return; }
     setLoading(true);
     try {
-      const data = await register({ name, email, password });
-      if (!data?.ok) throw new Error(data?.message || 'Registration failed');
+      const res = await register({ name, email, password });
+      if (!res.ok) throw new Error(`Registration failed: ${res.status}`);
       if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('signup_success');
       router.push('/dashboard');
     } catch (err) {

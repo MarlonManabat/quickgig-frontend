@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { login } from '@/lib/auth/client';
 
 export default function LoginPage() {
   const r = useRouter();
@@ -14,19 +15,14 @@ export default function LoginPage() {
     setErr('');
     setLoading(true);
     try {
-      const res = await fetch('/api/session/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (json?.ok) {
+      const res = await login({ email, password });
+      if (res.ok) {
         r.replace('/dashboard');
         return;
       }
-      setErr(json?.message || 'Invalid email or password');
-    } catch {
-      setErr('Auth service unreachable');
+      setErr(`Login failed: ${res.status}`);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Auth service unreachable');
     } finally {
       setLoading(false);
     }

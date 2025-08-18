@@ -31,12 +31,20 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+### Auth Proxy
+
+Authentication calls now go through same-origin Next.js routes (`/api/session/*`).
+These proxy to `${NEXT_PUBLIC_API_URL}` (default `https://quickgig.ph`) and
+forward headers, method, body, and cookies, removing the need for CORS workarounds.
+
 ### Vercel Preview
 
-Preview deployments skip smoke and live API checks unless both
-`VERCEL_ENV=production` and `NEXT_PUBLIC_API_URL` are set. To exercise the API
-in a preview, provide `NEXT_PUBLIC_API_URL`; otherwise the checks log `skip` and
-exit successfully.
+Smoke tests are automatically skipped on Vercel builds. To run smoke locally or
+in CI, opt in explicitly:
+
+```bash
+RUN_SMOKE=1 SMOKE_BASE_URL=http://127.0.0.1:3000 npm run build
+```
 
 ### Quick Start: Staging
 

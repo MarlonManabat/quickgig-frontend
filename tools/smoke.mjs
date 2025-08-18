@@ -7,7 +7,7 @@ if (!process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL.trim() =
   console.log('skip: no API URL');
   process.exit(0);
 }
-const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
+const base = process.env.SMOKE_BASE_URL || process.env.BASE || 'http://localhost:3000';
 const TIMEOUT = 5000;
 const fetchImpl = async (url, init) => {
   try {
@@ -58,7 +58,7 @@ if (beta || isProd) {
   } else {
     console.log('[smoke] link map sanity skipped');
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_STATUS_PAGE === 'true') {
+  if (process.env.SMOKE_BASE_URL && process.env.NEXT_PUBLIC_ENABLE_STATUS_PAGE === 'true') {
     try {
       const s = await fetchImpl(base + '/status');
       const txt = await s.text();
@@ -72,7 +72,7 @@ if (beta || isProd) {
       console.log('[smoke] status check failed');
     }
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_SECURITY_AUDIT === 'true') {
+  if (process.env.SMOKE_BASE_URL && process.env.NEXT_PUBLIC_ENABLE_SECURITY_AUDIT === 'true') {
     try {
       const r = await fetchImpl(base + '/status/ping');
       const j = await r.json().catch(() => ({}));
@@ -105,7 +105,7 @@ if (beta || isProd) {
       console.log('[engine] checks failed');
     }
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_SETTINGS === 'true') {
+  if (process.env.SMOKE_BASE_URL && process.env.NEXT_PUBLIC_ENABLE_SETTINGS === 'true') {
     try {
       const s = await fetchImpl(base + '/settings');
       const txt = await s.text();
@@ -132,7 +132,7 @@ if (beta || isProd) {
       console.log('[smoke] api settings failed');
     }
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER === 'true') {
+  if (process.env.SMOKE_BASE_URL && process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER === 'true') {
     try {
       const n = await fetchImpl(base + '/notifications');
       const txt = await n.text();
@@ -155,7 +155,7 @@ if (beta || isProd) {
       console.log('[smoke] mark-all-read failed');
     }
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER === 'true') {
+  if (process.env.SMOKE_BASE_URL && process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER === 'true') {
     try {
       const r = await fetchImpl(base + '/api/notify/index');
       const j = await r.json().catch(() => ({}));
@@ -171,7 +171,7 @@ if (beta || isProd) {
       console.log('[smoke] notify failed');
     }
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_PAYMENTS === 'true') {
+  if (process.env.SMOKE_BASE_URL && process.env.NEXT_PUBLIC_ENABLE_PAYMENTS === 'true') {
     if (process.env.NEXT_PUBLIC_ENABLE_PAYMENTS_LIVE === 'true') {
       try {
         const r = await fetchImpl(base + '/api/payments/live', {
@@ -202,7 +202,7 @@ if (beta || isProd) {
   } else {
     console.log('[smoke] payments skipped');
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS === 'true') {
+  if (process.env.SMOKE_BASE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS === 'true') {
       for (const p of ['/interviews', '/employer/interviews']) {
         try {
           const r = await fetchImpl(base + p, { redirect: 'manual' });
@@ -387,7 +387,7 @@ if (beta || isProd) {
   } else {
     console.log('[smoke] notify center qa skipped');
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_I18N_POLISH === 'true') {
+  if (process.env.SMOKE_BASE_URL && process.env.NEXT_PUBLIC_ENABLE_I18N_POLISH === 'true') {
     try {
       const en = await fetchImpl(base + '/?lang=english');
       const enTxt = await en.text();

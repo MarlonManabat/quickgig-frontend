@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
+const base = process.env.SMOKE_BASE_URL || process.env.BASE || 'http://localhost:3000';
 
 async function main() {
   if (process.env.ENGINE_MODE !== 'php') {
