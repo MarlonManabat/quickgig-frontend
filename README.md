@@ -176,6 +176,27 @@ Rollback: set `NEXT_PUBLIC_ENABLE_NOTIFY_CENTER_QA=false` and redeploy.
 
 Notes: dev/test only, mock-safe. Page `/qa/notifications-center` renders `toast-msg` and `notify-list` markers.
 
+### Hiring Decisions QA Harness (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_HIRING_QA` – simulate hiring decisions and job closeout in mock mode.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_HIRING_QA=true
+```
+
+Then run:
+
+```
+npx playwright test tests/hiringDecisionsQA.spec.ts
+BASE=http://localhost:3000 node tools/smoke.mjs
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_HIRING_QA=false` and redeploy.
+
+Notes: mock/test only, no live applicant impact.
+
 ## Staging auth & engine flows
 
 Engine-backed auth and data wiring is gated behind flags and off by default.

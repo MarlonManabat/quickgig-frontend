@@ -266,6 +266,26 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   } else {
     console.log('[smoke] bulk rejection qa skipped');
   }
+  if (process.env.NEXT_PUBLIC_ENABLE_HIRING_QA === 'true') {
+    try {
+      const r = await fetchImpl(base + '/qa/hiring-decisions?auto=1');
+      const txt = await r.text();
+      if (
+        r.status === 200 &&
+        /data-testid="status-hired"/.test(txt) &&
+        /data-testid="status-not_selected"/.test(txt) &&
+        /data-testid="closeout-preview"/.test(txt)
+      ) {
+        console.log('[smoke] hiring decisions qa ok');
+      } else {
+        console.log('[smoke] hiring decisions qa', r.status);
+      }
+    } catch {
+      console.log('[smoke] hiring decisions qa failed');
+    }
+  } else {
+    console.log('[smoke] hiring decisions qa skipped');
+  }
   if (process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER_QA === 'true') {
     try {
       const r = await fetchImpl(base + '/qa/notifications-center?auto=1');

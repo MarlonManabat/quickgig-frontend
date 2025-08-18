@@ -188,6 +188,8 @@ const strings = {
       toastStatusChanged: 'Status changed',
       toastNewApplicant: 'New applicant',
       toastNewMessage: 'New message',
+      hiringQATitle: 'Hiring Decisions QA',
+      closeoutDone: 'Closeout complete',
     },
     email: {
       apply_subject: 'New application received',
@@ -384,6 +386,8 @@ const strings = {
       toastStatusChanged: 'Nagbago ang status',
       toastNewApplicant: 'May bagong applicant',
       toastNewMessage: 'May bagong message',
+      hiringQATitle: 'Hiring Decisions QA',
+      closeoutDone: 'Tapos na ang closeout',
     },
     email: {
       apply_subject: 'May bagong application',

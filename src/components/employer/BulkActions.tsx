@@ -13,7 +13,7 @@ export default function BulkActions({ applicants, job, auto = false }: { applica
     if (auto) run();
   }, [auto]);
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" data-testid="bulk-actions">
       {!auto && (
         <button
           onClick={run}
