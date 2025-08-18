@@ -8,6 +8,7 @@ import { Briefcase, MousePointerClick, Shield } from 'lucide-react';
 import { checkHealth } from '@/lib/api';
 import { track } from '@/lib/track';
 import { env } from '@/config/env';
+import { t } from '@/lib/i18n';
 
 type ApiStatus = 'loading' | 'ok' | 'error';
 
@@ -24,19 +25,29 @@ export default function HomePageClient() {
       });
   }, []);
 
-  const features = [
-    { title: 'Post a gig in minutes', icon: Briefcase },
-    { title: 'Apply with one tap', icon: MousePointerClick },
-    { title: 'Secure messaging & updates', icon: Shield },
-  ];
+  const enable = env.NEXT_PUBLIC_ENABLE_I18N_POLISH;
+  const features = enable
+    ? [
+        { title: t('marketing.home.features.post'), icon: Briefcase },
+        { title: t('marketing.home.features.apply'), icon: MousePointerClick },
+        { title: t('marketing.home.features.secure'), icon: Shield },
+      ]
+    : [
+        { title: 'Post a gig in minutes', icon: Briefcase },
+        { title: 'Apply with one tap', icon: MousePointerClick },
+        { title: 'Secure messaging & updates', icon: Shield },
+      ];
 
   return (
     <div>
       <section className="hero text-fg">
         <div className="qg-container text-center py-24">
           <h1 className="font-heading text-6xl font-bold mb-4">QuickGig</h1>
-          <p className="font-body text-xl mb-8 text-fg opacity-90">
-            Gigs and talent, matched fast.
+          <p
+            className="font-body text-xl mb-8 text-fg opacity-90"
+            data-testid="home-tagline"
+          >
+            {enable ? t('marketing.home.tagline') : 'Gigs and talent, matched fast.'}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/register">
@@ -45,9 +56,9 @@ export default function HomePageClient() {
                 variant="secondary"
                 className="text-lg"
                 data-cta="signup"
-                data-testid="primary-cta"
+                data-testid="home-primary-cta"
               >
-                Simulan Na!
+                {enable ? t('marketing.home.cta.primary') : 'Simulan Na!'}
               </Button>
             </Link>
             <Link href="/find-work">
@@ -56,8 +67,9 @@ export default function HomePageClient() {
                 variant="outline"
                 className="text-lg border-fg text-fg hover:bg-fg hover:text-bg"
                 data-cta="browse-jobs"
+                data-testid="home-secondary-cta"
               >
-                Browse Jobs
+                {enable ? t('marketing.home.cta.secondary') : 'Browse Jobs'}
               </Button>
             </Link>
           </div>

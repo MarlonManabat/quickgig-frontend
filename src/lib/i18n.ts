@@ -1,4 +1,6 @@
 import { getPrefs } from './prefs';
+import enPolish from './i18n/en.json';
+import tlPolish from './i18n/tl.json';
 
 const strings = {
   en: {
@@ -404,6 +406,11 @@ const strings = {
     },
   },
 };
+
+if (process.env.NEXT_PUBLIC_ENABLE_I18N_POLISH === 'true') {
+  Object.assign(strings.en, enPolish);
+  Object.assign(strings.tl, tlPolish);
+}
 
 function copyVariant(): 'english' | 'taglish' {
   let variant = getPrefs().copy;

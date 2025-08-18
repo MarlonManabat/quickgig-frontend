@@ -333,6 +333,28 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   } else {
     console.log('[smoke] notify center qa skipped');
   }
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_I18N_POLISH === 'true') {
+    try {
+      const en = await fetchImpl(base + '/?lang=english');
+      const enTxt = await en.text();
+      const tl = await fetchImpl(base + '/?lang=taglish');
+      const tlTxt = await tl.text();
+      if (
+        en.status === 200 &&
+        tl.status === 200 &&
+        /data-testid="home-tagline">Fast-track your next gig\./.test(enTxt) &&
+        /data-testid="home-tagline">Bilis ang next gig mo\./.test(tlTxt)
+      ) {
+        console.log('[smoke] i18n polish ok');
+      } else {
+        console.log('[smoke] i18n polish mismatch');
+      }
+    } catch {
+      console.log('[smoke] i18n polish failed');
+    }
+  } else {
+    console.log('[smoke] i18n polish skipped');
+  }
   console.log('Smoke OK');
   if (process.env.SMOKE_REPORTS === '1') {
     try {

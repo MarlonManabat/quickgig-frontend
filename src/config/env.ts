@@ -104,6 +104,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_STATUS_PAGE ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_SECURITY_AUDIT:
     String(process.env.NEXT_PUBLIC_ENABLE_SECURITY_AUDIT ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_I18N_POLISH:
+    String(process.env.NEXT_PUBLIC_ENABLE_I18N_POLISH ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_PAYMENTS:
     String(process.env.NEXT_PUBLIC_ENABLE_PAYMENTS ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_GCASH:
