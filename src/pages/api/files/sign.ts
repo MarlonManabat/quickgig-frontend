@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const enabled = process.env.NEXT_PUBLIC_ENABLE_FILE_SIGNING === 'true';

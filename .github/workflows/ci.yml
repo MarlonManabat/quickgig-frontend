@@ -13,6 +13,12 @@ jobs:
           cache: 'npm'
       - name: Install
         run: npm ci
+      - name: Lint
+        run: npm run lint --silent
+      - name: Typecheck
+        run: npm run typecheck
       - name: Build
         run: npm run build
-
+      - name: Smoke (engine)
+        if: env.ENGINE_MODE == 'php' && env.ENGINE_BASE_URL != ''
+        run: node tools/smoke.mjs --engine

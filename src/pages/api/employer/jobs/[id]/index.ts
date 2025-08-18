@@ -1,36 +1,26 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getJob, updateJob } from '@/lib/employerStore';
-
-const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
+import { get, patch } from '@/lib/engine';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as { id: string };
-  if (MODE !== 'mock') {
-    const r = await fetch(`${BASE}/api/employer/jobs/${id}`, {
-      method: req.method,
-      headers: { cookie: req.headers.cookie || '', 'content-type': 'application/json' },
-      body: req.method === 'PATCH' ? JSON.stringify(req.body) : undefined,
-    });
-    const text = await r.text();
-    res.status(r.status).send(text);
-    return;
-  }
   if (req.method === 'GET') {
-    const job = await getJob(id);
-    if (!job) {
-      res.status(404).end();
-      return;
+    try {
+      const job = await get(`/api/employer/jobs/${id}`, req, () => getJob(id));
+      if (!job) { res.status(404).end(); return; }
+      res.status(200).json(job);
+    } catch (err) {
+      res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
     }
-    res.status(200).json(job);
     return;
   }
   if (req.method === 'PATCH') {
     try {
-      const updated = await updateJob(id, req.body);
+      const updated = await patch(`/api/employer/jobs/${id}`, req.body, req, () => updateJob(id, req.body));
       res.status(200).json(updated);
-    } catch {
-      res.status(400).json({ error: 'Unable to update' });
+    } catch (err) {
+      res.status((err as any).status || 400).json({ error: (err as any).message || 'Unable to update' });
     }
     return;
   }

@@ -1,28 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { listApplications, seedMockApps } from '@/lib/applicantStore';
-
-const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
+import { get, PATHS } from '@/lib/engine';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (MODE !== 'mock') {
-    const r = await fetch(`${BASE}/api/applications`, {
-      method: req.method,
-      headers: { cookie: req.headers.cookie || '' },
-    });
-    const text = await r.text();
-    res.status(r.status).send(text);
+  if (req.method !== 'GET') {
+    res.status(405).end();
     return;
   }
-
-  seedMockApps();
-  if (req.method === 'GET') {
-    const apps = await listApplications(req.headers.cookie);
+  const fallback = async () => {
+    seedMockApps();
+    return listApplications(req.headers.cookie);
+  };
+  try {
+    const apps = await get(PATHS.applications.list, req, fallback);
     res.status(200).json(apps);
-    return;
+  } catch (err) {
+    res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
   }
-  res.status(405).end();
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { env } from '@/config/env';
 import { addClient, removeClient } from '@/lib/notificationsStore';

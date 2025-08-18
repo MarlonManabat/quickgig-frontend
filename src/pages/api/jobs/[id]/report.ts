@@ -1,22 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createReport } from '@/lib/employerStore';
+import { rawRequest } from '@/lib/engine';
 
-const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
 const WEBHOOK = process.env.ALERTS_WEBHOOK_URL || '';
 const RATE = new Map<string, number>();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as { id: string };
   if (req.method !== 'POST') { res.status(405).end(); return; }
-  if (MODE !== 'mock') {
-    const r = await fetch(`${BASE}/api/jobs/${id}/report`, {
-      method: 'POST',
-      headers: { cookie: req.headers.cookie || '', 'content-type': 'application/json' },
-      body: JSON.stringify(req.body),
-    });
-    const text = await r.text();
-    res.status(r.status).send(text);
+  if (process.env.ENGINE_MODE === 'php') {
+    try {
+      const r = await rawRequest('POST', `/api/jobs/${id}/report`, req, req.body);
+      const text = await r.text();
+      res.status(r.status).send(text);
+    } catch (err) {
+      res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
+    }
     return;
   }
   const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || '';

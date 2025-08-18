@@ -1,19 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { incrementJobViews } from '@/lib/employerStore';
+import { rawRequest } from '@/lib/engine';
 
-const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
 const RATE = new Map<string, number>();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') { res.status(405).end(); return; }
-  if (MODE !== 'mock') {
-    const r = await fetch(`${BASE}/api/jobs/${req.query.id}/metrics/views`, {
-      method: 'POST',
-      headers: { cookie: req.headers.cookie || '' },
-    });
-    const text = await r.text();
-    res.status(r.status).send(text);
+  if (process.env.ENGINE_MODE === 'php') {
+    try {
+      const r = await rawRequest('POST', `/api/jobs/${req.query.id}/metrics/views`, req);
+      const text = await r.text();
+      res.status(r.status).send(text);
+    } catch (err) {
+      res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
+    }
     return;
   }
   const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || '';

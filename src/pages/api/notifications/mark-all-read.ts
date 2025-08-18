@@ -1,11 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { env } from '@/config/env';
 import type { NotificationKind } from '@/types/notification';
 import { read, save, broadcast } from '@/lib/notificationsStore';
-
-const MODE = process.env.ENGINE_MODE || 'mock';
-const AUTH_MODE = process.env.ENGINE_AUTH_MODE || '';
-const BASE = process.env.ENGINE_BASE_URL || '';
+import { post } from '@/lib/engine';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -17,27 +15,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
   const body = req.body as { kind?: NotificationKind };
-  if (MODE !== 'mock' && AUTH_MODE === 'php' && BASE) {
-    try {
-      const r = await fetch(`${BASE}/api/notifications/mark-all-read`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', cookie: req.headers.cookie || '' },
-        body: JSON.stringify(body),
-      });
-      if (r.ok) {
-        const text = await r.text();
-        res.status(200).send(text);
-        return;
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console -- best effort log
-      console.warn('[notifications] upstream failed', err);
-    }
+  try {
+    const data = await post('/api/notifications/mark-all-read', body, req, async () => {
+      const items = read(req, res).map((n) => !body.kind || n.kind === body.kind ? { ...n, read: true } : n);
+      save(res, items);
+      broadcast();
+      return { ok: true };
+    });
+    res.status(200).json(data);
+  } catch (err) {
+    res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
   }
-  const items = read(req, res).map((n) =>
-    !body.kind || n.kind === body.kind ? { ...n, read: true } : n,
-  );
-  save(res, items);
-  broadcast();
-  res.status(200).json({ ok: true });
 }

@@ -9,6 +9,27 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   if (![301,302,307,308].includes(r2.status)) bail(`HEAD /app expected redirect; got ${r2.status}`);
   const loc = r2.headers.get('location') || '';
   if (loc !== '/' && loc !== base + '/') bail(`HEAD /app location must be root; got ${loc}`);
+  const runEngine = process.argv.includes('--engine');
+  if (runEngine) {
+    try {
+      const s = await fetchImpl(base + '/api/session');
+      console.log('[engine] session', s.status);
+      const jobs = await fetchImpl(base + '/api/jobs?limit=1');
+      console.log('[engine] jobs', jobs.status);
+      let firstId;
+      try { const arr = await jobs.json(); firstId = Array.isArray(arr) && arr[0]?.id; } catch {}
+      if (firstId) {
+        const d = await fetchImpl(base + `/api/jobs/${firstId}`);
+        console.log('[engine] job detail', d.status);
+      }
+      const profile = await fetchImpl(base + '/api/profile');
+      console.log('[engine] profile', profile.status);
+      const apps = await fetchImpl(base + '/api/applications');
+      console.log('[engine] applications', apps.status);
+    } catch {
+      console.log('[engine] checks failed');
+    }
+  }
   if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_SETTINGS === 'true') {
     try {
       const s = await fetchImpl(base + '/settings');

@@ -31,6 +31,22 @@ To verify the live API locally, run:
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
 
+### Quick Start: Staging
+
+1. Copy `.env.staging.example` to `.env.local`.
+2. `ENGINE_MODE=php npm run build` to test against the staging engine.
+
+### Staging Verification
+
+```bash
+curl -I https://staging.quickgig.ph/api/health/engine
+curl https://staging.quickgig.ph/api/session
+curl https://staging.quickgig.ph/api/jobs?limit=1
+curl https://staging.quickgig.ph/api/jobs/1
+curl https://staging.quickgig.ph/api/profile
+curl https://staging.quickgig.ph/api/applications
+```
+
 ## Flags
 
 - `NEXT_PUBLIC_ENABLE_INTERVIEWS_UI` – enable interview scheduling UI. When enabled, the app uses `/api/interviews` and `/api/interviews/[id]` for creating and updating interviews. Optional helpers:
