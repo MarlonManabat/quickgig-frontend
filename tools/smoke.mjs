@@ -18,6 +18,16 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       console.log('[smoke] settings check failed');
     }
   }
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true') {
+    for (const p of ['/interviews', '/employer/interviews']) {
+      try {
+        const r = await fetchImpl(base + p, { redirect: 'manual' });
+        console.log('[smoke] interviews', p, r.status);
+      } catch {
+        console.log('[smoke] interviews failed', p);
+      }
+    }
+  }
   if (process.env.SMOKE_APPS === '1') {
     try {
       const r3 = await fetchImpl(base + '/api/applications/TEST');
