@@ -1,84 +1,124 @@
 import type { NextApiRequest } from 'next';
 
+export class EngineError extends Error {
+  status: number;
+  data?: unknown;
+  constructor(status: number, message: string, data?: unknown) {
+    super(message);
+    this.status = status;
+    this.data = data;
+  }
+}
+
 const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
+const BASE = (process.env.ENGINE_BASE_URL || '').replace(/\/$/, '');
 const ALLOW_FALLBACK = process.env.ALLOW_ENGINE_FALLBACK === 'true';
 
-export type EngineError = { status: number; message: string };
+export const isEngineOn = () => MODE === 'php';
 
-async function attempt(method: string, path: string, req?: NextApiRequest, body?: unknown): Promise<Response> {
+export interface EngineInit extends RequestInit {
+  req?: NextApiRequest;
+}
+
+async function rawFetch(path: string, init: EngineInit = {}): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10000);
   try {
-    const headers: Record<string, string> = { 'content-type': 'application/json' };
-    if (req?.headers.cookie) headers.cookie = req.headers.cookie;
-    const res = await fetch(BASE + path, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      signal: controller.signal,
-    });
-    return res;
+    const headers: Record<string, string> = {
+      ...(init.headers as Record<string, string> | undefined),
+    };
+    if (init.req?.headers.cookie) headers.cookie = init.req.headers.cookie;
+    const auth = init.req?.headers.authorization;
+    if (auth) headers.authorization = Array.isArray(auth) ? auth[0] : auth;
+    return await fetch(BASE + path, { ...init, headers, signal: controller.signal });
   } finally {
     clearTimeout(timer);
   }
 }
 
-async function request<T>(method: string, path: string, req?: NextApiRequest, body?: unknown, fallback?: () => Promise<T>): Promise<T> {
-  if (MODE !== 'php') {
-    if (fallback) return fallback();
-    throw { status: 500, message: 'ENGINE_MODE is mock' } as EngineError;
-  }
-  for (let i = 0; i < 2; i++) {
+export async function engineFetch<T>(path: string, init: EngineInit = {}): Promise<T> {
+  if (!isEngineOn()) throw new EngineError(500, 'ENGINE_MODE is mock');
+  let attempt = 0;
+  let delay = 250;
+  for (;;) {
     try {
-      const res = await attempt(method, path, req, body);
+      const res = await rawFetch(path, init);
       const text = await res.text();
       const data = text ? JSON.parse(text) : undefined;
       if (!res.ok) {
-        throw { status: res.status, message: data?.message || data?.error || text } as EngineError;
+        throw new EngineError(res.status, data?.message || data?.error || res.statusText, data);
       }
       return data as T;
-    } catch (err: unknown) {
-      const e = err as EngineError;
-      if (i === 0 && (e.status === 429 || e.status >= 500)) {
-        await new Promise((r) => setTimeout(r, 500));
-        continue;
-      }
-      if (fallback && ALLOW_FALLBACK) return fallback();
-      throw e;
+    } catch (err) {
+      attempt += 1;
+      if (attempt >= 3) throw err;
+      await new Promise((r) => setTimeout(r, delay));
+      delay *= 2;
     }
   }
-  if (fallback && ALLOW_FALLBACK) return fallback();
-  throw { status: 500, message: 'Engine request failed' } as EngineError;
 }
 
-async function raw(method: string, path: string, req?: NextApiRequest, body?: unknown, fallback?: () => Promise<Response>): Promise<Response> {
-  if (MODE !== 'php') {
-    if (fallback) return fallback();
-    throw new Error('ENGINE_MODE is mock');
+export async function withFallback<T>(fnEngine: () => Promise<T>, fnMock?: () => Promise<T>): Promise<T> {
+  if (!isEngineOn()) {
+    if (fnMock) return fnMock();
+    throw new EngineError(500, 'ENGINE_MODE is mock');
   }
-  for (let i = 0; i < 2; i++) {
-    try {
-      return await attempt(method, path, req, body);
-    } catch (err: unknown) {
-      const e = err as EngineError;
-      if (i === 0 && (e.status === 429 || e.status >= 500)) {
-        await new Promise((r) => setTimeout(r, 500));
-        continue;
-      }
-      if (fallback && ALLOW_FALLBACK) return fallback();
-      throw e;
-    }
+  try {
+    return await fnEngine();
+  } catch (err) {
+    if (fnMock && ALLOW_FALLBACK) return fnMock();
+    throw err;
   }
-  if (fallback && ALLOW_FALLBACK) return fallback();
-  throw new Error('Engine request failed');
 }
 
-export const get = <T>(path: string, req?: NextApiRequest, fallback?: () => Promise<T>) => request<T>('GET', path, req, undefined, fallback);
-export const post = <T>(path: string, body?: unknown, req?: NextApiRequest, fallback?: () => Promise<T>) => request<T>('POST', path, req, body, fallback);
-export const patch = <T>(path: string, body?: unknown, req?: NextApiRequest, fallback?: () => Promise<T>) => request<T>('PATCH', path, req, body, fallback);
-export const del = <T>(path: string, req?: NextApiRequest, body?: unknown, fallback?: () => Promise<T>) => request<T>('DELETE', path, req, body, fallback);
-export const rawRequest = (method: string, path: string, req?: NextApiRequest, body?: unknown) => raw(method, path, req, body);
+export const get = <T>(path: string, req?: NextApiRequest, fallback?: () => Promise<T>) =>
+  withFallback(() => engineFetch<T>(path, { method: 'GET', req }), fallback);
+
+export const post = <T>(path: string, body?: unknown, req?: NextApiRequest, fallback?: () => Promise<T>) =>
+  withFallback(
+    () =>
+      engineFetch<T>(path, {
+        method: 'POST',
+        req,
+        headers: { 'content-type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+      }),
+    fallback,
+  );
+
+export const patch = <T>(path: string, body?: unknown, req?: NextApiRequest, fallback?: () => Promise<T>) =>
+  withFallback(
+    () =>
+      engineFetch<T>(path, {
+        method: 'PATCH',
+        req,
+        headers: { 'content-type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+      }),
+    fallback,
+  );
+
+export const del = <T>(path: string, req?: NextApiRequest, body?: unknown, fallback?: () => Promise<T>) =>
+  withFallback(
+    () =>
+      engineFetch<T>(path, {
+        method: 'DELETE',
+        req,
+        headers: { 'content-type': 'application/json' },
+        body: body ? JSON.stringify(body) : undefined,
+      }),
+    fallback,
+  );
+
+export const rawRequest = (method: string, path: string, req?: NextApiRequest, body?: unknown) => {
+  if (!isEngineOn()) throw new Error('ENGINE_MODE is mock');
+  return rawFetch(path, {
+    method,
+    req,
+    headers: { 'content-type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+};
 
 export const PATHS = {
   auth: {
