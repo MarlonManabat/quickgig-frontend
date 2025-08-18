@@ -197,6 +197,26 @@ Rollback: set `NEXT_PUBLIC_ENABLE_HIRING_QA=false` and redeploy.
 
 Notes: mock/test only, no live applicant impact.
 
+### Payments Integration (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_PAYMENTS` – master switch for payments UI.
+- `NEXT_PUBLIC_ENABLE_GCASH` – enable GCash option.
+- `NEXT_PUBLIC_ENABLE_STRIPE` – enable Stripe card option.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_PAYMENTS=true
+NEXT_PUBLIC_ENABLE_GCASH=true
+NEXT_PUBLIC_ENABLE_STRIPE=true
+STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+STRIPE_SECRET_KEY=sk_test_xxx
+```
+
+With flags on, checkout flows show GCash QR upload and Stripe sandbox card (4242 4242 4242 4242).
+
+Rollback: set `NEXT_PUBLIC_ENABLE_PAYMENTS=false` and redeploy.
+
 ## Staging auth & engine flows
 
 Engine-backed auth and data wiring is gated behind flags and off by default.

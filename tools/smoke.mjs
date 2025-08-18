@@ -120,7 +120,23 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       console.log('[smoke] notify failed');
     }
   }
-    if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true') {
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_PAYMENTS === 'true') {
+    try {
+      const r = await fetchImpl(base + '/api/payments/mock', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ amount: 1, method: 'gcash' }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 200 && j.ok) console.log('[smoke] payments ok');
+      else console.log('[smoke] payments', r.status);
+    } catch {
+      console.log('[smoke] payments check failed');
+    }
+  } else {
+    console.log('[smoke] payments skipped');
+  }
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true') {
       for (const p of ['/interviews', '/employer/interviews']) {
         try {
           const r = await fetchImpl(base + p, { redirect: 'manual' });
