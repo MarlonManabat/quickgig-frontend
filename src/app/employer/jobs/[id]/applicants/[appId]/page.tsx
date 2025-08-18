@@ -94,6 +94,11 @@ export default function EmployerApplicantPage({ params }: { params: { id: string
       rejected: 'bg-red-200 text-red-800',
       hired: 'bg-green-300 text-green-900',
       withdrawn: 'bg-gray-300 text-gray-700',
+      interviewing: 'bg-blue-200 text-blue-800',
+      offer_made: 'bg-yellow-200 text-yellow-800',
+      offer_accepted: 'bg-green-200 text-green-800',
+      offer_declined: 'bg-red-200 text-red-800',
+      not_selected: 'bg-gray-300 text-gray-700',
     };
     return map[status];
   };
@@ -104,6 +109,11 @@ export default function EmployerApplicantPage({ params }: { params: { id: string
     rejected: t('status_rejected'),
     hired: t('status_hired'),
     withdrawn: t('status_withdrawn'),
+    interviewing: 'interviewing',
+    offer_made: 'offer_made',
+    offer_accepted: 'offer_accepted',
+    offer_declined: 'offer_declined',
+    not_selected: 'not_selected',
   };
 
   return (
