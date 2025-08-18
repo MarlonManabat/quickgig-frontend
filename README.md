@@ -66,6 +66,32 @@ The app targets a PHP engine in staging but keeps mock flows as a safety net.
 When the engine is unreachable or returns non‑2xx responses, the app
 automatically falls back to existing mock or legacy flows.
 
+## Public Launch Prep
+
+The production build enables core launch features by default when `NODE_ENV=production`:
+
+- Emails
+- Unified Notifications Center
+- Interviews with invites and reminders
+- Payments
+
+### Rollout
+
+1. Copy `.env.production.example` to `.env.production` and add secrets.
+2. Deploy with `NODE_ENV=production`.
+3. Run smoke tests:
+
+   ```bash
+   NODE_ENV=production BASE=https://app.quickgig.ph npm run smoke
+   ```
+
+### Rollback
+
+1. Set the launch flags above to `false` in `.env.production`.
+2. Redeploy.
+
+Security headers and monitoring remain active via `NEXT_PUBLIC_ENABLE_SECURITY_AUDIT` and are covered by the smoke script.
+
 ## Flags
 
 ### Beta Release Toggle (Flagged)
