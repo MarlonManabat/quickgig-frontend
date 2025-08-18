@@ -24,6 +24,8 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_REPORTS ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_ADMIN:
     String(process.env.NEXT_PUBLIC_ENABLE_ADMIN ?? 'true').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_JOB_VIEWS:
+    String(process.env.NEXT_PUBLIC_ENABLE_JOB_VIEWS ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_EMPLOYER_PROFILES:
     String(process.env.NEXT_PUBLIC_ENABLE_EMPLOYER_PROFILES ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_JOB_DRAFTS:
@@ -37,6 +39,7 @@ export const env = {
   NEXT_PUBLIC_ENABLE_ANALYTICS:
     String(process.env.NEXT_PUBLIC_ENABLE_ANALYTICS ?? 'true').toLowerCase() === 'true',
   METRICS_SECRET: process.env.METRICS_SECRET || '',
+  ALERTS_WEBHOOK_URL: process.env.ALERTS_WEBHOOK_URL || '',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

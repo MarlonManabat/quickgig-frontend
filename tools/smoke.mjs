@@ -1,4 +1,4 @@
-const base = process.env.BASE || 'http://localhost:3000';
+const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
 const fetchImpl = globalThis.fetch;
 const bail = (m)=>{ console.error(m); process.exit(1); };
 (async () => {
@@ -39,4 +39,20 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
     }
   }
   console.log('Smoke OK');
+  if (process.env.SMOKE_REPORTS === '1') {
+    try {
+      const r = await fetchImpl(base + '/api/jobs/TEST/report', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ reason: 'spam' }),
+      });
+      if (r.status !== 200) bail('report failed');
+      if (process.env.ALERTS_DIGEST_SECRET) {
+        const d = await fetchImpl(base + `/api/admin/digest?secret=${process.env.ALERTS_DIGEST_SECRET}`);
+        if (d.status !== 200) bail('digest failed');
+      }
+    } catch {
+      bail('reports check failed');
+    }
+  }
 })();
