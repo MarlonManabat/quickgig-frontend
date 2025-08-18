@@ -221,6 +221,19 @@ NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS=false
 Enable by setting `NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT=true`. Employers can mark a job as filled or closed and optionally bulk notify remaining applicants. Emails are sent only when `NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS=true` and user preferences permit.
 
 Rollback: turn the flags off. In engine mode, bulk rejection actions are irreversible, so exercise caution.
+
+## Buttons/Links Sanity Checker (flagged, dev-only)
+
+- `NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY` – when `true`, runs a development-only scan of navbar, footer, and primary CTAs to ensure links point to valid routes. Logs warnings only.
+
+Enable locally by setting in `.env.local`:
+
+```env
+NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY=true
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY=false` and redeploy. Dev-only and non-blocking.
+
 ## Hiring Decisions (flagged)
 
 Disabled by default. Configure via environment:
