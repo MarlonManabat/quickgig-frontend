@@ -95,6 +95,12 @@ const strings = {
         admin: 'No admin notices',
       },
     },
+    status: {
+      title: 'Status',
+      engine_ok: 'Engine reachable',
+      db_ok: 'DB reachable',
+      timestamp: 'Timestamp',
+    },
     settings: {
       title: 'Account Settings',
       language: {
@@ -271,6 +277,12 @@ const strings = {
         alert: 'Walang alerts',
         admin: 'Walang admin notices',
       },
+    },
+    status: {
+      title: 'Status',
+      engine_ok: 'Engine ok',
+      db_ok: 'DB ok',
+      timestamp: 'Oras',
     },
     settings: {
       title: 'Settings',

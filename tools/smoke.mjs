@@ -19,6 +19,20 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   } else {
     console.log('[smoke] link map sanity skipped');
   }
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_STATUS_PAGE === 'true') {
+    try {
+      const s = await fetchImpl(base + '/status');
+      const txt = await s.text();
+      if (
+        s.status === 200 &&
+        /data-testid="status-engine">ok/.test(txt) &&
+        /data-testid="status-db">ok/.test(txt)
+      ) console.log('[smoke] status ok');
+      else console.log('[smoke] status', s.status);
+    } catch {
+      console.log('[smoke] status check failed');
+    }
+  }
   const runEngine = process.argv.includes('--engine');
   if (runEngine) {
     try {
