@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { listAlerts, upsertAlert, removeAlert } from '@/lib/alertsStore';
 import type { JobAlert } from '@/types/alert';
+import { limit } from '@/server/rateLimit';
 
 const MODE = process.env.ENGINE_MODE;
 const BASE = process.env.ENGINE_BASE_URL || '';
@@ -22,6 +23,16 @@ async function notify(alert: JobAlert) {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as { id: string };
+  if (process.env.NEXT_PUBLIC_ENABLE_RATE_LIMITING === 'true') {
+    const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || '';
+    const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
+    const max = Number(process.env.RATE_LIMIT_MAX_PER_WINDOW || 60);
+    const { ok, retryAfterSeconds } = limit({ key: ip, max, windowMs });
+    if (!ok) {
+      res.setHeader('Retry-After', String(retryAfterSeconds));
+      return res.status(429).json({ error: 'rate_limited' });
+    }
+  }
   if (MODE !== 'mock') {
     const url = `${BASE}/alerts/${id}`;
     const r = await fetch(url, {

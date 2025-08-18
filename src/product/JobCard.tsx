@@ -125,3 +125,17 @@ export function JobGrid({ jobs }: { jobs: JobSummary[] }) {
   );
 }
 
+export function JobCardSkeleton() {
+  return (
+    <div style={{background:'#eee', height:120, borderRadius:T.radius.lg}} className="animate-pulse" />
+  );
+}
+
+export function JobGridSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <div style={{display:'grid', gap:12, gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))'}}>
+      {Array.from({length:count}).map((_,i)=>(<JobCardSkeleton key={i} />))}
+    </div>
+  );
+}
+

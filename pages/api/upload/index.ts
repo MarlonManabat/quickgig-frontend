@@ -7,6 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { hit } from '@/server/uploads/rateLimiter';
 import { makeUploadKey } from '@/server/uploads/makeUploadKey';
 import { logUpload } from '@/server/uploads/logger';
+import { limit } from '@/server/rateLimit';
 
 export const config = { api: { bodyParser: true } }; // simple JSON body
 
@@ -28,6 +29,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     if (process.env.NEXT_PUBLIC_ENABLE_S3_UPLOADS !== 'true') {
       return res.status(501).json({ ok: false, error: 'S3 uploads disabled' });
+    }
+    if (process.env.NEXT_PUBLIC_ENABLE_RATE_LIMITING === 'true') {
+      const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
+      const max = Number(process.env.RATE_LIMIT_MAX_PER_WINDOW || 60);
+      const { ok, retryAfterSeconds } = limit({ key: ip, max, windowMs });
+      if (!ok) {
+        res.setHeader('Retry-After', String(retryAfterSeconds));
+        return res.status(429).json({ error: 'rate_limited' });
+      }
     }
     if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method Not Allowed' });
 

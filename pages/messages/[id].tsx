@@ -10,6 +10,7 @@ import type { Thread } from '@/types/messages';
 import type { Session } from '@/types/user';
 import { env } from '@/config/env';
 import type { GetServerSidePropsContext } from 'next';
+import { track } from '@/lib/analytics';
 
 interface Props { thread: Thread | null; session: Session }
 
@@ -60,9 +61,11 @@ export default function ThreadPage({ thread, session }: Props) {
         });
         setTid(nid);
         router.replace(`/messages/${nid}`);
+        track('message_send', { threadId: nid });
       }
     } else {
       await send(body);
+      track('message_send', { threadId: tid });
     }
     setBody('');
     inputRef.current?.focus();

@@ -6,7 +6,7 @@ import ProductShell from '../src/components/layout/ProductShell';
 import { Card } from '../src/product/ui/Card';
 import { Button } from '../src/product/ui/Button';
 import { tokens as T } from '../src/theme/tokens';
-import { JobGrid } from '../src/product/JobCard';
+import { JobGrid, JobGridSkeleton } from '../src/product/JobCard';
 import { featuredJobs, type JobSummary } from '../src/lib/api';
 import { legacyFlagFromEnv, legacyFlagFromQuery } from '../src/lib/legacyFlag';
 import { t } from '../src/lib/t';
@@ -34,6 +34,19 @@ export default function Home({ legacyHtml, jobs }: Props){
   return (
     <ProductShell>
       <HeadSEO titleKey="home_hero_title" descKey="home_hero_cta" canonical="/" />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'QuickGig',
+            url: process.env.NEXT_PUBLIC_CANONICAL_HOST || '',
+            logo: (process.env.NEXT_PUBLIC_CANONICAL_HOST || '') + '/favicon.png',
+          }),
+        }}
+      />
       <OnboardingBanner />
       <div style={{display:'grid', gap:16}}>
           <Card>
@@ -51,7 +64,9 @@ export default function Home({ legacyHtml, jobs }: Props){
               <h2 style={{margin:'8px 0 12px', fontSize:20}}>{t('jobs_featured')}</h2>
               <JobGrid jobs={jobs}/>
             </section>
-          ) : null}
+          ) : (
+            <JobGridSkeleton count={3} />
+          )}
       </div>
     </ProductShell>
   );

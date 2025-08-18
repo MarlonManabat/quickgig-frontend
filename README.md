@@ -85,6 +85,14 @@ Messages SSE can be tested locally with:
 NEXT_PUBLIC_ENABLE_MESSAGES=true node tools/smoke_messages.mjs
 ```
 
+## Preview Launch Checklist
+
+- Set `NEXT_PUBLIC_CANONICAL_HOST`
+- Consider enabling `NEXT_PUBLIC_ENABLE_SECURITY_HEADERS`
+- JSON-LD present on jobs/home/search pages
+- Optional: turn on PWA (`NEXT_PUBLIC_ENABLE_PWA`), Consent + Webhook (`NEXT_PUBLIC_ENABLE_CONSENT`, `NEXT_PUBLIC_ANALYTICS_WEBHOOK`), Rate-limits (`NEXT_PUBLIC_ENABLE_RATE_LIMITING`), S3 uploads
+- Run `npm run smoke:prod`
+
 ## Sockets
 
 Socket.io connections are disabled on Vercel preview domains by default. They

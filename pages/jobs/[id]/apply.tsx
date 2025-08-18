@@ -18,6 +18,7 @@ import { UploadedFile } from '../../../src/types/upload';
 import { toBase64, truncateDataUrl, makeId } from '../../../src/lib/baseUpload';
 import { validateFile, MAX_MB } from '../../../src/lib/uploadPolicy';
 import { presign, putFile } from '../../../src/lib/uploader';
+import { track } from '../../../src/lib/analytics';
 
 type Props = { job: JobDetail|null; legacyHtml?: string };
 
@@ -39,6 +40,7 @@ export default function ApplyPage({ job, legacyHtml }: Props) {
   React.useEffect(() => {
     try { setUseLegacy(legacyFlagFromEnv() || legacyFlagFromQuery(new URL(window.location.href).searchParams)); } catch {}
   }, []);
+  React.useEffect(() => { if (job) track('apply_start', { id: job.id }); }, [job]);
   if (useLegacy && legacyHtml) return <div dangerouslySetInnerHTML={{__html: legacyHtml}} />;
 
   return (
@@ -110,6 +112,7 @@ function ApplyForm({ job }: { job: JobDetail }) {
       if (r.ok) {
         markApplied(String(job.id), toJobSummary(job));
         toast(t('apply_success'));
+        track('apply_complete', { id: job.id });
         router.push(`/jobs/${job.id}#applied`);
       } else {
         setStatus('err');

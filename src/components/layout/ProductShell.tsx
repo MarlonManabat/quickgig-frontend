@@ -3,6 +3,7 @@ import { tokens as T } from '../../theme/tokens';
 import NavBar from '../product/NavBar';
 import Footer from '../Footer';
 import { t } from '@/lib/t';
+import { ConsentBanner } from '../ConsentBanner';
 
 export default function ProductShell({children}:{children:React.ReactNode}) {
   return (
@@ -16,6 +17,7 @@ export default function ProductShell({children}:{children:React.ReactNode}) {
       </header>
       <main id="main" style={{display:'grid', gap:16}}>{children}</main>
       <Footer />
+      <ConsentBanner />
     </div>
   );
 }

@@ -22,6 +22,22 @@ export default function FindWork({ legacyHtml, items=[], total, q, loc, cat, sor
   return (
     <ProductShell>
       <HeadSEO titleKey="search_title" descKey="search_title" />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            url: process.env.NEXT_PUBLIC_CANONICAL_HOST || '',
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: `${process.env.NEXT_PUBLIC_CANONICAL_HOST || ''}/find-work?q={search_term_string}`,
+              'query-input': 'required name=search_term_string',
+            },
+          }),
+        }}
+      />
       <OnboardingBanner />
       <h1>{t('search_title')}</h1>
       <FilterBar q={q} loc={loc} cat={cat} sort={sort} />

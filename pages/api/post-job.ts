@@ -1,8 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { normalizeJobPost } from '../../src/lib/postJob';
+import { limit } from '../../src/server/rateLimit';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ ok:false, error:'Method not allowed' });
+  if (process.env.NEXT_PUBLIC_ENABLE_RATE_LIMITING === 'true') {
+    const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || '';
+    const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
+    const max = Number(process.env.RATE_LIMIT_MAX_PER_WINDOW || 60);
+    const { ok, retryAfterSeconds } = limit({ key: ip, max, windowMs });
+    if (!ok) {
+      res.setHeader('Retry-After', String(retryAfterSeconds));
+      return res.status(429).json({ ok:false, error:'rate_limited' });
+    }
+  }
   try {
     const payload = normalizeJobPost(req.body);
     const url = process.env.POST_JOB_WEBHOOK_URL;

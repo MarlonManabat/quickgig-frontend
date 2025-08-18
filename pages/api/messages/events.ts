@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from '@/lib/auth';
 import { latestMessage, ensureThread, sendMessage } from '@/lib/messageStore';
+import { limit } from '@/server/rateLimit';
 
 export const config = { api: { bodyParser: false } };
 
@@ -11,6 +12,16 @@ const POLL_MS = Number(process.env.EVENTS_POLL_MS || '5000');
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getSession(req);
   if (!user) return res.status(401).end();
+  if (process.env.NEXT_PUBLIC_ENABLE_RATE_LIMITING === 'true') {
+    const ip = req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress || '';
+    const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000);
+    const max = Number(process.env.RATE_LIMIT_MAX_PER_WINDOW || 60);
+    const { ok, retryAfterSeconds } = limit({ key: ip, max, windowMs });
+    if (!ok) {
+      res.setHeader('Retry-After', String(retryAfterSeconds));
+      return res.status(429).json({ error: 'rate_limited' });
+    }
+  }
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',

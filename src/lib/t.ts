@@ -151,6 +151,12 @@ const english: Messages = {
   'error.try_again': 'Try again',
   'error.go_home': 'Go home',
   'skip_to_content': 'Skip to content',
+  'rate_limited': 'Too many requests. Please try again later.',
+  'consent.ask': 'Allow basic analytics cookies?',
+  'consent.yes': 'Yes',
+  'consent.no': 'Not now',
+  'privacy.title': 'Privacy Policy',
+  'terms.title': 'Terms and Conditions',
 };
 
 const taglish: Messages = {
@@ -302,9 +308,16 @@ const taglish: Messages = {
   'error.try_again': 'Subukang muli',
   'error.go_home': 'Uwi sa home',
   'skip_to_content': 'Laktawan sa content',
+  'rate_limited': 'Sobra na ang requests. Subukan muli mamaya.',
+  'consent.ask': 'Payagan ang basic analytics cookies?',
+  'consent.yes': 'Oo',
+  'consent.no': 'Huwag muna',
+  'privacy.title': 'Patakaran sa Privacy',
+  'terms.title': 'Mga Tuntunin',
 };
 
 const bundle: Bundle = { english, taglish };
+export const bundles = { english, taglish };
 
 function readVariantFromEnv(): keyof Bundle {
   const v = (process.env.NEXT_PUBLIC_COPY_VARIANT || "english").toLowerCase();
