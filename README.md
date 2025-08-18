@@ -25,96 +25,11 @@ NEXT_PUBLIC_ENABLE_APPLY=false
 NEXT_PUBLIC_ENV=local
 ```
 
-3. Legacy marketing UI is **ON by default**. Ensure these files exist:
-
-   - `public/legacy/styles.css`
-   - `public/legacy/index.fragment.html`
-   - `public/legacy/login.fragment.html`
-
-   To override, adjust the flags in `.env.local`:
-
-   ```env
-   NEXT_PUBLIC_LEGACY_UI=true
-   NEXT_PUBLIC_LEGACY_STRICT_SHELL=true
-   NEXT_PUBLIC_SHOW_API_BADGE=false
-   NEXT_PUBLIC_BANNER_HTML=
-   ```
-
 To verify the live API locally, run:
 
 ```bash
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
-## Production-safe S3 uploads
-
-Uploads are feature-flagged and validated server-side. To enable in preview or prod, set:
-
-```
-NEXT_PUBLIC_ENABLE_S3_UPLOADS=true
-NEXT_PUBLIC_MAX_UPLOAD_MB=2
-ALLOWED_UPLOAD_MIME=image/png,image/jpeg,application/pdf
-S3_BUCKET=your-bucket
-S3_REGION=ap-southeast-1
-S3_ACCESS_KEY_ID=AKIA...
-S3_SECRET_ACCESS_KEY=...
-```
-
-S3 bucket CORS:
-
-```json
-[
-  {
-    "AllowedOrigins": ["*"],
-    "AllowedMethods": ["PUT"],
-    "AllowedHeaders": ["*"]
-  }
-]
-```
-
-To test locally (flag on):
-
-```
-node tools/smoke_upload.mjs
-```
-
-Preview enable steps: add the env vars above in Vercel and redeploy.
-
-Messages SSE can be tested locally with:
-
-```
-NEXT_PUBLIC_ENABLE_MESSAGES=true node tools/smoke_messages.mjs
-```
-
-## Sockets
-
-Socket.io connections are disabled on Vercel preview domains by default. They
-automatically enable on production domains when `NEXT_PUBLIC_ENABLE_SOCKETS=true`.
-
-## Auth
-
-Environment variables:
-
-- `JWT_COOKIE_NAME` – name of the session cookie (default `auth_token`).
-- `AUTH_SECRET` – secret used to sign and verify JWTs.
-- `ENGINE_AUTH_MODE` – `mock` (local default) or `php` for the real engine.
-- `ENGINE_BASE_URL` – legacy engine base URL.
-- `ENGINE_LOGIN_PATH` – path to the engine login script.
-
-Protected routes:
-
-`/dashboard`, `/messages`, `/payment`, `/settings`, `/profile`.
-
-Testing:
-
-In Vercel Preview and Production, set `NEXT_PUBLIC_LEGACY_UI=true` and `NEXT_PUBLIC_LEGACY_STRICT_SHELL=true`.
-
-```bash
-npm run lint && npm run typecheck
-curl -sS $PREVIEW/api/session/me -I  # 401 when signed out
-curl -sS $PREVIEW/api/session/login -XPOST -H "content-type: application/json" -d '{"email":"a@b.c","password":"x"}'  # 200 in mock mode
-```
-
-In Vercel, set `ENGINE_AUTH_MODE=php` for production and ensure `AUTH_SECRET` is a long random string.
 
 ## Jobs search & saved jobs
 
@@ -208,12 +123,9 @@ Backend endpoints (see `src/config/api.ts`):
 
 The frontend never blocks or fails the UI if the metrics backend is absent; `/api/metrics/track` always returns `{ ok: true }`.
 
-## Observability
+## Authentication
 
-- Toggle the API badge with `NEXT_PUBLIC_SHOW_API_BADGE=true`.
-- `GET /api/health` → `{ ok: true, services: { app: 'up'|'degraded' }, time }`.
-- `GET /api/version` → `{ ok: true, commit, branch, buildTime, node, next, app }`.
-- Logs are emitted to Vercel Runtime Logs with `[health]` and `[version]` prefixes.
+Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
 
 ## Profiles & Settings
 
@@ -429,39 +341,3 @@ Set the following in Vercel → Project → Settings → Environment Variables:
 
 After saving, redeploy via Vercel and verify at [`/system/status`](./src/app/system/status/page.tsx).
 To add a payment QR, upload `public/gcash-qr.png` and redeploy.
-
-### Legacy marketing parity
-
-- Sync fragments and assets:
-
-```bash
-npm run legacy:sync
-```
-
-- Inspect and verify:
-
-```bash
-npm run legacy:tree
-npm run legacy:verify
-npm run legacy:check
-```
-
-- Optional: hide the red API badge in Vercel by setting `NEXT_PUBLIC_SHOW_API_BADGE=false`.
-
-## Scripts & smoke tests
-
-```json
-{
-  "typecheck": "tsc -p tsconfig.json --noEmit",
-  "routes:print": "node tools/print_routes.mjs",
-  "smoke:status": "node tools/smoke_status.mjs",
-  "smoke:messages": "node tools/smoke_messages.mjs",
-  "smoke:upload": "node tools/smoke_upload.mjs"
-}
-```
-
-## Run CI locally
-
-```bash
-npm run typecheck && npm run build && npm run test && node tools/smoke_status.mjs
-```

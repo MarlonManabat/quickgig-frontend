@@ -10,15 +10,6 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_SAVED_API ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_SHOW_LOGOUT_ALL:
     String(process.env.NEXT_PUBLIC_SHOW_LOGOUT_ALL ?? 'false').toLowerCase() === 'true',
-  NEXT_PUBLIC_LEGACY_UI:
-    String(process.env.NEXT_PUBLIC_LEGACY_UI ?? 'false').toLowerCase() === 'true',
-  NEXT_PUBLIC_LEGACY_STRICT_SHELL:
-    String(process.env.NEXT_PUBLIC_LEGACY_STRICT_SHELL ?? 'false').toLowerCase() === 'true',
-  NEXT_PUBLIC_SHOW_API_BADGE:
-    String(process.env.NEXT_PUBLIC_SHOW_API_BADGE ?? 'false').toLowerCase() === 'true',
-  NEXT_PUBLIC_ENABLE_MESSAGES:
-    String(process.env.NEXT_PUBLIC_ENABLE_MESSAGES ?? 'false').toLowerCase() === 'true',
-  NEXT_PUBLIC_BANNER_HTML: process.env.NEXT_PUBLIC_BANNER_HTML || '',
   RESEND_API_KEY: process.env.RESEND_API_KEY || '',
   NOTIFY_FROM: process.env.NOTIFY_FROM || 'QuickGig <noreply@quickgig.ph>',
   NOTIFY_ADMIN_EMAIL: process.env.NOTIFY_ADMIN_EMAIL || '',
@@ -26,8 +17,7 @@ export const env = {
     process.env.EMPLOYER_EMAILS?.split(',').map((e) => e.trim()).filter(Boolean) || [],
   ALERTS_DIGEST_SECRET: process.env.ALERTS_DIGEST_SECRET || '',
   NEXT_PUBLIC_ENABLE_ALERTS:
-    String(process.env.NEXT_PUBLIC_ENABLE_ALERTS ?? 'true').toLowerCase() === 'true',
-  ALERTS_WEBHOOK_URL: process.env.ALERTS_WEBHOOK_URL || '',
+    String(process.env.NEXT_PUBLIC_ENABLE_ALERTS ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_REPORTS:
     String(process.env.NEXT_PUBLIC_ENABLE_REPORTS ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_ADMIN:
@@ -39,13 +29,6 @@ export const env = {
   NEXT_PUBLIC_ENABLE_ANALYTICS:
     String(process.env.NEXT_PUBLIC_ENABLE_ANALYTICS ?? 'true').toLowerCase() === 'true',
   METRICS_SECRET: process.env.METRICS_SECRET || '',
-  NEXT_PUBLIC_ENABLE_ONBOARDING:
-    String(process.env.NEXT_PUBLIC_ENABLE_ONBOARDING ?? 'true').toLowerCase() !== 'false',
-  NEXT_PUBLIC_ENABLE_S3_UPLOADS:
-    String(process.env.NEXT_PUBLIC_ENABLE_S3_UPLOADS ?? 'false').toLowerCase() === 'true',
-  NEXT_PUBLIC_MAX_UPLOAD_MB: Number(process.env.NEXT_PUBLIC_MAX_UPLOAD_MB || 2),
-  ALLOWED_UPLOAD_MIME:
-    (process.env.ALLOWED_UPLOAD_MIME || '').split(',').map((s) => s.trim()).filter(Boolean),
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

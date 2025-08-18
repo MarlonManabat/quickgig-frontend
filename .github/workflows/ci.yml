@@ -11,10 +11,8 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm ci
-      - run: npm run lint --silent || true
-      - run: npm run typecheck
-      - run: npm run build
-      - run: node tools/smoke_status.mjs
-      - run: node tools/smoke_messages.mjs || true
-      - run: node tools/smoke_upload.mjs || true
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build
+

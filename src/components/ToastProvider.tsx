@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { subscribe } from '@/lib/toast';
-import { t } from '@/lib/t';
 
 interface Toast {
   id: number;
@@ -29,16 +28,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="bg-red-500 text-white px-4 py-2 rounded shadow flex items-center gap-2"
+            className="bg-red-500 text-white px-4 py-2 rounded shadow"
           >
-            <span className="flex-1">{t.message}</span>
-            <button
-              aria-label={t('toast.close')}
-              className="text-white focus:outline focus:outline-2"
-              onClick={() => setToasts((ts) => ts.filter((x) => x.id !== t.id))}
-            >
-              ×
-            </button>
+            {t.message}
           </div>
         ))}
       </div>

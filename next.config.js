@@ -1,15 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: {
-    BUILD_TIME: new Date().toISOString(),
-  },
-  experimental: {
-    serverComponentsExternalPackages: ['@aws-sdk/client-s3','@aws-sdk/s3-request-presigner'],
-  },
   async redirects() {
     return [
-      { source: '/_legacy-diag', destination: '/legacy-diag', permanent: false },
+      {
+        source: '/:path*',
+        destination: 'https://app.quickgig.ph/:path*',
+        permanent: true, // use 308 on Vercel
+      },
     ];
   },
 };
+
 module.exports = nextConfig;
