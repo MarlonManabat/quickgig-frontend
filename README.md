@@ -45,9 +45,9 @@ To verify the live API locally, run:
 ```bash
 BASE=https://api.quickgig.ph node tools/check_live_api.mjs
 ```
-## S3 uploads (optional)
+## Production-safe S3 uploads
 
-Feature-flagged uploads generate a signed URL using the server-only AWS SDK. Set these env vars and toggle the flag:
+Uploads are feature-flagged and validated server-side. To enable in preview or prod, set:
 
 ```
 NEXT_PUBLIC_ENABLE_S3_UPLOADS=true
@@ -59,13 +59,31 @@ S3_ACCESS_KEY_ID=AKIA...
 S3_SECRET_ACCESS_KEY=...
 ```
 
-Get a presigned URL:
+S3 bucket CORS:
+
+```json
+[
+  {
+    "AllowedOrigins": ["*"],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["*"]
+  }
+]
+```
+
+To test locally (flag on):
 
 ```
-curl -X POST localhost:3000/api/upload -d '{"key":"uploads/test.txt","type":"text/plain"}' -H 'content-type: application/json'
+node tools/smoke_upload.mjs
 ```
 
-Use the returned URL to PUT the file from the browser.
+Preview enable steps: add the env vars above in Vercel and redeploy.
+
+Messages SSE can be tested locally with:
+
+```
+NEXT_PUBLIC_ENABLE_MESSAGES=true node tools/smoke_messages.mjs
+```
 
 ## Sockets
 
@@ -429,3 +447,21 @@ npm run legacy:check
 ```
 
 - Optional: hide the red API badge in Vercel by setting `NEXT_PUBLIC_SHOW_API_BADGE=false`.
+
+## Scripts & smoke tests
+
+```json
+{
+  "typecheck": "tsc -p tsconfig.json --noEmit",
+  "routes:print": "node tools/print_routes.mjs",
+  "smoke:status": "node tools/smoke_status.mjs",
+  "smoke:messages": "node tools/smoke_messages.mjs",
+  "smoke:upload": "node tools/smoke_upload.mjs"
+}
+```
+
+## Run CI locally
+
+```bash
+npm run typecheck && npm run build && npm run test && node tools/smoke_status.mjs
+```

@@ -25,6 +25,7 @@ playwright-report/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+tools/logs/
 
 # local env files
 .env*

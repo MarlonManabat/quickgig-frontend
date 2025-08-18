@@ -3,7 +3,6 @@ import { UploadedFile } from '@/types/upload';
 import { toBase64, truncateDataUrl, makeId } from '@/lib/baseUpload';
 import { validateFile, MAX_MB } from '@/lib/uploadPolicy';
 import { presign, putFile } from '@/lib/uploader';
-import { makeUploadKey } from '@/lib/uploadKey';
 import { toast } from '@/lib/toast';
 import { t } from '@/lib/t';
 
@@ -27,7 +26,7 @@ export default function UploadField({ label, accept, kind, onSaved, file: initia
   const open = () => { inputRef.current?.click(); };
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
+    let f = e.target.files?.[0];
     if (!f) return;
     const v = validateFile(f);
     if (!v.ok) {
@@ -36,11 +35,18 @@ export default function UploadField({ label, accept, kind, onSaved, file: initia
     }
     setErr('');
 
-    if (useS3) {
-      const key = makeUploadKey(kind === 'avatar' ? 'avatars' : 'resumes', f.name);
+    if (kind === 'avatar') {
       try {
-        const { url } = await presign(key, f.type);
-        await putFile(url, f, p => {
+        f = await downscaleImage(f);
+      } catch {
+        // ignore, use original file
+      }
+    }
+
+    if (useS3) {
+      try {
+        const { url, key } = await presign(f.name, f.type, f.size);
+        await putFile(url, f, (p) => {
           if (p.total) setProgress(Math.round((p.loaded / p.total) * 100));
         });
         const publicUrl = url.split('?')[0];
@@ -49,8 +55,12 @@ export default function UploadField({ label, accept, kind, onSaved, file: initia
         onSaved(up);
         toast(t(kind === 'resume' ? 'profile.resume.saved' : 'profile.avatar.saved'));
         setProgress(0);
-      } catch {
-        setErr(t('upload.failed'));
+      } catch (e) {
+        const msg = (e as Error).message === 'rate_limited'
+          ? t('upload.rate_limited')
+          : t('upload.failed');
+        setErr(msg);
+        toast(msg);
         setProgress(0);
       }
     } else {
@@ -79,11 +89,11 @@ export default function UploadField({ label, accept, kind, onSaved, file: initia
             <div>{file.url.split('/').pop()}</div>
             <div style={{fontSize:12,color:'#666'}}>{Math.round(file.size/1024)} KB</div>
           </div>
-          <button type="button" onClick={open} style={{marginRight:8, textDecoration:'underline', background:'none', border:'none', cursor:'pointer'}}>{t('profile.resume.replace')}</button>
-          <button type="button" onClick={onRemove} style={{textDecoration:'underline', background:'none', border:'none', cursor:'pointer'}}>{t('profile.resume.remove')}</button>
+          <button type="button" aria-label={t('profile.resume.replace')} onClick={open} style={{marginRight:8, textDecoration:'underline', background:'none', border:'none', cursor:'pointer'}}>{t('profile.resume.replace')}</button>
+          <button type="button" aria-label={t('profile.resume.remove')} onClick={onRemove} style={{textDecoration:'underline', background:'none', border:'none', cursor:'pointer'}}>{t('profile.resume.remove')}</button>
         </div>
       ) : (
-        <button type="button" onClick={open} style={{padding:'10px 12px', borderRadius:8, border:'1px solid #ccc', background:'#fff', cursor:'pointer', textAlign:'left'}}>{t('profile.resume.replace')}</button>
+        <button type="button" aria-label={t('upload.upload')} onClick={open} style={{padding:'10px 12px', borderRadius:8, border:'1px solid #ccc', background:'#fff', cursor:'pointer', textAlign:'left'}}>{t('profile.resume.replace')}</button>
       )}
       <input ref={inputRef} type="file" accept={accept} style={{display:'none'}} onChange={onChange} />
       {progress > 0 && progress < 100 && <div style={{fontSize:12}}>{t('upload.uploading')} {progress}%</div>}
@@ -91,4 +101,22 @@ export default function UploadField({ label, accept, kind, onSaved, file: initia
       {kind === 'resume' && !file && <div style={{fontSize:12,color:'#666'}}>{t('profile.resume.hint',{mb:MAX_MB})}</div>}
     </div>
   );
+}
+
+async function downscaleImage(file: File): Promise<File> {
+  const img = await createImageBitmap(file);
+  const canvas = document.createElement('canvas');
+  const scale = Math.min(1024 / img.width, 1024 / img.height, 1);
+  canvas.width = img.width * scale;
+  canvas.height = img.height * scale;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return file;
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.8)
+  );
+  if (!blob) return file;
+  return new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+    type: 'image/jpeg',
+  });
 }
