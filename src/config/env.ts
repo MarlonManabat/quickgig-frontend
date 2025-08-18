@@ -86,6 +86,10 @@ export const env = {
   NEXT_PUBLIC_NOTIFY_SRC_ADMIN:
     String(process.env.NEXT_PUBLIC_NOTIFY_SRC_ADMIN ?? 'false').toLowerCase() === 'true',
   EVENTS_POLL_MS: parseInt(process.env.EVENTS_POLL_MS || '5000', 10),
+  NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT:
+    String(process.env.NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS:
+    String(process.env.NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS ?? 'false').toLowerCase() === 'true',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

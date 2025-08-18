@@ -2,8 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { listJobs, publishJob, pauseJob, EmployerJob } from '@/lib/employerStore';
+import {
+  listJobs,
+  publishJob,
+  pauseJob,
+  EmployerJob,
+  closeJob,
+  reopenJob,
+  bulkRejectJob,
+} from '@/lib/employerStore';
 import { toast } from '@/lib/toast';
+import { jobState } from '@/lib/jobCloseout';
+import { env } from '@/config/env';
 
 export default function EmployerJobsPage() {
   const [jobs, setJobs] = useState<EmployerJob[]>([]);
@@ -40,6 +50,35 @@ export default function EmployerJobsPage() {
     }
   };
 
+  const close = async (job: EmployerJob) => {
+    try {
+      await closeJob(job.id, { reason: 'filled', bulkNotify: false });
+      toast('Job closed');
+      await load();
+    } catch {
+      toast('Failed to close');
+    }
+  };
+
+  const reopen = async (job: EmployerJob) => {
+    try {
+      await reopenJob(job.id);
+      toast('Job reopened');
+      await load();
+    } catch {
+      toast('Failed to reopen');
+    }
+  };
+
+  const bulk = async (job: EmployerJob) => {
+    try {
+      const r = await bulkRejectJob(job.id);
+      toast(`Notified ${r.count} applicants`);
+    } catch {
+      toast('Failed to notify');
+    }
+  };
+
   if (loading) return <main className="p-4">Loading...</main>;
   if (error) return <main className="p-4">{error}</main>;
 
@@ -67,7 +106,9 @@ export default function EmployerJobsPage() {
           {jobs.map((job) => (
             <tr key={job.id} className="border-b">
               <td className="p-2">{job.title}</td>
-              <td className="p-2 capitalize">{job.status}</td>
+              <td className="p-2 capitalize">
+                {env.NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT ? jobState(job) : job.status}
+              </td>
               <td className="p-2">{new Date(job.updatedAt).toLocaleDateString()}</td>
               <td className="p-2 space-x-2">
                 <Link
@@ -82,6 +123,21 @@ export default function EmployerJobsPage() {
                 >
                   {job.status === 'published' ? 'Pause' : 'Publish'}
                 </button>
+                {env.NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT && !job.closeout && (
+                  <button onClick={() => close(job)} className="text-qg-accent">
+                    Close
+                  </button>
+                )}
+                {env.NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT && job.closeout && (
+                  <>
+                    <button onClick={() => reopen(job)} className="text-qg-accent">
+                      Reopen
+                    </button>
+                    <button onClick={() => bulk(job)} className="text-qg-accent">
+                      Bulk notify
+                    </button>
+                  </>
+                )}
               </td>
             </tr>
           ))}

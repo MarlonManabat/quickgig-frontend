@@ -8,6 +8,8 @@ import type {
 import { seedMockApps } from './applicantStore';
 import type { Interview, InterviewStatus } from '@/types/interviews';
 import { readInterviews, writeInterviews } from './interviewStore';
+import type { JobCloseout, JobCloseReason } from '@/types/jobs';
+import { bulkRejectRemaining } from './jobCloseout';
 
 export interface EmployerJob {
   id: string;
@@ -19,6 +21,7 @@ export interface EmployerJob {
   status: 'draft' | 'published' | 'paused';
   metrics?: import('@/types/metrics').JobMetrics;
   updatedAt: string;
+  closeout?: JobCloseout;
 }
 
 const COMPANY_KEY = 'company';
@@ -233,6 +236,69 @@ export async function pauseJob(id: string, cookie?: string): Promise<EmployerJob
   });
   if (!res.ok) throw new Error(`engine ${res.status}`);
   return (await res.json()) as EmployerJob;
+}
+
+export async function closeJob(
+  id: string,
+  payload: { reason: JobCloseReason; note?: string; bulkNotify?: boolean },
+  cookie?: string,
+): Promise<{ job: EmployerJob; rejected: number }> {
+  if (MODE === 'mock') {
+    const jobs = readJobs();
+    const idx = jobs.findIndex((j) => j.id === id);
+    if (idx === -1) throw new Error('not found');
+    const closeout: JobCloseout = {
+      at: new Date().toISOString(),
+      by: 'employer',
+      reason: payload.reason,
+      note: payload.note,
+    };
+    jobs[idx].closeout = closeout;
+    writeJobs(jobs);
+    let rejected = 0;
+    if (payload.bulkNotify) rejected = bulkRejectRemaining(id);
+    return { job: jobs[idx], rejected };
+  }
+  const res = await fetch(`${BASE}/api/employer/jobs/${id}/close`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Cookie: cookie || '' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as { job: EmployerJob; rejected: number };
+}
+
+export async function reopenJob(
+  id: string,
+  cookie?: string,
+): Promise<EmployerJob> {
+  if (MODE === 'mock') {
+    const jobs = readJobs();
+    const idx = jobs.findIndex((j) => j.id === id);
+    if (idx === -1) throw new Error('not found');
+    delete jobs[idx].closeout;
+    writeJobs(jobs);
+    return jobs[idx];
+  }
+  const res = await fetch(`${BASE}/api/employer/jobs/${id}/reopen`, {
+    method: 'POST',
+    headers: { Cookie: cookie || '' },
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as EmployerJob;
+}
+
+export async function bulkRejectJob(id: string, cookie?: string): Promise<{ count: number }> {
+  if (MODE === 'mock') {
+    const count = bulkRejectRemaining(id);
+    return { count };
+  }
+  const res = await fetch(`${BASE}/api/employer/jobs/${id}/bulk/reject`, {
+    method: 'POST',
+    headers: { Cookie: cookie || '' },
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as { count: number };
 }
 
 export async function incrementJobViews(jobId: string, cookie?: string): Promise<JobMetrics> {

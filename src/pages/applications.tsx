@@ -115,6 +115,13 @@ export default function ApplicationsPage() {
                     <span className="px-2 py-1 rounded bg-gray-200 text-gray-800 text-xs">
                       {app.status}
                     </span>
+                    {env.NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT &&
+                      app.status !== 'hired' &&
+                      app.status === 'not_selected' && (
+                        <span className="ml-2 text-xs text-gray-500">
+                          Job closed
+                        </span>
+                      )}
                   </td>
                   <td className="py-2">
                     {Math.round(

@@ -157,7 +157,6 @@ endpoints expected (see `src/config/api.ts`):
 - `POST ${API.alertsRunDigest}` – trigger digest (optional)
 
 Vercel Cron setup:
-
 - Path: `/api/cron/job-alerts`
 - Method: `POST`
 - Schedule: `0 1 * * *` (daily 01:00 UTC) or `0 17 * * *`
@@ -197,6 +196,19 @@ NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY=weekly # daily | weekly
 Enable locally by setting `NEXT_PUBLIC_ENABLE_SETTINGS=true`. When also running with `ENGINE_MODE=php`, settings are persisted through the engine; otherwise they fall back to a localStorage mock and behave identically.
 
 Roll back any time by turning the flag off.
+
+## Job Closeout (flagged)
+
+Disabled by default. Configure via environment:
+
+```env
+NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT=false
+NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS=false
+```
+
+Enable by setting `NEXT_PUBLIC_ENABLE_JOB_CLOSEOUT=true`. Employers can mark a job as filled or closed and optionally bulk notify remaining applicants. Emails are sent only when `NEXT_PUBLIC_ENABLE_BULK_REJECTION_EMAILS=true` and user preferences permit.
+
+Rollback: turn the flags off. In engine mode, bulk rejection actions are irreversible, so exercise caution.
 ## Hiring Decisions (flagged)
 
 Disabled by default. Configure via environment:
