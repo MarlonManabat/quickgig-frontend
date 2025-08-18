@@ -158,6 +158,28 @@ Rollback: set `NEXT_PUBLIC_ENABLE_SECURITY_AUDIT=false` and redeploy.
 
 Notes: works in mock and php engine modes; logs request metrics to console.
 
+### Post-Launch Monitoring & Analytics (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_MONITORING` – enable Sentry error tracking, basic performance metrics, and product analytics stubs.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_MONITORING=true
+SENTRY_DSN=your-sentry-dsn
+MIXPANEL_TOKEN=your-mixpanel-token
+```
+
+Then run:
+
+```
+BASE=http://localhost:3000 npm run smoke
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_MONITORING=false` and redeploy.
+
+Notes: skips integrations when env vars are missing; logs to console in mock mode only.
+
 ### Localization & Content Polish (Flagged)
 
 - `NEXT_PUBLIC_ENABLE_I18N_POLISH` – refine EN/Taglish strings and marketing copy on landing pages.
