@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { get, PATHS } from '@/lib/engine';
+import { engineFetch, withFallback, PATHS } from '@/lib/engine';
 
 const mockJobs: Record<string, unknown> = {
   '1': { id: '1', title: 'Sample Job 1', company: 'Acme Corp', location: 'Manila' },
@@ -14,7 +14,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
   try {
-    const data = await get(PATHS.jobs.detail(id), req, async () => mockJobs[id] || null);
+    const data = await withFallback(
+      () => engineFetch(PATHS.jobs.detail(id), { req }),
+      async () => mockJobs[id] || null,
+    );
     if (!data) {
       res.status(404).end();
       return;

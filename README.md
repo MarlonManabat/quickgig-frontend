@@ -47,6 +47,25 @@ curl https://staging.quickgig.ph/api/profile
 curl https://staging.quickgig.ph/api/applications
 ```
 
+## Staging engine cutover
+
+The app targets a PHP engine in staging but keeps mock flows as a safety net.
+
+1. Enable the engine by setting in `.env.local`:
+   ```env
+   ENGINE_MODE=php
+   ENGINE_BASE_URL=https://api.quickgig.ph
+   ALLOW_ENGINE_FALLBACK=true
+   ```
+2. Deploy and verify with:
+   ```bash
+   curl https://staging.quickgig.ph/api/engine/health
+   ```
+3. Roll back by removing or changing `ENGINE_MODE`.
+
+When the engine is unreachable or returns non‑2xx responses, the app
+automatically falls back to existing mock or legacy flows.
+
 ## Flags
 
 - `NEXT_PUBLIC_ENABLE_INTERVIEWS_UI` – enable interview scheduling UI. When enabled, the app uses `/api/interviews` and `/api/interviews/[id]` for creating and updating interviews. Optional helpers:
