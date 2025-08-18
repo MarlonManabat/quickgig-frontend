@@ -6,8 +6,10 @@ import { env } from '@/config/env';
 import { t } from '@/lib/i18n';
 import { useNotifyStore } from '@/app/notify/store';
 import { useNotifyWatcher } from '@/hooks/useNotifyWatcher';
+import { useSettings } from '@/hooks/useSettings';
 
 export default function NotifyBell() {
+  const { settings } = useSettings();
   useNotifyWatcher();
   const { counts, items, markRead } = useNotifyStore();
   const [open, setOpen] = useState(false);
@@ -22,6 +24,7 @@ export default function NotifyBell() {
   }, []);
 
   if (!env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER) return null;
+  if (settings && !settings.notifyEnabled) return null;
   const count = counts.total;
   return (
     <div className="relative" ref={ref}>

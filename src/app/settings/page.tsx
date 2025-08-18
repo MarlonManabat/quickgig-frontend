@@ -4,14 +4,18 @@ import HeadSEO from '@/components/HeadSEO';
 import { env } from '@/config/env';
 import SettingsForm from './SettingsForm';
 
-export default function SettingsPage() {
-  if (!env.NEXT_PUBLIC_ENABLE_SETTINGS) {
-    notFound();
-  }
+function requireAuthSSR() {
   const token = cookies().get(env.JWT_COOKIE_NAME);
   if (!token) {
     redirect('/login?return=/settings');
   }
+}
+
+export default function SettingsPage() {
+  if (!env.NEXT_PUBLIC_ENABLE_SETTINGS) {
+    notFound();
+  }
+  requireAuthSSR();
   return (
     <>
       <HeadSEO title="Settings • QuickGig" />
@@ -19,4 +23,3 @@ export default function SettingsPage() {
     </>
   );
 }
-

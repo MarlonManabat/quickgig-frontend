@@ -1,24 +1,24 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import type { Settings } from '@/types/settings';
-import { defaultsFromEnv, mergeSettings } from '@/lib/settings';
-import { getPrefs, savePrefs } from '@/lib/prefs';
+import type { UserSettings } from '@/types/settings';
+import { defaults } from '@/app/settings/store';
 
 export function useSettings() {
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const [settings, setSettings] = useState<UserSettings | null>(null);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
-      const res = await fetch('/api/settings', { credentials: 'include' });
-      if (!res.ok) throw new Error('settings');
-      const data = (await res.json()) as Settings;
-      setSettings(data);
-    } catch (err) {
-      setError((err as Error).message);
-      setSettings(defaultsFromEnv());
+      const res = await fetch('/api/settings');
+      if (res.ok) {
+        const data = (await res.json()) as UserSettings;
+        setSettings(data);
+      } else {
+        setSettings(defaults);
+      }
+    } catch {
+      setSettings(defaults);
     }
   }, []);
 
@@ -27,29 +27,33 @@ export function useSettings() {
   }, [refresh]);
 
   const update = useCallback(
-    async (patch: Partial<Settings>) => {
+    async (patch: Partial<UserSettings>) => {
       if (!settings) return;
-      const optimistic = mergeSettings(settings, patch);
+      const optimistic = { ...settings, ...patch } as UserSettings;
       setSettings(optimistic);
       setSaving(true);
       try {
         const res = await fetch('/api/settings', {
-          method: 'PATCH',
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(patch),
+          body: JSON.stringify(optimistic),
         });
         if (res.ok) {
-          const data = (await res.json()) as Settings;
+          const data = (await res.json()) as UserSettings;
           setSettings(data);
-          if (patch.lang && patch.lang !== settings.lang) {
-            const prefs = getPrefs();
-            savePrefs({ ...prefs, copy: patch.lang === 'tl' ? 'taglish' : 'english' });
+          if (patch.lang) {
+            document.cookie = `NEXT_LOCALE=${patch.lang}; path=/`;
+            if (typeof window !== 'undefined')
+              localStorage.setItem(
+                'copyVariant',
+                patch.lang === 'tl' ? 'taglish' : 'english',
+              );
           }
         } else {
-          setSettings(settings); // revert
+          setSettings(settings);
         }
       } catch {
-        setSettings(settings); // revert
+        setSettings(settings);
       } finally {
         setSaving(false);
       }
@@ -57,15 +61,5 @@ export function useSettings() {
     [settings],
   );
 
-  return { settings, update, refresh, saving, error } as const;
-}
-
-export function useUserLang() {
-  const { settings } = useSettings();
-  return settings?.lang || defaultsFromEnv().lang;
-}
-
-export function useEmailPrefs() {
-  const { settings } = useSettings();
-  return settings?.email || defaultsFromEnv().email;
+  return { settings, update, refresh, saving } as const;
 }

@@ -45,13 +45,13 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       if (api.status === 200 && j.lang) console.log('[smoke] api settings ok');
       else console.log('[smoke] api settings', api.status);
       await fetchImpl(base + '/api/settings', {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email: { applications: 'none' } }),
+        body: JSON.stringify({ ...j, email: 'none' }),
       });
       const after = await fetchImpl(base + '/api/settings');
       const j2 = await after.json().catch(() => ({}));
-      if (j2.email && j2.email.applications === 'none') console.log('[smoke] api settings patch ok');
+      if (j2.email && j2.email === 'none') console.log('[smoke] api settings patch ok');
       else console.log('[smoke] api settings patch', after.status);
     } catch {
       console.log('[smoke] api settings failed');

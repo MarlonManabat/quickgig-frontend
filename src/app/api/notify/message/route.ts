@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { sendMail } from '@/server/mailer';
 import { unsign } from '@/lib/signedCookie';
-import type { Settings } from '@/types/settings';
+import type { UserSettings } from '@/types/settings';
 import { defaultsFromEnv, mergeSettings } from '@/lib/settings';
 
 export async function POST(req: Request) {
@@ -20,14 +20,8 @@ export async function POST(req: Request) {
     } | null;
     if (body) {
       if (!body.kind || allow(body.kind)) {
-        const kind:
-          | 'apply'
-          | 'interview'
-          | 'digest' = body.kind === 'interview'
-          ? 'interview'
-          : body.kind === 'digest'
-          ? 'digest'
-          : 'apply';
+        const kind: 'apply' | 'interview' | 'digest' =
+          body.kind === 'interview' ? 'interview' : body.kind === 'digest' ? 'digest' : 'apply';
         await sendMail({
           kind,
           to: body.to,
@@ -53,17 +47,11 @@ function allow(kind: 'apply' | 'interview' | 'digest' | 'marketing'): boolean {
     if (raw) {
       const v = unsign(raw);
       if (v) {
-        const parsed = JSON.parse(Buffer.from(v, 'base64').toString('utf8')) as Settings;
+        const parsed = JSON.parse(Buffer.from(v, 'base64').toString('utf8')) as UserSettings;
         s = mergeSettings(s, parsed);
       }
     }
-    const map = {
-      apply: s.email.applications,
-      interview: s.email.interviews,
-      digest: s.email.admin,
-      marketing: s.email.admin,
-    } as const;
-    const pref = map[kind];
+    const pref = s.email;
     if (pref === 'none') return false;
     if (pref === 'ops_only' && kind === 'digest') return false;
     return true;

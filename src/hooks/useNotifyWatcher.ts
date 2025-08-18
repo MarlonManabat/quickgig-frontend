@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { env } from '@/config/env';
 import type { NotifyItem } from '@/types/notify';
 import { useNotifyStore } from '@/app/notify/store';
+import { useSettings } from '@/hooks/useSettings';
 
 const srcEnabled = {
   message: env.NEXT_PUBLIC_NOTIFY_SRC_MESSAGES,
@@ -13,9 +14,11 @@ const srcEnabled = {
 
 export function useNotifyWatcher() {
   const { ingest, hydrate } = useNotifyStore();
+  const { settings } = useSettings();
 
   useEffect(() => {
     if (!env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER) return;
+    if (settings && !settings.notifyEnabled) return;
     fetch('/api/notify/index')
       .then((r) => r.json())
       .then((d) => {
@@ -25,10 +28,11 @@ export function useNotifyWatcher() {
         }
       })
       .catch(() => {});
-  }, [hydrate]);
+  }, [hydrate, settings]);
 
   useEffect(() => {
     if (!env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER) return;
+    if (settings && !settings.notifyEnabled) return;
     if (env.NEXT_PUBLIC_ENABLE_SOCKETS) {
       const es = new EventSource('/api/notify/events');
       es.onmessage = (e) => {
@@ -54,5 +58,5 @@ export function useNotifyWatcher() {
         .catch(() => {});
     }, env.EVENTS_POLL_MS);
     return () => clearInterval(id);
-  }, [ingest, hydrate]);
+  }, [ingest, hydrate, settings]);
 }

@@ -1,6 +1,18 @@
 import type { Interview } from '@/types/interview';
 import { toICS } from '@/lib/ics';
 import { sign } from '@/lib/signer';
+import type { UserSettings } from '@/types/settings';
+import { defaultsFromEnv } from '@/lib/settings';
+
+export function shouldSendEmail(
+  kind: 'apply' | 'interview' | 'digest',
+  s?: UserSettings,
+): boolean {
+  const st = s || defaultsFromEnv();
+  if (st.email === 'none') return false;
+  if (st.email === 'ops_only' && kind === 'digest') return false;
+  return true;
+}
 
 type MailPayload = {
   kind: 'apply' | 'interview' | 'digest';
@@ -11,7 +23,10 @@ type MailPayload = {
   data?: Record<string, unknown>;
 };
 
-export async function sendMail(msg: MailPayload) {
+export async function sendMail(msg: MailPayload, settings?: UserSettings) {
+  if (!shouldSendEmail(msg.kind, settings)) {
+    return { ok: true, skipped: 'prefs' } as const;
+  }
   const key = process.env.RESEND_API_KEY;
   if (!key) return { ok: true, skipped: 'no_api_key' };
 
@@ -138,4 +153,3 @@ export async function sendInterviewReminder({
   await Promise.all([send(toApplicant), send(toEmployer)]);
   return { ok: true };
 }
-
