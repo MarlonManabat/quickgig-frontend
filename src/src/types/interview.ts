@@ -1,17 +1,34 @@
-export type InterviewMethod = 'video' | 'phone' | 'in_person';
-export type InterviewStatus = 'proposed' | 'accepted' | 'declined' | 'cancelled' | 'rescheduled';
+export type InterviewMode = 'video' | 'phone' | 'in_person';
+export type InterviewStatus =
+  | 'pending'
+  | 'proposed'
+  | 'accepted'
+  | 'declined'
+  | 'canceled'
+  | 'completed'
+  | 'cancelled'
+  | 'rescheduled';
 
 export interface Interview {
   id: string;
-  appId: string;            // application id
   jobId: string;
-  employerId: string;
   applicantId: string;
-  method: InterviewMethod;
-  whenISO: string;          // ISO date
-  durationMins: number;
-  note?: string;
+  employerId: string;
+  mode?: InterviewMode;
+  startISO?: string;
+  durationMins?: number;
+  place?: string;
   status: InterviewStatus;
-  createdAt: string;
+  notes?: string;
+  note?: string;
   updatedAt: string;
+  createdAt: string;
+  // legacy fields
+  appId?: string;            // application id
+  method?: InterviewMode;
+  whenISO: string;          // ISO date
+  startsAt: string;
+  endsAt?: string;
 }
+
+export type InterviewMethod = InterviewMode; // compat
