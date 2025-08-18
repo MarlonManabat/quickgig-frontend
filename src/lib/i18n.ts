@@ -178,6 +178,11 @@ const strings = {
       toast_sent: 'Interview request sent',
       toast_updated: 'Interview updated',
     },
+    qa: {
+      interviewRemindersTitle: 'Interview Reminders QA',
+      inviteSent: 'Invite sent',
+      reminderSent: 'Reminder sent',
+    },
     email: {
       apply_subject: 'New application received',
       interview_subject: 'Interview update',
@@ -360,6 +365,11 @@ const strings = {
       method_in_person: 'In person',
       toast_sent: 'Na-send ang request',
       toast_updated: 'Na-update ang interview',
+    },
+    qa: {
+      interviewRemindersTitle: 'Interview Reminders QA',
+      inviteSent: 'Na-send ang invite',
+      reminderSent: 'Na-send ang reminder',
     },
     email: {
       apply_subject: 'May bagong application',
