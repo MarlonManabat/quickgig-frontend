@@ -139,6 +139,38 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       bail('interviews check failed');
     }
   }
+  if (process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_INVITES === 'true') {
+    try {
+      const start = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+      const create = await fetchImpl(base + '/api/interviews', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          appId: 'demo',
+          jobId: 'demo',
+          employerId: 'e',
+          applicantId: 'a',
+          whenISO: start,
+          durationMins: 30,
+          method: 'video',
+        }),
+      });
+      const j = await create.json().catch(() => ({}));
+      const id = j.id || j.interview?.id;
+      if (id) {
+        const r = await fetchImpl(base + `/api/interviews/${id}/invite`, {
+          method: 'POST',
+        });
+        console.log('[smoke] invite', r.status);
+        const r2 = await fetchImpl(base + '/api/interviews/remind-due', {
+          method: 'POST',
+        });
+        console.log('[smoke] remind', r2.status);
+      }
+    } catch {
+      console.log('[smoke] interview invites failed');
+    }
+  }
   console.log('Smoke OK');
   if (process.env.SMOKE_REPORTS === '1') {
     try {

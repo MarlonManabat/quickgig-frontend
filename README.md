@@ -37,6 +37,11 @@ BASE=https://api.quickgig.ph node tools/check_live_api.mjs
   - `NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD` – default method (`video`, `phone`, `in_person`).
   - `NEXT_PUBLIC_INTERVIEW_SLOT_MINUTES` – default duration in minutes.
   - `INTERVIEWS_WEBHOOK_URL` – POST webhook on create/update (best effort).
+- `NEXT_PUBLIC_ENABLE_INTERVIEWS` – master switch for interview features.
+- `NEXT_PUBLIC_ENABLE_INTERVIEW_INVITES` – enable calendar invites with signed RSVP links.
+- `INVITES_FROM` / `INVITES_REPLY_TO` – from and reply-to addresses for invites.
+- `NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS` – send reminder emails before an interview.
+- `REMINDER_LEAD_HOURS` – hours ahead of start to send reminders.
 - `NEXT_PUBLIC_ENABLE_SETTINGS` – enable account settings page under `/settings`. Stores preferences in a signed `settings_v1` cookie mirrored to `localStorage` for instant reloads. In `ENGINE_AUTH_MODE=php`, requests proxy to `${ENGINE_BASE_URL}/api/settings`.
 - `NEXT_PUBLIC_DEFAULT_LANG` – default language (`en` or `tl`) used when no user settings exist.
 - `NEXT_PUBLIC_DEFAULT_EMAIL_PREFS` – initial email preference (`ops_only`, `all`, `none`).
@@ -97,6 +102,24 @@ Vercel Cron setup:
 
 Create an alert from the **Create Alert from filters** button on `/jobs` and
 manage them in `/settings/alerts`.
+
+## Interview Invites & Reminders (flagged)
+
+Disabled by default. To exercise end-to-end locally:
+
+1. Set in `.env.local`:
+   ```env
+   NEXT_PUBLIC_ENABLE_INTERVIEWS=true
+   NEXT_PUBLIC_ENABLE_INTERVIEW_INVITES=true
+   NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS=true
+   NEXT_PUBLIC_ENABLE_EMAILS=true
+   ```
+2. Create an interview then `POST /api/interviews/{id}/invite` to send emails
+   with a minimal RFC5545 calendar attachment and signed RSVP links.
+3. `POST /api/interviews/remind-due` sends reminders
+   `REMINDER_LEAD_HOURS` before `startISO`.
+
+The ICS helper is lightweight and uses no external packages.
 
 ## Account Settings (flagged)
 

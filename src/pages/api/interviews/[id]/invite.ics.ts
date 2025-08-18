@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     `UID:${interview.id}@quickgig.ph`,
     `DTSTAMP:${formatUtc(interview.createdAt)}`,
     `DTSTART:${formatUtc(interview.startsAt)}`,
-    `DTEND:${formatUtc(interview.endsAt)}`,
+    `DTEND:${formatUtc(interview.endsAt || interview.startsAt)}`,
     `SUMMARY:Interview: Job ${interview.jobId}`,
     `DESCRIPTION:${(interview.notes || '')}${interview.locationOrLink ? '\n' + interview.locationOrLink : ''}`,
     'ORGANIZER;CN=QuickGig:mailto:noreply@quickgig.ph',
