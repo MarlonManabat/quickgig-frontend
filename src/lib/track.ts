@@ -4,7 +4,7 @@ import { getSessionId } from './sessionId';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function track(event: string, props: Record<string, any> = {}) {
-  if (!env.NEXT_PUBLIC_ENABLE_ANALYTICS) return;
+  if (!env.NEXT_PUBLIC_ENABLE_ANALYTICS || !env.NEXT_PUBLIC_ENABLE_CONSENT) return;
   try {
     const body = JSON.stringify({
       event,

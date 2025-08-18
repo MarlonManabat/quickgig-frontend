@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { env } from '@/config/env';
 import { API } from '@/config/api';
+import { guardRate } from '@/lib/guardRate';
 
 async function forward(req: NextRequest, target: string) {
   try {
@@ -23,5 +24,11 @@ async function forward(req: NextRequest, target: string) {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = guardRate(
+    req,
+    Number(process.env.RATE_LIMIT_MAX_PER_WINDOW) || 60,
+    Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000,
+  );
+  if (guard) return guard;
   return forward(req, API.uploadLogo);
 }

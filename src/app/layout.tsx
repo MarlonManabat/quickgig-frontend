@@ -68,18 +68,21 @@ export const metadata: Metadata = {
     creator: '@QuickGigPH',
   },
   icons: [{ rel: 'icon', url: faviconUrl }],
-  manifest: '/manifest.json',
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  manifest: process.env.NEXT_PUBLIC_ENABLE_PWA === 'true' ? '/manifest.json' : undefined,
+  robots:
+    process.env.NEXT_PUBLIC_NOINDEX === 'true'
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+          },
+        },
   verification: {
     google: 'your-google-verification-code',
   },

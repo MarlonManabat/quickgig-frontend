@@ -36,11 +36,19 @@ export const env = {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean),
+  NEXT_PUBLIC_ENABLE_CONSENT:
+    String(process.env.NEXT_PUBLIC_ENABLE_CONSENT ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_ANALYTICS:
-    String(process.env.NEXT_PUBLIC_ENABLE_ANALYTICS ?? 'true').toLowerCase() === 'true',
+    String(process.env.NEXT_PUBLIC_ENABLE_ANALYTICS ?? 'false').toLowerCase() === 'true',
   METRICS_SECRET: process.env.METRICS_SECRET || '',
   NEXT_PUBLIC_ENABLE_ONBOARDING:
     String(process.env.NEXT_PUBLIC_ENABLE_ONBOARDING ?? 'true').toLowerCase() !== 'false',
+  NEXT_PUBLIC_ENABLE_PWA:
+    String(process.env.NEXT_PUBLIC_ENABLE_PWA ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_SECURITY_HEADERS:
+    String(process.env.NEXT_PUBLIC_ENABLE_SECURITY_HEADERS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_RATE_LIMITING:
+    String(process.env.NEXT_PUBLIC_ENABLE_RATE_LIMITING ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_S3_UPLOADS:
     String(process.env.NEXT_PUBLIC_ENABLE_S3_UPLOADS ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_MAX_UPLOAD_MB: Number(process.env.NEXT_PUBLIC_MAX_UPLOAD_MB || 2),
