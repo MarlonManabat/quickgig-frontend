@@ -51,6 +51,10 @@ backend provides the endpoints, saved jobs are also synced via:
 
 Use the “Saved only” filter on the Jobs page to view saved jobs.
 
+## Applicant applications
+
+Turn on `NEXT_PUBLIC_ENABLE_APPLICANT_APPS=true` to expose a `/applications` page for logged-in applicants. The page lists submitted applications and lets you update their status or navigate to related jobs and messages.
+
 ## Job Alerts
 
 Turn on with `NEXT_PUBLIC_ENABLE_ALERTS=true` and optionally set

@@ -118,6 +118,12 @@ const Navigation: React.FC = () => {
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Messages
                 </Link>
+                <Link
+                  href="/applications"
+                  className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                >
+                  Applications
+                </Link>
 
                 <Link
                   href="/payment"
@@ -268,6 +274,13 @@ const Navigation: React.FC = () => {
                   >
                     <MessageCircle className="w-5 h-5 mr-3" />
                     Messages
+                  </Link>
+                  <Link
+                    href="/applications"
+                    className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Applications
                   </Link>
                     <Link
                       href="/payment"

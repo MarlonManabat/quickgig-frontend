@@ -16,7 +16,7 @@ import { track } from '@/lib/track';
 
 function JobsPageContent() {
   const router = useRouter();
-  const search = useSearchParams();
+  const search = useSearchParams()!;
 
   const [filters, setFilters] = useState<JobFilters>({ page: 1, limit: 20 });
   const [jobs, setJobs] = useState<Job[]>([]);
