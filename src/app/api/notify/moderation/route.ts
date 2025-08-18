@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { sendMail } from '@/server/mailer';
+import { flags } from '@/lib/flags';
 
 export async function POST(req: Request) {
-  const EMAILS_ON = process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true';
+  const EMAILS_ON = flags.emails;
   if (!EMAILS_ON) {
     return NextResponse.json({ ok: true, skipped: 'emails_disabled' });
   }

@@ -68,6 +68,24 @@ automatically falls back to existing mock or legacy flows.
 
 ## Flags
 
+### Beta Release Toggle (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_BETA_RELEASE` – turn on core beta flows together in staging. Automatically enables emails, notifications center, interviews, interview invites/reminders, and payments.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_BETA_RELEASE=true
+```
+
+Then run:
+
+```
+BASE=http://localhost:3000 npm run smoke
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_BETA_RELEASE=false` and redeploy.
+
 ### App Shell V2 (Flagged)
 
 - `NEXT_PUBLIC_ENABLE_APP_SHELL_V2` – opt-in new header/footer and tokens matching app.quickgig.ph. UI only, no route changes.

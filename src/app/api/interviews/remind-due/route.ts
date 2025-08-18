@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { listAll } from '@/src/lib/interviews';
 import { sendInterviewReminder } from '@/server/mailer';
+import { flags } from '@/lib/flags';
 
 export async function POST() {
-  if (process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS !== 'true') {
+  if (!flags.interviewReminders) {
     return NextResponse.json({ skipped: true });
   }
   const all = listAll();
@@ -14,7 +15,7 @@ export async function POST() {
       (iv.startISO || iv.whenISO || iv.startsAt) as string,
     ).getTime();
     if (start - now <= lead * 3600 * 1000 && start > now) {
-      if (process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true') {
+      if (flags.emails) {
         try {
           await sendInterviewReminder({ interview: iv });
         } catch {}

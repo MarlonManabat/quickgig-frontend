@@ -1,6 +1,15 @@
 const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
 const fetchImpl = globalThis.fetch;
 const bail = (m)=>{ console.error(m); process.exit(1); };
+const beta = process.env.NEXT_PUBLIC_ENABLE_BETA_RELEASE === 'true';
+if (beta) {
+  process.env.NEXT_PUBLIC_ENABLE_EMAILS = 'true';
+  process.env.NEXT_PUBLIC_ENABLE_NOTIFY_CENTER = 'true';
+  process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS = 'true';
+  process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_INVITES = 'true';
+  process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS = 'true';
+  process.env.NEXT_PUBLIC_ENABLE_PAYMENTS = 'true';
+}
 (async () => {
   const r1 = await fetchImpl(base + '/', { method: 'HEAD', redirect: 'manual' });
   if (r1.status < 200 || r1.status >= 400) bail(`HEAD / expected 2xx; got ${r1.status}`);
@@ -148,7 +157,7 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   } else {
     console.log('[smoke] payments skipped');
   }
-  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI === 'true') {
+  if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_INTERVIEWS === 'true') {
       for (const p of ['/interviews', '/employer/interviews']) {
         try {
           const r = await fetchImpl(base + p, { redirect: 'manual' });

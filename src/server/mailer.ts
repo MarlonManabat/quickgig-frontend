@@ -3,6 +3,7 @@ import { toICS } from '@/lib/ics';
 import { sign } from '@/lib/signer';
 import type { UserSettings } from '@/types/settings';
 import { defaultsFromEnv } from '@/lib/settings';
+import { flags } from '@/lib/flags';
 
 export function shouldSendEmail(
   kind: 'apply' | 'interview' | 'digest',
@@ -64,7 +65,7 @@ export async function sendMail(msg: MailPayload, settings?: UserSettings) {
   return { ok: true };
 }
 
-const emailsEnabled = () => process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true';
+const emailsEnabled = () => flags.emails;
 
 export async function sendInterviewInvite({
   interview,
@@ -75,7 +76,7 @@ export async function sendInterviewInvite({
   toApplicant?: string;
   toEmployer?: string;
 }) {
-  if (process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_INVITES !== 'true')
+  if (!flags.interviewInvites)
     return { ok: true, skipped: 'flag_off' };
   if (!emailsEnabled()) return { ok: true, skipped: 'emails_off' };
   const from = process.env.INVITES_FROM || process.env.NOTIFY_FROM || '';
@@ -122,7 +123,7 @@ export async function sendInterviewReminder({
   toApplicant?: string;
   toEmployer?: string;
 }) {
-  if (process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS !== 'true')
+  if (!flags.interviewReminders)
     return { ok: true, skipped: 'flag_off' };
   if (!emailsEnabled()) return { ok: true, skipped: 'emails_off' };
   const from = process.env.INVITES_FROM || process.env.NOTIFY_FROM || '';
