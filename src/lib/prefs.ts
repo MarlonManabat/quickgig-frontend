@@ -4,10 +4,10 @@ const KEY = 'quickgig:prefs';
 
 function defaultPrefs(): UserPrefs {
   return {
-    copy: process.env.NEXT_PUBLIC_COPY_VARIANT === 'taglish' ? 'taglish' : 'english',
+    copy: process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE === 'tl' ? 'taglish' : 'english',
     emails:
       (process.env.NEXT_PUBLIC_DEFAULT_EMAIL_PREFS as UserPrefs['emails']) ||
-      'ops_only',
+      'none',
   };
 }
 
@@ -35,11 +35,11 @@ export function savePrefs(p: UserPrefs): void {
 export function prefersEmail(
   kind: 'apply' | 'interview' | 'digest' | 'marketing',
 ): boolean {
+  if (kind === 'marketing') return true;
   const prefs = getPrefs();
   if (prefs.emails === 'none') return false;
   if (prefs.emails === 'all') return true;
-  if (prefs.emails === 'ops_only')
-    return kind === 'apply' || kind === 'interview';
+  if (prefs.emails === 'alerts_only') return kind === 'digest';
   return false;
 }
 

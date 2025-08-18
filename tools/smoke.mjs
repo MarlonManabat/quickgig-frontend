@@ -12,7 +12,8 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   if (process.env.SMOKE_URL && process.env.NEXT_PUBLIC_ENABLE_SETTINGS === 'true') {
     try {
       const s = await fetchImpl(base + '/settings');
-      if (s.status === 200) console.log('[smoke] settings ok');
+      const txt = await s.text();
+      if (s.status === 200 && /Language/i.test(txt)) console.log('[smoke] settings ok');
       else console.log('[smoke] settings', s.status);
     } catch {
       console.log('[smoke] settings check failed');
