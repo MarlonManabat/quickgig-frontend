@@ -60,6 +60,12 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_ANALYTICS ?? 'true').toLowerCase() === 'true',
   METRICS_SECRET: process.env.METRICS_SECRET || '',
   ALERTS_WEBHOOK_URL: process.env.ALERTS_WEBHOOK_URL || '',
+  NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER:
+    String(process.env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER ?? 'false').toLowerCase() === 'true',
+  NOTIFS_POLL_MS: parseInt(process.env.NOTIFS_POLL_MS || '30000', 10),
+  NOTIFS_PAGE_SIZE: parseInt(process.env.NOTIFS_PAGE_SIZE || '20', 10),
+  NEXT_PUBLIC_ENABLE_SOCKETS:
+    String(process.env.NEXT_PUBLIC_ENABLE_SOCKETS ?? 'false').toLowerCase() === 'true',
 };
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import NotificationDropdown from './NotificationDropdown';
+import NotificationsBell from './NotificationsBell';
 import WalletDisplay from './WalletDisplay';
 import Button from './ui/Button';
 import { Menu, X, User, LogOut, Briefcase, Plus, MessageCircle, Settings, Home, CreditCard, Bell } from 'lucide-react';
@@ -152,7 +152,7 @@ const Navigation: React.FC = () => {
                 </Link>
                 
                 {/* Notification Dropdown */}
-                <NotificationDropdown />
+                {env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER && <NotificationsBell />}
                 
                 {/* Wallet Display */}
                 <WalletDisplay />
