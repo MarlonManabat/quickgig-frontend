@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import {
   getApplication,
@@ -5,9 +6,8 @@ import {
   appendEvent,
   seedMockApps,
 } from '@/lib/applicantStore';
+import { get, patch, PATHS } from '@/lib/engine';
 
-const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
 const throttle: Record<string, number> = {};
 
 export default async function handler(
@@ -16,27 +16,22 @@ export default async function handler(
 ) {
   const { id } = req.query as { id: string };
 
-  if (MODE !== 'mock') {
-    const url = `${BASE}/api/applications/${id}`;
-    const r = await fetch(url, {
-      method: req.method,
-      headers: { cookie: req.headers.cookie || '' },
-      body: req.method === 'PATCH' ? JSON.stringify(req.body) : undefined,
-    });
-    const text = await r.text();
-    res.status(r.status).send(text);
-    return;
-  }
-
-  seedMockApps();
+  const fallbackGet = async () => {
+    seedMockApps();
+    return getApplication(id, req.headers.cookie);
+  };
 
   if (req.method === 'GET') {
-    const app = await getApplication(id, req.headers.cookie);
-    if (!app) {
-      res.status(404).end();
-      return;
+    try {
+      const app = await get(PATHS.applications.update(id), req, fallbackGet);
+      if (!app) {
+        res.status(404).end();
+        return;
+      }
+      res.status(200).json(app);
+    } catch (err) {
+      res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
     }
-    res.status(200).json(app);
     return;
   }
 
@@ -50,21 +45,20 @@ export default async function handler(
     throttle[ip] = Date.now();
     const { action, note, event } = req.body || {};
     try {
-      if (action === 'withdraw') {
-        const updated = await withdrawApplication(id, note, req.headers.cookie);
-        res.status(200).json(updated);
-        return;
-      }
-      if (event) {
-        const updated = await appendEvent(id, event, req.headers.cookie);
-        res.status(200).json(updated);
-        return;
-      }
-    } catch {
-      res.status(400).json({ error: 'Unable to update' });
-      return;
+      const fallback = async () => {
+        if (action === 'withdraw') {
+          return withdrawApplication(id, note, req.headers.cookie);
+        }
+        if (event) {
+          return appendEvent(id, event, req.headers.cookie);
+        }
+        throw new Error('Invalid action');
+      };
+      const data = await patch(PATHS.applications.update(id), req.body, req, fallback);
+      res.status(200).json(data);
+    } catch (err) {
+      res.status(400).json({ error: (err as any).message || 'Unable to update' });
     }
-    res.status(400).json({ error: 'Invalid action' });
     return;
   }
 

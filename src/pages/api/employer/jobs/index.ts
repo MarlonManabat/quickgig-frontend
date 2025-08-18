@@ -1,28 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { listJobs, createJobDraft } from '@/lib/employerStore';
-
-const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
+import { get, post } from '@/lib/engine';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (MODE !== 'mock') {
-    const r = await fetch(`${BASE}/api/employer/jobs`, {
-      method: req.method,
-      headers: { cookie: req.headers.cookie || '', 'content-type': 'application/json' },
-      body: req.method === 'POST' ? JSON.stringify(req.body) : undefined,
-    });
-    const text = await r.text();
-    res.status(r.status).send(text);
-    return;
-  }
   if (req.method === 'GET') {
-    const jobs = await listJobs();
-    res.status(200).json(jobs);
+    try {
+      const jobs = await get('/api/employer/jobs', req, () => listJobs());
+      res.status(200).json(jobs);
+    } catch (err) {
+      res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
+    }
     return;
   }
   if (req.method === 'POST') {
-    const job = await createJobDraft();
-    res.status(200).json(job);
+    try {
+      const job = await post('/api/employer/jobs', req.body, req, () => createJobDraft());
+      res.status(200).json(job);
+    } catch (err) {
+      res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
+    }
     return;
   }
   res.status(405).end();

@@ -1,10 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { env } from '@/config/env';
 import { read, save, broadcast } from '@/lib/notificationsStore';
-
-const MODE = process.env.ENGINE_MODE || 'mock';
-const AUTH_MODE = process.env.ENGINE_AUTH_MODE || '';
-const BASE = process.env.ENGINE_BASE_URL || '';
+import { patch } from '@/lib/engine';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'PATCH') {
@@ -15,35 +13,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(401).end();
     return;
   }
-  const { id } = req.query;
+  const { id } = req.query as { id: string };
   const body = req.body as { read?: boolean };
-  if (MODE !== 'mock' && AUTH_MODE === 'php' && BASE) {
-    try {
-      const r = await fetch(`${BASE}/api/notifications/${id}`, {
-        method: 'PATCH',
-        headers: { 'content-type': 'application/json', cookie: req.headers.cookie || '' },
-        body: JSON.stringify(body),
-      });
-      if (r.ok) {
-        const text = await r.text();
-        res.status(200).send(text);
-        return;
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console -- best effort log
-      console.warn('[notifications] upstream failed', err);
-    }
+  try {
+    const data = await patch(`/api/notifications/${id}`, body, req, async () => {
+      const items = read(req, res);
+      const idx = items.findIndex((n) => n.id === id);
+      if (idx === -1) throw { status: 404, message: 'Not found' };
+      if (typeof body.read === 'boolean') items[idx].read = body.read;
+      save(res, items);
+      broadcast();
+      return { ok: true };
+    });
+    res.status(200).json(data);
+  } catch (err) {
+    res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
   }
-  const items = read(req, res);
-  const idx = items.findIndex((n) => n.id === id);
-  if (idx === -1) {
-    res.status(404).end();
-    return;
-  }
-  if (typeof body.read === 'boolean') {
-    items[idx].read = body.read;
-  }
-  save(res, items);
-  broadcast();
-  res.status(200).json({ ok: true });
 }

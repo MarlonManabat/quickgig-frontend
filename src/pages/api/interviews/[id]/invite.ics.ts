@@ -1,8 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { listByUser } from '@/lib/interviews';
-
-const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
+import { rawRequest } from '@/lib/engine';
 
 function formatUtc(iso: string): string {
   const d = new Date(iso);
@@ -11,16 +10,18 @@ function formatUtc(iso: string): string {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query as { id: string };
-  if (MODE !== 'mock') {
-    const r = await fetch(`${BASE}/api/interviews/${id}/invite.ics`, {
-      headers: { cookie: req.headers.cookie || '' },
-    });
-    const text = await r.text();
-    res.setHeader('Content-Type', 'text/calendar');
-    res.status(r.status).send(text);
-    return;
+  if (process.env.ENGINE_MODE === 'php') {
+    try {
+      const r = await rawRequest('GET', `/api/interviews/${id}/invite.ics`, req);
+      const text = await r.text();
+      res.setHeader('Content-Type', 'text/calendar');
+      res.status(r.status).send(text);
+      return;
+    } catch (err) {
+      res.status((err as any).status || 500).end();
+      return;
+    }
   }
-
   const all = await listByUser('applicant');
   const interview = all.find((i) => i.id === id);
   if (!interview) {

@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { listInterviews, respondInterview } from '@/lib/applicantStore';
+import { get, patch } from '@/lib/engine';
 
-const MODE = process.env.ENGINE_MODE || 'mock';
-const BASE = process.env.ENGINE_BASE_URL || '';
 const throttle: Record<string, number> = {};
 
 export default async function handler(
@@ -10,22 +10,15 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   const { id } = req.query as { id: string };
-
-  if (MODE !== 'mock') {
-    const url = `${BASE}/api/applications/${id}/interviews`;
-    const r = await fetch(url, {
-      method: req.method,
-      headers: { cookie: req.headers.cookie || '' },
-      body: req.method === 'PATCH' ? JSON.stringify(req.body) : undefined,
-    });
-    const text = await r.text();
-    res.status(r.status).send(text);
-    return;
-  }
+  const path = `/api/applications/${id}/interviews`;
 
   if (req.method === 'GET') {
-    const list = await listInterviews(id);
-    res.status(200).json(list);
+    try {
+      const list = await get(path, req, () => listInterviews(id));
+      res.status(200).json(list);
+    } catch (err) {
+      res.status((err as any).status || 500).json({ error: (err as any).message || 'engine error' });
+    }
     return;
   }
 
@@ -39,7 +32,7 @@ export default async function handler(
     throttle[ip] = Date.now();
     const { id: interviewId, action, slot } = req.body || {};
     try {
-      const interview = await respondInterview(interviewId, action, slot);
+      const interview = await patch(path, req.body, req, () => respondInterview(interviewId, action, slot));
       if (process.env.INTERVIEWS_WEBHOOK_URL && (action === 'accept' || action === 'decline')) {
         fetch(process.env.INTERVIEWS_WEBHOOK_URL, {
           method: 'POST',
@@ -49,8 +42,8 @@ export default async function handler(
       }
       res.status(200).json(interview);
       return;
-    } catch {
-      res.status(400).json({ error: 'Unable to update' });
+    } catch (err) {
+      res.status(400).json({ error: (err as any).message || 'Unable to update' });
       return;
     }
   }
