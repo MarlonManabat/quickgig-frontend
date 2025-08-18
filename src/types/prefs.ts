@@ -1,4 +1,4 @@
-export type EmailPrefs = 'ops_only'|'all'|'none';
+export type EmailPrefs = 'alerts_only'|'all'|'none';
 export interface UserPrefs {
   copy: 'english'|'taglish';
   emails: EmailPrefs;

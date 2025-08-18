@@ -37,6 +37,20 @@ BASE=https://api.quickgig.ph node tools/check_live_api.mjs
   - `NEXT_PUBLIC_INTERVIEW_DEFAULT_METHOD` – default method (`video`, `phone`, `in_person`).
   - `NEXT_PUBLIC_INTERVIEW_SLOT_MINUTES` – default duration in minutes.
   - `INTERVIEWS_WEBHOOK_URL` – POST webhook on create/update (best effort).
+- `NEXT_PUBLIC_ENABLE_SETTINGS` – enable account settings page under `/settings`. Stores preferences in a signed `settings` cookie mirrored to `localStorage` for instant reloads. In `ENGINE_AUTH_MODE=php`, requests proxy to `${ENGINE_BASE_URL}/api/settings`.
+- `NEXT_PUBLIC_DEFAULT_LANGUAGE` – default language (`en` or `tl`) used when no user settings exist.
+- `NEXT_PUBLIC_DEFAULT_EMAIL_PREFS` – initial email preference (`none`, `alerts_only`, `all`).
+- `NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY` – default alerts digest frequency (`off`, `daily`, `weekly`).
+
+### Language smoke test
+
+With settings enabled locally, run:
+
+```bash
+node -e "fetch('http://localhost:3000/api/settings',{method:'PUT',headers:{'content-type':'application/json'},body:'{\"language\":\"tl\"}'}).then(()=>console.log('ok'))"
+```
+
+Reload the app and the UI should display Taglish strings.
 
 ## Jobs search & saved jobs
 

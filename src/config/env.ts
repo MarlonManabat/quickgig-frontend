@@ -14,8 +14,12 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_APPLICANT_APPS ?? 'true').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_SETTINGS:
     String(process.env.NEXT_PUBLIC_ENABLE_SETTINGS ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_DEFAULT_LANGUAGE:
+    (process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE as 'en' | 'tl') || 'en',
   NEXT_PUBLIC_DEFAULT_EMAIL_PREFS:
-    (process.env.NEXT_PUBLIC_DEFAULT_EMAIL_PREFS as 'ops_only' | 'all' | 'none') || 'ops_only',
+    (process.env.NEXT_PUBLIC_DEFAULT_EMAIL_PREFS as 'none' | 'alerts_only' | 'all') || 'none',
+  NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY:
+    (process.env.NEXT_PUBLIC_DEFAULT_ALERTS_FREQUENCY as 'off' | 'daily' | 'weekly') || 'weekly',
   RESEND_API_KEY: process.env.RESEND_API_KEY || '',
   NOTIFY_FROM: process.env.NOTIFY_FROM || 'QuickGig <noreply@quickgig.ph>',
   NOTIFY_ADMIN_EMAIL: process.env.NOTIFY_ADMIN_EMAIL || '',
