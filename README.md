@@ -80,6 +80,20 @@ NEXT_PUBLIC_ENABLE_APP_SHELL_V2=true
 
 Rollback: remove or set `NEXT_PUBLIC_ENABLE_APP_SHELL_V2=false` and redeploy.
 
+### Engine Wiring Status Page (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_STATUS_PAGE` – expose internal `/status` page showing engine and DB health.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_STATUS_PAGE=true
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_STATUS_PAGE=false` and redeploy.
+
+Notes: internal health check, not for SEO.
+
 ## Staging auth & engine flows
 
 Engine-backed auth and data wiring is gated behind flags and off by default.
