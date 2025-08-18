@@ -94,6 +94,26 @@ Rollback: set `NEXT_PUBLIC_ENABLE_STATUS_PAGE=false` and redeploy.
 
 Notes: internal health check, not for SEO.
 
+### Security + Monitoring (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_SECURITY_AUDIT` – tighter security headers, API rate limiting, and `/status/ping` uptime endpoint.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_SECURITY_AUDIT=true
+```
+
+Then run:
+
+```
+BASE=http://localhost:3000 npm run smoke
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_SECURITY_AUDIT=false` and redeploy.
+
+Notes: works in mock and php engine modes; logs request metrics to console.
+
 ### Apply Flow Happy Path Audit (Flagged)
 
 - `NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT` – run snapshot tests for the Apply flow in mock mode. Dev/test only.

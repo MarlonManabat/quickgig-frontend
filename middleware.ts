@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { env } from './src/config/env';
+import { rateLimit } from './src/middleware/rateLimit';
 
 const protectedPaths = ['/dashboard', '/settings/profile', '/settings/account'];
 const employerPaths = ['/employer'];
@@ -9,6 +10,14 @@ const adminPaths = ['/admin'];
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
+
+  if (
+    env.NEXT_PUBLIC_ENABLE_SECURITY_AUDIT &&
+    (pathname.startsWith('/api') || pathname.startsWith('/status/ping'))
+  ) {
+    const limited = rateLimit(req);
+    if (limited) return limited;
+  }
 
   if (protectedPaths.some((p) => pathname.startsWith(p))) {
     if (!token) {
@@ -55,6 +64,8 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
+    '/api/:path*',
+    '/status/ping',
     '/dashboard/:path*',
     '/settings/profile/:path*',
     '/settings/account/:path*',
