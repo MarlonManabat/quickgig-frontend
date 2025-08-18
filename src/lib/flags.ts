@@ -1,5 +1,21 @@
 import { env } from '@/config/env';
 
+export const apiOrigin = (env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+export const engineMode = process.env.ENGINE_MODE || 'mock';
+export const cookieStrategy: RequestCredentials = env.NEXT_PUBLIC_ENABLE_ENGINE_AUTH
+  ? 'include'
+  : 'omit';
+export const apiOriginOk =
+  !!apiOrigin &&
+  (process.env.NODE_ENV !== 'production' || apiOrigin.startsWith('https://'));
+
+if (!apiOriginOk) {
+  // eslint-disable-next-line no-console
+  console.error(
+    `[flags] NEXT_PUBLIC_API_URL missing or not https in production: "${apiOrigin}"`
+  );
+}
+
 export const flags = {
   beta: env.NEXT_PUBLIC_ENABLE_BETA_RELEASE,
   emails: env.NEXT_PUBLIC_ENABLE_EMAILS,

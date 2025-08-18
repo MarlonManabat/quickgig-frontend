@@ -24,7 +24,14 @@ export default function RegisterPage() {
       if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('signup_success');
       router.push('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      const status = (err as { status?: number }).status;
+      if (err instanceof TypeError || status === 0) {
+        setError(
+          'Check CORS for app.quickgig.ph on the API, and ensure API is HTTPS.'
+        );
+      } else {
+        setError(err instanceof Error ? err.message : 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
