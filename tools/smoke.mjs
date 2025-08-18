@@ -11,15 +11,16 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
   if (loc !== '/' && loc !== base + '/') bail(`HEAD /app location must be root; got ${loc}`);
   if (process.env.SMOKE_APPS === '1') {
     try {
-      const r3 = await fetchImpl(base + '/api/applications');
-      if (r3.ok) {
-        const arr = await r3.json();
-        console.log('applications', Array.isArray(arr) ? arr.length : 'n/a');
-      } else {
-        console.log('applications check skipped', r3.status);
-      }
-    } catch (e) {
-      console.log('applications check skipped');
+      const r3 = await fetchImpl(base + '/api/applications/TEST');
+      if (r3.status !== 200) bail(`GET /api/applications/TEST ${r3.status}`);
+      const r4 = await fetchImpl(base + '/api/applications/TEST', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'withdraw' }),
+      });
+      if (r4.status !== 200) bail(`PATCH /api/applications/TEST ${r4.status}`);
+    } catch {
+      bail('applications check failed');
     }
   }
   if (process.env.SMOKE_EMPLOYER === '1') {

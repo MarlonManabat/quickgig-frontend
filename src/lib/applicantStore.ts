@@ -1,7 +1,10 @@
-import type { ApplicationSummary, ApplicationStatus } from '@/types/application';
+import type { ApplicationSummary } from '@/types/application';
+import type { ApplicationDetail, ApplicationEvent } from '@/types/applications';
 
 const LS_KEY = 'apps';
+const DETAIL_KEY = 'app-details';
 let memoryApps: ApplicationSummary[] | null = null;
+let memoryDetails: Record<string, ApplicationDetail> | null = null;
 
 function readApps(): ApplicationSummary[] {
   if (typeof window !== 'undefined' && window.localStorage) {
@@ -19,33 +22,66 @@ function writeApps(apps: ApplicationSummary[]) {
   }
 }
 
+function readDetails(): Record<string, ApplicationDetail> {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const raw = window.localStorage.getItem(DETAIL_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, ApplicationDetail>) : {};
+  }
+  return memoryDetails || {};
+}
+
+function writeDetails(details: Record<string, ApplicationDetail>) {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.setItem(DETAIL_KEY, JSON.stringify(details));
+  } else {
+    memoryDetails = details;
+  }
+}
+
 export function seedMockApps() {
   const existing = readApps();
-  if (existing.length) return;
-  const now = new Date().toISOString();
-  const sample: ApplicationSummary[] = [
-    {
-      id: '1',
-      jobId: '1',
-      jobTitle: 'Sample Job 1',
-      company: 'Acme Corp',
-      location: 'Manila',
-      status: 'applied',
-      submittedAt: now,
-      updatedAt: now,
-    },
-    {
-      id: '2',
-      jobId: '2',
-      jobTitle: 'Sample Job 2',
-      company: 'Globex',
-      location: 'Cebu',
-      status: 'viewed',
-      submittedAt: now,
-      updatedAt: now,
-    },
-  ];
-  writeApps(sample);
+  if (!existing.length) {
+    const now = new Date().toISOString();
+    const sample: ApplicationSummary[] = [
+      {
+        id: '1',
+        jobId: '1',
+        jobTitle: 'Sample Job 1',
+        company: 'Acme Corp',
+        location: 'Manila',
+        status: 'applied',
+        submittedAt: now,
+        updatedAt: now,
+      },
+      {
+        id: '2',
+        jobId: '2',
+        jobTitle: 'Sample Job 2',
+        company: 'Globex',
+        location: 'Cebu',
+        status: 'viewed',
+        submittedAt: now,
+        updatedAt: now,
+      },
+    ];
+    writeApps(sample);
+  }
+  const details = readDetails();
+  if (!Object.keys(details).length) {
+    const now = new Date().toISOString();
+    const map: Record<string, ApplicationDetail> = {};
+    readApps().forEach((a) => {
+      map[a.id] = {
+        id: a.id,
+        jobId: a.jobId,
+        jobTitle: a.jobTitle,
+        company: a.company,
+        status: 'new',
+        events: [{ at: now, type: 'new', by: 'applicant' }],
+      };
+    });
+    writeDetails(map);
+  }
 }
 
 const MODE = process.env.ENGINE_MODE || 'mock';
@@ -63,41 +99,73 @@ export async function listApplications(cookie?: string): Promise<ApplicationSumm
   return (await res.json()) as ApplicationSummary[];
 }
 
-export async function getApplication(id: string, cookie?: string): Promise<ApplicationSummary | null> {
+export async function getApplication(
+  id: string,
+  cookie?: string,
+): Promise<ApplicationDetail | null> {
   if (MODE === 'mock') {
-    const apps = await listApplications();
-    return apps.find((a) => a.id === id) || null;
+    seedMockApps();
+    const details = readDetails();
+    return details[id] || null;
   }
   const res = await fetch(`${BASE}/api/applications/${id}`, {
     headers: { Cookie: cookie || '' },
   });
   if (!res.ok) throw new Error(`engine ${res.status}`);
-  return (await res.json()) as ApplicationSummary;
+  return (await res.json()) as ApplicationDetail;
 }
 
-export async function updateStatus(
+export async function withdrawApplication(
   id: string,
-  status: ApplicationStatus,
+  note?: string,
   cookie?: string,
-): Promise<ApplicationSummary> {
+): Promise<ApplicationDetail> {
   if (MODE === 'mock') {
-    const apps = await listApplications();
-    const idx = apps.findIndex((a) => a.id === id);
-    if (idx === -1) throw new Error('not found');
-    const updated: ApplicationSummary = {
-      ...apps[idx],
-      status,
-      updatedAt: new Date().toISOString(),
+    const details = readDetails();
+    const app = details[id];
+    if (!app) throw new Error('not found');
+    const event: ApplicationEvent = {
+      at: new Date().toISOString(),
+      type: 'withdrawn',
+      by: 'applicant',
+      note,
     };
-    apps[idx] = updated;
-    writeApps(apps);
-    return updated;
+    app.status = 'withdrawn';
+    app.events = [event, ...app.events];
+    details[id] = app;
+    writeDetails(details);
+    return app;
   }
   const res = await fetch(`${BASE}/api/applications/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Cookie: cookie || '' },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ action: 'withdraw', note }),
   });
   if (!res.ok) throw new Error(`engine ${res.status}`);
-  return (await res.json()) as ApplicationSummary;
+  return (await res.json()) as ApplicationDetail;
 }
+
+export async function appendEvent(
+  id: string,
+  event: ApplicationEvent,
+  cookie?: string,
+): Promise<ApplicationDetail> {
+  if (MODE === 'mock') {
+    const details = readDetails();
+    const app = details[id];
+    if (!app) throw new Error('not found');
+    app.events = [event, ...app.events];
+    details[id] = app;
+    writeDetails(details);
+    return app;
+  }
+  const res = await fetch(`${BASE}/api/applications/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Cookie: cookie || '' },
+    body: JSON.stringify({ event }),
+  });
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as ApplicationDetail;
+}
+
+export { readApps };

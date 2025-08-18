@@ -32,6 +32,10 @@ export const env = {
     String(process.env.NEXT_PUBLIC_ENABLE_JOB_DRAFTS ?? 'false').toLowerCase() === 'true',
   NEXT_PUBLIC_ENABLE_FILE_SIGNING:
     String(process.env.NEXT_PUBLIC_ENABLE_FILE_SIGNING ?? 'false').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_APPLICATION_DETAIL:
+    String(process.env.NEXT_PUBLIC_ENABLE_APPLICATION_DETAIL ?? 'true').toLowerCase() === 'true',
+  NEXT_PUBLIC_ENABLE_EMPLOYER_APPLICANT_DRILLDOWN:
+    String(process.env.NEXT_PUBLIC_ENABLE_EMPLOYER_APPLICANT_DRILLDOWN ?? 'true').toLowerCase() === 'true',
   ADMIN_EMAILS: (process.env.ADMIN_EMAILS || '')
     .split(',')
     .map((s) => s.trim())
