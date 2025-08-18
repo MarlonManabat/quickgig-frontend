@@ -6,6 +6,8 @@ import type {
   ApplicationStatus,
 } from '@/types/applications';
 import { seedMockApps } from './applicantStore';
+import type { Interview, InterviewStatus } from '@/types/interviews';
+import { readInterviews, writeInterviews } from './interviewStore';
 
 export interface EmployerJob {
   id: string;
@@ -414,6 +416,84 @@ export async function appendEmployerNote(
   });
   if (!res.ok) throw new Error(`engine ${res.status}`);
   return (await res.json()) as ApplicationDetail;
+}
+
+export async function createInterviewInvite(
+  jobId: string,
+  appId: string,
+  payload: Omit<Interview, 'id' | 'status' | 'jobId' | 'appId' | 'createdAt' | 'updatedAt'>,
+  cookie?: string,
+): Promise<Interview> {
+  if (MODE === 'mock') {
+    const map = readInterviews();
+    const now = new Date().toISOString();
+    const interview: Interview = {
+      id: String(Date.now()),
+      jobId,
+      appId,
+      status: 'proposed',
+      createdAt: now,
+      updatedAt: now,
+      ...payload,
+    };
+    const arr = map[appId] || [];
+    arr.push(interview);
+    map[appId] = arr;
+    writeInterviews(map);
+    const details = readAppDetails();
+    const app = details[appId];
+    if (app) {
+      app.events = [
+        { at: now, type: 'note', by: 'employer', note: 'Proposed interview' },
+        ...app.events,
+      ];
+      details[appId] = app;
+      writeAppDetails(details);
+    }
+    return interview;
+  }
+  const res = await fetch(
+    `${BASE}/api/employer/jobs/${jobId}/applicants/${appId}/interviews`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Cookie: cookie || '' },
+      body: JSON.stringify(payload),
+    },
+  );
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as Interview;
+}
+
+export async function updateInterviewStatus(
+  jobId: string,
+  appId: string,
+  id: string,
+  status: InterviewStatus,
+  cookie?: string,
+): Promise<Interview> {
+  if (MODE === 'mock') {
+    const map = readInterviews();
+    const arr = map[appId] || [];
+    const idx = arr.findIndex((i) => i.id === id);
+    if (idx === -1) throw new Error('not found');
+    const interview = arr[idx];
+    interview.status = status;
+    interview.updatedAt = new Date().toISOString();
+    arr[idx] = interview;
+    map[appId] = arr;
+    writeInterviews(map);
+    return interview;
+  }
+  const res = await fetch(
+    `${BASE}/api/employer/jobs/${jobId}/applicants/${appId}/interviews`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Cookie: cookie || '' },
+      body: JSON.stringify({ id, status }),
+    },
+  );
+  if (!res.ok) throw new Error(`engine ${res.status}`);
+  return (await res.json()) as Interview;
 }
 
 export { readJobs };
