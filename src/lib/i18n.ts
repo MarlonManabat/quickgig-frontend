@@ -96,6 +96,11 @@ const strings = {
         rescheduled: 'Rescheduled',
       },
     },
+    email: {
+      apply_subject: 'New application received',
+      interview_subject: 'Interview update',
+      digest_subject: 'Daily QuickGig digest',
+    },
   },
   tl: {
     dashboard: 'Dashboard',
@@ -191,6 +196,11 @@ const strings = {
         completed: 'Completed',
         rescheduled: 'Rescheduled',
       },
+    },
+    email: {
+      apply_subject: 'May bagong application',
+      interview_subject: 'Update sa interview',
+      digest_subject: 'Daily QuickGig digest',
     },
   },
 };

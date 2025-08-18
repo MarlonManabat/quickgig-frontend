@@ -1,33 +1,38 @@
 import { NextResponse } from 'next/server';
-import { sendMail } from '@/server/mailer';
-import { env } from '@/config/env';
-import { prefersEmail } from '@/lib/prefs';
 
 export async function POST(req: Request) {
-  const { applicantEmail, applicantName, employerEmail, jobTitle } = await req.json();
-  const safeJob = String(jobTitle || 'your application');
-  const toEmployer = employerEmail || env.NOTIFY_ADMIN_EMAIL;
+  const body = (await req.json().catch(() => ({}))) as {
+    jobId?: string;
+    applicantId?: string;
+  };
+  const { jobId, applicantId } = body;
 
-  if (applicantEmail) {
-    if (prefersEmail('apply')) {
-      await sendMail({
-        to: applicantEmail,
-        subject: `We received your application for ${safeJob}`,
-        html: `<p>Hi ${applicantName || ''},</p><p>Thanks for applying for <b>${safeJob}</b>. We’ll be in touch.</p>`,
-      }).catch(() => {});
-    } else {
-      // eslint-disable-next-line no-console -- best effort log
-      console.log('[notify:skipped by prefs]');
-    }
+  if (!jobId || !applicantId) {
+    return NextResponse.json({ ok: true, skipped: 'invalid' });
   }
 
-  if (toEmployer) {
+  const data = { jobId, applicantId };
+  const EMAILS_ON = process.env.NEXT_PUBLIC_ENABLE_EMAILS === 'true';
+
+  if (!EMAILS_ON) {
+    return NextResponse.json({ ok: true, skipped: 'emails_disabled' });
+  }
+
+  try {
+    const { sendMail } = await import('@/server/mailer');
     await sendMail({
-      to: toEmployer,
-      subject: `New application for ${safeJob}`,
-      html: `<p>You have a new application for <b>${safeJob}</b>.</p>`,
-    }).catch(() => {});
+      kind: 'apply',
+      to: process.env.NOTIFY_ADMIN_EMAIL || 'admin@quickgig.ph',
+      from: process.env.NOTIFY_FROM || 'QuickGig <noreply@quickgig.ph>',
+      data,
+    });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error('notify.application send failed', err);
+    // Never break the product flow; just report a soft failure.
+    return NextResponse.json(
+      { ok: false, error: 'mail_failed' },
+      { status: 500 },
+    );
   }
-
-  return NextResponse.json({ ok: true });
 }

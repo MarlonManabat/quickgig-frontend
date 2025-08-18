@@ -127,6 +127,17 @@ Backend endpoints (see `src/config/api.ts`):
 
 The frontend never blocks or fails the UI if the metrics backend is absent; `/api/metrics/track` always returns `{ ok: true }`.
 
+## Email notifications
+
+Emails are off by default. To enable sending, set in `.env`:
+
+```env
+NEXT_PUBLIC_ENABLE_EMAILS=true
+RESEND_API_KEY=your_resend_api_key
+```
+
+When disabled or misconfigured, the app skips sends without affecting user flows.
+
 ## Authentication
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
