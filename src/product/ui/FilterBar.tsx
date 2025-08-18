@@ -5,6 +5,7 @@ import { env } from '@/config/env';
 import { findByParams, upsertAlert } from '@/lib/alertsStore';
 import type { AlertFreq, JobAlert } from '@/types/alert';
 import { toast } from '@/lib/toast';
+import { track } from '@/lib/analytics';
 
 type Props = {
   q?: string;
@@ -55,6 +56,7 @@ export default function FilterBar({ q = '', loc = '', cat = '', sort = 'relevant
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        track('search_submit', state);
         push(state);
       }}
       style={{ display: 'grid', gap: 12, gridTemplateColumns: '1fr 1fr 1fr 1fr auto auto' }}

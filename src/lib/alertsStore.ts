@@ -1,4 +1,5 @@
 import type { JobAlert } from '@/types/alert';
+import { track } from '@/lib/analytics';
 
 const KEY = 'alerts:v1';
 let mem: JobAlert[] = [];
@@ -34,8 +35,10 @@ export function upsertAlert(a: Omit<JobAlert, 'id' | 'createdAt'> & { id?: strin
   const next: JobAlert = { ...all[existingIndex], ...a, id, createdAt } as JobAlert;
   if (existingIndex !== -1) {
     all[existingIndex] = next;
+    track('alert_update', { id });
   } else {
     all.push(next);
+    track('alert_create', { id });
   }
   write(all);
   return next;
@@ -44,6 +47,7 @@ export function upsertAlert(a: Omit<JobAlert, 'id' | 'createdAt'> & { id?: strin
 export function removeAlert(id: string): void {
   const all = read().filter((a) => a.id !== id);
   write(all);
+  track('alert_delete', { id });
 }
 
 export function findByParams(p: Partial<JobAlert>): JobAlert | undefined {

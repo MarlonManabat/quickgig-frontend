@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { track } from '@/lib/analytics';
 const KEY = 'qg:savedJobs';
 function read(): string[] {
   if (typeof window === 'undefined') return [];
@@ -20,6 +21,7 @@ export function useSavedJobs() {
     setIds(prev => {
       const next = prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id];
       write(next);
+      track(prev.includes(id) ? 'job_unsave' : 'job_save', { id });
       return next;
     });
   }, []);

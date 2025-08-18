@@ -14,6 +14,7 @@ import { t } from '../../src/lib/t';
 import { isApplied } from '../../src/lib/appliedStore';
 import { useSession } from '../../src/hooks/useSession';
 import { OnboardingBanner } from '../../src/product/onboarding/Banner';
+import { track } from '../../src/lib/analytics';
 
 type Props = { job: JobDetail | null; legacyHtml?: string };
 
@@ -39,7 +40,12 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
   React.useEffect(() => {
     try { setUseLegacy(legacyFlagFromEnv() || legacyFlagFromQuery(new URL(window.location.href).searchParams)); } catch {} 
   }, []);
-  React.useEffect(() => { if (job) setApplied(isApplied(job.id)); }, [job]);
+  React.useEffect(() => {
+    if (job) {
+      setApplied(isApplied(job.id));
+      track('job_view', { id: job.id });
+    }
+  }, [job]);
   if (useLegacy && legacyHtml) return <div dangerouslySetInnerHTML={{__html: legacyHtml}} />;
 
   if (!job) {
@@ -57,6 +63,38 @@ export default function JobDetailsPage({ job, legacyHtml }: Props) {
   return (
     <ProductShell>
       <HeadSEO title={job.title} descKey="search_title" />
+      {job && (
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'JobPosting',
+              title: job.title,
+              description: job.description,
+              ...(job.company
+                ? { hiringOrganization: { '@type': 'Organization', name: job.company } }
+                : {}),
+              ...(job.location
+                ? {
+                    jobLocation: {
+                      '@type': 'Place',
+                      address: {
+                        '@type': 'PostalAddress',
+                        addressLocality: job.location,
+                        addressCountry: 'PH',
+                      },
+                    },
+                  }
+                : {}),
+              ...(job.postedAt ? { datePosted: job.postedAt } : {}),
+              ...(job as any).validThrough ? { validThrough: (job as any).validThrough } : {},
+              ...(job as any).employmentType ? { employmentType: (job as any).employmentType } : {},
+            }),
+          }}
+        />
+      )}
       <OnboardingBanner />
       <article style={{background:'#fff', border:`1px solid ${T.colors.border}`, borderRadius:12, padding:20, display:'grid', gap:12}}>
         <div style={{display:'flex', alignItems:'center', gap:12}}>
