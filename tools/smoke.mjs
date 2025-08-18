@@ -232,6 +232,25 @@ const bail = (m)=>{ console.error(m); process.exit(1); };
       console.log('[smoke] interview invites failed');
     }
   }
+  if (process.env.NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS_QA === 'true') {
+    try {
+      const r = await fetchImpl(base + '/qa/interview-reminders?auto=1');
+      const txt = await r.text();
+      if (
+        r.status === 200 &&
+        /data-testid="invite-sent"/.test(txt) &&
+        /data-testid="reminder-sent"/.test(txt)
+      ) {
+        console.log('[smoke] interview reminders qa ok');
+      } else {
+        console.log('[smoke] interview reminders qa', r.status);
+      }
+    } catch {
+      console.log('[smoke] interview reminders qa failed');
+    }
+  } else {
+    console.log('[smoke] interview reminders qa skipped');
+  }
   console.log('Smoke OK');
   if (process.env.SMOKE_REPORTS === '1') {
     try {

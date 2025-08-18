@@ -114,6 +114,26 @@ Rollback: set `NEXT_PUBLIC_ENABLE_APPLY_FLOW_AUDIT=false` and redeploy.
 
 Notes: mock mode only; ensures Apply happy path UI renders.
 
+### Interview Reminders QA Harness (Flagged)
+
+- `NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS_QA` – run a mock invite + reminder flow and expose test markers.
+
+Enable locally by setting in `.env.local`:
+
+```
+NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS_QA=true
+```
+
+Then run:
+
+```
+npx playwright test tests/interviewRemindersQA.spec.ts
+```
+
+Rollback: set `NEXT_PUBLIC_ENABLE_INTERVIEW_REMINDERS_QA=false` and redeploy.
+
+Notes: dev/test only, mock-safe. Page `/qa/interview-reminders` renders `invite-sent` and `reminder-sent` markers.
+
 ## Staging auth & engine flows
 
 Engine-backed auth and data wiring is gated behind flags and off by default.
