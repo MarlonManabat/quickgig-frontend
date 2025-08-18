@@ -30,7 +30,13 @@ async function rawFetch(path: string, init: EngineInit = {}): Promise<Response> 
     if (init.req?.headers.cookie) headers.cookie = init.req.headers.cookie;
     const auth = init.req?.headers.authorization;
     if (auth) headers.authorization = Array.isArray(auth) ? auth[0] : auth;
-    return await fetch(BASE + path, { ...init, headers, signal: controller.signal });
+    headers['X-QuickGig-Client'] = 'web';
+    return await fetch(BASE + path, {
+      ...init,
+      headers,
+      credentials: 'include',
+      signal: controller.signal,
+    });
   } finally {
     clearTimeout(timer);
   }

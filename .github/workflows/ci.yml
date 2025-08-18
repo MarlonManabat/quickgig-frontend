@@ -21,3 +21,5 @@ jobs:
         run: npm run build
       - name: Smoke engine
         run: node tools/smoke_engine.mjs || echo 'engine unavailable – skipped'
+      - name: Smoke engine auth
+        run: node tools/smoke_engine_auth.mjs || echo 'engine auth skipped'
