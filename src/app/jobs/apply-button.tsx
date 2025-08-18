@@ -91,6 +91,7 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
   return (
     <>
       <button
+        data-testid="apply-button"
         className="bg-yellow-400 rounded px-3 py-1"
         onClick={() => {
           setOpen(true);
@@ -102,7 +103,10 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
       {open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           {submitted ? (
-            <div className="bg-white p-4 rounded space-y-4 w-80 text-center">
+            <div
+              data-testid="apply-confirmation"
+              className="bg-white p-4 rounded space-y-4 w-80 text-center"
+            >
               <p>Application submitted!</p>
               <button
                 className="bg-gray-200 px-3 py-1 rounded cursor-not-allowed"
@@ -116,6 +120,7 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
             </div>
           ) : (
             <form
+              data-testid="apply-form"
               onSubmit={submit}
               className="bg-white p-4 rounded space-y-2 w-80"
             >
