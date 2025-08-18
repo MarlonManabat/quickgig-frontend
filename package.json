@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "npm run smoke",
     "start": "next start -p 3000",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
