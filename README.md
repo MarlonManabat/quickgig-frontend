@@ -852,3 +852,9 @@ Set the following in Vercel → Project → Settings → Environment Variables:
 
 After saving, redeploy via Vercel and verify at [`/system/status`](./src/app/system/status/page.tsx).
 To add a payment QR, upload `public/gcash-qr.png` and redeploy.
+
+### Smoke on Vercel
+Preview/Production builds skip smoke by default. To force:
+- Set build env `RUN_SMOKE=1`
+- Provide `SMOKE_BASE_URL` (e.g., your deployed URL)
+Locally, start the app then run: `SMOKE_BASE_URL=http://127.0.0.1:3000 RUN_SMOKE=1 npm run postbuild`
