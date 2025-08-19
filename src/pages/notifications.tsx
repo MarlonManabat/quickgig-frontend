@@ -7,6 +7,7 @@ import type { NotificationKind, NotificationList } from '@/types/notification';
 import Pagination from '@/components/Pagination';
 import { env } from '@/config/env';
 import { t } from '@/lib/i18n';
+import { api } from '@/config/api';
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   if (!env.NEXT_PUBLIC_ENABLE_NOTIFICATION_CENTER) return { notFound: true } as const;
@@ -14,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     const base =
       process.env.NEXT_PUBLIC_SITE_URL ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    const res = await fetch(`${base}/api/session/me`, {
+    const res = await fetch(`${base}${api.session.me}`, {
       headers: { cookie: req.headers.cookie || '' },
     });
     if (!res.ok) {

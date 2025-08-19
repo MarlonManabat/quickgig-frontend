@@ -1,9 +1,13 @@
-import { env } from './env';
-
-export const GATE = new URL(env.API_URL);
-export function gate(path: string) {
-  return new URL(path, GATE).toString();
-}
+export const api = {
+  session: {
+    login: '/api/session/login',
+    me: '/api/session/me',
+    logout: '/api/session/logout',
+  },
+  system: {
+    status: '/api/system/status',
+  },
+};
 
 export function passThroughSetCookie(from: Response, to: Headers) {
   const raw = (from.headers as unknown as { raw?: () => Record<string, string[]> }).raw?.()[

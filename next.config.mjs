@@ -4,10 +4,6 @@ const enableSecurity =
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async rewrites() {
-    const GATE = process.env.NEXT_PUBLIC_GATE_ORIGIN || 'https://api.quickgig.ph';
-    return [{ source: '/gate/:path*', destination: `${GATE}/:path*` }];
-  },
   async redirects() {
     const rules = [
       // quickgig.ph → app.quickgig.ph

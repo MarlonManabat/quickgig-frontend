@@ -3,7 +3,7 @@ import { toast } from './toast';
 import { report } from './report';
 import type { Job } from '../../types/jobs';
 
-const BASE = '/gate';
+const BASE = '/api';
 
 async function apiRequest(path: string, init?: RequestInit) {
   return fetch(`${BASE}${path}`, {
@@ -129,5 +129,4 @@ export async function fetchJobs(): Promise<Job[]> {
   return apiFetch<Job[]>('/jobs');
 }
 
-export const API_BASE = BASE;
 

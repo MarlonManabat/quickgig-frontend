@@ -7,6 +7,7 @@ import { t } from '@/lib/i18n';
 import { toast } from '@/lib/toast';
 import { env } from '@/config/env';
 import type { GetServerSidePropsContext } from 'next';
+import { api } from '@/config/api';
 
 export default function ApplicantInterviewsPage() {
   const [items, setItems] = useState<Interview[]>([]);
@@ -62,7 +63,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const base =
     process.env.NEXT_PUBLIC_SITE_URL ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-  const userRes = await fetch(base + '/api/session/me', {
+  const userRes = await fetch(base + api.session.me, {
     headers: { cookie },
   });
   const user = userRes.ok ? await userRes.json() : null;

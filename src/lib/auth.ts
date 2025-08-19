@@ -1,7 +1,8 @@
 import { guardAgainstPhpOrigin } from './fetchGuard';
+import { api } from '@/config/api';
 
 export async function login(payload: Record<string, string>) {
-  const url = '/api/session/login';
+  const url = api.session.login;
   guardAgainstPhpOrigin(url);
   const res = await fetch(url, {
     method: 'POST',
@@ -34,7 +35,7 @@ export async function register(
 }
 
 export async function me() {
-  const url = '/api/session/me';
+  const url = api.session.me;
   guardAgainstPhpOrigin(url);
   const r = await fetch(url, { credentials: 'include', cache: 'no-store' });
   return r.json().catch(() => ({}));

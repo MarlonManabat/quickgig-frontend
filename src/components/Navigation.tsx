@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession } from '@/hooks/useSession';
+import { api } from '@/config/api';
 import NotificationsBell from './NotificationsBell';
 import NotifyBell from './NotifyBell';
 import { NotifyProvider } from '@/app/notify/store';
@@ -24,7 +25,7 @@ const Navigation: React.FC = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleLogout = async () => {
-    await fetch('/api/session/logout', { method: 'POST' });
+    await fetch(api.session.logout, { method: 'POST' });
     setIsMenuOpen(false);
     router.push('/login');
   };

@@ -1,4 +1,5 @@
 import { env } from '@/config/env';
+import { api } from '@/config/api';
 
 let inited = false;
 
@@ -98,12 +99,12 @@ export async function checkApiHealth(): Promise<ApiHealthStatus> {
   const internal = fetch('/api/system/ping', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json().catch(() => null) : null))
     .catch(() => null);
-  const external = fetch('/gate/system/status', { cache: 'no-store' })
+  const external = fetch(api.system.status, { cache: 'no-store' })
     .then((r) => (r.ok ? r.json().catch(() => null) : null))
     .catch(() => null);
   const [i, e] = await Promise.all([internal, external]);
   const internalOk = Boolean(i && (i.ok === true || i.status === 'ok'));
-  const externalOk = Boolean(e && (e.ok === true || e.status === 'ok'));
+  const externalOk = Boolean(e && e.ok === true);
   if (externalOk) return 'ok';
   if (internalOk) return 'degraded';
   return 'error';

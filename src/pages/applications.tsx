@@ -5,12 +5,13 @@ import type { GetServerSideProps } from 'next';
 import type { ApplicationSummary } from '@/types/application';
 import { fetchApplications } from '@/lib/applicationsApi';
 import { env } from '@/config/env';
+import { api } from '@/config/api';
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   if (!env.NEXT_PUBLIC_ENABLE_APPLICANT_APPS) return { notFound: true } as const;
   try {
     const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const res = await fetch(`${base}/api/session/me`, {
+    const res = await fetch(`${base}${api.session.me}`, {
       headers: { cookie: req.headers.cookie || '' },
     });
     if (!res.ok) {

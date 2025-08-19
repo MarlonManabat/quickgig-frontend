@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginData, SignupData, UpdateUserData } from '@/types';
 import { login as loginApi, register as registerApi, me as meApi } from '@/lib/auth';
+import { api } from '@/config/api';
 import { apiPut } from '@/lib/api';
 
 interface AuthContextType {
@@ -60,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch('/api/session/logout', { method: 'POST' });
+    await fetch(api.session.logout, { method: 'POST' });
     setUser(null);
   };
 

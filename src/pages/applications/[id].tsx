@@ -9,12 +9,13 @@ import type { ApplicationDetail, ApplicationEvent, ApplicationStatus } from '@/t
 import type { Interview } from '@/src/types/interview';
 import InterviewForm from '@/product/interviews/InterviewForm';
 import { interviewsEnabled } from '@/src/lib/interviews';
+import { api } from '@/config/api';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
   if (!env.NEXT_PUBLIC_ENABLE_APPLICATION_DETAIL) return { notFound: true } as const;
   try {
     const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const r = await fetch(`${base}/api/session/me`, {
+    const r = await fetch(`${base}${api.session.me}`, {
       headers: { cookie: req.headers.cookie || '' },
     });
     if (!r.ok) {

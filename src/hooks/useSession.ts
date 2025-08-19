@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { api } from '@/config/api';
 
 interface SessionUser {
   isEmployer?: boolean;
@@ -15,7 +16,7 @@ export function useSession() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/session/me', { cache: 'no-store' })
+    fetch(api.session.me, { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: unknown) => {
         const obj = data as Record<string, unknown>;
