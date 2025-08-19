@@ -43,6 +43,12 @@ headers intact.
 2. Open DevTools → Network tab.
 3. Submit the form and confirm a `POST /api/session/register` request (same origin) and no `quickgig.ph/*.php` calls.
 
+#### Auth Proxy Enforcement
+
+- Browser code **must only** call `/api/session/*` for auth.
+- A global client interceptor rewrites accidental `quickgig.ph/*.php` calls.
+- CI fails if `.php` auth endpoints are referenced from client code.
+
 ### Vercel Preview
 
 Vercel builds skip smoke tests automatically. To run smoke locally or in CI,

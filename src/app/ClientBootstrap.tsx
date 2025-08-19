@@ -2,87 +2,69 @@
 import { useEffect } from 'react';
 import { initMonitoring } from '@/lib/monitoring';
 
-const reAuth = /^https?:\/\/(api\.)?quickgig\.ph\/(auth\/)?(login|register|me)\.php/i;
+const LOGIN_PHP = 'login.php';
+const REGISTER_PHP = 'register.php';
+
+function mapPhpToProxy(url: string): string | null {
+  try {
+    const u = new URL(url, window.location.origin);
+    const isPhp =
+      u.pathname.endsWith('/' + LOGIN_PHP) ||
+      u.pathname.endsWith('/' + REGISTER_PHP);
+    const isQG = /\.?quickgig\.ph$/i.test(u.hostname);
+    if (isPhp && isQG) {
+      if (u.pathname.endsWith('/' + LOGIN_PHP)) return '/api/session/login';
+      if (u.pathname.endsWith('/' + REGISTER_PHP)) return '/api/session/register';
+    }
+  } catch {}
+  return null;
+}
 
 export default function ClientBootstrap() {
   useEffect(() => {
     initMonitoring();
-    // Intercept fetch
-    const origFetch = window.fetch;
-    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
-      const url =
-        typeof input === 'string'
-          ? input
-          : input instanceof URL
-          ? input.href
-          : (input as Request).url;
-      const m = typeof url === 'string' && url.match(reAuth);
-      if (m) {
-        const name = m[3];
-        const target = `/api/session/${name}`;
-        console.warn('[auth-guard][fetch] rerouting', url, '→', target);
-        input = target;
+
+    const origFetch = window.fetch.bind(window);
+    window.fetch = (async (
+      input: RequestInfo | URL,
+      init?: RequestInit
+    ) => {
+      const raw = typeof input === 'string' ? input : (input as Request)?.url ?? '';
+      const mapped = typeof raw === 'string' ? mapPhpToProxy(raw) : null;
+      if (mapped) {
+        init = { ...(init || {}), credentials: 'include' };
+        input = mapped;
+        // eslint-disable-next-line no-console
+        console.warn('[auth-intercept] Rewrote cross-origin PHP call to', mapped);
       }
       return origFetch(input as RequestInfo, init);
+    }) as typeof fetch;
+
+    const fixForms = () => {
+      document.querySelectorAll('form[action]').forEach((f) => {
+        const form = f as HTMLFormElement;
+        const a = form.getAttribute('action') || '';
+        const mapped = mapPhpToProxy(a);
+        if (mapped) {
+          form.setAttribute('action', mapped);
+          form.method = 'post';
+          form.noValidate = form.noValidate;
+          // eslint-disable-next-line no-console
+          console.warn('[auth-intercept] Rewrote form action to', mapped);
+        }
+      });
     };
-
-    // Intercept XHR (axios/legacy)
-    const origOpen = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function (
-      method: string,
-      url: string,
-      async?: boolean,
-      username?: string | null,
-      password?: string | null
-    ) {
-      const m = typeof url === 'string' && url.match(reAuth);
-      if (m) {
-        const name = m[3];
-        const target = `/api/session/${name}`;
-        console.warn('[auth-guard][xhr] rerouting', url, '→', target);
-        return origOpen.call(this, method, target, async ?? true, username ?? null, password ?? null);
-      }
-      return origOpen.call(this, method, url, async ?? true, username ?? null, password ?? null);
-    };
-
-    // Intercept raw <form> posts to auth endpoints
-    function onFormSubmit(e: Event) {
-      const f = e.target as HTMLFormElement;
-      if (!(f instanceof HTMLFormElement)) return;
-      const action = f.action || '';
-      const m = action.match(reAuth);
-      if (!m) return;
-
-      const name = m[3];
-      const target = `/api/session/${name}`;
-      console.warn('[auth-guard][form] rerouting', action, '→', target);
-      e.preventDefault();
-
-      // Serialize and send via same-origin fetch
-      const fd = new FormData(f);
-      const body: Record<string, string> = {};
-      fd.forEach((v, k) => (body[k] = String(v)));
-
-      fetch(target, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        credentials: 'include',
-      })
-        .then((r) => r.json().catch(() => ({})))
-        .then((json) => {
-          if (json?.ok) window.location.replace('/dashboard');
-          else alert(json?.message || 'Authentication failed');
-        })
-        .catch(() => alert('Auth service unreachable'));
-    }
-    document.addEventListener('submit', onFormSubmit, true);
-
-    console.log('[auth-guard] installed');
+    fixForms();
+    const obs = new MutationObserver(fixForms);
+    obs.observe(document.documentElement, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['action'],
+    });
     return () => {
       window.fetch = origFetch;
-      XMLHttpRequest.prototype.open = origOpen;
-      document.removeEventListener('submit', onFormSubmit, true);
+      obs.disconnect();
     };
   }, []);
 
