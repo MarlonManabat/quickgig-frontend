@@ -5,13 +5,24 @@ const enableSecurity =
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
-    return [
+    const rules = [
+      // quickgig.ph → app.quickgig.ph
       {
         source: '/:path*',
+        has: [{ type: 'host', value: 'quickgig.ph' }],
         destination: 'https://app.quickgig.ph/:path*',
-        permanent: true, // use 308 on Vercel
+        permanent: true,
+      },
+      // www.quickgig.ph → app.quickgig.ph
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.quickgig.ph' }],
+        destination: 'https://app.quickgig.ph/:path*',
+        permanent: true,
       },
     ];
+
+    return [...rules];
   },
   async headers() {
     if (!enableSecurity) return [];
@@ -35,4 +46,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

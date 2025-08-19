@@ -864,3 +864,15 @@ Preview/Production builds skip smoke by default. To force:
 - Set build env `RUN_SMOKE=1`
 - Provide `SMOKE_BASE_URL` (e.g., your deployed URL)
 Locally, start the app then run: `SMOKE_BASE_URL=http://127.0.0.1:3000 RUN_SMOKE=1 npm run postbuild`
+
+## Canonical host & DNS
+
+### DNS required
+- `app.quickgig.ph` → `CNAME cname.vercel-dns.com`
+- `quickgig.ph` (apex) → `A 76.76.21.21` (Vercel)
+- `www.quickgig.ph` → `CNAME cname.vercel-dns.com`
+- Remove any `A` records for `app`/`www` that point to old IPs (e.g., `89.116.53.39`)
+
+### Redirect behavior
+- `quickgig.ph/*` and `www.quickgig.ph/*` → 308 to `https://app.quickgig.ph/*`
+- Implemented in `next.config.mjs`, **not** `vercel.json`.
