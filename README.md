@@ -26,7 +26,8 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
    ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
 API_URL=http://localhost:3001
-JWT_COOKIE_NAME=auth_token
+NEXT_PUBLIC_GATE_ORIGIN=http://localhost:3001
+JWT_COOKIE_NAME=qg_session
 NEXT_PUBLIC_ENABLE_APPLY=false
 NEXT_PUBLIC_ENV=local
 ```
@@ -54,6 +55,21 @@ headers intact.
 - Browser code **must only** call `/api/session/*` for auth.
 - A global client interceptor rewrites accidental `quickgig.ph/*.php` calls.
 - CI fails if `.php` auth endpoints are referenced from client code.
+
+### Authentication (Production)
+
+Set these env vars in Vercel and redeploy:
+
+- `NEXT_PUBLIC_GATE_ORIGIN` – upstream auth gateway origin
+- `GATE_LOGIN_PATH` – default `/auth/login`
+- `GATE_ME_PATH` – default `/auth/me`
+- `GATE_LOGOUT_PATH` – default `/auth/logout`
+- `JWT_COOKIE_NAME` – default `qg_session`
+- `JWT_MAX_AGE_SECONDS` – default `1209600`
+
+Successful login sets an HttpOnly cookie (`Secure`, `SameSite=Lax`, `Path=/`).
+Routes under `/dashboard`, `/messages`, `/applications`, and `/settings`
+require this cookie and redirect to `/login?next=...` when missing.
 
 ### API proxy
 
@@ -407,7 +423,7 @@ back to `false`.
 
 Troubleshooting:
 
-- Ensure the `auth_token` cookie is present after login.
+- Ensure the `qg_session` cookie is present after login.
 - A missing cookie or 401 responses usually indicate CORS or credential issues.
 - If the engine times out or returns 5xx, the app falls back to mock flows.
 

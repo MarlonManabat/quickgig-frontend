@@ -7,7 +7,15 @@ export const env = {
     process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
   API_URL:
     process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
-  JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'auth_token',
+  NEXT_PUBLIC_GATE_ORIGIN: process.env.NEXT_PUBLIC_GATE_ORIGIN || '',
+  GATE_LOGIN_PATH: process.env.GATE_LOGIN_PATH || '/auth/login',
+  GATE_ME_PATH: process.env.GATE_ME_PATH || '/auth/me',
+  GATE_LOGOUT_PATH: process.env.GATE_LOGOUT_PATH || '/auth/logout',
+  JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'qg_session',
+  JWT_MAX_AGE_SECONDS: parseInt(
+    process.env.JWT_MAX_AGE_SECONDS || '1209600',
+    10,
+  ),
   NEXT_PUBLIC_ENABLE_BETA_RELEASE: BETA,
   NEXT_PUBLIC_ENABLE_APPLY:
     String(process.env.NEXT_PUBLIC_ENABLE_APPLY ?? 'false').toLowerCase() === 'true',
@@ -151,5 +159,9 @@ if (process.env.NODE_ENV !== 'production') {
     console.warn(
       '[env] NEXT_PUBLIC_API_URL / API_URL not set. Using https://api.quickgig.ph'
     );
+  }
+  if (!process.env.NEXT_PUBLIC_GATE_ORIGIN) {
+    // eslint-disable-next-line no-console
+    console.warn('[env] NEXT_PUBLIC_GATE_ORIGIN not set');
   }
 }

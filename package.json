@@ -26,7 +26,8 @@
     "scan:links": "node tools/check_links.mjs",
     "guard:auth-proxy": "node tools/guard_auth_proxy.mjs",
     "verify:http": "node scripts/verify_http.mjs",
-    "verify:api": "node -e \"fetch('http://127.0.0.1:3000/gate/system/status').then(r=>console.log(r.status)).catch(e=>{console.error(e);process.exit(1)})\""
+    "verify:api": "node -e \"fetch('http://127.0.0.1:3000/gate/system/status').then(r=>console.log(r.status)).catch(e=>{console.error(e);process.exit(1)})\"",
+    "verify:auth": "node scripts/verify-auth.mjs"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",

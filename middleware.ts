@@ -3,13 +3,10 @@ import type { NextRequest } from 'next/server';
 import { env } from './src/config/env';
 import { rateLimit } from './src/middleware/rateLimit';
 
-const protectedPaths = ['/dashboard', '/settings/profile', '/settings/account'];
-const employerPaths = ['/employer'];
-const adminPaths = ['/admin'];
+const PROTECTED_PREFIXES = ['/dashboard', '/messages', '/applications', '/settings'];
 
 export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
+  const { pathname, search } = req.nextUrl;
 
   if (
     env.NEXT_PUBLIC_ENABLE_SECURITY_AUDIT &&
@@ -19,57 +16,26 @@ export function middleware(req: NextRequest) {
     if (limited) return limited;
   }
 
-  if (protectedPaths.some((p) => pathname.startsWith(p))) {
-    if (!token) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/login';
-      return NextResponse.redirect(url);
-    }
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/public') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
   }
 
-  if (employerPaths.some((p) => pathname.startsWith(p))) {
-    if (!token) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/login';
-      return NextResponse.redirect(url);
-    }
-    const isEmployer = req.cookies.get('isEmployer')?.value === 'true';
-    if (!isEmployer) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/';
-      return NextResponse.redirect(url);
-    }
-  }
-
-  if (adminPaths.some((p) => pathname.startsWith(p))) {
-    if (!token) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/';
-      return NextResponse.redirect(url);
-    }
-    const role = req.cookies.get('role')?.value || '';
-    const email = req.cookies.get('email')?.value || '';
-    const isAdmin =
-      ['admin', 'moderator', 'staff'].includes(role.toLowerCase()) ||
-      (email && env.ADMIN_EMAILS.includes(email));
-    if (!isAdmin) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/';
-      return NextResponse.redirect(url);
-    }
+  const hasSession = req.cookies.has(env.JWT_COOKIE_NAME);
+  if (!hasSession && PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) {
+    const url = req.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('next', pathname + search);
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/api/:path*',
-    '/status/ping',
-    '/dashboard/:path*',
-    '/settings/profile/:path*',
-    '/settings/account/:path*',
-    '/employer/:path*',
-    '/admin/:path*',
-  ],
+  matcher: ['/((?!api|_next|public|.*\\..*).*)'],
 };

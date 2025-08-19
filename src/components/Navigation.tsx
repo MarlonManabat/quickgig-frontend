@@ -25,7 +25,7 @@ const Navigation: React.FC = () => {
   const handleLogout = async () => {
     await logout();
     setIsMenuOpen(false);
-    router.push("/");
+    router.push('/login');
   };
 
   return (
