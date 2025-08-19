@@ -1,29 +1,23 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { env } from '@/config/env';
-import { gate, passThroughSetCookie } from '@/config/api';
+import { gateFetch } from '@/lib/gateway';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request) {
-  const upstream = await fetch(gate(env.GATE_ME_PATH), {
-    headers: { cookie: req.headers.get('cookie') || '' },
-    credentials: 'include',
-    cache: 'no-store',
-  });
-
-  if (upstream.status === 401) {
-    return NextResponse.json(
-      { ok: false },
-      { status: 401, headers: { 'cache-control': 'no-store' } }
-    );
+export async function GET(req: NextRequest) {
+  const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
+  if (!token) {
+    return NextResponse.json({ ok: false }, { status: 401 });
   }
-
-  const data = await upstream.json().catch(() => ({}));
-  const res = NextResponse.json(data, {
-    status: upstream.status,
-    headers: { 'cache-control': 'no-store' },
+  const upstream = await gateFetch('/auth/me', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Cookie: `${env.JWT_COOKIE_NAME}=${token}`,
+    },
   });
-  passThroughSetCookie(upstream, res.headers);
-  return res;
+  if (upstream.status === 200) {
+    const data = await upstream.json().catch(() => ({}));
+    return NextResponse.json(data);
+  }
+  return NextResponse.json({ ok: false }, { status: 401 });
 }

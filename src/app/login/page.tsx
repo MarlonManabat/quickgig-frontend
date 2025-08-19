@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,18 +16,17 @@ export default function LoginPage() {
     const res = await fetch('/api/session/login', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ identifier, password }),
     });
-    if (res.status === 200 || res.status === 302) {
+    const data = await res.json().catch(() => null);
+    if (data?.ok) {
       const next =
         typeof window !== 'undefined'
           ? new URLSearchParams(window.location.search).get('next')
           : null;
       router.push(next || '/dashboard');
-    } else if (res.status === 401) {
-      setError('Invalid credentials');
     } else {
-      setError('Login failed');
+      setError(data?.error || 'Login failed');
     }
     setLoading(false);
   }
@@ -36,17 +35,17 @@ export default function LoginPage() {
     <div className="qg-container py-12">
       <div className="max-w-md mx-auto bg-white/70 rounded-2xl p-6 shadow">
         <h1 className="text-2xl font-bold mb-2">Login</h1>
-        <form onSubmit={onSubmit} className="space-y-3">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              className="w-full border rounded-lg p-2"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+          <form onSubmit={onSubmit} className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">Identifier</label>
+              <input
+                className="w-full border rounded-lg p-2"
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                required
+              />
+            </div>
           <div>
             <label className="block text-sm font-medium mb-1">Password</label>
             <input

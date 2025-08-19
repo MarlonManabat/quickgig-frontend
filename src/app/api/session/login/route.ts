@@ -1,43 +1,52 @@
-import { NextResponse } from 'next/server';
-import { env } from '@/config/env';
-import { gate, passThroughSetCookie } from '@/config/api';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { env, isProd } from '@/config/env';
+import { gateFetch } from '@/lib/gateway';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
-  const { email, password } = await req.json();
-  const upstream = await fetch(gate(env.GATE_LOGIN_PATH), {
+const BodySchema = z.object({ identifier: z.string(), password: z.string() });
+
+export async function POST(req: NextRequest) {
+  const parsed = BodySchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return NextResponse.json({ ok: false, error: 'Invalid body' }, { status: 400 });
+  }
+  const upstream = await gateFetch('/auth/login', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-    redirect: 'manual',
-    credentials: 'include',
-    cache: 'no-store',
+    body: JSON.stringify(parsed.data),
   });
 
-  if (upstream.status === 200 || upstream.status === 302) {
-    const res = new NextResponse(upstream.body, {
-      status: upstream.status,
-      headers: {
-        'content-type': upstream.headers.get('content-type') || 'application/json',
-        'cache-control': 'no-store',
-      },
+  if (upstream.ok) {
+    let token: string | undefined;
+    const setCookie = upstream.headers.get('set-cookie');
+    if (setCookie) {
+      const match = setCookie.match(new RegExp(`${env.JWT_COOKIE_NAME}=([^;]+)`));
+      if (match) token = match[1];
+    }
+    if (!token) {
+      const data = await upstream.json().catch(() => null);
+      token = data?.token;
+    }
+    if (!token) {
+      return NextResponse.json({ ok: false, error: 'Missing token' }, { status: 500 });
+    }
+    const res = NextResponse.json({ ok: true });
+    res.cookies.set({
+      name: env.JWT_COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: env.JWT_MAX_AGE_SECONDS,
+      ...(isProd ? { domain: 'quickgig.ph' } : {}),
     });
-    passThroughSetCookie(upstream, res.headers);
     return res;
   }
 
-  if (upstream.status === 401) {
-    return NextResponse.json(
-      { ok: false, error: 'Invalid credentials' },
-      { status: 401, headers: { 'cache-control': 'no-store' } }
-    );
-  }
-
-  const text = await upstream.text().catch(() => '');
-  return NextResponse.json(
-    { ok: false, error: text || upstream.statusText },
-    { status: upstream.status, headers: { 'cache-control': 'no-store' } }
-  );
+  const errorData = await upstream.json().catch(() => null);
+  const error = (errorData && (errorData.error || errorData.message)) || upstream.statusText;
+  return NextResponse.json({ ok: false, error }, { status: upstream.status });
 }

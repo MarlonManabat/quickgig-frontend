@@ -24,12 +24,9 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 2. Copy `.env.example` to `.env.local` and adjust as needed. Sensible
    defaults are included for local development:
    ```env
+NEXT_PUBLIC_API_URL=https://app.quickgig.ph
 API_URL=https://api.quickgig.ph
-NEXT_PUBLIC_GATE_ORIGIN=https://api.quickgig.ph
-GATE_LOGIN_PATH=/auth/login
-GATE_ME_PATH=/auth/me
-GATE_LOGOUT_PATH=/auth/logout
-JWT_COOKIE_NAME=qq_session
+JWT_COOKIE_NAME=auth_token
 JWT_MAX_AGE_SECONDS=1209600
 ```
 
@@ -37,6 +34,26 @@ JWT_MAX_AGE_SECONDS=1209600
 
 Set the env vars above in Vercel → Project → Settings → Env Vars (Production).
 Protected routes redirect to /login when session cookie is missing.
+
+### Verify login flow
+
+```bash
+BASE=https://app.quickgig.ph
+# Unauthed
+curl -i $BASE/api/session/me
+
+# Login (follow redirects; store cookie)
+curl -i -L -c cookies.txt -H 'content-type: application/json' \
+  -d '{"identifier":"<email>","password":"<password>"}' \
+  $BASE/api/session/login
+
+# Auth’d
+curl -i -b cookies.txt $BASE/api/session/me
+
+# Logout then verify cleared
+curl -i -b cookies.txt -X POST $BASE/api/session/logout
+curl -i -b cookies.txt $BASE/api/session/me
+```
 
 To verify the live API locally, run:
 
