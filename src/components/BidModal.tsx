@@ -36,10 +36,8 @@ export default function BidModal({ isOpen, onClose, jobId, jobTitle, onBidSubmit
     setError('');
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
       await apiFetch('/bids/create', {
         method: 'POST',
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         credentials: 'include',
         body: JSON.stringify({
           jobId,

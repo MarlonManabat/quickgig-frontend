@@ -39,9 +39,7 @@ export default function NotificationDropdown() {
     try {
       setLoading(true);
       setError('');
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
       const response = await apiFetch<{ data?: Notification[] }>('/notifications/list', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         credentials: 'include',
       });
       setNotifications(response.data || []);
@@ -56,10 +54,8 @@ export default function NotificationDropdown() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
       await apiFetch(`/notifications/${notificationId}/read`, {
         method: 'PUT',
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         credentials: 'include',
       });
       setNotifications(prev => 
@@ -76,12 +72,10 @@ export default function NotificationDropdown() {
   const markAllAsRead = async () => {
     try {
       const unreadNotifications = notifications.filter(n => !n.read);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
       await Promise.all(
         unreadNotifications.map(notif =>
           apiFetch(`/notifications/${notif._id}/read`, {
             method: 'PUT',
-            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
             credentials: 'include',
           })
         )

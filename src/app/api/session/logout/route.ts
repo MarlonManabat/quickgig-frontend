@@ -5,23 +5,15 @@ import { gate, passThroughSetCookie } from '@/config/api';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request) {
-  const upstream = await fetch(gate(env.GATE_ME_PATH), {
+export async function POST(req: Request) {
+  const upstream = await fetch(gate(env.GATE_LOGOUT_PATH), {
+    method: 'POST',
     headers: { cookie: req.headers.get('cookie') || '' },
     credentials: 'include',
     cache: 'no-store',
   });
-
-  if (upstream.status === 401) {
-    return NextResponse.json(
-      { ok: false },
-      { status: 401, headers: { 'cache-control': 'no-store' } }
-    );
-  }
-
-  const data = await upstream.json().catch(() => ({}));
-  const res = NextResponse.json(data, {
-    status: upstream.status,
+  const res = new NextResponse(null, {
+    status: 204,
     headers: { 'cache-control': 'no-store' },
   });
   passThroughSetCookie(upstream, res.headers);

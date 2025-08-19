@@ -24,12 +24,19 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 2. Copy `.env.example` to `.env.local` and adjust as needed. Sensible
    defaults are included for local development:
    ```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-API_URL=http://localhost:3001
-JWT_COOKIE_NAME=auth_token
-NEXT_PUBLIC_ENABLE_APPLY=false
-NEXT_PUBLIC_ENV=local
+API_URL=https://api.quickgig.ph
+NEXT_PUBLIC_GATE_ORIGIN=https://api.quickgig.ph
+GATE_LOGIN_PATH=/auth/login
+GATE_ME_PATH=/auth/me
+GATE_LOGOUT_PATH=/auth/logout
+JWT_COOKIE_NAME=qq_session
+JWT_MAX_AGE_SECONDS=1209600
 ```
+
+### Authentication
+
+Set the env vars above in Vercel → Project → Settings → Env Vars (Production).
+Protected routes redirect to /login when session cookie is missing.
 
 To verify the live API locally, run:
 

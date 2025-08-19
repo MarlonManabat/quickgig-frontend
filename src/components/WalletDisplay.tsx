@@ -21,9 +21,7 @@ const WalletDisplay: React.FC = () => {
   const fetchWalletInfo = async () => {
     try {
       setLoading(true);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
       const response = await apiFetch<{ data?: WalletInfo }>('/wallet', {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         credentials: 'include',
       });
       setWalletInfo(response.data || null);

@@ -1,3 +1,26 @@
+import { env } from './env';
+
+export const GATE = new URL(env.API_URL);
+export function gate(path: string) {
+  return new URL(path, GATE).toString();
+}
+
+export function passThroughSetCookie(from: Response, to: Headers) {
+  const raw = (from.headers as unknown as { raw?: () => Record<string, string[]> }).raw?.()[
+    'set-cookie'
+  ];
+  const single = from.headers.get('set-cookie');
+  const cookies = raw || (single ? [single] : []);
+  for (const c of cookies) {
+    to.append('set-cookie', c);
+  }
+}
+
+export async function json<T>(url: string, init?: RequestInit) {
+  const res = await fetch(url, { ...init, cache: 'no-store' });
+  return res.json() as Promise<T>;
+}
+
 export const API = {
   me: '/auth/me.php',
   jobs: '/jobs/list.php',
