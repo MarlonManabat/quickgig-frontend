@@ -867,12 +867,14 @@ Locally, start the app then run: `SMOKE_BASE_URL=http://127.0.0.1:3000 RUN_SMOKE
 
 ## Canonical host & DNS
 
-### DNS required
-- `app.quickgig.ph` → `CNAME cname.vercel-dns.com`
-- `quickgig.ph` (apex) → `A 76.76.21.21` (Vercel)
-- `www.quickgig.ph` → `CNAME cname.vercel-dns.com`
-- Remove any `A` records for `app`/`www` that point to old IPs (e.g., `89.116.53.39`)
+### DNS
+- `@` → `76.76.21.21`
+- `www` → `cname.vercel-dns.com`
+- `app` → project CNAME from Vercel Domains page
 
-### Redirect behavior
-- `quickgig.ph/*` and `www.quickgig.ph/*` → 308 to `https://app.quickgig.ph/*`
-- Implemented in `next.config.mjs`, **not** `vercel.json`.
+### Behavior
+- `quickgig.ph/*` and `www.quickgig.ph/*` 308 → `https://app.quickgig.ph/:path*`
+- `https://app.quickgig.ph/*` serves 200
+
+### Check
+- `npm run verify:http`

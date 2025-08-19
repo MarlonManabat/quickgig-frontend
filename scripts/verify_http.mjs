@@ -1,29 +1,38 @@
-#!/usr/bin/env node
-/**
- * Usage:
- *   node scripts/verify_http.mjs quickgig.ph
- *   node scripts/verify_http.mjs www.quickgig.ph
- *
- * Exits 0 if host 308-redirects to https://app.quickgig.ph/, else 1.
- */
-import { execSync } from 'node:child_process';
+import https from 'node:https';
 
-const host = process.argv[2];
-if (!host) {
-  console.error('Host required'); process.exit(2);
+const checks = [
+  { url: 'https://quickgig.ph/',        expect: 308, must: 'https://app.quickgig.ph/' },
+  { url: 'https://www.quickgig.ph/',    expect: 308, must: 'https://app.quickgig.ph/' },
+  { url: 'https://app.quickgig.ph/',    expect: 200 },
+];
+
+function head(url) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(url, { method: 'HEAD' }, res => {
+      resolve({ status: res.statusCode, location: res.headers.location || '' });
+    });
+    req.on('error', reject);
+    req.end();
+  });
 }
 
-try {
-  const out = execSync(`curl -sSI https://${host}/ | tr -d '\r'`, { stdio: 'pipe' }).toString();
-  const has308 = /HTTP\/\d\.\d 308/.test(out);
-  const toApp = /Location:\s*https:\/\/app\.quickgig\.ph\//i.test(out);
-  if (has308 && toApp) {
-    console.log(`[ok] ${host} → app.quickgig.ph (308)`);
-    process.exit(0);
+let failed = 0;
+(async () => {
+  for (const c of checks) {
+    try {
+      const r = await head(c.url);
+      const okStatus = r.status === c.expect;
+      const okLoc = c.must ? r.location && r.location.startsWith(c.must) : true;
+      if (okStatus && okLoc) {
+        console.log('OK  ', c.url, '->', r.status, r.location || '');
+      } else {
+        failed++;
+        console.error('FAIL', c.url, 'got', r.status, r.location || '');
+      }
+    } catch (e) {
+      failed++;
+      console.error('ERR ', c.url, e?.message || e);
+    }
   }
-  console.error('[fail] Unexpected response:\n' + out);
-  process.exit(1);
-} catch (e) {
-  console.error('[fail] Request error:\n' + (e.stdout?.toString() || e.message));
-  process.exit(1);
-}
+  if (failed) process.exit(1);
+})();
