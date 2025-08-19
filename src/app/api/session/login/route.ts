@@ -8,6 +8,13 @@ export const runtime = 'nodejs';
 const BodySchema = z.object({ identifier: z.string(), password: z.string() });
 
 export async function POST(req: NextRequest) {
+  if (!env.API_URL) {
+    return Response.json(
+      { ok: false, error: 'misconfigured', detail: 'API_URL is not set' },
+      { status: 503 }
+    );
+  }
+
   const body = await req.json().catch(() => null);
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
@@ -40,7 +47,9 @@ export async function POST(req: NextRequest) {
     return res;
   }
 
+  const headers = new Headers();
+  copySetCookie(upstream, headers);
   const data = await upstream.json().catch(() => null);
   const error = data?.error || data?.message || 'Login failed';
-  return NextResponse.json({ ok: false, error }, { status: upstream.status });
+  return NextResponse.json({ ok: false, error }, { status: upstream.status, headers });
 }

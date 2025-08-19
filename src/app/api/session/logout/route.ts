@@ -5,6 +5,13 @@ import { gateway, copySetCookie } from '@/lib/gateway';
 export const runtime = 'nodejs';
 
 export async function POST() {
+  if (!env.API_URL) {
+    return Response.json(
+      { ok: false, error: 'misconfigured', detail: 'API_URL is not set' },
+      { status: 503 }
+    );
+  }
+
   let upstream: Response | null = null;
   try {
     upstream = await gateway('/auth/logout', { method: 'POST' });
