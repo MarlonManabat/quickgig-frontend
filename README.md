@@ -46,8 +46,23 @@ Optional:
 
 - `NEXT_PUBLIC_SOCKET_URL=wss://api.quickgig.ph`
 
-Set these in Vercel → Project → Settings → Env Vars (Production).
+Set these in Vercel → Project → Settings → Env Vars (Production). API_URL is
+required in production; defaults only apply to local/preview builds.
 Protected routes redirect to /login when session cookie is missing.
+
+`POST /api/session/register` expects `{ name, email, password }` and proxies to
+`${API_URL}/auth/register`, falling back to `/auth/signup` if the first call
+returns `404`.
+
+Example register + me smoke:
+
+```bash
+API_URL=https://api.quickgig.ph \\
+curl -sv -H 'content-type: application/json' \\
+  --data '{"name":"Smoke","email":"smoke+$(date +%s)@example.com","password":"Xx1!Xx1!"}' \\
+  -c jar.txt -b jar.txt https://app.quickgig.ph/api/session/register
+curl -sv -b jar.txt https://app.quickgig.ph/api/session/me
+```
 
 ### Verify login flow
 

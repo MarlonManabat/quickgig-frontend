@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { env } from '@/config/env';
-import { gateway, copySetCookie } from '@/lib/gateway';
+import { gateway } from '@/lib/gateway';
+import { copySetCookie } from '@/lib/http';
 
 export const runtime = 'nodejs';
 
@@ -17,11 +18,11 @@ export async function POST(req: NextRequest) {
   const upstream = await gateway('/auth/login', {
     method: 'POST',
     body: JSON.stringify(parsed.data),
+    cache: 'no-store',
   });
-
+  const cookieInit = copySetCookie(upstream);
   if (upstream.ok) {
-    const res = new NextResponse(null, { status: 204 });
-    copySetCookie(upstream, res.headers);
+    const res = new NextResponse(null, { ...cookieInit, status: 204 });
     if (!upstream.headers.get('set-cookie')) {
       const data = await upstream.json().catch(() => null);
       const token = data?.token || data?.accessToken;
@@ -40,7 +41,13 @@ export async function POST(req: NextRequest) {
     return res;
   }
 
-  const data = await upstream.json().catch(() => null);
-  const error = data?.error || data?.message || 'Login failed';
-  return NextResponse.json({ ok: false, error }, { status: upstream.status });
+  const text = await upstream.text();
+  const sanitized = parsed.data.password
+    ? text.replaceAll(parsed.data.password, '')
+    : text;
+  console.error('[login]', upstream.status, sanitized.slice(0, 100));
+  return NextResponse.json(
+    { ok: false, error: sanitized, status: upstream.status },
+    { ...cookieInit, status: upstream.status },
+  );
 }
