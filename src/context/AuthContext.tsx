@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginData, SignupData, UpdateUserData } from '@/types';
-import { login as loginApi, register as registerApi, me as meApi } from '@/lib/auth';
-import { api } from '@/config/api';
+import { apiLogin, apiRegister, apiMe, apiLogout } from '@/lib/auth-client';
+import { startSocket, stopSocket } from '@/lib/socket';
 import { apiPut } from '@/lib/api';
 
 interface AuthContextType {
@@ -29,16 +29,17 @@ export const useAuth = () => {
 
 interface AuthProviderProps {
   children: ReactNode;
+  hasSession?: boolean;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children, hasSession = false }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchMe = async () => {
     try {
-      const data = await meApi();
-      const userData = (data.user || data) as User;
+      const data = await apiMe();
+      const userData = (data?.user || data) as User;
       if (userData && Object.keys(userData).length) setUser(userData);
       else setUser(null);
     } catch {
@@ -47,21 +48,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!hasSession) { setLoading(false); return; }
     fetchMe().finally(() => setLoading(false));
-  }, []);
+  }, [hasSession]);
 
   const login = async (data: LoginData) => {
-    await loginApi({ email: data.email, password: data.password });
+    await apiLogin({ identifier: data.email, password: data.password });
     await fetchMe();
+    startSocket();
   };
 
   const signup = async (data: SignupData) => {
-    await registerApi({ email: data.email, password: data.password, name: data.name });
+    await apiRegister({ name: data.name, email: data.email, password: data.password });
     await fetchMe();
+    startSocket();
   };
 
   const logout = async () => {
-    await fetch(api.session.logout, { method: 'POST' });
+    await apiLogout();
+    stopSocket();
     setUser(null);
   };
 

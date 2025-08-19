@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { env } from '@/config/env';
 import { track } from '@/lib/track';
-import { register } from '@/lib/auth';
+import { apiRegister } from '@/lib/auth-client';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function RegisterPage() {
     if (!name || !email || !password) { setError('All fields are required'); return; }
     setLoading(true);
     try {
-      await register({ name, email, password });
+      await apiRegister({ name, email, password });
       if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('signup_success');
       router.push('/dashboard');
     } catch (err) {

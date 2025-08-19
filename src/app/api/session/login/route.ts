@@ -1,52 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { env, isProd } from '@/config/env';
-import { gateFetch } from '@/lib/gateway';
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { env } from '@/config/env';
+import { loginUpstream } from '@/lib/gateway';
 
-export const runtime = 'nodejs';
+export async function POST(req: Request) {
+  const body = await req.json();
+  const res = await loginUpstream(body);
 
-const BodySchema = z.object({ identifier: z.string(), password: z.string() });
-
-export async function POST(req: NextRequest) {
-  const parsed = BodySchema.safeParse(await req.json());
-  if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: 'Invalid body' }, { status: 400 });
+  if (!res.ok) {
+    const msg = await safeMessage(res);
+    return NextResponse.json({ ok: false, message: msg }, { status: res.status });
   }
-  const upstream = await gateFetch('/auth/login', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(parsed.data),
+
+  let token = '';
+  try { token = (await res.json())?.token ?? ''; } catch {}
+  if (!token) token = new URL(res.url).searchParams.get('token') ?? '';
+
+  if (!token) {
+    const upstreamCookie = res.headers.get('set-cookie') ?? '';
+    if (!upstreamCookie) return NextResponse.json({ ok: false }, { status: 502 });
+    // last resort: pass through upstream cookie name if present
+    const match = upstreamCookie.match(/([^=]+)=([^;]+)/);
+    if (match) token = match[2];
+  }
+
+  cookies().set(env.cookieName, token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: env.maxAge,
+    domain: '.quickgig.ph',
   });
 
-  if (upstream.ok) {
-    let token: string | undefined;
-    const setCookie = upstream.headers.get('set-cookie');
-    if (setCookie) {
-      const match = setCookie.match(new RegExp(`${env.JWT_COOKIE_NAME}=([^;]+)`));
-      if (match) token = match[1];
-    }
-    if (!token) {
-      const data = await upstream.json().catch(() => null);
-      token = data?.token;
-    }
-    if (!token) {
-      return NextResponse.json({ ok: false, error: 'Missing token' }, { status: 500 });
-    }
-    const res = NextResponse.json({ ok: true });
-    res.cookies.set({
-      name: env.JWT_COOKIE_NAME,
-      value: token,
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: env.JWT_MAX_AGE_SECONDS,
-      ...(isProd ? { domain: 'quickgig.ph' } : {}),
-    });
-    return res;
-  }
+  return NextResponse.json({ ok: true });
+}
 
-  const errorData = await upstream.json().catch(() => null);
-  const error = (errorData && (errorData.error || errorData.message)) || upstream.statusText;
-  return NextResponse.json({ ok: false, error }, { status: upstream.status });
+async function safeMessage(r: Response) {
+  try { const j = await r.json(); return j?.message ?? r.statusText; } catch { return r.statusText; }
 }

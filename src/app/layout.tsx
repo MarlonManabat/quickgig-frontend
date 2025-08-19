@@ -14,6 +14,7 @@ import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
 import AppShellV2 from '@/components/layouts/AppShellV2';
 import { env } from '@/config/env';
+import { cookies } from 'next/headers';
 
 const legacySans = localFont({
   variable: "--font-legacy-sans",
@@ -100,6 +101,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const hasSession = cookies().has(env.cookieName);
   const skin = process.env.NEXT_PUBLIC_SKIN;
   const legacy = skin === "legacy" ? legacySans.variable : "";
   return (
@@ -113,7 +115,7 @@ export default function RootLayout({
         {env.NEXT_PUBLIC_ENABLE_MONITORING && (
           <span data-testid="monitoring-flag" className="hidden" />
         )}
-        <AuthProvider>
+        <AuthProvider hasSession={hasSession}>
           <SocketProvider>
             <ToastProvider>
               <ErrorBoundary>

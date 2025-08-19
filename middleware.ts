@@ -2,14 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { env } from '@/config/env';
 
 export function middleware(req: NextRequest) {
-  if (
-    req.nextUrl.pathname.startsWith('/api') ||
-    req.nextUrl.pathname.startsWith('/socket.io') ||
-    req.nextUrl.pathname === '/login'
-  ) {
-    return NextResponse.next();
-  }
-  const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
+  const token = req.cookies.get(env.cookieName)?.value;
   if (!token) {
     const url = new URL('/login', req.url);
     url.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search);

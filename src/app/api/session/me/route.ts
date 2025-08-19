@@ -1,23 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { env } from '@/config/env';
-import { gateFetch } from '@/lib/gateway';
+import { NextResponse } from 'next/server';
+import { meUpstream } from '@/lib/gateway';
 
-export const runtime = 'nodejs';
+export async function GET() {
+  const res = await meUpstream();
+  if (!res.ok) {
+    if (res.status === 401) {
+      return NextResponse.json({ ok: false }, { status: 401 });
+    }
+    const msg = await safeMessage(res);
+    return NextResponse.json({ ok: false, message: msg }, { status: res.status });
+  }
+  const data = await res.json().catch(() => ({}));
+  return NextResponse.json(data);
+}
 
-export async function GET(req: NextRequest) {
-  const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
-  if (!token) {
-    return NextResponse.json({ ok: false }, { status: 401 });
-  }
-  const upstream = await gateFetch('/auth/me', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Cookie: `${env.JWT_COOKIE_NAME}=${token}`,
-    },
-  });
-  if (upstream.status === 200) {
-    const data = await upstream.json().catch(() => ({}));
-    return NextResponse.json(data);
-  }
-  return NextResponse.json({ ok: false }, { status: 401 });
+async function safeMessage(r: Response) {
+  try { const j = await r.json(); return j?.message ?? r.statusText; } catch { return r.statusText; }
 }

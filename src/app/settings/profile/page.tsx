@@ -5,7 +5,7 @@ import { Input, Textarea } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { API } from '@/config/api';
 import { toast } from '@/lib/toast';
-import { me } from '@/lib/auth';
+import { apiMe } from '@/lib/auth-client';
 import { apiPost } from '@/lib/api';
 
 interface ProfileData {
@@ -36,7 +36,7 @@ export default function ProfileSettingsPage() {
   useEffect(() => {
     (async () => {
       try {
-        const d = await me();
+        const d = (await apiMe()) || {};
         setData({
           name: d.name || '',
           headline: d.headline || '',
