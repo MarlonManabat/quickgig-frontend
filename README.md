@@ -49,14 +49,11 @@ headers intact.
 - A global client interceptor rewrites accidental `quickgig.ph/*.php` calls.
 - CI fails if `.php` auth endpoints are referenced from client code.
 
-### Vercel Preview
+### Smoke Gate on Vercel
 
-Vercel builds skip smoke tests automatically. To run smoke locally or in CI,
-set `RUN_SMOKE=1` and provide a base URL:
-
-```bash
-RUN_SMOKE=1 SMOKE_BASE_URL=http://127.0.0.1:3000 npm run build
-```
+- Preview/Production builds skip smoke by default.
+- To force smoke on Vercel, set build env `RUN_SMOKE=1` and `SMOKE_BASE_URL` to your deployed URL.
+- Local: start the app (`next start`), then `SMOKE_BASE_URL=http://127.0.0.1:3000 RUN_SMOKE=1 npm run postbuild` or just `npm run smoke`.
 
 ### Quick Start: Staging
 
