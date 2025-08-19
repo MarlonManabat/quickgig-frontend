@@ -1,25 +1,46 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login } from '@/lib/auth';
+import { toast } from '@/lib/toast';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const r = useRouter();
+  const { login: doLogin, refresh } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const showDemo =
+    process.env.NEXT_PUBLIC_DEMO_LOGIN === '1' &&
+    process.env.NEXT_PUBLIC_VERCEL_ENV !== 'production';
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setErr('');
     setLoading(true);
     try {
-      await login({ email, password });
-      r.replace('/dashboard');
+      await doLogin({ email, password });
+      r.push('/dashboard');
       return;
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Auth service unreachable');
+      toast(e instanceof Error ? e.message : 'Auth service unreachable');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function demoLogin() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/session/demo', { method: 'POST' });
+      if (res.ok) {
+        await refresh();
+        r.push('/dashboard');
+      } else {
+        toast('Demo login failed');
+      }
+    } catch {
+      toast('Demo login failed');
     } finally {
       setLoading(false);
     }
@@ -31,11 +52,6 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-2">Login</h1>
         <p className="text-sm text-gray-600 mb-4">Sign in to your QuickGig account.</p>
         <form onSubmit={onSubmit} className="space-y-3">
-          {err && (
-            <div role="alert" className="alert-error">
-              {err}
-            </div>
-          )}
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
@@ -67,6 +83,16 @@ export default function LoginPage() {
           >
             {loading ? 'Signing in…' : 'Login'}
           </button>
+          {showDemo && (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={demoLogin}
+              className="btn btn-secondary w-full"
+            >
+              Continue as Demo
+            </button>
+          )}
         </form>
         <p className="text-sm mt-3">
           No account? <a className="text-sky-600 font-semibold" href="/register">Sign up</a>
