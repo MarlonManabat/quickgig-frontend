@@ -9,10 +9,10 @@ import { checkApiHealth, type ApiHealthStatus } from '@/lib/monitoring';
 import { track } from '@/lib/track';
 import { env } from '@/config/env';
 import { t } from '@/lib/i18n';
-import { useSession } from '@/hooks/useSession';
+import { useAuth } from '@/context/AuthContext';
 
 export default function HomePageClient() {
-  const { user } = useSession();
+  const { user } = useAuth();
   const [status, setStatus] = useState<ApiHealthStatus | 'idle' | 'loading'>('idle');
 
   useEffect(() => {
