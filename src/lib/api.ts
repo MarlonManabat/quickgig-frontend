@@ -89,23 +89,13 @@ export interface HealthResponse {
 }
 
 export async function checkHealth(): Promise<HealthResponse> {
-  const paths = ['/health', '/health.php'];
-  for (const path of paths) {
-    const start = Date.now();
-    const res = await safeFetch(path);
-    const latency = Date.now() - start;
-    const parsed = safeJsonParse<{ status?: string }>(res.body);
-    const ok =
-      res.ok &&
-      parsed.ok &&
-      parsed.value?.status &&
-      String(parsed.value.status).toLowerCase() === 'ok';
-    if (ok) return { ...res, path, latency };
-    if (res.error) console.error(`Health check ${path} error:`, res.error);
-    if (!parsed.ok)
-      console.error(`Health check ${path} parse error:`, parsed.error);
-  }
-  return { ok: false, status: 0, body: '', path: '/health.php', latency: 0, error: 'Health check failed' };
+  const path = '/diag/status';
+  const start = Date.now();
+  const res = await safeFetch(path);
+  const latency = Date.now() - start;
+  const parsed = safeJsonParse<{ ok?: boolean }>(res.body);
+  const ok = res.ok && parsed.ok && Boolean(parsed.value?.ok);
+  return { ...res, ok, path, latency };
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {

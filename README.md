@@ -851,8 +851,8 @@ Preflight (`OPTIONS`) should return `200`.
 
 ## Health & CI
 
-* **API health:** `https://api.quickgig.ph/health.php` → JSON `{ ok: true, ts: <unix> }`
-* Minimal CI: install + build.
+* **API health:** `https://app.quickgig.ph/api/diag/status` → JSON `{ ok: true, ... }`
+* Minimal CI: install + build + `npm run smoke:api`.
 
 ### Local/Preview Notes
 
@@ -861,13 +861,13 @@ Preflight (`OPTIONS`) should return `200`.
 ## Manual Triage
 
 * Frontend: `curl -I https://quickgig.ph/` shows `308` with `Location: https://app.quickgig.ph/`.
-* API: `https://api.quickgig.ph/health.php` in a browser.
+* API: `https://app.quickgig.ph/api/diag/status` in a browser.
 * DevTools → Application → Cookies: confirm `.quickgig.ph` cookie, `Secure`, `HttpOnly`, `SameSite=None`.
 
 ## Screenshots / Evidence (attach in PR description)
 
 * `quickgig.ph` rendering correctly
-* `api.quickgig.ph/health.php` JSON
+* `app.quickgig.ph/api/diag/status` JSON
 
 
 ## Production Domains (canonical)
@@ -885,7 +885,7 @@ Preflight (`OPTIONS`) should return `200`.
   open https://app.quickgig.ph
 
 - Verify API:
-  curl -i https://api.quickgig.ph/health.php
+  curl -i https://app.quickgig.ph/api/diag/status
 
 ### Cookies & CORS
 - Cookies from API: Domain=.quickgig.ph; Path=/; Secure; HttpOnly; SameSite=None

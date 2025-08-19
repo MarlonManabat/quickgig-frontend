@@ -36,8 +36,8 @@ export async function runHealthChecks(): Promise<HealthResult[]> {
   const health = await checkHealth();
   let hint: string | undefined;
   if (!health.ok) {
-    if (health.status === 404 && health.path === '/health')
-      hint = 'Ensure health.php exists at api docroot';
+    if (health.status === 404)
+      hint = 'Ensure /status endpoint exists on backend';
     else if (health.status === 403)
       hint = 'Check Hostinger .htaccess or WAF rule; DirectoryIndex and RewriteEngine Off';
     else if (health.status === 500)

@@ -5,9 +5,9 @@ const BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph').repl
 
 (async () => {
   try {
-    const res = await fetch(BASE + '/health.php');
+    const res = await fetch(BASE + '/status');
     const data = await res.json();
-    if (data && data.status === 'ok') {
+    if (res.ok && data) {
       console.log('API OK');
       process.exit(0);
     }

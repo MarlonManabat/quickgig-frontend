@@ -52,8 +52,7 @@ async function check(path, expect) {
   rows.push(await check('/', { key: 'message', value: 'QuickGig API' }));
 
   // Health check with fallback
-  let health = await check('/health', { key: 'status', value: 'ok' });
-  if (!health.pass) health = await check('/health.php', { key: 'status', value: 'ok' });
+  const health = await check('/status', { key: 'ok', value: true });
   rows.push(health);
 
   console.log('Endpoint | Code | Result | Body');
