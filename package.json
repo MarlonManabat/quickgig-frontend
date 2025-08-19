@@ -24,7 +24,9 @@
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/check_links.mjs",
-    "guard:auth-proxy": "node tools/guard_auth_proxy.mjs"
+    "guard:auth-proxy": "node tools/guard_auth_proxy.mjs",
+    "verify:http:apex": "node scripts/verify_http.mjs quickgig.ph",
+    "verify:http:www": "node scripts/verify_http.mjs www.quickgig.ph"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
