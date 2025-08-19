@@ -46,6 +46,12 @@ Optional:
 
 - `NEXT_PUBLIC_SOCKET_URL=wss://api.quickgig.ph`
 
+**Required in Vercel (Preview & Production):** `API_URL=https://api.quickgig.ph`
+
+Optional: `NEXT_PUBLIC_SOCKET_URL` (sockets disabled when unset).
+
+How to verify: open `/api/diag/env` on the Preview URL and look for `apiUrlSet:true`.
+
 Set these in Vercel → Project → Settings → Env Vars (Production).
 Protected routes redirect to /login when session cookie is missing.
 
