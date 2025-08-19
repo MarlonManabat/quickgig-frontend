@@ -1,5 +1,4 @@
 export const API = {
-  register: '/auth/register.php',
   me: '/auth/me.php',
   jobs: '/jobs/list.php',
   jobById: (id: string | number) => `/jobs/show.php?id=${id}`,

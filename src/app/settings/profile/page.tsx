@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button';
 import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { toast } from '@/lib/toast';
-import { me } from '@/lib/auth/client';
+import { me } from '@/lib/auth';
 
 interface ProfileData {
   name: string;

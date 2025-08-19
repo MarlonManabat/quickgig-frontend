@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { env } from '@/config/env';
 import { track } from '@/lib/track';
-import { register } from '@/lib/auth/client';
+import { register } from '@/lib/auth';
 
 export default function RegisterPage() {
   const router = useRouter();
