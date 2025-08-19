@@ -36,7 +36,17 @@ only connects after authentication and does not serve `/socket.io` itself.
 
 ### Authentication
 
-Set the env vars above in Vercel → Project → Settings → Env Vars (Production).
+Required env vars:
+
+- `API_URL=https://api.quickgig.ph`
+- `JWT_COOKIE_NAME=auth_token`
+- `JWT_MAX_AGE_SECONDS=1209600`
+
+Optional:
+
+- `NEXT_PUBLIC_SOCKET_URL=wss://api.quickgig.ph`
+
+Set these in Vercel → Project → Settings → Env Vars (Production).
 Protected routes redirect to /login when session cookie is missing.
 
 ### Verify login flow
