@@ -1,55 +1,83 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
+import { env } from '@/config/env';
+import { proxyFetch, cloneHeaders } from '@/lib/http';
 
-const GATE = process.env.NEXT_PUBLIC_GATE_ORIGIN || 'https://api.quickgig.ph';
-const COOKIE = process.env.JWT_COOKIE_NAME || 'qg.sid';
+export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  let body: unknown;
   try {
-      const body = await req.json();
-      const r = await fetch(`${GATE}/session/login`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(body),
-        cache: 'no-store',
-      });
-
-    // Forward errors verbatim
-    if (!r.ok) {
-      const msg = await r.text().catch(() => '');
-      return NextResponse.json({ ok: false, error: msg || r.statusText }, { status: r.status });
-    }
-
-    // Prefer Set-Cookie from upstream if present
-    const setCookie = r.headers.get('set-cookie');
-    if (setCookie) {
-      // Pass through upstream cookie(s)
-      return new NextResponse(await r.text(), {
-        status: 200,
-        headers: { 'set-cookie': setCookie, 'content-type': 'application/json' },
-      });
-    }
-
-      // Or set our own cookie if upstream returns a token body
-      const json: Record<string, unknown> = await r.json().catch(() => ({}));
-      const token =
-        (typeof json.token === 'string' ? json.token : undefined) ||
-        (typeof json[COOKIE] === 'string' ? (json[COOKIE] as string) : undefined);
-      if (token) {
-        cookies().set({
-          name: COOKIE,
-          value: token,
-          httpOnly: true,
-        secure: true,
-        sameSite: 'lax',
-        path: '/',
-      });
-      return NextResponse.json({ ok: true });
-    }
-
-    return NextResponse.json({ ok: true }); // successful but cookie set by upstream via other means
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'login failed';
-      return NextResponse.json({ ok: false, error: msg }, { status: 500 });
-    }
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ ok: false, error: 'invalid json' }, { status: 400 });
   }
+  const { email, password } = (body || {}) as Record<string, unknown>;
+  if (typeof email !== 'string' || typeof password !== 'string') {
+    return NextResponse.json({ ok: false, error: 'invalid body' }, { status: 400 });
+  }
+
+  const headers = cloneHeaders(req.headers);
+  headers.set('content-type', 'application/json');
+
+  let upstream: Response;
+  try {
+    upstream = await proxyFetch(
+      `${env.NEXT_PUBLIC_GATE_ORIGIN}${env.GATE_LOGIN_PATH}`,
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ email, password }),
+      },
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'login failed';
+    return NextResponse.json({ ok: false, error: msg }, { status: 502 });
+  }
+
+  if (!upstream.ok) {
+    let error = '';
+    try {
+      const data = (await upstream.json()) as Record<string, unknown>;
+      error =
+        (typeof data.error === 'string' ? data.error : undefined) ||
+        (typeof data.message === 'string' ? data.message : undefined) ||
+        '';
+    } catch {
+      error = await upstream.text().catch(() => '');
+    }
+    return NextResponse.json(
+      { ok: false, error },
+      { status: upstream.status },
+    );
+  }
+
+  const setCookies = upstream.headers.getSetCookie?.() ?? [];
+  if (setCookies.length) {
+    const res = NextResponse.json({ ok: true });
+    for (const c of setCookies) res.headers.append('set-cookie', c);
+    return res;
+  }
+
+  const json = (await upstream.json().catch(() => ({}))) as Record<string, unknown>;
+  const token =
+    typeof json.token === 'string'
+      ? json.token
+      : typeof json.access_token === 'string'
+      ? (json.access_token as string)
+      : undefined;
+  if (token) {
+    const res = NextResponse.json({ ok: true });
+    res.cookies.set({
+      name: env.JWT_COOKIE_NAME,
+      value: token,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: env.JWT_MAX_AGE_SECONDS,
+    });
+    return res;
+  }
+
+  return NextResponse.json({ ok: true });
+}
