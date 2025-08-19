@@ -18,7 +18,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const to = setTimeout(() => controller.abort(), 2500);
     const res = await fetch(`${apiBase}/jobs/list.php?page=1&limit=100`, {
       signal: controller.signal,
-      cache: 'no-store',
       next: { revalidate: 60 },
     });
     clearTimeout(to);
