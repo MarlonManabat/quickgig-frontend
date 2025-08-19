@@ -5,7 +5,7 @@ import { API } from '@/config/api';
 async function forward(req: NextRequest, target: string) {
   try {
     const form = await req.formData();
-    const res = await fetch(`${env.API_URL}${target}`, {
+    const res = await fetch(`${env.apiUrl}${target}`, {
       method: 'POST',
       body: form,
       headers: {

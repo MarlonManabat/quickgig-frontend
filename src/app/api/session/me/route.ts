@@ -5,14 +5,14 @@ import { gateFetch } from '@/lib/gateway';
 export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
+  const token = req.cookies.get(env.cookieName)?.value;
   if (!token) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
   const upstream = await gateFetch('/auth/me', {
     headers: {
       Authorization: `Bearer ${token}`,
-      Cookie: `${env.JWT_COOKIE_NAME}=${token}`,
+      Cookie: `${env.cookieName}=${token}`,
     },
   });
   if (upstream.status === 200) {

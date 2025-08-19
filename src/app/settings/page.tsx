@@ -5,7 +5,7 @@ import { env } from '@/config/env';
 import SettingsForm from './SettingsForm';
 
 function requireAuthSSR() {
-  const token = cookies().get(env.JWT_COOKIE_NAME);
+  const token = cookies().get(env.cookieName);
   if (!token) {
     redirect('/login?return=/settings');
   }

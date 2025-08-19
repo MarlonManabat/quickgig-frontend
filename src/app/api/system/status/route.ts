@@ -4,7 +4,7 @@ export async function GET() {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 3000);
   try {
-    const res = await fetch(`${env.API_URL}/system/status`, {
+    const res = await fetch(`${env.apiUrl}/system/status`, {
       signal: controller.signal,
       cache: 'no-store',
     });

@@ -1,6 +1,7 @@
-import { NextRequest } from "next/server";
+import { NextRequest } from 'next/server';
+import { env } from '@/config/env';
 
-const PHP_BASE = process.env.NEXT_PUBLIC_API_URL || "https://quickgig.ph"; // public domain base (legacy host)
+const PHP_BASE = env.publicApiUrl || 'https://quickgig.ph'; // public domain base (legacy host)
 
 function rewriteSetCookie(headers: Headers) {
   const all = headers.getSetCookie?.() as unknown as string[] | undefined;
