@@ -23,12 +23,16 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
    ```
 2. Copy `.env.example` to `.env.local` and adjust as needed. Sensible
    defaults are included for local development:
-   ```env
-NEXT_PUBLIC_API_URL=https://app.quickgig.ph
+```env
+NEXT_PUBLIC_API_URL=https://api.quickgig.ph
+NEXT_PUBLIC_SOCKET_URL=wss://api.quickgig.ph
 API_URL=https://api.quickgig.ph
 JWT_COOKIE_NAME=auth_token
 JWT_MAX_AGE_SECONDS=1209600
 ```
+
+Socket.IO is hosted by the backend at `NEXT_PUBLIC_SOCKET_URL`; the frontend
+only connects after authentication and does not serve `/socket.io` itself.
 
 ### Authentication
 
@@ -81,11 +85,11 @@ headers intact.
 
 ### API proxy
 
-Set `NEXT_PUBLIC_GATE_ORIGIN` in Vercel → Environment Variables. All API
-requests should use `/gate/...`, which rewrites to the external API origin.
-Optionally verify locally with `npm run verify:api` while the dev server is running.
+Client requests should use same-origin `/api/*` routes or the helpers in
+`src/config/api.ts`, which proxy to `NEXT_PUBLIC_API_URL`. The legacy `/gate`
+prefix is no longer used.
 
-### Smoke Gate on Vercel
+### Smoke tests on Vercel
 
 - Preview/Production builds skip smoke by default.
 - To force smoke on Vercel, set build env `RUN_SMOKE=1` and `SMOKE_BASE_URL` to your deployed URL.
@@ -673,7 +677,7 @@ Session routes in `src/app/api/session` proxy to the backend and set an HTTP-onl
 
 ### Auth
 
-- `NEXT_PUBLIC_GATE_ORIGIN` – upstream API origin for gateway calls
+- `NEXT_PUBLIC_SOCKET_URL` – backend Socket.IO endpoint
 - `JWT_COOKIE_NAME` – name of the auth cookie
 - `NEXT_PUBLIC_DEMO_LOGIN=1` (preview only) – enables the “Continue as Demo” button on `/login`
 

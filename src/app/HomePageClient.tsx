@@ -9,19 +9,21 @@ import { checkApiHealth, type ApiHealthStatus } from '@/lib/monitoring';
 import { track } from '@/lib/track';
 import { env } from '@/config/env';
 import { t } from '@/lib/i18n';
+import { useSession } from '@/hooks/useSession';
 
 export default function HomePageClient() {
-  const [status, setStatus] = useState<ApiHealthStatus | 'loading'>('loading');
+  const { user } = useSession();
+  const [status, setStatus] = useState<ApiHealthStatus | 'idle' | 'loading'>('idle');
 
   useEffect(() => {
     if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('view_home');
-    checkApiHealth()
-      .then(setStatus)
-      .catch((err) => {
-        console.error(err);
-        setStatus('error');
-      });
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    setStatus('loading');
+    checkApiHealth().then(setStatus);
+  }, [user]);
 
   const enable = env.NEXT_PUBLIC_ENABLE_I18N_POLISH;
   const features = enable
@@ -74,26 +76,30 @@ export default function HomePageClient() {
         </div>
       </section>
 
-      <div className="bg-bg">
-        <div className="qg-container py-2 flex justify-center">
-          {status === 'loading' ? (
-            <span className="text-sm text-fg opacity-80">Checking API…</span>
-          ) : (
-            <span
-              title={status === 'degraded' ? 'External API unreachable' : undefined}
-              className={`px-3 py-1 rounded-full text-sm font-medium text-fg ${
-                status === 'ok'
-                  ? 'bg-primary'
-                  : status === 'degraded'
-                  ? 'bg-yellow-400'
-                  : 'bg-red-600'
-              }`}
-            >
-              {status === 'degraded' ? 'API: Degraded' : `API: ${status === 'ok' ? 'OK' : 'ERROR'}`}
-            </span>
-          )}
+      {user && status !== 'idle' && (
+        <div className="bg-bg">
+          <div className="qg-container py-2 flex justify-center">
+            {status === 'loading' ? (
+              <span className="text-sm text-fg opacity-80">Checking API…</span>
+            ) : (
+              <span
+                title={status === 'degraded' ? 'External API unreachable' : undefined}
+                className={`px-3 py-1 rounded-full text-sm font-medium text-fg ${
+                  status === 'ok'
+                    ? 'bg-primary'
+                    : status === 'degraded'
+                    ? 'bg-yellow-400'
+                    : 'bg-red-600'
+                }`}
+              >
+                {status === 'degraded'
+                  ? 'API: Degraded'
+                  : `API: ${status === 'ok' ? 'OK' : 'ERROR'}`}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <section className="py-20">
         <div className="qg-container grid gap-8 md:grid-cols-3">
