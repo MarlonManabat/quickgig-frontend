@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginData, SignupData, UpdateUserData } from '@/types';
 import { api } from '@/lib/apiClient';
-import { login as loginApi, register as registerApi, me as meApi } from '@/lib/auth';
+import { login as loginApi, register as registerApi } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -35,7 +35,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const fetchMe = async () => {
     try {
-      const data = await meApi();
+      const res = await fetch('/api/session/me', { credentials: 'include' });
+      const data = await res.json().catch(() => ({}));
       const userData = (data.user || data) as User;
       if (userData && Object.keys(userData).length) setUser(userData);
       else setUser(null);

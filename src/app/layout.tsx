@@ -8,6 +8,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import { ToastProvider } from "../components/ToastProvider";
 import SettingsBanner from "../components/SettingsBanner";
 import ClientBootstrap from '@/app/ClientBootstrap';
+import AuthIntercept from './_components/AuthIntercept';
 import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
 import AppShellV2 from '@/components/layouts/AppShellV2';
@@ -95,6 +96,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="font-body antialiased bg-bg text-fg">
+        <AuthIntercept />
         <ClientBootstrap />
         {env.NEXT_PUBLIC_ENABLE_MONITORING && (
           <span data-testid="monitoring-flag" className="hidden" />
