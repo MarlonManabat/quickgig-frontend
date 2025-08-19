@@ -5,12 +5,11 @@ export function middleware(req: NextRequest) {
   if (req.nextUrl.pathname.startsWith('/api') || req.nextUrl.pathname === '/login') {
     return NextResponse.next();
   }
-  const token = req.cookies.get(env.JWT_COOKIE_NAME);
+  const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
   if (!token) {
-    const url = req.nextUrl.clone();
-    url.pathname = '/login';
+    const url = new URL('/login', req.url);
     url.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search);
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(url, { status: 307 });
   }
   return NextResponse.next();
 }
