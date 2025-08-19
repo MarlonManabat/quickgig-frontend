@@ -19,7 +19,7 @@ export default function EnvPage() {
         {entries.map(([key, value]) => (
           <li key={key}>
             <span className="font-mono">{key}</span>: {value ? (
-              <span>{value}</span>
+              <span>{String(value)}</span>
             ) : (
               <span className="rounded bg-red-200 px-1 text-red-800">missing</span>
             )}

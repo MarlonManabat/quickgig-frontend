@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/config/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,19 +13,19 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const res = await fetch(api.session.login, {
+    const res = await fetch('/api/session/login', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ identifier, password }),
     });
-    const data = await res.json().catch(() => null);
-    if (data?.ok) {
+    if (res.ok) {
       const next =
         typeof window !== 'undefined'
           ? new URLSearchParams(window.location.search).get('next')
           : null;
       router.push(next || '/dashboard');
     } else {
+      const data = await res.json().catch(() => null);
       setError(data?.error || 'Login failed');
     }
     setLoading(false);

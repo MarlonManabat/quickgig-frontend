@@ -1,30 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { env, isProd } from '@/config/env';
-import { gateFetch } from '@/lib/gateway';
+import { NextResponse } from 'next/server';
+import { env } from '@/config/env';
+import { gateway, copySetCookie } from '@/lib/gateway';
 
 export const runtime = 'nodejs';
 
-export async function POST(req: NextRequest) {
-  const token = req.cookies.get(env.cookieName)?.value;
-  if (token) {
-    await gateFetch('/auth/logout', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Cookie: `${env.cookieName}=${token}`,
-      },
-    }).catch(() => undefined);
+export async function POST() {
+  let upstream: Response | null = null;
+  try {
+    upstream = await gateway('/auth/logout', { method: 'POST' });
+  } catch {
+    upstream = null;
   }
-  const res = NextResponse.json({ ok: true });
+  const res = new NextResponse(null, { status: 204 });
+  if (upstream) {
+    copySetCookie(upstream, res.headers);
+  }
   res.cookies.set({
-    name: env.cookieName,
+    name: env.JWT_COOKIE_NAME,
     value: '',
     httpOnly: true,
     secure: true,
     sameSite: 'lax',
     path: '/',
     maxAge: 0,
-    ...(isProd ? { domain: 'quickgig.ph' } : {}),
   });
   return res;
 }

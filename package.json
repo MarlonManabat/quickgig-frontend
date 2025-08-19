@@ -18,6 +18,7 @@
     "check:dns:app": "node tools/check_dns_app.mjs",
     "check:jobs": "node tools/check_jobs_api.mjs || true",
     "smoke": "node tools/smoke.mjs && (node tools/smoke_app_shell_v2.mjs || echo 'shell v2 smoke skipped') && (node tools/smoke_hiring.mjs || echo 'hiring smoke skipped') && (node tools/smoke_closeout.mjs || echo 'closeout smoke skipped') && (node tools/smoke_apply_flow_audit.mjs || echo 'apply flow audit smoke skipped')",
+    "smoke:auth": "bash -lc \"rm -f jar.txt; curl -sSI https://app.quickgig.ph/dashboard | head -n5; curl -si -c jar.txt -b jar.txt -H 'content-type: application/json' -d '{\\\"identifier\\\":\\\"YOU@EMAIL\\\",\\\"password\\\":\\\"YOUR_PASSWORD\\\"}' https://app.quickgig.ph/api/session/login | head -n12; curl -si -b jar.txt https://app.quickgig.ph/api/session/me | head -n12; curl -sSI -b jar.txt https://app.quickgig.ph/dashboard | head -n5; true\"",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test -c ./playwright.config.ts --grep @smoke",

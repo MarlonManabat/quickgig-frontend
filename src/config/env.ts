@@ -1,21 +1,29 @@
-const get = (k: string) => process.env[k];
+import { z } from 'zod';
 
-export const env: {
-  apiUrl: string;
-  publicApiUrl: string;
-  socketUrl: string;
-  cookieName: string;
-  maxAge: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-} = {
-  ...process.env,
-  apiUrl: get('API_URL')!,
-  publicApiUrl: get('NEXT_PUBLIC_API_URL')!,
-  socketUrl: get('NEXT_PUBLIC_SOCKET_URL') ?? '',
-  cookieName: get('JWT_COOKIE_NAME') ?? 'gg_session',
-  maxAge: Number(get('JWT_MAX_AGE_SECONDS') ?? 1209600),
+const schema = z.object({
+  API_URL: z.string(),
+  JWT_COOKIE_NAME: z.string(),
+  JWT_MAX_AGE_SECONDS: z.coerce.number().default(1209600),
+  NEXT_PUBLIC_API_URL: z.string(),
+  NEXT_PUBLIC_SOCKET_URL: z.string(),
+});
+
+const parsed = schema.parse({
+  API_URL: process.env.API_URL ?? 'http://127.0.0.1:8080',
+  JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME ?? 'auth_token',
+  JWT_MAX_AGE_SECONDS: process.env.JWT_MAX_AGE_SECONDS ?? 1209600,
+  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? '',
+  NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL ?? '',
+});
+
+export const env = {
+  ...parsed,
+  apiUrl: parsed.API_URL,
+  publicApiUrl: parsed.NEXT_PUBLIC_API_URL ?? '',
+  socketUrl: parsed.NEXT_PUBLIC_SOCKET_URL ?? '',
+  cookieName: parsed.JWT_COOKIE_NAME,
+  maxAge: parsed.JWT_MAX_AGE_SECONDS,
 };
 
-export const isProd = (env.VERCEL_ENV ?? env.NODE_ENV) === 'production';
-
+export const isProd =
+  (process.env.VERCEL_ENV ?? process.env.NODE_ENV) === 'production';
