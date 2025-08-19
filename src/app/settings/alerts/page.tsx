@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/apiClient';
 import { API, JobFilters } from '@/config/api';
 import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
 import Button from '@/components/ui/Button';
 import AlertModal, { AlertData } from '@/components/alerts/AlertModal';
 import { notFound } from 'next/navigation';
+import { apiGet, apiPost } from '@/lib/api';
 
 interface Alert extends AlertData {
   id: string | number;
@@ -24,9 +24,9 @@ export default function AlertsSettingsPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get(API.alertsList);
-        const items = Array.isArray(res.data) ? res.data : res.data?.items || [];
-        setAlerts(items);
+        const res = await apiGet<{ items?: Alert[] }>(API.alertsList);
+        const items = Array.isArray(res) ? res : res.items || [];
+        setAlerts(items as Alert[]);
       } catch {
         toast('Failed to load alerts');
       } finally {
@@ -64,7 +64,7 @@ export default function AlertsSettingsPage() {
     const next = !a.email;
     setAlerts((prev) => prev.map((p) => (p.id === a.id ? { ...p, email: next } : p)));
     try {
-      await api.post(API.alertsToggle(a.id), { email: next });
+      await apiPost(API.alertsToggle(a.id), { email: next });
       toast('Alert updated');
     } catch {
       toast('Failed to update');
@@ -77,7 +77,7 @@ export default function AlertsSettingsPage() {
     const prev = alerts;
     setAlerts((p) => p.filter((a) => a.id !== id));
     try {
-      await api.post(API.alertsDelete(id), {});
+      await apiPost(API.alertsDelete(id), {});
       toast('Alert deleted');
     } catch {
       toast('Failed to delete');

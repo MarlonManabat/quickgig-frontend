@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { API } from '@/config/api';
-import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
+import { apiGet, apiPost } from '@/lib/api';
 
 interface UserRow {
   id: string | number;
@@ -22,9 +22,8 @@ export default function AdminUsersPage() {
     const params = new URLSearchParams();
     if (q) params.set('q', q);
     if (status) params.set('status', status);
-    fetch(`${env.NEXT_PUBLIC_API_URL}${API.adminUsersList}?${params.toString()}`)
-      .then((r) => r.json())
-      .then((d) => setUsers((d.users as UserRow[]) || d))
+    apiGet<{ users?: UserRow[] }>(`${API.adminUsersList}?${params.toString()}`)
+      .then((d) => setUsers(d.users || (d as unknown as UserRow[])))
       .catch(() => setUsers([]));
   };
 
@@ -44,22 +43,14 @@ export default function AdminUsersPage() {
 
   const ban = async (id: string | number) => {
     const reason = prompt('Reason (optional)') || '';
-    const res = await fetch(`${env.NEXT_PUBLIC_API_URL}${API.adminUserBan(id)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason }),
-    });
-    const data = await res.json().catch(() => ({}));
+    const data = await apiPost<{ email?: string }>(API.adminUserBan(id), { reason }).catch(() => ({}) as { email?: string });
     notify(data.email, 'Account banned', 'Your account was banned.');
     toast('User banned');
     load();
   };
 
   const unban = async (id: string | number) => {
-    const res = await fetch(`${env.NEXT_PUBLIC_API_URL}${API.adminUserUnban(id)}`, {
-      method: 'POST',
-    });
-    const data = await res.json().catch(() => ({}));
+    const data = await apiPost<{ email?: string }>(API.adminUserUnban(id), {}).catch(() => ({}) as { email?: string });
     notify(data.email, 'Account unbanned', 'Your account was unbanned.');
     toast('User unbanned');
     load();

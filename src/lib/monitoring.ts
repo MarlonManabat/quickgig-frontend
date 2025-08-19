@@ -58,23 +58,23 @@ function initMixpanel(isMock: boolean) {
 }
 
 function initWebVitals() {
-    const vitalsPkg = 'web-vitals';
-    import(vitalsPkg)
-      .then(({ onCLS, onFID, onLCP }) => {
-        type VitalsMetric = { name: string; value: number };
-        const log = (metric: VitalsMetric) => {
-          if (typeof window !== 'undefined') {
-            // eslint-disable-next-line no-console
-            console.log('[monitoring][vitals]', metric.name, metric.value);
-          }
-        };
-        onCLS(log);
-        onFID(log);
-        onLCP(log);
-      })
-      .catch(() => {
-        /* no-op */
-      });
+  const vitalsPkg = 'web-vitals';
+  import(vitalsPkg)
+    .then(({ onCLS, onFID, onLCP }) => {
+      type VitalsMetric = { name: string; value: number };
+      const log = (metric: VitalsMetric) => {
+        if (typeof window !== 'undefined') {
+          // eslint-disable-next-line no-console
+          console.log('[monitoring][vitals]', metric.name, metric.value);
+        }
+      };
+      onCLS(log);
+      onFID(log);
+      onLCP(log);
+    })
+    .catch(() => {
+      /* no-op */
+    });
 }
 
 export function trackEvent(name: string, props?: Record<string, unknown>) {
@@ -90,4 +90,21 @@ export function trackEvent(name: string, props?: Record<string, unknown>) {
     // eslint-disable-next-line no-console
     console.log('[monitoring][event]', name, props);
   }
+}
+
+export type ApiHealthStatus = 'ok' | 'degraded' | 'error';
+
+export async function checkApiHealth(): Promise<ApiHealthStatus> {
+  const internal = fetch('/api/system/ping', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json().catch(() => null) : null))
+    .catch(() => null);
+  const external = fetch('/gate/system/status', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json().catch(() => null) : null))
+    .catch(() => null);
+  const [i, e] = await Promise.all([internal, external]);
+  const internalOk = Boolean(i && (i.ok === true || i.status === 'ok'));
+  const externalOk = Boolean(e && (e.ok === true || e.status === 'ok'));
+  if (externalOk) return 'ok';
+  if (internalOk) return 'degraded';
+  return 'error';
 }

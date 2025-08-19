@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { API } from '@/config/api';
-import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
+import { apiGet, apiPost } from '@/lib/api';
 
 interface Job {
   id: string | number;
@@ -16,9 +16,8 @@ export default function AdminJobsPage() {
   const [jobs, setJobs] = useState<Job[] | null>(null);
 
   const load = () => {
-    fetch(`${env.NEXT_PUBLIC_API_URL}${API.adminJobsPending}`)
-      .then((r) => r.json())
-      .then((d) => setJobs((d.jobs as Job[]) || d))
+    apiGet<{ jobs?: Job[] }>(API.adminJobsPending)
+      .then((d) => setJobs(d.jobs || (d as unknown as Job[])))
       .catch(() => setJobs([]));
   };
 
@@ -36,10 +35,7 @@ export default function AdminJobsPage() {
   };
 
   const approve = async (id: string | number) => {
-    const res = await fetch(`${env.NEXT_PUBLIC_API_URL}${API.adminJobApprove(id)}`, {
-      method: 'POST',
-    });
-    const data = await res.json().catch(() => ({}));
+    const data = await apiPost<{ email?: string }>(API.adminJobApprove(id), {}).catch(() => ({}) as { email?: string });
     notify(data.email, 'Job approved', 'Your job was approved.');
     toast('Job approved');
     load();
@@ -47,12 +43,7 @@ export default function AdminJobsPage() {
 
   const reject = async (id: string | number) => {
     const reason = prompt('Reason (optional)') || '';
-    const res = await fetch(`${env.NEXT_PUBLIC_API_URL}${API.adminJobReject(id)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason }),
-    });
-    const data = await res.json().catch(() => ({}));
+    const data = await apiPost<{ email?: string }>(API.adminJobReject(id), { reason }).catch(() => ({}) as { email?: string });
     notify(data.email, 'Job rejected', 'Your job was rejected.');
     toast('Job rejected');
     load();

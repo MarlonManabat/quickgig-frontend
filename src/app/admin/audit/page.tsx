@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { API } from '@/config/api';
-import { env } from '@/config/env';
+import { apiGet } from '@/lib/api';
 
 interface AuditItem {
   at: string;
@@ -17,9 +17,8 @@ export default function AdminAuditPage() {
   const [view, setView] = useState<AuditItem | null>(null);
 
   useEffect(() => {
-    fetch(`${env.NEXT_PUBLIC_API_URL}${API.adminAuditList}`)
-      .then((r) => r.json())
-      .then((d) => setItems((d.items as AuditItem[]) || d))
+    apiGet<{ items?: AuditItem[] }>(API.adminAuditList)
+      .then((d) => setItems(d.items || (d as unknown as AuditItem[])))
       .catch(() => setItems([]));
   }, []);
 

@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Input, Textarea } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { toast } from '@/lib/toast';
 import { me } from '@/lib/auth';
+import { apiPost } from '@/lib/api';
 
 interface ProfileData {
   name: string;
@@ -62,7 +62,7 @@ export default function ProfileSettingsPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.post(API.updateProfile, {
+      await apiPost(API.updateProfile, {
         ...data,
         skills: data.skills
           .split(',')
@@ -105,7 +105,7 @@ export default function ProfileSettingsPage() {
 
   const handleRemove = async () => {
     try {
-      await api.post(API.deleteResume, {});
+      await apiPost(API.deleteResume, {});
       setResume(null);
       toast('Resume removed');
     } catch {

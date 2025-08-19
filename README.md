@@ -55,6 +55,12 @@ headers intact.
 - A global client interceptor rewrites accidental `quickgig.ph/*.php` calls.
 - CI fails if `.php` auth endpoints are referenced from client code.
 
+### API proxy
+
+Set `NEXT_PUBLIC_GATE_ORIGIN` in Vercel → Environment Variables. All API
+requests should use `/gate/...`, which rewrites to the external API origin.
+Optionally verify locally with `npm run verify:api` while the dev server is running.
+
 ### Smoke Gate on Vercel
 
 - Preview/Production builds skip smoke by default.

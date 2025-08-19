@@ -1,12 +1,11 @@
 'use client';
 import { useState } from 'react';
-import axios from 'axios';
-import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
 import { track } from '@/lib/track';
 import { flags } from '@/lib/flags';
+import { apiPost } from '@/lib/api';
 
 interface ApplyProps {
   jobId: string;
@@ -54,8 +53,11 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.post(API.apply, { jobId, name, email, phone, note });
-      const appId = (res.data && (res.data.id || res.data.applicationId)) || undefined;
+      const data = await apiPost<{ id?: string; applicationId?: string }>(
+        API.apply,
+        { jobId, name, email, phone, note },
+      );
+      const appId = data.id || data.applicationId;
       if (flags.emails) {
         // fire-and-forget; do not block UI
         fetch('/api/notify/application', {
@@ -69,8 +71,9 @@ export default function ApplyButton({ jobId, title }: ApplyProps) {
       if (env.NEXT_PUBLIC_ENABLE_ANALYTICS)
         track('apply_success', { jobId });
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
-        const status = err.response.status;
+      if (err instanceof Error) {
+        const m = err.message.match(/->\s(\d+)/);
+        const status = m ? Number(m[1]) : 0;
         if (status === 401) {
           window.location.href = '/login';
           return;

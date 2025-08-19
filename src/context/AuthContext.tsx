@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginData, SignupData, UpdateUserData } from '@/types';
-import { api } from '@/lib/apiClient';
 import { login as loginApi, register as registerApi, me as meApi } from '@/lib/auth';
+import { apiPut } from '@/lib/api';
 
 interface AuthContextType {
   user: User | null;
@@ -64,9 +64,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const updateUser = async (data: UpdateUserData) => {
-    const res = await api.put<{ user?: User }>("/user/update", data);
-    if (res.data.user) {
-      setUser(res.data.user);
+    const res = await apiPut<{ user?: User }>("/user/update", data);
+    if (res.user) {
+      setUser(res.user);
     }
   };
 

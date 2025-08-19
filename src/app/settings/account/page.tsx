@@ -4,10 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
+import { apiPost } from '@/lib/api';
 
 export default function AccountSettingsPage() {
   const [current, setCurrent] = useState('');
@@ -18,7 +18,7 @@ export default function AccountSettingsPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post(API.changePassword, { current, next });
+      await apiPost(API.changePassword, { current, next });
       toast('Password changed');
       setCurrent('');
       setNext('');
@@ -31,7 +31,7 @@ export default function AccountSettingsPage() {
 
   const handleLogoutAll = async () => {
     try {
-      await api.post('/auth/logoutAll.php', {});
+      await apiPost('/auth/logoutAll.php', {});
       toast('Logged out of all devices');
     } catch {
       toast('Failed to log out');

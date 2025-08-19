@@ -1,6 +1,6 @@
 import { API } from '@/config/api';
 import { env } from '@/config/env';
-import { api } from './apiClient';
+import { apiGet, apiPost } from './api';
 
 const KEY = 'quickgig_saved_jobs';
 
@@ -35,8 +35,7 @@ export async function hydrateSavedIds() {
   if (typeof window === 'undefined') return [];
   if (env.NEXT_PUBLIC_ENABLE_SAVED_API) {
     try {
-      const res = await api.get<string[]>(API.savedList);
-      const ids = res.data;
+      const ids = await apiGet<string[]>(API.savedList);
       localStorage.setItem(KEY, JSON.stringify(ids));
       return ids;
     } catch {
@@ -50,7 +49,7 @@ export async function toggle(id: string | number) {
   const saved = toggleLocal(id);
   if (env.NEXT_PUBLIC_ENABLE_SAVED_API) {
     try {
-      await api.post(API.savedToggle(id));
+      await apiPost(API.savedToggle(id), {});
     } catch {
       // ignore
     }
