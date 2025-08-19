@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import "../styles/tokens-legacy.css";
 import { AuthProvider } from "../context/AuthContext";
 import { SocketProvider } from "../context/SocketContext";
 import Navigation from "../components/Navigation";
@@ -88,8 +89,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const skin = process.env.NEXT_PUBLIC_SKIN;
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className={skin === 'legacy' ? 'legacy scroll-smooth' : 'scroll-smooth'}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

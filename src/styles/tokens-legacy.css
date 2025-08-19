@@ -1,0 +1,16 @@
+:root {
+  --brand: #00b272;
+  --card: #ffffff;
+  --danger: #ef4444;
+  --radius-lg: 0.5rem;
+  --radius-md: 0.375rem;
+  --radius-sm: 0.25rem;
+  --shadow-card: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+html.legacy {
+  --brand: #005f73;
+  --card: #f0f0f0;
+  --danger: #dc2626;
+  --shadow-card: 0 2px 4px rgba(0,0,0,0.08);
+}
