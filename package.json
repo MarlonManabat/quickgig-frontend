@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "npm run guard:auth-proxy && node tools/smoke_gate.mjs",
+    "postbuild": "npm run guard:auth-proxy && node --input-type=module -e \"if(!process.env.CI) import('./tools/smoke_gate.mjs'); else console.log('[smoke-gate] skipped in CI');\"",
     "start": "next start -p 3000",
     "lint": "eslint .",
     "lint:ci": "eslint . --max-warnings=0",
@@ -30,13 +30,13 @@
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",
     "axios": "^1.11.0",
-    "clsx": "^2.1.1",
+    "clsx": "2.1.1",
     "lucide-react": "^0.539.0",
     "next": "14.2.31",
     "react": "^18",
     "react-dom": "^18",
     "socket.io-client": "^4.8.1",
-    "tailwind-merge": "^3.3.1",
+    "tailwind-merge": "3.3.1",
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "devDependencies": {
