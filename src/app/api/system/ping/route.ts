@@ -15,7 +15,7 @@ async function tryFetch(url: string) {
 }
 
 export async function GET() {
-  const base = env.apiUrl.replace(/\/$/, '');
+  const base = env.API_URL!.replace(/\/$/, '');
   const paths = ['/health', '/health.php', ''];
   for (const p of paths) {
     const result = await tryFetch(`${base}${p}`);

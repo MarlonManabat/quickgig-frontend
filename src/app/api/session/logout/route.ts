@@ -16,7 +16,7 @@ export async function POST() {
     copySetCookie(upstream, res.headers);
   }
   res.cookies.set({
-    name: env.JWT_COOKIE_NAME,
+    name: env.JWT_COOKIE_NAME!,
     value: '',
     httpOnly: true,
     secure: true,

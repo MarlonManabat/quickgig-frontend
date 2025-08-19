@@ -13,7 +13,7 @@ interface JobPageProps {
 }
 
 async function fetchJob(id: string): Promise<Job> {
-  const res = await fetch(`${env.apiUrl}${API.jobById(id)}`, {
+  const res = await fetch(`${env.API_URL!}${API.jobById(id)}`, {
     cache: 'no-store',
   });
   if (!res.ok) {

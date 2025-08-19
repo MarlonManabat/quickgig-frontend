@@ -22,5 +22,5 @@ export async function gateway(
     h.set('cookie', incoming);
   }
 
-  return fetch(`${env.API_URL}${path}`, { ...rest, headers: h });
+  return fetch(`${env.API_URL!}${path}`, { ...rest, headers: h });
 }

@@ -5,7 +5,7 @@ import { env } from '@/config/env';
 const BASE = process.env.ENGINE_BASE_URL || '';
 
 export async function DELETE(req: NextRequest) {
-  if (!cookies().get(env.cookieName)) {
+  if (!cookies().get(env.JWT_COOKIE_NAME!)) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
   if (BASE) {
@@ -19,7 +19,7 @@ export async function DELETE(req: NextRequest) {
     }
   }
   const res = NextResponse.json({ ok: true }, { status: 202 });
-  res.headers.append('Set-Cookie', `${env.cookieName}=; Path=/; Max-Age=0`);
+  res.headers.append('Set-Cookie', `${env.JWT_COOKIE_NAME!}=; Path=/; Max-Age=0`);
   res.headers.append('Set-Cookie', `settings_v1=; Path=/; Max-Age=0`);
   return res;
 }

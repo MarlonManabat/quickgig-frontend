@@ -5,7 +5,7 @@ import { API } from '@/config/api';
 export async function POST(req: Request, ctx: { params: { id: string } }) {
   try {
     const body = await req.json().catch(() => ({}));
-    const r = await fetch(`${env.apiUrl}${API.sendMessage(ctx.params.id)}`, {
+    const r = await fetch(`${env.API_URL!}${API.sendMessage(ctx.params.id)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

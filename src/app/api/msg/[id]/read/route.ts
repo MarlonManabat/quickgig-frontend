@@ -4,7 +4,7 @@ import { API } from '@/config/api';
 
 export async function POST(_: Request, ctx: { params: { id: string } }) {
   try {
-    const r = await fetch(`${env.apiUrl}${API.markConversationRead(ctx.params.id)}`, {
+    const r = await fetch(`${env.API_URL!}${API.markConversationRead(ctx.params.id)}`, {
       method: 'POST',
       credentials: 'include',
     });

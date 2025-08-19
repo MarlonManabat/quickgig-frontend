@@ -8,7 +8,7 @@ export const config = {
 };
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!req.cookies[env.cookieName]) {
+  if (!req.cookies[env.JWT_COOKIE_NAME!]) {
     res.status(401).end();
     return;
   }

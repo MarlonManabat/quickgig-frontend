@@ -27,13 +27,13 @@ export async function POST(req: NextRequest) {
       const token = data?.token || data?.accessToken;
       if (token) {
         res.cookies.set({
-          name: env.JWT_COOKIE_NAME,
+          name: env.JWT_COOKIE_NAME!,
           value: token,
           httpOnly: true,
           secure: true,
           sameSite: 'lax',
           path: '/',
-          maxAge: env.JWT_MAX_AGE_SECONDS,
+          maxAge: Number(env.JWT_MAX_AGE_SECONDS),
         });
       }
     }
