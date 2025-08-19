@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { API } from '@/config/api';
-import { env } from '@/config/env';
+import { apiGet } from '@/lib/api';
 
 interface Summary {
   counts?: { pendingJobs?: number; reports?: number; users?: number };
@@ -13,8 +13,7 @@ export default function AdminDashboard() {
   const [summary, setSummary] = useState<Summary | null>(null);
 
   useEffect(() => {
-    fetch(`${env.NEXT_PUBLIC_API_URL}${API.adminSummary}`)
-      .then((r) => r.json())
+    apiGet<Summary>(API.adminSummary)
       .then(setSummary)
       .catch(() => setSummary({}));
   }, []);

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { API } from '@/config/api';
 import { env } from '@/config/env';
 import { toast } from '@/lib/toast';
+import { apiPost } from '@/lib/api';
 
 interface Props {
   targetId: string | number;
@@ -22,11 +23,7 @@ export default function ReportButton({ targetId, type }: Props) {
     e.preventDefault();
     setLoading(true);
     try {
-      await fetch(`${env.NEXT_PUBLIC_API_URL}${API.reportCreate}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, targetId, reason, details }),
-      });
+      await apiPost(API.reportCreate, { type, targetId, reason, details });
       toast('Thanks — our moderators will review.');
       setOpen(false);
       setReason('Scam');

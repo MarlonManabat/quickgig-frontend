@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { toast } from '@/lib/toast';
+import { apiPost } from '@/lib/api';
 
 export default function ResetPage() {
   const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ export default function ResetPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post(API.requestPasswordReset, { email });
+      await apiPost(API.requestPasswordReset, { email });
       toast('If that email exists, a reset link has been sent.');
     } catch (err) {
       console.warn('password reset', err);

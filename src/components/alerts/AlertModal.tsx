@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { Input, Select } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { api } from '@/lib/apiClient';
 import { API, JobFilters } from '@/config/api';
 import { toast } from '@/lib/toast';
 import { env } from '@/config/env';
 import { track } from '@/lib/track';
+import { apiPost, apiPatch } from '@/lib/api';
 
 export interface AlertData {
   id?: string | number;
@@ -80,11 +80,11 @@ export default function AlertModal({ open, onClose, initial, onSaved }: Props) {
       const payload = { name, filters: clean, frequency, email };
       const creating = !initial?.id;
       const res = creating
-        ? await api.post(API.alertsCreate, payload)
-        : await api.patch(API.alertsUpdate(initial!.id!), payload);
+        ? await apiPost<AlertData>(API.alertsCreate, payload)
+        : await apiPatch<AlertData>(API.alertsUpdate(initial!.id!), payload);
       toast('Alert saved');
       if (creating && env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('alert_create');
-      onSaved?.(res.data);
+      onSaved?.(res as AlertData);
       onClose();
     } catch {
       toast('Failed to save alert');

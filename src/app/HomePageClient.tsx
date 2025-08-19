@@ -5,20 +5,18 @@ import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Briefcase, MousePointerClick, Shield } from 'lucide-react';
-import { checkHealth } from '@/lib/api';
+import { checkApiHealth, type ApiHealthStatus } from '@/lib/monitoring';
 import { track } from '@/lib/track';
 import { env } from '@/config/env';
 import { t } from '@/lib/i18n';
 
-type ApiStatus = 'loading' | 'ok' | 'error';
-
 export default function HomePageClient() {
-  const [status, setStatus] = useState<ApiStatus>('loading');
+  const [status, setStatus] = useState<ApiHealthStatus | 'loading'>('loading');
 
   useEffect(() => {
     if (env.NEXT_PUBLIC_ENABLE_ANALYTICS) track('view_home');
-    checkHealth()
-      .then((res) => setStatus(res.ok ? 'ok' : 'error'))
+    checkApiHealth()
+      .then(setStatus)
       .catch((err) => {
         console.error(err);
         setStatus('error');
@@ -82,11 +80,16 @@ export default function HomePageClient() {
             <span className="text-sm text-fg opacity-80">Checking API…</span>
           ) : (
             <span
+              title={status === 'degraded' ? 'External API unreachable' : undefined}
               className={`px-3 py-1 rounded-full text-sm font-medium text-fg ${
-                status === 'ok' ? 'bg-primary' : 'bg-red-600'
+                status === 'ok'
+                  ? 'bg-primary'
+                  : status === 'degraded'
+                  ? 'bg-yellow-400'
+                  : 'bg-red-600'
               }`}
             >
-              API: {status === 'ok' ? 'OK' : 'ERROR'}
+              {status === 'degraded' ? 'API: Degraded' : `API: ${status === 'ok' ? 'OK' : 'ERROR'}`}
             </span>
           )}
         </div>

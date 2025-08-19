@@ -1,31 +1,65 @@
 import { safeJsonParse } from './json';
 import { toast } from './toast';
 import { report } from './report';
-import { env } from '@/config/env';
 import type { Job } from '../../types/jobs';
 
-export const API_BASE = env.NEXT_PUBLIC_API_URL;
+const BASE = '/gate';
 
-export function get(path: string, init?: RequestInit) {
-  return fetch(`${API_BASE}${path}`, { ...init, method: 'GET' });
-}
-
-export function post(path: string, body: unknown, init?: RequestInit) {
-  return fetch(`${API_BASE}${path}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers || {}),
-    },
-    body: JSON.stringify(body),
+async function apiRequest(path: string, init?: RequestInit) {
+  return fetch(`${BASE}${path}`, {
+    cache: 'no-store',
+    credentials: 'include',
     ...init,
   });
 }
 
-/**
- * Fetches from the QuickGig API with a 5 second timeout and
- * returns a simplified response object.
- */
+export const apiRaw = apiRequest;
+
+export async function apiGet<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await apiRequest(path, { ...init, method: 'GET' });
+  if (!res.ok) throw new Error(`GET ${path} -> ${res.status}`);
+  return res.json();
+}
+
+export async function apiPost<T>(path: string, body: unknown, init?: RequestInit): Promise<T> {
+  const res = await apiRequest(path, {
+    ...init,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`POST ${path} -> ${res.status}`);
+  return res.json();
+}
+
+export async function apiPut<T>(path: string, body: unknown, init?: RequestInit): Promise<T> {
+  const res = await apiRequest(path, {
+    ...init,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`PUT ${path} -> ${res.status}`);
+  return res.json();
+}
+
+export async function apiPatch<T>(path: string, body: unknown, init?: RequestInit): Promise<T> {
+  const res = await apiRequest(path, {
+    ...init,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`PATCH ${path} -> ${res.status}`);
+  return res.json();
+}
+
+export async function apiDelete<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await apiRequest(path, { ...init, method: 'DELETE' });
+  if (!res.ok) throw new Error(`DELETE ${path} -> ${res.status}`);
+  return res.json();
+}
+
 export async function safeFetch(
   path: string,
   init?: RequestInit,
@@ -33,12 +67,7 @@ export async function safeFetch(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 5000);
   try {
-    const res = await fetch(`${API_BASE}${path}`, {
-      mode: 'cors',
-      ...init,
-      credentials: 'include',
-      signal: controller.signal,
-    });
+    const res = await apiRequest(path, { ...init, signal: controller.signal });
     const body = await res.text();
     return { ok: res.ok, status: res.status, body };
   } catch (err) {
@@ -59,10 +88,6 @@ export interface HealthResponse {
   error?: string;
 }
 
-/**
- * Try /health then /health.php. Returns the first successful result
- * or the final failure.
- */
 export async function checkHealth(): Promise<HealthResponse> {
   const paths = ['/health', '/health.php'];
   for (const path of paths) {
@@ -83,10 +108,6 @@ export async function checkHealth(): Promise<HealthResponse> {
   return { ok: false, status: 0, body: '', path: '/health.php', latency: 0, error: 'Health check failed' };
 }
 
-/**
- * Convenience helper for JSON APIs used across the app.
- * Throws on non-2xx responses or invalid JSON.
- */
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     const res = await safeFetch(path, {
@@ -107,4 +128,6 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
 export async function fetchJobs(): Promise<Job[]> {
   return apiFetch<Job[]>('/jobs');
 }
+
+export const API_BASE = BASE;
 

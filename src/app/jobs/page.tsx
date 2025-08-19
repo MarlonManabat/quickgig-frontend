@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { api } from '@/lib/apiClient';
 import { API, JobFilters, mapToJobQuery } from '@/config/api';
 import type { Job } from '@/types/jobs';
 import ApplyButton from './apply-button';
@@ -13,6 +12,7 @@ import { getSavedIds, hydrateSavedIds } from '@/lib/savedJobs';
 import AlertModal from '@/components/alerts/AlertModal';
 import { env } from '@/config/env';
 import { track } from '@/lib/track';
+import { apiGet } from '@/lib/api';
 
 function JobsPageContent() {
   const router = useRouter();
@@ -67,27 +67,29 @@ function JobsPageContent() {
           const pageIds = ids.slice(start, start + limit).slice(0, 50);
           const res = await Promise.all(
             pageIds.map((id) =>
-              api.get<Job>(API.jobById(id)).then((r) => r.data).catch(() => null)
+              apiGet<Job>(API.jobById(id)).catch(() => null)
             )
           );
           const items = res.filter(Boolean) as Job[];
           setJobs(items);
           setTotal(totalIds);
         } else {
-          const res = await api.get(API.jobs, {
-            params: mapToJobQuery(filters),
-          });
+          const res = await apiGet<
+            | Job[]
+            | { items: Job[]; total?: number }
+            | { data: Job[]; total?: number }
+          >(`${API.jobs}?${new URLSearchParams(mapToJobQuery(filters)).toString()}`);
           let items: Job[] = [];
           let total = 0;
-          if (Array.isArray(res.data)) {
+          if (Array.isArray(res)) {
+            items = res;
+            total = res.length;
+          } else if ('items' in res && Array.isArray(res.items)) {
+            items = res.items;
+            total = Number(res.total) || res.items.length;
+          } else if ('data' in res && Array.isArray(res.data)) {
             items = res.data;
-            total = res.data.length;
-          } else if (res.data.items) {
-            items = res.data.items;
-            total = Number(res.data.total) || res.data.items.length;
-          } else if (res.data.data) {
-            items = res.data.data;
-            total = Number(res.data.total) || res.data.data.length;
+            total = Number(res.total) || res.data.length;
           }
           setJobs(items);
           setTotal(total);
