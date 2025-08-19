@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+export const isProd =
+  (process.env.VERCEL_ENV ?? process.env.NODE_ENV) === 'production';
+
 const schema = z.object({
   API_URL: z.string(),
   JWT_COOKIE_NAME: z.string(),
@@ -9,7 +12,8 @@ const schema = z.object({
 });
 
 const parsed = schema.parse({
-  API_URL: process.env.API_URL ?? 'http://127.0.0.1:8080',
+  API_URL:
+    process.env.API_URL ?? (isProd ? undefined : 'http://127.0.0.1:8080'),
   JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME ?? 'auth_token',
   JWT_MAX_AGE_SECONDS: process.env.JWT_MAX_AGE_SECONDS ?? 1209600,
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL ?? '',
@@ -25,5 +29,3 @@ export const env = {
   maxAge: parsed.JWT_MAX_AGE_SECONDS,
 };
 
-export const isProd =
-  (process.env.VERCEL_ENV ?? process.env.NODE_ENV) === 'production';
