@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (data: LoginData) => {
-    await loginApi(data.email, data.password);
+    await loginApi({ email: data.email, password: data.password });
     await fetchMe();
   };
 

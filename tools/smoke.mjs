@@ -7,7 +7,8 @@ if (!process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL.trim() =
   console.log('skip: no API URL');
   process.exit(0);
 }
-const base = process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
+const base =
+  process.env.SMOKE_BASE_URL || process.env.SMOKE_URL || process.env.BASE || 'http://localhost:3000';
 const TIMEOUT = 5000;
 const fetchImpl = async (url, init) => {
   try {
