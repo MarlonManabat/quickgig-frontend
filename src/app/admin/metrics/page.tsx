@@ -22,7 +22,7 @@ export default function AdminMetricsPage() {
   useEffect(() => {
     async function load() {
       try {
-        const sRes = await fetch(`${env.API_URL}${API.metricsSummary}?range=7`);
+        const sRes = await fetch(`${env.apiUrl}${API.metricsSummary}?range=7`);
         const sJson = await sRes.json();
         setSummary(sJson || {});
         const metrics = ['signups', 'applies', 'messages', 'job_posts'];
@@ -31,7 +31,7 @@ export default function AdminMetricsPage() {
           metrics.map(async (m) => {
             try {
               const r = await fetch(
-                `${env.API_URL}${API.metricsTimeseries}?metric=${m}&range=30`,
+                `${env.apiUrl}${API.metricsTimeseries}?metric=${m}&range=30`,
               );
               const j = await r.json();
               ts[m] = Array.isArray(j) ? j : j.values || [];

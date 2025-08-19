@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).end();
     return;
   }
-  if (!req.cookies[env.JWT_COOKIE_NAME]) {
+  if (!req.cookies[env.cookieName]) {
     res.status(401).end();
     return;
   }

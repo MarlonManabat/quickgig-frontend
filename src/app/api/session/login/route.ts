@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     let token: string | undefined;
     const setCookie = upstream.headers.get('set-cookie');
     if (setCookie) {
-      const match = setCookie.match(new RegExp(`${env.JWT_COOKIE_NAME}=([^;]+)`));
+      const match = setCookie.match(new RegExp(`${env.cookieName}=([^;]+)`));
       if (match) token = match[1];
     }
     if (!token) {
@@ -34,13 +34,13 @@ export async function POST(req: NextRequest) {
     }
     const res = NextResponse.json({ ok: true });
     res.cookies.set({
-      name: env.JWT_COOKIE_NAME,
+      name: env.cookieName,
       value: token,
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: env.JWT_MAX_AGE_SECONDS,
+      maxAge: env.maxAge,
       ...(isProd ? { domain: 'quickgig.ph' } : {}),
     });
     return res;

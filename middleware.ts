@@ -9,7 +9,7 @@ export function middleware(req: NextRequest) {
   ) {
     return NextResponse.next();
   }
-  const token = req.cookies.get(env.JWT_COOKIE_NAME)?.value;
+  const token = req.cookies.get(env.cookieName)?.value;
   if (!token) {
     const url = new URL('/login', req.url);
     url.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search);

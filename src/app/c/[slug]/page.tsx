@@ -3,7 +3,7 @@ import { env } from '@/config/env';
 import Link from 'next/link';
 
 async function fetchCompany(slug: string) {
-  const res = await fetch(`${env.API_URL}${API.publicCompany(slug)}`, { cache: 'no-store' });
+  const res = await fetch(`${env.apiUrl}${API.publicCompany(slug)}`, { cache: 'no-store' });
   if (!res.ok) return null;
   return res.json().catch(() => null);
 }

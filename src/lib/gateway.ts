@@ -6,7 +6,7 @@ export async function gateFetch(path: string, init: RequestInit = {}) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    const url = `${env.API_URL}${path}`;
+    const url = `${env.apiUrl}${path}`;
     const res = await fetch(url, { ...init, signal: controller.signal });
     return res;
   } finally {

@@ -5,7 +5,7 @@ import { API } from '@/config/api';
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const r = await fetch(`${env.API_URL}${API.startConversation}`, {
+    const r = await fetch(`${env.apiUrl}${API.startConversation}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

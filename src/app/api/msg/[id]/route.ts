@@ -4,7 +4,7 @@ import { API } from '@/config/api';
 
 export async function GET(_: Request, ctx: { params: { id: string } }) {
   try {
-    const r = await fetch(`${env.API_URL}${API.conversationById(ctx.params.id)}`, { credentials: 'include' });
+    const r = await fetch(`${env.apiUrl}${API.conversationById(ctx.params.id)}`, { credentials: 'include' });
     const json = await r.json().catch(() => ({}));
     return NextResponse.json(json, { status: 200 });
   } catch {
