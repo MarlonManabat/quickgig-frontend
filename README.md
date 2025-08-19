@@ -852,6 +852,7 @@ Preflight (`OPTIONS`) should return `200`.
 ## Health & CI
 
 * **API health:** `https://app.quickgig.ph/api/diag/status` → JSON `{ ok: true, ... }`
+* Hostinger may serve HTML for unknown paths; the probe falls back to `/health.php`.
 * Minimal CI: install + build + `npm run smoke:api`.
 
 ### Local/Preview Notes

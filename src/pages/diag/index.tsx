@@ -4,25 +4,25 @@ import { APP_VERSION } from '../../../lib/version';
 interface StatusResponse {
   ok: boolean;
   backend?: unknown;
-  baseUrl?: string;
-  time?: string;
-  error?: { message: string; cause?: string; baseUrl: string };
+  baseUrl: string;
+  used?: '/status' | '/health.php';
+  durationMs?: number;
+  status?: number;
+  contentType?: string | null;
+  sample?: string;
+  message?: string;
 }
 
 export default function DiagPage() {
   const [data, setData] = useState<StatusResponse | null>(null);
-  const [duration, setDuration] = useState<number | null>(null);
 
   async function load() {
-    const start = performance.now();
     try {
       const res = await fetch('/api/diag/status');
-      const json = await res.json();
+      const json: StatusResponse = await res.json();
       setData(json);
     } catch (err) {
-      setData({ ok: false, error: { message: (err as Error).message, baseUrl: '' } });
-    } finally {
-      setDuration(performance.now() - start);
+      setData({ ok: false, baseUrl: '', message: (err as Error).message });
     }
   }
 
@@ -44,13 +44,14 @@ export default function DiagPage() {
         ) : (
           <span className="px-2 py-1 text-xs bg-red-600 text-white rounded">FAIL</span>
         )}
-        {duration !== null && (
-          <span className="text-sm">{Math.round(duration)}ms</span>
+        {typeof data?.durationMs === 'number' && (
+          <span className="text-sm">{Math.round(data.durationMs)}ms</span>
         )}
       </div>
-      <div>Backend base URL: {data?.baseUrl || data?.error?.baseUrl || 'unknown'}</div>
+      <div>Backend base URL: {data?.baseUrl || 'unknown'}</div>
+      <div>Used path: {data?.used || 'unknown'}</div>
       <pre className="bg-gray-100 p-2 text-xs overflow-auto">
-        {data ? JSON.stringify(data.backend || data.error, null, 2) : 'Loading...'}
+        {data ? JSON.stringify(data.ok ? data.backend : data, null, 2) : 'Loading...'}
       </pre>
       <button
         onClick={load}

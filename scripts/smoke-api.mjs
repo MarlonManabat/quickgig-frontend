@@ -2,20 +2,39 @@
 /* eslint-disable no-console */
 
 const BASE = (process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph').replace(/\/$/, '');
-const controller = new AbortController();
-const timer = setTimeout(() => controller.abort(), 10000);
+const headers = {
+  Accept: 'application/json',
+  'User-Agent': 'QuickGigDiag/1.0',
+};
 
-(async () => {
+async function tryPath(path) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000);
   try {
-    const res = await fetch(BASE + '/status', { signal: controller.signal });
-    const data = await res.json();
-    console.log(JSON.stringify(data, null, 2));
-    if (res.ok && data) process.exit(0);
-    process.exit(1);
+    const res = await fetch(BASE + path, { headers, signal: controller.signal });
+    const ct = res.headers.get('content-type');
+    const text = await res.text();
+    if (res.ok && ct && ct.startsWith('application/json')) {
+      try {
+        JSON.parse(text);
+        console.log(`OK via ${path}`);
+        console.log(text);
+        process.exit(0);
+      } catch {
+        // fall through
+      }
+    }
   } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
-    process.exit(1);
+    console.error(`${path} error:`, err instanceof Error ? err.message : err);
   } finally {
     clearTimeout(timer);
   }
+}
+
+(async () => {
+  await tryPath('/status');
+  await tryPath('/health.php');
+  console.error('API smoke failed');
+  process.exit(1);
 })();
+
