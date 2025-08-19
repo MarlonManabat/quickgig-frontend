@@ -29,9 +29,7 @@ export default function BidListModal({ isOpen, onClose, jobId, jobTitle }: BidLi
     try {
       setLoading(true);
       setError('');
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
       const response = await apiFetch<{ data?: Bid[] }>(`/bids/list?jobId=${jobId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         credentials: 'include',
       });
       setBids(response.data || []);
@@ -45,10 +43,8 @@ export default function BidListModal({ isOpen, onClose, jobId, jobTitle }: BidLi
   const handleBidAction = async (bidId: string, status: 'Accepted' | 'Rejected') => {
     try {
       setActionLoading(bidId);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : undefined;
       await apiFetch(`/bids/${bidId}/status`, {
         method: 'PUT',
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         credentials: 'include',
         body: JSON.stringify({ status }),
       });

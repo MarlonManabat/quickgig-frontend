@@ -3,11 +3,19 @@ const BETA =
   'true';
 
 export const env = {
+  API_URL: process.env.API_URL || 'https://api.quickgig.ph',
+  NEXT_PUBLIC_GATE_ORIGIN:
+    process.env.NEXT_PUBLIC_GATE_ORIGIN || 'https://api.quickgig.ph',
+  GATE_LOGIN_PATH: process.env.GATE_LOGIN_PATH || '/auth/login',
+  GATE_ME_PATH: process.env.GATE_ME_PATH || '/auth/me',
+  GATE_LOGOUT_PATH: process.env.GATE_LOGOUT_PATH || '/auth/logout',
+  JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'qq_session',
+  JWT_MAX_AGE_SECONDS: parseInt(
+    process.env.JWT_MAX_AGE_SECONDS || '1209600',
+    10
+  ),
   NEXT_PUBLIC_API_URL:
     process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
-  API_URL:
-    process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://api.quickgig.ph',
-  JWT_COOKIE_NAME: process.env.JWT_COOKIE_NAME || 'auth_token',
   NEXT_PUBLIC_ENABLE_BETA_RELEASE: BETA,
   NEXT_PUBLIC_ENABLE_APPLY:
     String(process.env.NEXT_PUBLIC_ENABLE_APPLY ?? 'false').toLowerCase() === 'true',
@@ -144,6 +152,7 @@ export const env = {
   SENTRY_DSN: process.env.SENTRY_DSN || '',
   MIXPANEL_TOKEN: process.env.MIXPANEL_TOKEN || '',
 };
+export type Env = typeof env;
 // In dev, warn about missing values (never throw in production)
 if (process.env.NODE_ENV !== 'production') {
   if (!process.env.NEXT_PUBLIC_API_URL && !process.env.API_URL) {

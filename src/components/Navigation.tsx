@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '@/context/AuthContext';
+import { useSession } from '@/hooks/useSession';
 import NotificationsBell from './NotificationsBell';
 import NotifyBell from './NotifyBell';
 import { NotifyProvider } from '@/app/notify/store';
@@ -16,16 +16,17 @@ import { isAdmin } from '@/auth/isAdmin';
 import { t } from '@/lib/i18n';
 
 const Navigation: React.FC = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user } = useSession();
+  const isAuthenticated = !!user;
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleLogout = async () => {
-    await logout();
+    await fetch('/api/session/logout', { method: 'POST' });
     setIsMenuOpen(false);
-    router.push("/");
+    router.push('/login');
   };
 
   return (
