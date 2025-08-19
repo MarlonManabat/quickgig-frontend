@@ -53,7 +53,7 @@ headers intact.
 
 - Browser code **must only** call `/api/session/*` for auth.
 - A global client interceptor rewrites accidental `quickgig.ph/*.php` calls.
-- CI fails if `.php` auth endpoints are referenced from client code.
+- CI fails if `.php` auth endpoints are referenced from client code (`npm run guard:auth-proxy`).
 
 ### Smoke Gate on Vercel
 

@@ -6,7 +6,6 @@ import Button from '@/components/ui/Button';
 import { api } from '@/lib/apiClient';
 import { API } from '@/config/api';
 import { toast } from '@/lib/toast';
-import { me } from '@/lib/auth';
 
 interface ProfileData {
   name: string;
@@ -36,7 +35,9 @@ export default function ProfileSettingsPage() {
   useEffect(() => {
     (async () => {
       try {
-        const d = await me();
+        const res = await fetch('/api/session/me', { credentials: 'include' });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const d: any = await res.json().catch(() => ({}));
         setData({
           name: d.name || '',
           headline: d.headline || '',
