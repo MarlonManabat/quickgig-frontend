@@ -21,30 +21,23 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
    ```bash
    npm install
    ```
-2. Copy `.env.example` to `.env.local` and adjust as needed. Sensible
-   defaults are included for local development:
+2. Copy `.env.example` to `.env.local` and adjust as needed:
 ```env
-NEXT_PUBLIC_API_URL=https://api.quickgig.ph
-NEXT_PUBLIC_SOCKET_URL=wss://api.quickgig.ph
 API_URL=https://api.quickgig.ph
 JWT_COOKIE_NAME=auth_token
 JWT_MAX_AGE_SECONDS=1209600
 ```
-
-Socket.IO is hosted by the backend at `NEXT_PUBLIC_SOCKET_URL`; the frontend
-only connects after authentication and does not serve `/socket.io` itself.
 
 ### Authentication
 
 Required env vars:
 
 - `API_URL=https://api.quickgig.ph`
-- `JWT_COOKIE_NAME=auth_token`
-- `JWT_MAX_AGE_SECONDS=1209600`
 
 Optional:
 
-- `NEXT_PUBLIC_SOCKET_URL=wss://api.quickgig.ph`
+- `JWT_COOKIE_NAME=auth_token`
+- `JWT_MAX_AGE_SECONDS=1209600`
 
 Set these in Vercel → Project → Settings → Env Vars (Production).
 Protected routes redirect to /login when session cookie is missing.
@@ -67,6 +60,17 @@ curl -i -b cookies.txt $BASE/api/session/me
 # Logout then verify cleared
 curl -i -b cookies.txt -X POST $BASE/api/session/logout
 curl -i -b cookies.txt $BASE/api/session/me
+```
+
+### Smoke (against production gateway)
+
+```bash
+API_URL=https://api.quickgig.ph \
+curl -sv -H 'content-type: application/json' \
+  --data "{\"name\":\"Smoke $(date +%s)\",\"email\":\"smoke$(date +%s)@example.com\",\"password\":\"Xx1!xX1!\"}" \
+  -c jar.txt -b jar.txt https://app.quickgig.ph/api/session/register
+
+curl -sv -b jar.txt https://app.quickgig.ph/api/session/me
 ```
 
 To verify the live API locally, run:

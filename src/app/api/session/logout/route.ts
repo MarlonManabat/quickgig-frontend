@@ -1,28 +1,14 @@
 import { NextResponse } from 'next/server';
-import { env } from '@/config/env';
-import { gateway, copySetCookie } from '@/lib/gateway';
-
-export const runtime = 'nodejs';
+import { getEnv } from '@/config/env';
+import { copySetCookie, jsonFrom, withCookieHeaders } from '@/lib/proxy';
 
 export async function POST() {
-  let upstream: Response | null = null;
-  try {
-    upstream = await gateway('/auth/logout', { method: 'POST' });
-  } catch {
-    upstream = null;
-  }
-  const res = new NextResponse(null, { status: 204 });
-  if (upstream) {
-    copySetCookie(upstream, res.headers);
-  }
-  res.cookies.set({
-    name: env.JWT_COOKIE_NAME,
-    value: '',
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 0,
-  });
-  return res;
+  const { API_URL } = getEnv();
+  const res = await fetch(`${API_URL}/auth/logout`, withCookieHeaders({
+    method: 'POST',
+    redirect: 'manual',
+  }));
+  const out = NextResponse.json(await jsonFrom(res), { status: res.status });
+  copySetCookie(res, out); // allow backend to clear cookie
+  return out;
 }
