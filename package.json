@@ -24,7 +24,10 @@
     "playwright:install": "playwright install --with-deps",
     "scan:appdomain": "node tools/scan_app_domain.mjs",
     "scan:links": "node tools/check_links.mjs",
-    "guard:auth-proxy": "node tools/guard_auth_proxy.mjs"
+    "guard:auth-proxy": "node tools/guard_auth_proxy.mjs",
+    "verify:dns": "node scripts/verify_dns.mjs",
+    "verify:http": "node scripts/verify_http.mjs",
+    "cutover:explain": "node -e \"console.log('A     @     76.76.21.21\\nCNAME www   cname.vercel-dns.com\\nCNAME app   cname.vercel-dns.com\\nA     api   89.116.53.39')\""
   },
   "dependencies": {
     "@next/bundle-analyzer": "^15.4.6",

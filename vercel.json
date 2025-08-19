@@ -1,0 +1,6 @@
+{
+  "redirects": [
+    { "source": "https://quickgig.ph/:path*", "destination": "https://app.quickgig.ph/:path*", "permanent": true },
+    { "source": "https://www.quickgig.ph/:path*", "destination": "https://app.quickgig.ph/:path*", "permanent": true }
+  ]
+}

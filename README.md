@@ -7,6 +7,31 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 - `quickgig.ph` and `www.quickgig.ph` are served by Vercel and issue a 308 to `https://app.quickgig.ph/:path*`
 - `app.quickgig.ph` is served by Vercel and hosts the modern app.
 
+## Cutover to Canonical Domain
+
+Configure the following DNS records on Hostinger:
+
+| Type | Host | Value |
+| --- | --- | --- |
+| A | @ | 76.76.21.21 |
+| CNAME | www | cname.vercel-dns.com |
+| CNAME | app | cname.vercel-dns.com |
+| A | api | 89.116.53.39 |
+
+Verify locally:
+
+```bash
+dig +short quickgig.ph A
+dig +short www.quickgig.ph CNAME
+dig +short app.quickgig.ph CNAME
+dig +short api.quickgig.ph A
+curl -I https://quickgig.ph/status
+curl -I https://www.quickgig.ph/status
+curl -I https://app.quickgig.ph/status
+```
+
+Redirects in [`vercel.json`](./vercel.json) guarantee canonical behavior even before the Vercel dashboard "Primary" setting is toggled.
+
 ### Cutover Checklist
 
 * Attach domain to project (Action attempts this automatically).
