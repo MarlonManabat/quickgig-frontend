@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import Link from "next/link";
 import "./globals.css";
 import "../styles/tokens-legacy.css";
@@ -13,6 +14,16 @@ import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
 import AppShellV2 from '@/components/layouts/AppShellV2';
 import { env } from '@/config/env';
+
+const legacySans = localFont({
+  variable: "--font-legacy-sans",
+  display: "swap",
+  fallback: ["system-ui", "Arial", "sans-serif"],
+  src: [
+    { path: "../../public/legacy/fonts/LegacySans-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../../public/legacy/fonts/LegacySans-Medium.woff2", weight: "500", style: "normal" },
+  ],
+});
 
 if (process.env.NODE_ENV !== 'production' && env.NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY) {
   import('../../tools/linkMapSanity').then((m) => m.linkMapSanity?.());
@@ -90,13 +101,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const skin = process.env.NEXT_PUBLIC_SKIN;
+  const legacy = skin === "legacy" ? legacySans.variable : "";
   return (
     <html lang="en" className={skin === 'legacy' ? 'legacy scroll-smooth' : 'scroll-smooth'}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="font-body antialiased bg-bg text-fg">
+      <body className={`font-body antialiased bg-bg text-fg ${legacy}`}>
         <ClientBootstrap />
         {env.NEXT_PUBLIC_ENABLE_MONITORING && (
           <span data-testid="monitoring-flag" className="hidden" />
