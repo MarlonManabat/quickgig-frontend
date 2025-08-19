@@ -1,11 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -15,6 +11,13 @@ const config: Config = {
         fg: 'var(--fg)',
         muted: 'var(--muted)',
         accent: 'var(--accent)',
+        brand: {
+          DEFAULT: 'var(--brand)',
+          600: 'var(--brand-600)',
+        },
+        danger: 'var(--danger)',
+        border: 'var(--border)',
+        card: 'var(--card)',
         background: 'var(--bg)',
         foreground: 'var(--fg)',
         // QuickGig Brand Colors
@@ -47,6 +50,7 @@ const config: Config = {
       fontFamily: {
         heading: ['DM Sans', 'sans-serif'],
         body: ['DM Sans', 'sans-serif'],
+        sans: ['var(--font-sans)'],
       },
       fontSize: {
         'qg-xs': '0.75rem',
@@ -59,6 +63,11 @@ const config: Config = {
         'qg-4xl': '2.25rem',
         'qg-5xl': '3rem',
         'qg-6xl': '3.75rem',
+        xs: 'var(--text-xs)',
+        sm: 'var(--text-sm)',
+        base: 'var(--text-base)',
+        lg: 'var(--text-lg)',
+        xl: 'var(--text-xl)',
       },
       spacing: {
         'qg-1': '0.25rem',
@@ -79,12 +88,15 @@ const config: Config = {
         'qg-lg': '12px',
         'qg-xl': '16px',
         'qg-2xl': '24px',
+        lg: 'var(--radius)',
       },
       boxShadow: {
         'qg-sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
         'qg-md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         'qg-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         'qg-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        sm: 'var(--shadow-sm)',
+        md: 'var(--shadow-md)',
       },
       transitionDuration: {
         'qg-fast': '150ms',

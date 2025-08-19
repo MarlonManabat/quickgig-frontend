@@ -29,7 +29,7 @@ const Navigation: React.FC = () => {
   };
 
   return (
-    <nav data-testid="navbar" className="qg-navbar bg-qg-navy shadow-qg-lg sticky top-0 z-50">
+    <nav data-testid="navbar" className="qg-navbar bg-brand text-white shadow-md sticky top-0 z-50 rounded-b-lg">
       <div className="qg-container">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -53,14 +53,14 @@ const Navigation: React.FC = () => {
           <div className="hidden lg:flex items-center space-x-1">
             <Link
               href="/"
-              className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+              className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
             >
               <Home className="w-4 h-4 mr-2" />
               Home
             </Link>
             <Link
               href="/find-work"
-              className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+              className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
             >
               <Briefcase className="w-4 h-4 mr-2" />
               Find Work
@@ -68,12 +68,12 @@ const Navigation: React.FC = () => {
             {user?.isEmployer && (
               <div className="relative group">
                 <button
-                  className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                  className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                 >
                   <Briefcase className="w-4 h-4 mr-2" />
                   Employer
                 </button>
-                <div className="absolute hidden group-hover:block bg-qg-navy-light rounded-qg-md mt-2 min-w-[150px]">
+                <div className="absolute hidden group-hover:block bg-qg-navy-light rounded-lg mt-2 min-w-[150px]">
                   <Link
                     href="/employer/company"
                     className="block px-4 py-2 qg-navbar-link hover:bg-qg-navy"
@@ -100,7 +100,7 @@ const Navigation: React.FC = () => {
               <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-qg-navy-light">
                   <Link
                     href="/dashboard"
-                    className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                   >
                     <Home className="w-4 h-4 mr-2" />
                     Dashboard
@@ -109,14 +109,14 @@ const Navigation: React.FC = () => {
                   <>
                     <Link
                       href="/admin"
-                      className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                     >
                       <Settings className="w-4 h-4 mr-2" />
                       Admin
                     </Link>
                     <Link
                       href="/admin/reports"
-                      className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                     >
                       <Settings className="w-4 h-4 mr-2" />
                       Reports
@@ -125,21 +125,21 @@ const Navigation: React.FC = () => {
                 )}
                 <Link
                   href="/messages"
-                  className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                  className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                 >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Messages
                 </Link>
                 <Link
                   href="/applications"
-                  className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                  className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                 >
                   Applications
                 </Link>
                 {env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI && (
                   <Link
                     href={user?.isEmployer ? '/employer/interviews' : '/interviews'}
-                    className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                   >
                     Interviews
                   </Link>
@@ -147,7 +147,7 @@ const Navigation: React.FC = () => {
 
                 <Link
                   href="/payment"
-                  className="qg-navbar-link flex items-center px-4 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                  className="qg-navbar-link flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
                   Payment (Beta)
@@ -168,7 +168,7 @@ const Navigation: React.FC = () => {
                     {env.NEXT_PUBLIC_ENABLE_ALERTS && (
                       <Link
                         href="/settings/alerts"
-                        className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                       >
                         <Bell className="w-4 h-4 mr-2" />
                         <span className="hidden xl:inline">Alerts</span>
@@ -177,7 +177,7 @@ const Navigation: React.FC = () => {
                     {env.NEXT_PUBLIC_ENABLE_SETTINGS && (
                       <Link
                         href="/settings"
-                        className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                       >
                         <Settings className="w-4 h-4 mr-2" />
                         <span className="hidden xl:inline">{t('navbar.settings')}</span>
@@ -185,7 +185,7 @@ const Navigation: React.FC = () => {
                     )}
                     <Link
                       href="/settings/profile"
-                      className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      className="qg-navbar-link flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                     >
                       <User className="w-4 h-4 mr-2" />
                       <span className="hidden xl:inline">Profile</span>
@@ -196,7 +196,7 @@ const Navigation: React.FC = () => {
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="qg-navbar-link flex items-center px-3 py-2 rounded-qg-md text-sm font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-fg"
+                      className="qg-navbar-link flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-fg"
                     >
                       <LogOut className="w-4 h-4" />
                       <span className="hidden xl:inline ml-2">Logout</span>
@@ -224,7 +224,7 @@ const Navigation: React.FC = () => {
             {isAuthenticated && <WalletDisplay />}
             <button
               onClick={toggleMenu}
-              className="qg-navbar-link p-2 rounded-qg-md transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+              className="qg-navbar-link p-2 rounded-lg transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -237,7 +237,7 @@ const Navigation: React.FC = () => {
             <div className="py-4 space-y-2">
               <Link
                 href="/"
-                className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Home className="w-5 h-5 mr-3" />
@@ -245,7 +245,7 @@ const Navigation: React.FC = () => {
               </Link>
               <Link
                 href="/find-work"
-                className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Briefcase className="w-5 h-5 mr-3" />
@@ -258,7 +258,7 @@ const Navigation: React.FC = () => {
                       Kumusta, <span className="font-medium text-fg">{user?.name}</span>
                     </div>
                   </div>
-                    <Link href="/dashboard" className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent" onClick={() => setIsMenuOpen(false)}>
+                    <Link href="/dashboard" className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent" onClick={() => setIsMenuOpen(false)}>
                       <Home className="w-5 h-5 mr-3" />
                       Dashboard
                     </Link>
@@ -267,7 +267,7 @@ const Navigation: React.FC = () => {
                     <>
                       <Link
                         href="/admin"
-                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <Settings className="w-5 h-5 mr-3" />
@@ -275,7 +275,7 @@ const Navigation: React.FC = () => {
                       </Link>
                       <Link
                         href="/admin/reports"
-                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <Settings className="w-5 h-5 mr-3" />
@@ -287,7 +287,7 @@ const Navigation: React.FC = () => {
                     <>
                       <Link
                         href="/employer/company"
-                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <Briefcase className="w-5 h-5 mr-3" />
@@ -295,7 +295,7 @@ const Navigation: React.FC = () => {
                       </Link>
                       <Link
                         href="/employer/jobs"
-                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <Briefcase className="w-5 h-5 mr-3" />
@@ -303,7 +303,7 @@ const Navigation: React.FC = () => {
                       </Link>
                       <Link
                         href="/employer/jobs/new"
-                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <Plus className="w-5 h-5 mr-3" />
@@ -313,7 +313,7 @@ const Navigation: React.FC = () => {
                   )}
                   <Link
                     href="/messages"
-                    className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <MessageCircle className="w-5 h-5 mr-3" />
@@ -321,7 +321,7 @@ const Navigation: React.FC = () => {
                   </Link>
                   <Link
                     href="/applications"
-                    className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                    className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Applications
@@ -329,7 +329,7 @@ const Navigation: React.FC = () => {
                   {env.NEXT_PUBLIC_ENABLE_INTERVIEWS_UI && (
                     <Link
                       href={user?.isEmployer ? '/employer/interviews' : '/interviews'}
-                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Interviews
@@ -337,7 +337,7 @@ const Navigation: React.FC = () => {
                   )}
                     <Link
                       href="/payment"
-                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <CreditCard className="w-5 h-5 mr-3" />
@@ -346,7 +346,7 @@ const Navigation: React.FC = () => {
                     {env.NEXT_PUBLIC_ENABLE_ALERTS && (
                       <Link
                         href="/settings/alerts"
-                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <Bell className="w-5 h-5 mr-3" />
@@ -356,7 +356,7 @@ const Navigation: React.FC = () => {
                     {env.NEXT_PUBLIC_ENABLE_SETTINGS && (
                       <Link
                         href="/settings"
-                        className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                        className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <Settings className="w-5 h-5 mr-3" />
@@ -365,7 +365,7 @@ const Navigation: React.FC = () => {
                     )}
                     <Link
                       href="/settings/profile"
-                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-qg-navy-light hover:text-qg-accent"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <User className="w-5 h-5 mr-3" />
@@ -375,7 +375,7 @@ const Navigation: React.FC = () => {
                   <div className="border-t border-qg-navy-light mt-4 pt-4">
                     <button
                       onClick={handleLogout}
-                      className="qg-navbar-link flex items-center px-4 py-3 rounded-qg-md text-base font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-fg w-full text-left"
+                      className="qg-navbar-link flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-qg-fast hover:bg-red-600 hover:text-fg w-full text-left"
                     >
                       <LogOut className="w-5 h-5 mr-3" />
                       Logout
