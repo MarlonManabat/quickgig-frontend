@@ -21,8 +21,13 @@ const nextConfig = {
         permanent: true,
       },
     ];
+    const existing = (typeof originalRedirects === 'function')
+      ? await originalRedirects()
+      : (typeof existingRedirects === 'function'
+          ? await existingRedirects()
+          : []);
 
-    return [...rules];
+    return [...rules, ...existing];
   },
   async headers() {
     if (!enableSecurity) return [];
