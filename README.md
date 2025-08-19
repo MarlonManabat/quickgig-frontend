@@ -37,6 +37,12 @@ Frontend auth calls use same-origin routes (`/api/session/*`) that proxy to
 `NEXT_PUBLIC_API_URL`. This removes CORS/preflight issues and keeps `Set-Cookie`
 headers intact.
 
+#### Verify Auth Proxy
+
+1. `npm run dev` and open `/register` in the browser.
+2. Open DevTools → Network tab.
+3. Submit the form and confirm a `POST /api/session/register` request (same origin) and no `quickgig.ph/*.php` calls.
+
 ### Vercel Preview
 
 Vercel builds skip smoke tests automatically. To run smoke locally or in CI,

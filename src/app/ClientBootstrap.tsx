@@ -67,7 +67,7 @@ export default function ClientBootstrap() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-        credentials: 'same-origin',
+        credentials: 'include',
       })
         .then((r) => r.json().catch(() => ({})))
         .then((json) => {
