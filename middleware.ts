@@ -13,7 +13,7 @@ export function middleware(req: NextRequest) {
 
   if (!needsAuth) return NextResponse.next();
 
-  const hasSession = Boolean(req.cookies.get(env.JWT_COOKIE_NAME)?.value);
+  const hasSession = Boolean(req.cookies.get(env.JWT_COOKIE_NAME!)?.value);
   if (hasSession) return NextResponse.next();
 
   const url = new URL('/login', req.url);

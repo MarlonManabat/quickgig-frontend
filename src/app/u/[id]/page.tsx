@@ -6,7 +6,7 @@ import { getUser } from '@/auth/getUser';
 
 async function fetchUser(id: string) {
   const path = id === 'me' ? API.me : API.publicUser(id);
-  const res = await fetch(`${env.apiUrl}${path}`, {
+  const res = await fetch(`${env.API_URL!}${path}`, {
     headers: { cookie: cookies().toString() },
     cache: 'no-store',
   });

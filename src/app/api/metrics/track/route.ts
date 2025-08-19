@@ -8,10 +8,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const ua = req.headers.get('user-agent') || '';
     const ip = req.headers.get('x-forwarded-for') || req.ip || '';
-    const fwd = await fetch(`${env.apiUrl}${API.metricsTrack}`, {
+    const fwd = await fetch(`${env.API_URL!}${API.metricsTrack}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...body, ua, ip, secret: env.METRICS_SECRET }),
+      body: JSON.stringify({ ...body, ua, ip, secret: process.env.METRICS_SECRET }),
     });
     return NextResponse.json({ ok: fwd.ok }, { status: 200 });
   } catch {

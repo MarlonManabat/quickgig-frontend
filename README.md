@@ -691,6 +691,8 @@ Session routes in `src/app/api/session` proxy to the backend and set an HTTP-onl
 - `JWT_COOKIE_NAME` – name of the auth cookie
 - `NEXT_PUBLIC_DEMO_LOGIN=1` (preview only) – enables the “Continue as Demo” button on `/login`
 
+Env vars load via `src/config/env.ts`, which is Edge-safe and intentionally avoids importing `server-only`.
+
 Login posts to `/api/session/login` and relies on an upstream `Set-Cookie` or a token in the JSON body.
 
 ### Auth Proxy

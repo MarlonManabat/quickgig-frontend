@@ -6,7 +6,7 @@ export async function POST() {
   try {
     const body = { secret: process.env.ALERTS_DIGEST_SECRET || '' };
     if (API.alertsRunDigest) {
-      const r = await fetch(`${env.apiUrl}${API.alertsRunDigest}`, {
+      const r = await fetch(`${env.API_URL!}${API.alertsRunDigest}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
