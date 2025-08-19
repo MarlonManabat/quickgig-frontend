@@ -92,12 +92,12 @@ export default function HealthCheckClient({
       </table>
       <p>
         <a
-          href="https://api.quickgig.ph/health"
+          href="/api/diag/status"
           target="_blank"
           rel="noopener noreferrer"
           className="underline text-blue-600"
         >
-          Open API /health
+          Open API /diag/status
         </a>
       </p>
     </div>

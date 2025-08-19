@@ -1,4 +1,4 @@
-import { env } from '@/config/env';
+import { BASE } from '../../../../../lib/api';
 
 async function tryFetch(url: string) {
   const controller = new AbortController();
@@ -15,8 +15,8 @@ async function tryFetch(url: string) {
 }
 
 export async function GET() {
-  const base = env.API_URL!.replace(/\/$/, '');
-  const paths = ['/health', '/health.php', ''];
+  const base = BASE.replace(/\/$/, '');
+  const paths = ['/status', ''];
   for (const p of paths) {
     const result = await tryFetch(`${base}${p}`);
     if (result) {
