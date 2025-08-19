@@ -17,7 +17,7 @@
     "check:app:soft": "node tools/check_live_app.mjs || true",
     "check:dns:app": "node tools/check_dns_app.mjs",
     "check:jobs": "node tools/check_jobs_api.mjs || true",
-    "smoke": "node tools/smoke.mjs && (node tools/smoke_app_shell_v2.mjs || echo 'shell v2 smoke skipped') && (node tools/smoke_hiring.mjs || echo 'hiring smoke skipped') && (node tools/smoke_closeout.mjs || echo 'closeout smoke skipped') && (node tools/smoke_apply_flow_audit.mjs || echo 'apply flow audit smoke skipped')",
+    "smoke": "node tools/smoke.mjs && (node tools/smoke_app_shell_v2.mjs || echo 'shell v2 smoke skipped') && (node tools/smoke_hiring.mjs || echo 'hiring smoke skipped') && (node tools/smoke_closeout.mjs || echo 'closeout smoke skipped') && (node tools/smoke_apply_flow_audit.mjs || echo 'apply flow audit smoke skipped') && (node tools/smoke_auth_proxy.mjs || echo 'auth proxy smoke skipped')",
     "api:check": "npm run check:api",
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test -c ./playwright.config.ts --grep @smoke",

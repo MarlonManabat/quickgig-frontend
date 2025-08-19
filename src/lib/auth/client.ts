@@ -1,10 +1,17 @@
 'use client';
 
+import { guardAgainstPhpOrigin } from '@/lib/fetchGuard';
+
 async function json(res: Response) { return res.json().catch(() => ({})); }
 
 export async function login(payload: URLSearchParams | Record<string, string>) {
-  const body = payload instanceof URLSearchParams ? payload : new URLSearchParams(payload);
-  const res = await fetch('/api/session/login', {
+  const body =
+    payload instanceof URLSearchParams
+      ? payload
+      : new URLSearchParams(payload as Record<string, string>);
+  const url = '/api/session/login';
+  guardAgainstPhpOrigin(url);
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
@@ -15,8 +22,13 @@ export async function login(payload: URLSearchParams | Record<string, string>) {
 }
 
 export async function register(payload: URLSearchParams | Record<string, string>) {
-  const body = payload instanceof URLSearchParams ? payload : new URLSearchParams(payload);
-  const res = await fetch('/api/session/register', {
+  const body =
+    payload instanceof URLSearchParams
+      ? payload
+      : new URLSearchParams(payload as Record<string, string>);
+  const url = '/api/session/register';
+  guardAgainstPhpOrigin(url);
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
@@ -27,7 +39,9 @@ export async function register(payload: URLSearchParams | Record<string, string>
 }
 
 export async function me() {
-  const r = await fetch('/api/session/me', { credentials: 'include' });
+  const url = '/api/session/me';
+  guardAgainstPhpOrigin(url);
+  const r = await fetch(url, { credentials: 'include' });
   return json(r);
 }
 
