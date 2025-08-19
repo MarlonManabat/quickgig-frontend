@@ -1,18 +1,13 @@
 import { guardAgainstPhpOrigin } from './fetchGuard';
 
-export async function login(
-  payload: URLSearchParams | Record<string, string>
-) {
-  const body =
-    payload instanceof URLSearchParams
-      ? payload
-      : new URLSearchParams(payload as Record<string, string>);
+export async function login(payload: Record<string, string>) {
   const url = '/api/session/login';
   guardAgainstPhpOrigin(url);
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString(),
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
     credentials: 'include',
   });
   if (!res.ok) throw new Error(`Login failed: ${res.status}`);
@@ -41,7 +36,7 @@ export async function register(
 export async function me() {
   const url = '/api/session/me';
   guardAgainstPhpOrigin(url);
-  const r = await fetch(url, { credentials: 'include' });
+  const r = await fetch(url, { credentials: 'include', cache: 'no-store' });
   return r.json().catch(() => ({}));
 }
 

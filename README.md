@@ -647,6 +647,14 @@ When disabled or misconfigured, the app skips sends without affecting user flows
 
 Session routes in `src/app/api/session` proxy to the backend and set an HTTP-only cookie used for auth. `middleware.ts` protects sensitive pages.
 
+### Auth
+
+- `NEXT_PUBLIC_GATE_ORIGIN` – upstream API origin for gateway calls
+- `JWT_COOKIE_NAME` – name of the auth cookie
+- `NEXT_PUBLIC_DEMO_LOGIN=1` (preview only) – enables the “Continue as Demo” button on `/login`
+
+Login posts to `/api/session/login` and relies on an upstream `Set-Cookie` or a token in the JSON body.
+
 ### Auth Proxy
 Auth routes `/api/session/*` run on **Node runtime** and stream upstream responses; this avoids CORS and Buffer/Edge issues on Vercel.
 
