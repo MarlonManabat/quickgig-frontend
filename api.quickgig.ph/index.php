@@ -39,6 +39,10 @@ function authUser($db) {
 }
 
 try {
+  if ($method==='GET' && $path==='/status') {
+    require __DIR__ . '/health.php';
+    return;
+  }
   // Auth routes
   if ($method==='POST' && $path==='/auth/register') {
     $name = trim($body['name'] ?? '');
