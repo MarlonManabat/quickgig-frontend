@@ -41,8 +41,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         ref={ref}
         className={cn(
           env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-            ? 'bg-fg text-bg rounded-lg shadow-qg-md transition-all duration-qg-normal'
-            : 'bg-bg text-fg rounded-qg-lg shadow-qg-md transition-all duration-qg-normal',
+            ? 'bg-card text-fg rounded-lg shadow-md transition-all duration-qg-normal'
+            : 'bg-card text-fg rounded-lg shadow-md transition-all duration-qg-normal',
           hover && 'hover:shadow-qg-lg hover:-translate-y-1 cursor-pointer',
           paddingClasses[padding],
           className
@@ -58,15 +58,15 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, children, variant = 'default', ...props }, ref) => {
     const v1Variants = {
-      default: 'bg-bg text-fg',
-      primary: 'bg-primary text-fg',
-      accent: 'bg-secondary text-fg',
+      default: 'bg-card text-fg',
+      primary: 'bg-brand text-white',
+      accent: 'bg-accent text-white',
     } as const;
 
     const v2Variants = {
-      default: 'bg-fg text-bg',
-      primary: 'bg-primary text-fg',
-      accent: 'bg-secondary text-bg',
+      default: 'bg-card text-fg',
+      primary: 'bg-brand text-white',
+      accent: 'bg-accent text-white',
     } as const;
 
     const variants = env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2 ? v2Variants : v1Variants;
@@ -106,7 +106,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
     return (
       <div
         ref={ref}
-        className={cn('flex items-center justify-between pt-4 mt-4 border-t border-gray-200', className)}
+        className={cn('flex items-center justify-between pt-4 mt-4 border-t border-border', className)}
         {...props}
       >
         {children}
@@ -118,15 +118,15 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
 const CardTag = React.forwardRef<HTMLSpanElement, CardTagProps>(
   ({ className, children, variant = 'default', ...props }, ref) => {
     const tagV1 = {
-      default: 'bg-bg text-fg border border-fg',
-      primary: 'bg-primary text-fg',
-      accent: 'bg-secondary text-fg',
+      default: 'bg-card text-fg border border-border',
+      primary: 'bg-brand text-white',
+      accent: 'bg-accent text-white',
     } as const;
 
     const tagV2 = {
-      default: 'bg-fg text-bg border border-bg',
-      primary: 'bg-primary text-fg',
-      accent: 'bg-secondary text-bg',
+      default: 'bg-card text-fg border border-border',
+      primary: 'bg-brand text-white',
+      accent: 'bg-accent text-white',
     } as const;
 
     const variants = env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2 ? tagV2 : tagV1;

@@ -878,3 +878,11 @@ Locally, start the app then run: `SMOKE_BASE_URL=http://127.0.0.1:3000 RUN_SMOKE
 
 ### Check
 - `npm run verify:http`
+
+## Legacy Skin
+
+The app supports a scoped legacy visual theme powered by CSS variables and Tailwind mapping.
+
+- Tokens live in [`src/styles/tokens-legacy.css`](./src/styles/tokens-legacy.css) and mirror values from the old stylesheet.
+- Switch themes by setting `NEXT_PUBLIC_SKIN=legacy` (default) or `NEXT_PUBLIC_SKIN=modern`.
+- Components reference abstract tokens (e.g. `bg-brand`, `text-fg`) so visual tweaks happen in the token file without refactors.

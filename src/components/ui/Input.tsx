@@ -48,16 +48,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             className={cn(
               env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-                ? 'block w-full px-4 py-3 border border-muted rounded-md bg-fg text-bg'
-                : 'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+                ? 'block w-full px-4 py-3 border border-border rounded-lg bg-card text-fg'
+                : 'block w-full px-4 py-3 border-2 border-border rounded-lg font-body',
               env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-                ? 'focus:ring-2 focus:ring-primary focus:border-primary'
-                : 'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
+                ? 'focus:ring-2 focus:ring-brand focus:border-brand'
+                : 'focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all duration-qg-fast',
               'placeholder:text-gray-400',
               error &&
                 (env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-                  ? 'border-red-500'
-                  : 'border-red-300 focus:border-red-500 focus:ring-red-500/20'),
+                  ? 'border-danger'
+                  : 'border-danger focus:border-danger focus:ring-danger/20'),
               icon && iconPosition === 'left' && 'pl-10',
               icon && iconPosition === 'right' && 'pr-10',
               className
@@ -72,10 +72,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && (
-          <p className="text-sm text-red-600 font-medium">{error}</p>
+          <p className="text-sm text-danger font-medium">{error}</p>
         )}
         {helper && !error && (
-          <p className="text-sm text-gray-500">{helper}</p>
+          <p className="text-sm text-muted">{helper}</p>
         )}
       </div>
     );
@@ -97,26 +97,26 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           id={textareaId}
           className={cn(
             env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-              ? 'block w-full px-4 py-3 border border-muted rounded-md bg-fg text-bg'
-              : 'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+              ? 'block w-full px-4 py-3 border border-border rounded-lg bg-card text-fg'
+              : 'block w-full px-4 py-3 border-2 border-border rounded-lg font-body',
             env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-              ? 'focus:ring-2 focus:ring-primary focus:border-primary'
-              : 'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
+              ? 'focus:ring-2 focus:ring-brand focus:border-brand'
+              : 'focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all duration-qg-fast',
             'placeholder:text-gray-400 resize-vertical min-h-[100px]',
             error &&
               (env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-                ? 'border-red-500'
-                : 'border-red-300 focus:border-red-500 focus:ring-red-500/20'),
+                ? 'border-danger'
+                : 'border-danger focus:border-danger focus:ring-danger/20'),
             className
           )}
           ref={ref}
           {...props}
         />
         {error && (
-          <p className="text-sm text-red-600 font-medium">{error}</p>
+          <p className="text-sm text-danger font-medium">{error}</p>
         )}
         {helper && !error && (
-          <p className="text-sm text-gray-500">{helper}</p>
+          <p className="text-sm text-muted">{helper}</p>
         )}
       </div>
     );
@@ -138,15 +138,15 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           id={selectId}
           className={cn(
             env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-              ? 'block w-full px-4 py-3 border border-muted rounded-md bg-fg text-bg cursor-pointer'
-              : 'block w-full px-4 py-3 border-2 border-gray-300 rounded-qg-md font-body',
+              ? 'block w-full px-4 py-3 border border-border rounded-lg bg-card text-fg cursor-pointer'
+              : 'block w-full px-4 py-3 border-2 border-border rounded-lg font-body',
             env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-              ? 'focus:ring-2 focus:ring-primary focus:border-primary'
-              : 'focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-qg-fast',
+              ? 'focus:ring-2 focus:ring-brand focus:border-brand'
+              : 'focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all duration-qg-fast',
             error &&
               (env.NEXT_PUBLIC_ENABLE_APP_SHELL_V2
-                ? 'border-red-500'
-                : 'border-red-300 focus:border-red-500 focus:ring-red-500/20'),
+                ? 'border-danger'
+                : 'border-danger focus:border-danger focus:ring-danger/20'),
             className
           )}
           ref={ref}
@@ -164,10 +164,10 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           ))}
         </select>
         {error && (
-          <p className="text-sm text-red-600 font-medium">{error}</p>
+          <p className="text-sm text-danger font-medium">{error}</p>
         )}
         {helper && !error && (
-          <p className="text-sm text-gray-500">{helper}</p>
+          <p className="text-sm text-muted">{helper}</p>
         )}
       </div>
     );

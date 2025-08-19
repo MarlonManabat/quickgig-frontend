@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import "../styles/tokens-legacy.css";
 import { AuthProvider } from "../context/AuthContext";
 import { SocketProvider } from "../context/SocketContext";
 import Navigation from "../components/Navigation";
@@ -12,6 +13,9 @@ import { SEO } from "@/config/seo";
 import { canonical } from "@/lib/canonical";
 import AppShellV2 from '@/components/layouts/AppShellV2';
 import { env } from '@/config/env';
+import localFont from 'next/font/local';
+import fs from 'fs';
+import path from 'path';
 
 if (process.env.NODE_ENV !== 'production' && env.NEXT_PUBLIC_ENABLE_LINK_MAP_SANITY) {
   import('../../tools/linkMapSanity').then((m) => m.linkMapSanity?.());
@@ -83,13 +87,38 @@ export const metadata: Metadata = {
   },
 };
 
+const legacySans = (() => {
+  try {
+    const base = path.join(process.cwd(), 'public/legacy/fonts');
+    if (fs.existsSync(path.join(base, 'LegacySans-Regular.woff2'))) {
+      return localFont({
+        src: [
+          { path: '../../public/legacy/fonts/LegacySans-Regular.woff2', weight: '400', style: 'normal' },
+          { path: '../../public/legacy/fonts/LegacySans-Medium.woff2', weight: '500', style: 'normal' },
+          { path: '../../public/legacy/fonts/LegacySans-Bold.woff2', weight: '700', style: 'normal' },
+        ],
+        variable: '--font-sans',
+        display: 'swap',
+        preload: true,
+      });
+    }
+  } catch {
+    // legacy fonts missing
+  }
+  return { variable: '' } as { variable: string };
+})();
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const skin = process.env.NEXT_PUBLIC_SKIN ?? 'legacy';
   return (
-    <html lang="en" className="scroll-smooth">
+    <html
+      lang="en"
+      className={`${skin === 'legacy' ? `theme-legacy ${legacySans.variable}` : 'theme-modern'} scroll-smooth`}
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

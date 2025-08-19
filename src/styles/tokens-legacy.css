@@ -1,0 +1,24 @@
+:root.theme-legacy {
+  /* TODO: verify values against public/legacy/styles.css */
+  --bg: #ffffff; /* body background */
+  --fg: #0b1f33; /* body text color */
+  --muted: #6b7280; /* muted text */
+  --brand: #0ea5e9; /* primary brand color */
+  --brand-600: #0284c7; /* hover/darker brand */
+  --accent: #22c55e; /* accent/success */
+  --danger: #ef4444; /* danger */
+  --border: #e5e7eb; /* border color */
+  --card: #ffffff; /* card background */
+
+  --radius: 6px; /* border radius */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06); /* small shadow */
+  --shadow-md: 0 4px 10px rgba(0,0,0,.08); /* medium shadow */
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; /* base font */
+  --text-xs: 12px; /* text-xs */
+  --text-sm: 14px; /* text-sm */
+  --text-base: 16px; /* text-base */
+  --text-lg: 18px; /* text-lg */
+  --text-xl: 20px; /* text-xl */
+  --heading-weight: 700; /* heading font weight */
+}
