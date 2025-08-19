@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { SEO } from '@/config/seo';
 
+export const revalidate = 60;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = (SEO.siteUrl || 'https://quickgig.ph').replace(/[/]$/, '');
   const urls: MetadataRoute.Sitemap = [
@@ -18,7 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const to = setTimeout(() => controller.abort(), 2500);
     const res = await fetch(`${apiBase}/jobs/list.php?page=1&limit=100`, {
       signal: controller.signal,
-      next: { revalidate: 60 },
     });
     clearTimeout(to);
 

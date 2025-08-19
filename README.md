@@ -5,8 +5,14 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 ## Routing (production)
 
 - `quickgig.ph` and `www.quickgig.ph` are served by Vercel and issue a 308 to `https://app.quickgig.ph/:path*`
-- `app.quickgig.ph` is hosted on Hostinger and serves the live product.
-- No Vercel domain is attached to `app.quickgig.ph`. This avoids DNS conflicts and preserves the working app.
+- `app.quickgig.ph` is served by Vercel and hosts the modern app.
+
+### Cutover Checklist
+
+* Attach domain to project (Action attempts this automatically).
+* Set DNS: `CNAME app → cname.vercel-dns.com`.
+* Verify `/status` and presence of `x-vercel-id` header.
+* Ensure DevTools Network shows no calls to `quickgig.ph/*.php` (only `/api/session/*`).
 - Rollback: revert this PR to restore any previous behavior.
 
 ## Setup
@@ -688,7 +694,7 @@ Login, signup, and other protected pages call the external API at
 * `/health-check` remains available for diagnostics.
 * If login via `https://app.quickgig.ph` has cookie issues, set API/app cookies with:
   `Domain=.quickgig.ph; Path=/; Secure; HttpOnly; SameSite=None`.
-* The `app.quickgig.ph` host serves the live product on Hostinger.
+* The `app.quickgig.ph` host serves the modern app on Vercel.
 
 ### Smoke checks
 
@@ -827,7 +833,7 @@ Preflight (`OPTIONS`) should return `200`.
 
 ## Routing restore runbook
 
-- `app.quickgig.ph` serves the product on Hostinger (A=89.116.53.39).
+- `app.quickgig.ph` is served by Vercel (CNAME to cname.vercel-dns.com).
 - `quickgig.ph` and `www.quickgig.ph` redirect with 308 to `https://app.quickgig.ph`.
 - No proxying of `/app` via Next.js or Vercel.
 - Verification commands:
