@@ -944,3 +944,52 @@ Locally, start the app then run: `SMOKE_BASE_URL=http://127.0.0.1:3000 RUN_SMOKE
 
 ### Check
 - `npm run verify:http`
+
+## Backend Deploy
+
+Backend code lives in `api.quickgig.ph/` and deploys to Hostinger.
+
+### Hostinger environment
+
+Set the following variables on the server:
+
+- `DB_HOST`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASS`
+- `JWT_SECRET`
+- `ADMIN_TOKEN`
+- `INSTALL_TOKEN`
+
+### GitHub Secrets (SSH deploy)
+
+- `HOSTINGER_HOST`
+- `HOSTINGER_USER`
+- `HOSTINGER_SSH_KEY`
+- `HOSTINGER_REMOTE_DIR`
+
+### GitHub Secrets (FTP fallback)
+
+- `HOSTINGER_FTP_SERVER`
+- `HOSTINGER_FTP_USER`
+- `HOSTINGER_FTP_PASSWORD`
+
+### Installer
+
+Run once after uploading:
+
+```
+https://api.quickgig.ph/tools/install.php?token=RUN_ONCE
+```
+
+### Verify
+
+```
+BASE=https://api.quickgig.ph
+curl -s "$BASE/status"
+curl -s "$BASE/events/index.php"
+```
+
+### Runbook
+
+If `/events/index.php` returns HTML, deploy didn’t run or files aren’t in `public_html/api/`—rerun workflow or check server path.

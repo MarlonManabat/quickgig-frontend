@@ -1,10 +1,13 @@
 <?php
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-// Database connection
+if (!defined('ADMIN_TOKEN')) {
+    define('ADMIN_TOKEN', getenv('ADMIN_TOKEN') ?: '');
+}
+
 function db() {
     static $pdo;
     if (!$pdo) {
@@ -16,7 +19,6 @@ function db() {
     return $pdo;
 }
 
-// JSON response helper
 function json($code, $data) {
     http_response_code($code);
     header('Content-Type: application/json');
@@ -24,7 +26,6 @@ function json($code, $data) {
     exit;
 }
 
-// CORS helper
 function allow_origin() {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     $allowed = ['https://app.quickgig.ph', 'https://quickgig.ph'];
@@ -32,7 +33,7 @@ function allow_origin() {
         header("Access-Control-Allow-Origin: $origin");
         header('Access-Control-Allow-Credentials: true');
     }
-    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Allow-Headers: Content-Type, X-Admin-Token');
     header('Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS');
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(204);
@@ -40,7 +41,6 @@ function allow_origin() {
     }
 }
 
-// JWT helpers
 function jwt_issue(array $payload) {
     return JWT::encode($payload, getenv('JWT_SECRET') ?: 'change_me', 'HS256');
 }
@@ -53,7 +53,6 @@ function jwt_verify(string $token) {
     }
 }
 
-// Cookie helpers
 function set_auth_cookie(string $token) {
     setcookie('auth_token', $token, [
         'expires' => time() + 2592000,
@@ -76,7 +75,6 @@ function clear_auth_cookie() {
     ]);
 }
 
-// Current user helper
 function current_user() {
     $token = $_COOKIE['auth_token'] ?? '';
     if (!$token) return null;
