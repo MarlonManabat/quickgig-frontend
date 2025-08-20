@@ -968,11 +968,22 @@ Set the following variables on the server:
 - `HOSTINGER_SSH_KEY`
 - `HOSTINGER_REMOTE_DIR`
 
-### GitHub Secrets (FTP fallback)
+### Deploy backend via FTP
 
-- `HOSTINGER_FTP_SERVER`
-- `HOSTINGER_FTP_USER`
-- `HOSTINGER_FTP_PASSWORD`
+If SSH is unavailable, use the FTPS workflow.
+
+Required secrets:
+
+- `FTP_SERVER`
+- `FTP_PORT` *(usually 21)*
+- `FTP_USERNAME`
+- `FTP_PASSWORD`
+- `HOSTINGER_SERVER_DIR`
+- `ADMIN_TOKEN`
+
+Trigger: Actions → **Deploy PHP API to Hostinger (FTP)** → **Run workflow**.
+
+Verify: open `https://api.quickgig.ph/status`, `https://api.quickgig.ph/health.php`, and `https://api.quickgig.ph/events/index.php`.
 
 ### Installer
 
@@ -987,6 +998,7 @@ https://api.quickgig.ph/tools/install.php?token=RUN_ONCE
 ```
 BASE=https://api.quickgig.ph
 curl -s "$BASE/status"
+curl -s "$BASE/health.php"
 curl -s "$BASE/events/index.php"
 ```
 

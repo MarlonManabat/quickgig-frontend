@@ -1,0 +1,70 @@
+name: Deploy PHP API to Hostinger (FTP)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp jq
+
+      - name: Deploy api/ via FTPS
+        env:
+          FTP_SERVER:   ${{ secrets.FTP_SERVER }}
+          FTP_PORT:     ${{ secrets.FTP_PORT }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE_DIR:   ${{ secrets.HOSTINGER_SERVER_DIR }}
+        run: |
+          set -euo pipefail
+          test -d api || { echo "api/ not found"; exit 1; }
+          # lftp settings: force TLS, passive mode, retries
+          lftp -e "
+            set ftp:ssl-allow true;
+            set ftp:ssl-force true;
+            set ftp:passive-mode true;
+            set net:max-retries 2;
+            set net:timeout 30;
+            mkdir -p ${REMOTE_DIR};
+            mirror -R --delete --only-newer --verbose api/ ${REMOTE_DIR};
+            bye
+          " -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" -p \"$FTP_PORT\" \"$FTP_SERVER\"
+
+      - name: Verify endpoints & run installer
+        run: |
+          set -euo pipefail
+          BASE="https://api.quickgig.ph"
+          echo "== status =="
+          curl -fsS "$BASE/status" | jq .
+          echo "== health =="
+          curl -fsS "$BASE/health.php" | jq .
+          echo "== installer (run-once) =="
+          curl -fsS "$BASE/tools/install.php?token=RUN_ONCE" | tee /tmp/install.json | jq .
+
+      - name: Seed sample event
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          set -euo pipefail
+          BASE="https://api.quickgig.ph"
+          PAYLOAD=$(jq -n \
+            --arg slug "launch-party" \
+            --arg title "Launch Party" \
+            --arg venue "Makati" \
+            --arg start "2025-09-10 19:00:00" \
+            --arg status "published" \
+            --argjson ticket_types '[{"name":"General","price_cents":50000,"quantity_total":100}]' \
+            '{slug:$slug,title:$title,venue:$venue,start_time:$start,status:$status,ticket_types:$ticket_types}')
+          curl -fsS -X POST "$BASE/admin/events/create.php" \
+            -H "Content-Type: application/json" \
+            -H "X-Admin-Token: $ADMIN_TOKEN" \
+            --data "$PAYLOAD" | tee /tmp/seed.json | jq .
+          echo "== list events =="
+          curl -fsS "$BASE/events/index.php" | jq .
