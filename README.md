@@ -55,6 +55,8 @@ How to verify: open `/api/diag/env` on the Preview URL and look for `apiUrlSet:t
 Set these in Vercel → Project → Settings → Env Vars (Production).
 Protected routes redirect to /login when session cookie is missing.
 
+Ensure `NEXT_PUBLIC_API_URL=https://api.quickgig.ph` is set in Vercel (Preview & Production). Cookies are shared across subdomains via `Domain=.quickgig.ph`.
+
 ### Verify login flow
 
 ```bash

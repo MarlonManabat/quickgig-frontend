@@ -21,7 +21,11 @@ export function passThroughSetCookie(from: Response, to: Headers) {
 }
 
 export async function json<T>(url: string, init?: RequestInit) {
-  const res = await fetch(url, { ...init, cache: 'no-store' });
+  const res = await fetch(url, {
+    ...init,
+    cache: 'no-store',
+    credentials: 'include',
+  });
   return res.json() as Promise<T>;
 }
 
