@@ -1025,3 +1025,31 @@ Required secrets:
   - `HOSTINGER_SSH_KEY_B64` – base64 of the same private key
 
 The SSH secret must be the **private key** itself (not `.pub` and not a password).
+
+## Go Live
+
+Run **Actions → Go Live (FTP deploy + install + seed + revalidate)** to deploy the API over FTPS, run the installer, seed a sample event and refresh frontend caches.
+
+Required secrets:
+
+- `FTP_SERVER`
+- `FTP_PORT`
+- `FTP_USERNAME`
+- `FTP_PASSWORD`
+- `HOSTINGER_SERVER_DIR`
+- `ADMIN_TOKEN`
+
+Optional secrets:
+
+- `REVALIDATE_TOKEN`
+- `VERCEL_DEPLOY_HOOK_URL`
+- `FTP_DISABLE_CERT_VERIFY`
+
+Health checks:
+
+```bash
+BASE=https://api.quickgig.ph
+curl -fsS "$BASE/status" | jq
+curl -fsS "$BASE/health.php" | jq
+curl -fsS "$BASE/events/index.php" | jq
+```
