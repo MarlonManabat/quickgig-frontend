@@ -1,7 +1,8 @@
 DirectoryIndex index.php index.html
-RewriteEngine On
-RewriteRule ^health$ health.php [L]
-RewriteRule ^status$ health.php [L,QSA]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Let actual files run; no SPA rewrites here.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+</IfModule>

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../api/bootstrap.php';
+require_once __DIR__.'/../bootstrap.php';
 allow_origin();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
