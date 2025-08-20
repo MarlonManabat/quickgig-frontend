@@ -1,16 +1,25 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { env } from '@/config/env';
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const p = req.nextUrl.pathname;
   if (p.startsWith('/api') || p.startsWith('/socket.io')) return NextResponse.next();
+
+  if (p.startsWith('/account')) {
+    const r = await fetch(new URL('/api/auth/me', req.url), {
+      headers: { cookie: req.headers.get('cookie') || '' },
+    });
+    if (r.status === 401) {
+      return NextResponse.redirect(new URL('/login', req.url), { status: 307 });
+    }
+    return NextResponse.next();
+  }
 
   const needsAuth =
     p.startsWith('/dashboard') ||
     p.startsWith('/messages') ||
     p.startsWith('/applications') ||
-    p.startsWith('/settings') ||
-    p.startsWith('/account');
+    p.startsWith('/settings');
 
   if (!needsAuth) return NextResponse.next();
 

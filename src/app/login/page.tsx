@@ -1,67 +1,48 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { login } from '../../../lib/auth';
+import { toast } from '@/lib/toast';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-    const res = await fetch('/api/session/login', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ identifier, password }),
-    });
-    if (res.ok) {
-      const next =
-        typeof window !== 'undefined'
-          ? new URLSearchParams(window.location.search).get('next')
-          : null;
-      router.push(next || '/dashboard');
-    } else {
-      const data = await res.json().catch(() => null);
-      setError(data?.error || 'Login failed');
+    try {
+      await login(email, password);
+      router.push('/account');
+    } catch {
+      toast('Login failed');
     }
-    setLoading(false);
   }
 
   return (
-    <div className="qg-container py-12">
-      <div className="max-w-md mx-auto bg-white/70 rounded-2xl p-6 shadow">
-        <h1 className="text-2xl font-bold mb-2">Login</h1>
-          <form onSubmit={onSubmit} className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">Identifier</label>
-              <input
-                className="w-full border rounded-lg p-2"
-                type="text"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                required
-              />
-            </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              className="w-full border rounded-lg p-2"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-          <button type="submit" disabled={loading} className="btn btn-primary w-full">
-            {loading ? 'Signing in…' : 'Login'}
-          </button>
-        </form>
-      </div>
-    </div>
+    <main className="p-4 max-w-md mx-auto">
+      <h1 className="text-xl mb-4">Login</h1>
+      <form onSubmit={onSubmit} className="flex flex-col gap-2">
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border p-2"
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="border p-2"
+          required
+        />
+        <button type="submit" className="bg-blue-500 text-white p-2 mt-2">
+          Login
+        </button>
+      </form>
+    </main>
   );
 }
