@@ -2,169 +2,73 @@ name: Bootstrap backend (deploy + install + seed)
 
 on:
   workflow_dispatch:
-    inputs:
-      slug:
-        description: Event slug
-        required: true
-        default: launch-party
-      title:
-        description: Event title
-        required: true
-        default: Launch Party
-      venue:
-        description: Venue
-        required: true
-        default: Makati
-      start_time:
-        description: Start time (YYYY-MM-DD HH:MM:SS)
-        required: true
-        default: 2025-09-10 19:00:00
-      price:
-        description: Ticket price (whole currency units, e.g. 5000 PHP cents or 5000)
-        required: true
-        default: "5000"
-      quantity:
-        description: Ticket quantity
-        required: true
-        default: "100"
-
-env:
-  BASE: https://api.quickgig.ph
-  REMOTE_DIR: ${{ secrets.HOSTINGER_REMOTE_DIR }}
 
 jobs:
   bootstrap:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    env:
+      BASE: https://api.quickgig.ph
+      HOST: ${{ secrets.HOSTINGER_HOST }}
+      PORT: ${{ secrets.HOSTINGER_PORT }}
+      USER: ${{ secrets.HOSTINGER_USER }}
+      REMOTE: ${{ secrets.HOSTINGER_REMOTE_DIR }}
+      ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ---------- Deploy ----------
-      - name: Decide deploy method
-        id: method
+      - name: Install tools
         run: |
-          if [[ -n "${{ secrets.HOSTINGER_SSH_KEY }}" && -n "${{ secrets.HOSTINGER_HOST }}" ]]; then
-            echo "method=ssh" >> $GITHUB_OUTPUT
-          elif [[ -n "${{ secrets.HOSTINGER_FTP_SERVER }}" ]]; then
-            echo "method=ftp" >> $GITHUB_OUTPUT
-          else
-            echo "::error::No Hostinger credentials found. Provide SSH or FTP secrets."
-            exit 1
-          fi
+          sudo apt-get update
+          sudo apt-get install -y jq rsync lftp
 
-      - name: Deploy via SSH
-        if: steps.method.outputs.method == 'ssh'
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOSTINGER_HOST }}
-          port: ${{ secrets.HOSTINGER_PORT || '22' }}
-          username: ${{ secrets.HOSTINGER_USER }}
-          key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          overwrite: true
-          strip_components: 0
-          source: "api.quickgig.ph/*"
-          target: "${{ env.REMOTE_DIR }}"
-
-      - name: Deploy via FTP
-        if: steps.method.outputs.method == 'ftp'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
-          username: ${{ secrets.HOSTINGER_FTP_USER }}
-          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
-          local-dir: api.quickgig.ph/
-          server-dir: ${{ env.REMOTE_DIR }}
-          dangerous-clean-slate: false
-
-      # ---------- Smoke ----------
-      - name: Check /status
-        id: status
+      - name: Setup SSH
         run: |
-          set -e
-          curl -sS -w '\n%{http_code}\n' "$BASE/status" -o status.json | tee status.code
-          code=$(tail -n1 status.code)
-          echo "http_code=$code" >> $GITHUB_OUTPUT
-          echo '```json' >> $GITHUB_STEP_SUMMARY
-          cat status.json >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          [[ "$code" == "200" ]] || (echo "::warning::/status not 200 (got $code). Continuing.")
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HOSTINGER_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p "$PORT" "$HOST" >> ~/.ssh/known_hosts
 
-      - name: Check /events/index.php
-        id: events_index
+      - name: Test SSH and prepare remote dir
         run: |
-          set -e
-          curl -sS -w '\n%{http_code}\n' "$BASE/events/index.php" -o events.json | tee events.code
-          code=$(tail -n1 events.code)
-          echo "http_code=$code" >> $GITHUB_OUTPUT
-          echo '```json' >> $GITHUB_STEP_SUMMARY
-          cat events.json >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          # allow 404 before install
+          set -euxo pipefail
+          ssh -p "$PORT" "$USER@$HOST" "echo connected && mkdir -p '$REMOTE'"
 
-      # ---------- Install ----------
+      - name: Deploy API via rsync
+        run: |
+          set -euxo pipefail
+          rsync -e "ssh -p $PORT" -av --delete api.quickgig.ph/ "$USER@$HOST:$REMOTE/"
+
+      - name: Health check (with fallback)
+        run: |
+          set -euxo pipefail
+          curl -fsS "$BASE/status" || curl -fsS "$BASE/health.php"
+
       - name: Run installer (idempotent)
         run: |
-          set -e
-          curl -sS -i "$BASE/tools/install.php?token=RUN_ONCE" | sed -n '1,30p' | tee -a $GITHUB_STEP_SUMMARY
+          set -euxo pipefail
+          curl -fsS "$BASE/tools/install.php?token=RUN_ONCE" | head -c 200 || true
 
-      # ---------- Seed event ----------
-      - name: Seed example event (try price_cents then price)
-        id: seed
-        env:
-          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+      - name: Seed sample event
         run: |
-          set -e
-          slug="${{ github.event.inputs.slug }}"
-          title="${{ github.event.inputs.title }}"
-          venue="${{ github.event.inputs.venue }}"
-          start="${{ github.event.inputs.start_time }}"
-          price="${{ github.event.inputs.price }}"
-          qty="${{ github.event.inputs.quantity }}"
+          set -euxo pipefail
+          curl -fsS -X POST "$BASE/admin/events/create.php" \
+            -H "Content-Type: application/json" \
+            -H "X-Admin-Token: $ADMIN_TOKEN" \
+            --data-raw '{
+              "slug":"launch-party",
+              "title":"Launch Party",
+              "venue":"Makati",
+              "start_time":"2025-09-10 19:00:00",
+              "status":"published",
+              "ticket_types":[
+                {"name":"General","price_cents":50000,"quantity_total":100},
+                {"name":"VIP","price_cents":112000,"quantity_total":20}
+              ]
+            }' || true
 
-          echo "Attempt 1: schema A (tickets[*].price_cents)"
-          body_a=$(jq -nc --arg slug "$slug" --arg title "$title" --arg venue "$venue" --arg start "$start" --argjson price "$price" --argjson qty "$qty" \
-            '{slug:$slug,title:$title,venue:$venue,start_time:$start,status:"published",
-              tickets:[{name:"GA",price_cents:($price*10|floor)*10,quantity_total:$qty}] }')
-          code_a=$(curl -sS -o seed_a.json -w '%{http_code}' -X POST "$BASE/admin/events/create.php" \
-            -H "X-Admin-Token: $ADMIN_TOKEN" -H "Content-Type: application/json" --data "$body_a" || true)
-          echo "Attempt 1 code: $code_a"
-
-          if [[ "$code_a" != "200" && "$code_a" != "201" ]]; then
-            echo "Attempt 2: schema B (ticket_types[*].price)"
-            body_b=$(jq -nc --arg slug "$slug" --arg title "$title" --arg venue "$venue" --arg start "$start" --argjson price "$price" --argjson qty "$qty" \
-              '{slug:$slug,name:$title,venue:$venue,start_time:$start,status:"published",
-                ticket_types:[{name:"General",price:$price,quantity_total:$qty}] }')
-            code_b=$(curl -sS -o seed_b.json -w '%{http_code}' -X POST "$BASE/admin/events/create.php" \
-              -H "X-Admin-Token: $ADMIN_TOKEN" -H "Content-Type: application/json" --data "$body_b" || true)
-            echo "Attempt 2 code: $code_b"
-            testcode="$code_b"
-            cat seed_b.json > seed.json || true
-          else
-            testcode="$code_a"
-            cat seed_a.json > seed.json || true
-          fi
-
-          echo "create_code=$testcode" >> $GITHUB_OUTPUT
-          echo '### Seed response' >> $GITHUB_STEP_SUMMARY
-          echo '```json' >> $GITHUB_STEP_SUMMARY
-          cat seed.json >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
-      - name: Show event (by slug)
+      - name: Verify events JSON
         run: |
-          slug="${{ github.event.inputs.slug }}"
-          curl -sS "$BASE/events/show.php?slug=$slug" | tee show.json >/dev/null
-          echo '### Show event' >> $GITHUB_STEP_SUMMARY
-          echo "Event URL: $BASE/events/show.php?slug=$slug" >> $GITHUB_STEP_SUMMARY
-          echo '```json' >> $GITHUB_STEP_SUMMARY
-          cat show.json >> $GITHUB_STEP_SUMMARY || true
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          curl -fsS "$BASE/events/index.php" | jq '.[0] | {id,slug,title}'
 
-      - name: Final summary
-        run: |
-          echo "✅ Backend bootstrap completed for $BASE" >> $GITHUB_STEP_SUMMARY
-          echo "- Deploy dir: $REMOTE_DIR" >> $GITHUB_STEP_SUMMARY
-          echo "- Status HTTP: ${{ steps.status.outputs.http_code }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Events index HTTP: ${{ steps.events_index.outputs.http_code }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Seed code: ${{ steps.seed.outputs.create_code }}" >> $GITHUB_STEP_SUMMARY
