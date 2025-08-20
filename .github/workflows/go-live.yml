@@ -1,17 +1,101 @@
-name: Go Live
+name: Go Live (FTPS deploy + install + seed + revalidate)
 
 on:
   workflow_dispatch:
+    inputs:
+      slug:
+        description: Event slug
+        type: string
+        required: true
+        default: launch-party
+      title:
+        description: Event title
+        type: string
+        required: true
+        default: Launch Party
+      venue:
+        description: Event venue
+        type: string
+        required: true
+        default: Makati
+      start_time:
+        description: "Event start time (YYYY-MM-DD HH:MM:SS)"
+        type: string
+        required: true
+        default: "2025-09-10 19:00:00"
 
 jobs:
-  deploy:
+  go-live:
     runs-on: ubuntu-latest
+    env:
+      BASE: https://api.quickgig.ph
+      APP_ORIGIN: https://app.quickgig.ph
+      FTP_SERVER: ${{ secrets.FTP_SERVER || secrets.HOSTINGER_FTP_HOST }}
+      FTP_PORT: ${{ secrets.FTP_PORT }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      HOSTINGER_SERVER_DIR: ${{ secrets.HOSTINGER_SERVER_DIR }}
+      ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+      REVALIDATE_TOKEN: ${{ secrets.REVALIDATE_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Revalidate frontend caches
-        env:
-          APP_ORIGIN: https://app.quickgig.ph
-          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
         run: |
-          set -euo pipefail
-          curl -fsS -X POST "$APP_ORIGIN/api/revalidate?secret=$REVALIDATE_SECRET&tag=events"
+          echo "== Install tools =="
+          sudo apt-get update
+          sudo apt-get install -y lftp jq
+
+      - name: Deploy backend via FTPS
+        run: |
+          echo "== Deploy backend via FTPS =="
+          if [ -d api ]; then
+            BACKEND_DIR=api
+          elif [ -d api.quickgig.ph ]; then
+            BACKEND_DIR=api.quickgig.ph # repository uses this folder for backend
+          elif [ -d backend ]; then
+            BACKEND_DIR=backend
+          else
+            echo "Unable to locate backend directory" >&2
+            exit 1
+          fi
+          echo "Mirroring $BACKEND_DIR/ to $HOSTINGER_SERVER_DIR"
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -p "$FTP_PORT" "$FTP_SERVER" <<'LFTPEOF'
+            set ftp:ssl-force true
+            set ssl:verify-certificate no
+            mirror -R --delete "$BACKEND_DIR/" "$HOSTINGER_SERVER_DIR"
+            quit
+LFTPEOF
+
+      - name: Verify backend
+        run: |
+          echo "== Verify backend =="
+          curl -sSf "$BASE/status" | jq .
+          curl -sSf "$BASE/tools/install.php?token=RUN_ONCE" | tee /tmp/install.json
+
+      - name: Seed sample event
+        env:
+          SLUG: ${{ inputs.slug }}
+          TITLE: ${{ inputs.title }}
+          VENUE: ${{ inputs.venue }}
+          START_TIME: ${{ inputs.start_time }}
+        run: |
+          echo "== Seed sample event =="
+          curl -sSf -X POST "$BASE/admin/events/create.php" \
+            -H "X-Admin-Token: $ADMIN_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "{\"slug\":\"$SLUG\",\"title\":\"$TITLE\",\"venue\":\"$VENUE\",\"start_time\":\"$START_TIME\",\"status\":\"published\",\"tickets\":[{\"name\":\"GA\",\"price_cents\":50000,\"quantity_total\":100},{\"name\":\"VIP\",\"price_cents\":112000,\"quantity_total\":20}]}" | jq .
+          echo "== List events =="
+          curl -sSf "$BASE/events/index.php" | jq .
+
+      - name: Revalidate frontend cache
+        env:
+          SLUG: ${{ inputs.slug }}
+        run: |
+          echo "== Revalidate frontend cache =="
+          curl -sSf -X POST "$APP_ORIGIN/api/revalidate" \
+            -H "X-Revalidate-Token: $REVALIDATE_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "{\"tags\":[\"events\",\"event:$SLUG\"]}"
+

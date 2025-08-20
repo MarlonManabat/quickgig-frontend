@@ -1,10 +1,10 @@
 import Link from 'next/link';
 
 interface Event {
-  id: number;
   slug: string;
-  name: string;
-  description?: string;
+  title: string;
+  venue: string;
+  start_time: string;
 }
 
 export default async function EventsPage() {
@@ -30,8 +30,10 @@ export default async function EventsPage() {
       <h1>Events</h1>
       <ul>
         {events.map((ev) => (
-          <li key={ev.id}>
-            <Link href={`/events/${ev.slug}`}>{ev.name}</Link>
+          <li key={ev.slug}>
+            <Link href={`/events/${ev.slug}`}>
+              {ev.title} - {new Date(ev.start_time).toLocaleString()} @ {ev.venue}
+            </Link>
           </li>
         ))}
       </ul>

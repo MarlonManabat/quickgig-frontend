@@ -1,40 +1,43 @@
 interface TicketType {
-  id: number;
   name: string;
-  price: number;
-  quantity: number;
+  price_cents: number;
+  quantity_total: number;
 }
 
 interface Event {
-  id: number;
   slug: string;
-  name: string;
-  description?: string;
-  ticket_types?: TicketType[];
+  title: string;
+  venue: string;
+  start_time: string;
+  tickets?: TicketType[];
 }
 
-export default async function EventPage({ params }: { params?: { slug?: string } }) {
-  const slug = params?.slug;
-  if (!slug) {
-    return <div>Not found</div>;
-  }
-
+export default async function EventPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/events/show.php?slug=${encodeURIComponent(slug)}`,
-      { next: { tags: ['events'] } }
+      { next: { tags: ['events', `event:${slug}`] } }
     );
     if (!res.ok) {
       return <div>Not found</div>;
     }
     const event: Event = await res.json();
-    if (!event || !event.name) {
-      return <div>Not found</div>;
-    }
     return (
       <div>
-        <h1>{event.name}</h1>
-        {event.description && <p>{event.description}</p>}
+        <h1>{event.title}</h1>
+        <p>
+          {new Date(event.start_time).toLocaleString()} @ {event.venue}
+        </p>
+        {event.tickets && event.tickets.length > 0 && (
+          <ul>
+            {event.tickets.map((t) => (
+              <li key={t.name}>
+                {t.name}: ₱{(t.price_cents / 100).toFixed(2)} ({t.quantity_total})
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     );
   } catch {

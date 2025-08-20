@@ -20,18 +20,39 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 
 ## Go Live
 
-Configure the following in Vercel before going live:
+### Required GitHub Secrets
+
+- `FTP_SERVER`, `FTP_PORT`, `FTP_USERNAME`, `FTP_PASSWORD`
+- `HOSTINGER_SERVER_DIR` (remote API root)
+- `ADMIN_TOKEN` (backend admin bearer)
+- `REVALIDATE_TOKEN`
+
+### Required Vercel/Env
 
 - `NEXT_PUBLIC_API_URL=https://api.quickgig.ph`
-- `REVALIDATE_SECRET=<random-long-secret>`
+- `REVALIDATE_TOKEN=<same value as above>`
 
-To refresh event pages after updates:
+### How to run
+
+1. Go to **Actions → Go Live** in GitHub.
+2. Provide the workflow inputs or accept defaults.
+3. The workflow deploys PHP backend via FTPS, runs install, seeds a sample event, and revalidates frontend caches.
+4. Verify:
+
+   ```bash
+   curl -sSf https://api.quickgig.ph/status | jq .
+   ```
+
+   Then visit `https://app.quickgig.ph/events` and open the new event’s detail page.
+
+### Revalidating manually
 
 ```bash
-curl -X POST "https://app.quickgig.ph/api/revalidate?secret=$REVALIDATE_SECRET&tag=events"
+curl -X POST \
+  -H "X-Revalidate-Token: $REVALIDATE_TOKEN" \
+  -d '{"tags":["events"]}' \
+  https://app.quickgig.ph/api/revalidate
 ```
-
-The Go Live workflow triggers this revalidation automatically after deploy.
 
 ## Setup
 
