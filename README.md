@@ -2,7 +2,8 @@
 
 A Next.js application for QuickGig.ph configured for deployment on Vercel.
 
-> Note: We use the Next.js App Router for pages; the Pages Router is only used for API routes under `pages/api/**`.
+> We use **App Router** for pages. `pages/` is reserved for **API routes** only.
+> Set `NEXT_PUBLIC_API_URL` in Vercel Preview & Production.
 
 ## Routing (production)
 
