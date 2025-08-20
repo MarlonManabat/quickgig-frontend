@@ -42,39 +42,52 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install tools
+        shell: bash
         run: |
           echo "== Install tools =="
           sudo apt-get update
           sudo apt-get install -y lftp jq
 
       - name: Deploy backend via FTPS
+        shell: bash
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          HOSTINGER_SERVER_DIR: ${{ vars.HOSTINGER_SERVER_DIR || secrets.HOSTINGER_SERVER_DIR }}
+          BACKEND_DIR: ${{ env.BACKEND_DIR }}
         run: |
-          echo "== Deploy backend via FTPS =="
+          set -euo pipefail
+
           if [ -d api ]; then
             BACKEND_DIR=api
-          elif [ -d api.quickgig.ph ]; then
-            BACKEND_DIR=api.quickgig.ph # repository uses this folder for backend
+          elif [ -d _api.quickgig.ph ]; then
+            BACKEND_DIR=_api.quickgig.ph
           elif [ -d backend ]; then
             BACKEND_DIR=backend
-          else
-            echo "Unable to locate backend directory" >&2
-            exit 1
           fi
-          echo "Mirroring $BACKEND_DIR/ to $HOSTINGER_SERVER_DIR"
-          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -p "$FTP_PORT" "$FTP_SERVER" <<'LFTPEOF'
-            set ftp:ssl-force true
-            set ssl:verify-certificate no
-            mirror -R --delete "$BACKEND_DIR/" "$HOSTINGER_SERVER_DIR"
-            quit
-LFTPEOF
+
+          echo "== Mirror $BACKEND_DIR to \$HOSTINGER_SERVER_DIR via FTPS =="
+
+          cat >/tmp/lftp.cmd <<'EOF'
+          set ftp:ssl-force true
+          set ssl:verify-certificate no
+          mirror -R --delete "$BACKEND_DIR" "$HOSTINGER_SERVER_DIR"
+          quit
+          EOF
+
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -p "$FTP_PORT" "$FTP_SERVER" -f /tmp/lftp.cmd
 
       - name: Verify backend
+        shell: bash
         run: |
           echo "== Verify backend =="
           curl -sSf "$BASE/status" | jq .
           curl -sSf "$BASE/tools/install.php?token=RUN_ONCE" | tee /tmp/install.json
 
       - name: Seed sample event
+        shell: bash
         env:
           SLUG: ${{ inputs.slug }}
           TITLE: ${{ inputs.title }}
@@ -90,6 +103,7 @@ LFTPEOF
           curl -sSf "$BASE/events/index.php" | jq .
 
       - name: Revalidate frontend cache
+        shell: bash
         env:
           SLUG: ${{ inputs.slug }}
         run: |
