@@ -1,0 +1,155 @@
+name: Go Live (FTP deploy + install + seed + revalidate)
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: Event slug to seed
+        required: true
+        default: launch-party
+      title:
+        description: Event title
+        required: true
+        default: Launch Party
+      venue:
+        description: Venue
+        required: true
+        default: Makati
+      start_time:
+        description: Start time (YYYY-MM-DD HH:MM:SS)
+        required: true
+        default: 2025-09-10 19:00:00
+
+concurrency:
+  group: go-live
+  cancel-in-progress: true
+
+jobs:
+  go-live:
+    runs-on: ubuntu-latest
+    env:
+      BASE: https://api.quickgig.ph
+      APP_ORIGIN: https://app.quickgig.ph
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y lftp jq
+
+      - name: Resolve local API dir
+        id: src
+        run: |
+          set -euo pipefail
+          if [ -d api ]; then echo "dir=api" >> $GITHUB_OUTPUT
+          elif [ -d backend/api ]; then echo "dir=backend/api" >> $GITHUB_OUTPUT
+          elif [ -d php ]; then echo "dir=php" >> $GITHUB_OUTPUT
+          else
+            echo "::error::Could not find api/ (or backend/api or php)"; ls -la; exit 1
+          fi
+
+      - name: Deploy API via FTPS
+        env:
+          FTP_SERVER:   ${{ secrets.FTP_SERVER }}
+          FTP_PORT:     ${{ secrets.FTP_PORT }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE_DIR:   ${{ secrets.HOSTINGER_SERVER_DIR }}
+          FTP_DISABLE_CERT_VERIFY: ${{ secrets.FTP_DISABLE_CERT_VERIFY }}
+        run: |
+          set -euo pipefail
+          SRC="${{ steps.src.outputs.dir }}/"
+          [ -d "$SRC" ] || { echo "::error::Missing $SRC"; exit 1; }
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" -p "${FTP_PORT:-21}" "$FTP_SERVER" <<'EOF'
+set ftp:ssl-allow true
+set ftp:ssl-force true
+set ftp:ssl-protect-data true
+set ftp:passive-mode true
+set net:max-retries 2
+set net:timeout 30
+$( [ "${FTP_DISABLE_CERT_VERIFY:-}" = "true" ] && echo "set ssl:verify-certificate no" )
+mkdir -p $REMOTE_DIR
+mirror -R --delete --only-newer --verbose \
+  --exclude-glob .git* --exclude-glob .github --exclude-glob node_modules \
+  ${SRC} ${REMOTE_DIR}
+bye
+EOF
+
+      - name: Verify status/health
+        run: |
+          set -euo pipefail
+          echo "== /status =="
+          curl -fsS "$BASE/status" | jq . | tee /tmp/status.json
+          echo "== /health.php =="
+          curl -fsS "$BASE/health.php" | jq . | tee /tmp/health.json
+
+      - name: Run installer (idempotent)
+        run: |
+          set -euo pipefail
+          echo "== installer =="
+          curl -fsS "$BASE/tools/install.php?token=RUN_ONCE" | tee /tmp/install.json || true
+
+      - name: Seed sample event (best-effort)
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          set -euo pipefail
+          slug="${{ github.event.inputs.slug }}"
+          title="${{ github.event.inputs.title }}"
+          venue="${{ github.event.inputs.venue }}"
+          start="${{ github.event.inputs.start_time }}"
+          payload=$(jq -nc --arg slug "$slug" --arg title "$title" --arg venue "$venue" --arg start "$start" \
+            '{slug:$slug,title:$title,venue:$venue,start_time:$start,status:"published",
+              ticket_types:[{name:"GA",price_cents:50000,quantity_total:100}] }')
+          echo "$payload" | jq .
+          curl -sS -o /tmp/seed.json -w "%{http_code}\n" -X POST "$BASE/admin/events/create.php" \
+            -H "Content-Type: application/json" -H "X-Admin-Token: $ADMIN_TOKEN" \
+            --data "$payload" | tee /tmp/seed.code
+          code=$(tail -n1 /tmp/seed.code || true)
+          echo "seed_http=$code"
+          # Do not fail on duplicate
+          if [ "$code" = "401" ] || [ "$code" = "403" ] || [ "$code" = "500" ]; then
+            echo "::error::Seed failed with HTTP $code"; cat /tmp/seed.json || true; exit 1
+          fi
+
+      - name: List events
+        run: |
+          set -euo pipefail
+          curl -fsS "$BASE/events/index.php" | jq .
+
+      - name: Revalidate frontend (if endpoint + secret exist)
+        env:
+          REVALIDATE_TOKEN: ${{ secrets.REVALIDATE_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "${REVALIDATE_TOKEN:-}" ]; then
+            echo "Hitting ${APP_ORIGIN}/api/revalidate"
+            curl -fsS "${APP_ORIGIN}/api/revalidate?secret=${REVALIDATE_TOKEN}" | jq .
+          else
+            echo "REVALIDATE_TOKEN not set; skipping."
+          fi
+
+      - name: Trigger Vercel deploy hook (optional)
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          set -euo pipefail
+          if [ -n "${VERCEL_DEPLOY_HOOK_URL:-}" ]; then
+            curl -fsS -X POST "$VERCEL_DEPLOY_HOOK_URL" || true
+          else
+            echo "No Vercel deploy hook provided; skipping."
+          fi
+
+      - name: Summary
+        run: |
+          {
+            echo "## Go Live Summary"
+            echo "- Backend deployed to: \`${{ secrets.HOSTINGER_SERVER_DIR }}\`"
+            echo "- Status:"; cat /tmp/status.json || true
+            echo "- Health:"; cat /tmp/health.json || true
+            echo "- Installer:"; cat /tmp/install.json || true
+            echo "- Seed response:"; cat /tmp/seed.json || true
+          } >> $GITHUB_STEP_SUMMARY
