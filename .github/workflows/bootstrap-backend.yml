@@ -15,47 +15,37 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install tools
-        shell: bash
         run: |
-          set -euxo pipefail
           sudo apt-get update
-          sudo apt-get install -y jq rsync lftp
+          sudo apt-get install -y jq rsync openssh-client
 
       - name: Setup SSH
-        shell: bash
         env:
           HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
           HOSTINGER_PORT: ${{ secrets.HOSTINGER_PORT }}
           HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
+          HOSTINGER_REMOTE_DIR: ${{ secrets.HOSTINGER_REMOTE_DIR }}
           HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
           HOSTINGER_SSH_KEY_B64: ${{ secrets.HOSTINGER_SSH_KEY_B64 }}
         run: |
           set -euxo pipefail
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
           if [[ -n "${HOSTINGER_SSH_KEY_B64:-}" ]]; then
-            echo "$HOSTINGER_SSH_KEY_B64" | base64 -d > ~/.ssh/hostinger
+            printf '%s' "$HOSTINGER_SSH_KEY_B64" | base64 -d > ~/.ssh/hostinger
+          elif [[ -n "${HOSTINGER_SSH_KEY:-}" ]]; then
+            printf '%s' "$HOSTINGER_SSH_KEY" > ~/.ssh/hostinger
           else
-            if [[ -z "${HOSTINGER_SSH_KEY:-}" ]]; then
-              echo "Missing HOSTINGER_SSH_KEY or HOSTINGER_SSH_KEY_B64 secret" >&2
-              exit 1
-            fi
-            cat > ~/.ssh/hostinger <<'EOF'
-${{ secrets.HOSTINGER_SSH_KEY }}
-EOF
+            echo "Missing HOSTINGER_SSH_KEY or HOSTINGER_SSH_KEY_B64" >&2
+            exit 1
           fi
           chmod 600 ~/.ssh/hostinger
-
           ssh-keyscan -p "$HOSTINGER_PORT" "$HOSTINGER_HOST" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
-
-          # Verbose probe; if this fails we want 255 with details
-          ssh -vvv -i ~/.ssh/hostinger -p "$HOSTINGER_PORT" \
+          # probe
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/hostinger -p "$HOSTINGER_PORT" \
             "$HOSTINGER_USER@$HOSTINGER_HOST" "echo ok"
 
-      - name: Deploy API via rsync
-        shell: bash
+      - name: Deploy via rsync
         env:
           HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
           HOSTINGER_PORT: ${{ secrets.HOSTINGER_PORT }}
@@ -63,20 +53,28 @@ EOF
           HOSTINGER_REMOTE_DIR: ${{ secrets.HOSTINGER_REMOTE_DIR }}
         run: |
           set -euxo pipefail
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/hostinger -p ${HOSTINGER_PORT}" \
-            api.quickgig.ph/ "${HOSTINGER_USER}@${HOSTINGER_HOST}:${HOSTINGER_REMOTE_DIR}/"
+          rsync -avz --delete \
+            --exclude='.git' --exclude='.github' \
+            -e "ssh -i ~/.ssh/hostinger -p $HOSTINGER_PORT" \
+            api.quickgig.ph/ "$HOSTINGER_USER@$HOSTINGER_HOST:$HOSTINGER_REMOTE_DIR"
 
-      - name: Install & seed backend
-        shell: bash
+      - name: Verify & install
         run: |
           set -euxo pipefail
-          # Health
-          curl -sS https://api.quickgig.ph/status | jq
+          BASE="https://api.quickgig.ph"
+          curl -sSf "$BASE/status" || curl -sSf "$BASE/health.php"
+          curl -sSf "$BASE/tools/install.php?token=RUN_ONCE" | tee /tmp/install.json
 
-          # Run installer (idempotent; allow non-200 to not fail the job hard)
-          curl -sS "https://api.quickgig.ph/tools/install.php?token=RUN_ONCE" || true
-
-          # Verify events endpoint responds (if present)
-          curl -sS https://api.quickgig.ph/events/index.php | head -n 20 || true
+      - name: Seed sample event
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          set -euxo pipefail
+          BASE="https://api.quickgig.ph"
+          PAYLOAD='{"slug":"launch-party","title":"Launch Party","venue":"Makati","start_time":"2025-09-10 19:00:00","status":"published","ticket_types":[{"name":"GA","price_cents":50000,"quantity_total":100},{"name":"VIP","price_cents":120000,"quantity_total":20}]}'
+          curl -sS --fail-with-body -X POST "$BASE/admin/events/create.php" \
+            -H "Content-Type: application/json" \
+            -H "X-Admin-Token: $ADMIN_TOKEN" \
+            --data "$PAYLOAD" | tee /tmp/seed.json || true
+          curl -sSf "$BASE/events/index.php" | jq . >/dev/null
 

@@ -1008,3 +1008,20 @@ Local alternative:
 ```bash
 ADMIN=<token> BASE=https://api.quickgig.ph npm run bootstrap:backend
 ```
+
+## Backend bootstrap workflow
+
+The "Bootstrap backend (deploy + install + seed)" workflow uploads `api.quickgig.ph/` to Hostinger via rsync over SSH, then calls `/status` (falling back to `/health.php`) and `/tools/install.php?token=RUN_ONCE`.
+
+Required secrets:
+
+- `HOSTINGER_HOST`
+- `HOSTINGER_PORT`
+- `HOSTINGER_USER`
+- `HOSTINGER_REMOTE_DIR`
+- `ADMIN_TOKEN`
+- One of:
+  - `HOSTINGER_SSH_KEY` – private key text
+  - `HOSTINGER_SSH_KEY_B64` – base64 of the same private key
+
+The SSH secret must be the **private key** itself (not `.pub` and not a password).
