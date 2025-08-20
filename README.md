@@ -968,43 +968,31 @@ Set the following variables on the server:
 - `HOSTINGER_SSH_KEY`
 - `HOSTINGER_REMOTE_DIR`
 
-### Deploy backend via FTP
+### Backend deploy (FTP)
 
-If SSH is unavailable, use the FTPS workflow.
+FTP is the default deploy path; the legacy SSH workflow remains available for troubleshooting.
+
+Run: Actions → **Deploy PHP API to Hostinger (FTP)** → **Run workflow**.
 
 Required secrets:
 
-- `FTP_SERVER`
-- `FTP_PORT` *(usually 21)*
-- `FTP_USERNAME`
-- `FTP_PASSWORD`
-- `HOSTINGER_SERVER_DIR`
+- `HOSTINGER_FTP_HOST`
+- `HOSTINGER_FTP_USER`
+- `HOSTINGER_FTP_PASS`
+- `HOSTINGER_SERVER_DIR` (domains/quickgig.ph/public_html/api)
 - `ADMIN_TOKEN`
+- Optional legacy names: `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`
 
-Trigger: Actions → **Deploy PHP API to Hostinger (FTP)** → **Run workflow**.
+Smoke test:
 
-Verify: open `https://api.quickgig.ph/status`, `https://api.quickgig.ph/health.php`, and `https://api.quickgig.ph/events/index.php`.
-
-### Installer
-
-Run once after uploading:
-
-```
-https://api.quickgig.ph/tools/install.php?token=RUN_ONCE
-```
-
-### Verify
-
-```
+```bash
 BASE=https://api.quickgig.ph
-curl -s "$BASE/status"
-curl -s "$BASE/health.php"
-curl -s "$BASE/events/index.php"
+curl -fsS "$BASE/status" | jq
+curl -fsS "$BASE/health.php" | jq
+curl -fsS "$BASE/events/index.php" | jq
 ```
 
-### Runbook
-
-If `/events/index.php` returns HTML, deploy didn’t run or files aren’t in `public_html/api/`—rerun workflow or check server path.
+Re-running is safe: the installer is idempotent and the sample `launch-party` event may already exist.
 
 ## Backend Bootstrap (deploy + install + seed)
 
