@@ -28,7 +28,7 @@
     "guard:auth-proxy": "node tools/guard_auth_proxy.mjs",
     "verify:http": "node scripts/verify_http.mjs",
     "verify:api": "node -e \"fetch('http://127.0.0.1:3000/api/system/status').then(r=>console.log(r.status)).catch(e=>{console.error(e);process.exit(1)})\"",
-    "smoke:api": "node scripts/smoke-api.mjs",
+    "smoke:api": "bash scripts/smoke-backend.sh",
     "diag:local": "next dev -p 3000",
     "check:routes": "node scripts/check-route-conflicts.mjs",
     "bootstrap:backend": "bash scripts/bootstrap_backend.sh"
