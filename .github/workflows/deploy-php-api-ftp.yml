@@ -1,0 +1,140 @@
+name: Deploy PHP API to Hostinger (FTP)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'api/**'
+      - 'backend/api/**'
+      - 'php/**'
+      - '.github/workflows/deploy-php-api-ftp.yml'
+
+concurrency:
+  group: deploy-php-api-ftp
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y lftp jq
+
+      - name: Resolve source directory
+        id: src
+        run: |
+          set -euo pipefail
+          if [ -d api ]; then
+            echo "LOCAL_DIR=api" >> "$GITHUB_OUTPUT"
+          elif [ -d backend/api ]; then
+            echo "LOCAL_DIR=backend/api" >> "$GITHUB_OUTPUT"
+          elif [ -d php ]; then
+            echo "LOCAL_DIR=php" >> "$GITHUB_OUTPUT"
+          else
+            echo "No api directory found" >&2
+            find . -maxdepth 2 -print >&2
+            exit 1
+          fi
+
+      - name: FTP deploy
+        env:
+          HOST: ${{ secrets.HOSTINGER_FTP_HOST || secrets.FTP_SERVER }}
+          USER: ${{ secrets.HOSTINGER_FTP_USER || secrets.FTP_USERNAME }}
+          PASS: ${{ secrets.HOSTINGER_FTP_PASS || secrets.FTP_PASSWORD }}
+          REMOTE_DIR: ${{ secrets.HOSTINGER_SERVER_DIR }}
+          FTP_DISABLE_CERT_VERIFY: ${{ secrets.FTP_DISABLE_CERT_VERIFY }}
+          LOCAL_DIR: ${{ steps.src.outputs.LOCAL_DIR }}
+        run: |
+          set -euo pipefail
+          test -n "$HOST" || { echo "Missing HOSTINGER_FTP_HOST/FTP_SERVER" >&2; exit 1; }
+          test -n "$USER" || { echo "Missing HOSTINGER_FTP_USER/FTP_USERNAME" >&2; exit 1; }
+          test -n "$PASS" || { echo "Missing HOSTINGER_FTP_PASS/FTP_PASSWORD" >&2; exit 1; }
+          test -n "$REMOTE_DIR" || { echo "Missing HOSTINGER_SERVER_DIR" >&2; exit 1; }
+          test -d "$LOCAL_DIR" || { echo "Local dir $LOCAL_DIR not found" >&2; exit 1; }
+          VERIFY=yes
+          if [ "${FTP_DISABLE_CERT_VERIFY:-false}" = "true" ]; then
+            VERIFY=no
+          fi
+          lftp_log=$(mktemp)
+          lftp -u "$USER","$PASS" "ftp://$HOST" <<LFTP | tee "$lftp_log"
+set ssl:verify-certificate $VERIFY;
+set ftp:ssl-force true;
+set ftp:ssl-protect-data true;
+set net:max-retries 2;
+set net:timeout 30;
+mirror -R "${LOCAL_DIR}/" "${REMOTE_DIR}/" \
+  --parallel=4 --delete --exclude-glob .git* --exclude logs/ --exclude node_modules/ \
+  --exclude-glob '*.map' --exclude-glob '*.ts';
+bye
+LFTP
+          echo '---- lftp summary ----'
+          grep -E 'Total:|Uploaded:|Removed:' "$lftp_log" || tail -n 20 "$lftp_log"
+
+      - name: Post-deploy verification
+        env:
+          BASE: https://api.quickgig.ph
+        run: |
+          set -euo pipefail
+          curl -fsS "$BASE/status" | jq -C . | tee /tmp/status.json
+          grep -q '"ok"' /tmp/status.json || { echo 'status check failed'; cat /tmp/status.json; exit 1; }
+          curl -fsS "$BASE/health.php" | jq -C . | tee /tmp/health.json
+          grep -q '"ok"' /tmp/health.json || { echo 'health check failed'; cat /tmp/health.json; exit 1; }
+
+      - name: Run installer
+        env:
+          BASE: https://api.quickgig.ph
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/install.json -w "%{http_code}" "$BASE/tools/install.php?token=RUN_ONCE" || echo "000")
+          cat /tmp/install.json
+          if [ "$code" = "000" ] || [ "$code" -ge 500 ]; then
+            echo "installer failed (HTTP $code)"
+            exit 1
+          fi
+
+      - name: Seed sample event
+        env:
+          BASE: https://api.quickgig.ph
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          set -euo pipefail
+          payload='{"slug":"launch-party","title":"Launch Party","venue":"Makati","start_time":"2025-09-10 19:00:00","status":"published","ticket_types":[{"name":"GA","price_cents":50000,"quantity_total":100}]}'
+          code=$(curl -sS -o /tmp/seed.json -w "%{http_code}" -X POST "$BASE/admin/events/create.php" \
+            -H "Content-Type: application/json" -H "X-Admin-Token: $ADMIN_TOKEN" --data "$payload" || echo "000")
+          cat /tmp/seed.json
+          if [ "$code" = "000" ] || [ "$code" -ge 500 ] || [ "$code" = "401" ] || [ "$code" = "403" ]; then
+            echo "seed failed (HTTP $code)"
+            exit 1
+          fi
+
+      - name: List events
+        env:
+          BASE: https://api.quickgig.ph
+        run: |
+          set -euo pipefail
+          curl -fsS "$BASE/events/index.php" | jq -C '.events | length as $n | {count:$n}'
+
+      - name: Append JSON to summary
+        run: |
+          set -euo pipefail
+          {
+            echo '### status.json'
+            echo '```json'
+            cat /tmp/status.json
+            echo '```'
+            echo '### health.json'
+            echo '```json'
+            cat /tmp/health.json
+            echo '```'
+            echo '### install.json'
+            echo '```json'
+            cat /tmp/install.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
