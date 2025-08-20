@@ -5,6 +5,17 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 > We use **App Router** for pages. `pages/` is reserved for **API routes** only.
 > Set `NEXT_PUBLIC_API_URL` in Vercel Preview & Production.
 
+## Events & Tickets
+
+Public pages:
+
+- `/events` – list published events
+- `/events/[slug]` – event details with ticket selection
+- `/checkout` – create orders and show payment instructions
+
+Admin UI (`/admin`) is enabled when `NEXT_PUBLIC_ADMIN_UI=true` and uses server
+proxies that send `ADMIN_TOKEN` to the backend.
+
 ## Routing (production)
 
 - `quickgig.ph` and `www.quickgig.ph` are served by Vercel and issue a 308 to `https://app.quickgig.ph/:path*`
@@ -32,6 +43,8 @@ NEXT_PUBLIC_SOCKET_URL=wss://api.quickgig.ph
 API_URL=https://api.quickgig.ph
 JWT_COOKIE_NAME=auth_token
 JWT_MAX_AGE_SECONDS=1209600
+NEXT_PUBLIC_ADMIN_UI=false
+ADMIN_TOKEN=your_admin_secret
 ```
 
 Socket.IO is hosted by the backend at `NEXT_PUBLIC_SOCKET_URL`; the frontend

@@ -8,9 +8,16 @@ if ($token !== (getenv('INSTALL_TOKEN') ?: '')) {
     exit;
 }
 
-$sql = file_get_contents(__DIR__.'/../migrations/001_create_users.sql');
+$migrations = [
+    '001_create_users.sql',
+    '010_events.sql',
+];
+
 try {
-    db()->exec($sql);
+    foreach ($migrations as $file) {
+        $sql = file_get_contents(__DIR__.'/../migrations/' . $file);
+        db()->exec($sql);
+    }
     echo "ok";
 } catch (Throwable $e) {
     http_response_code(500);
