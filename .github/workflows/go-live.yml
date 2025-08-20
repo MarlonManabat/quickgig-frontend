@@ -2,16 +2,133 @@ name: Go Live
 
 on:
   workflow_dispatch:
+    inputs:
+      slug:
+        description: Event slug
+        required: false
+        default: launch-party
+      title:
+        description: Event title
+        required: false
+        default: Launch Party
+      venue:
+        description: Event venue
+        required: false
+        default: Makati
+      start_time:
+        description: Start time (YYYY-MM-DD HH:MM:SS)
+        required: false
+        default: '2025-09-10 19:00:00'
+
+concurrency:
+  group: go-live
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  go-live:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Revalidate frontend caches
-        env:
-          APP_ORIGIN: https://app.quickgig.ph
-          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: sudo apt-get update && sudo apt-get install -y lftp jq
+
+      - name: Resolve backend dir
+        id: backend
         run: |
-          set -euo pipefail
-          curl -fsS -X POST "$APP_ORIGIN/api/revalidate?secret=$REVALIDATE_SECRET&tag=events"
+          set -e
+          FILE=$(find . -path "*/tools/install.php" | head -n1)
+          if [ -z "$FILE" ]; then
+            echo "tools/install.php not found" >&2
+            exit 1
+          fi
+          BACKEND_DIR=$(dirname "$(dirname "$FILE")")
+          echo "BACKEND_DIR=$BACKEND_DIR" >> $GITHUB_ENV
+          echo "backend_dir=$BACKEND_DIR" >> $GITHUB_OUTPUT
+
+      - name: Deploy via FTPS
+        env:
+          FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST || secrets.FTP_SERVER }}
+          FTP_USER: ${{ secrets.HOSTINGER_FTP_USER || secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.HOSTINGER_FTP_PASS || secrets.FTP_PASSWORD }}
+          REMOTE_DIR: ${{ secrets.HOSTINGER_SERVER_DIR || secrets.HOSTINGER_REMOTE_DIR }}
+        run: |
+          set -e
+          if [ -z "$FTP_HOST" ] || [ -z "$FTP_USER" ] || [ -z "$FTP_PASS" ] || [ -z "$REMOTE_DIR" ]; then
+            echo "Missing FTP credentials or remote directory. Required: HOSTINGER_FTP_HOST/FTP_SERVER, HOSTINGER_FTP_USER/FTP_USERNAME, HOSTINGER_FTP_PASS/FTP_PASSWORD, HOSTINGER_SERVER_DIR/HOSTINGER_REMOTE_DIR" >&2
+            exit 1
+          fi
+          lftp -u "$FTP_USER","$FTP_PASS" "ftps://$FTP_HOST" <<'EOLFTP'
+set ftp:ssl-force true
+set ftp:ssl-protect-data true
+set ssl:verify-certificate no
+mirror -R --only-newer --parallel=4 --exclude-glob .git --exclude-glob node_modules --exclude-glob .next "$BACKEND_DIR/" "$REMOTE_DIR"
+quit
+EOLFTP
+
+      - name: Verify health
+        run: |
+          set -e
+          curl -sSf https://api.quickgig.ph/status | tee /tmp/status.json | jq
+          if ! curl -sSf https://api.quickgig.ph/health.php | tee /tmp/health.json | jq; then
+            echo '{}' > /tmp/health.json
+          fi
+
+      - name: Run installer (idempotent)
+        run: |
+          set -e
+          CODE=$(curl -sS -o /tmp/install.json -w "%{http_code}" "https://api.quickgig.ph/tools/install.php?token=RUN_ONCE")
+          cat /tmp/install.json
+          if [ "$CODE" -ge 500 ]; then
+            echo "Installer error $CODE" >&2
+            exit 1
+          fi
+
+      - name: Seed sample event
+        id: seed
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+          SLUG: ${{ github.event.inputs.slug || 'launch-party' }}
+          TITLE: ${{ github.event.inputs.title || 'Launch Party' }}
+          VENUE: ${{ github.event.inputs.venue || 'Makati' }}
+          START: ${{ github.event.inputs.start_time || '2025-09-10 19:00:00' }}
+        run: |
+          set -e
+          if [ -z "$ADMIN_TOKEN" ]; then
+            echo "Missing ADMIN_TOKEN secret" >&2
+            exit 1
+          fi
+          PAYLOAD=$(jq -n --arg slug "$SLUG" --arg title "$TITLE" --arg venue "$VENUE" --arg start "$START" '{slug:$slug,title:$title,venue:$venue,start_time:$start,ticket_types:[{name:"GA",price:500,quantity:100},{name:"VIP",price:1000,quantity:50}]}')
+          CODE=$(curl -sS -o /tmp/seed.json -w "%{http_code}" -X POST "https://api.quickgig.ph/admin/events/create.php" -H "Content-Type: application/json" -H "X-Admin-Token: $ADMIN_TOKEN" -d "$PAYLOAD")
+          cat /tmp/seed.json
+          if [ "$CODE" -ge 500 ]; then
+            echo "Seed request failed ($CODE)" >&2
+            exit 1
+          fi
+          ID=$(jq -r '.id // .event.id // empty' /tmp/seed.json)
+          echo "id=$ID" >> $GITHUB_OUTPUT
+          curl -sSf "https://api.quickgig.ph/events/index.php" | jq
+          curl -sSf "https://api.quickgig.ph/events/show.php?slug=$SLUG" | jq
+
+      - name: Revalidate frontend caches
+        if: secrets.REVALIDATE_SECRET != ''
+        run: |
+          curl -sS -X POST "https://app.quickgig.ph/api/revalidate?secret=${{ secrets.REVALIDATE_SECRET }}&tag=events" | tee /tmp/revalidate.json | jq
+
+      - name: Revalidate skipped
+        if: secrets.REVALIDATE_SECRET == ''
+        run: echo '{"skipped":true}' | tee /tmp/revalidate.json
+
+      - name: Summarize
+        env:
+          SEED_ID: ${{ steps.seed.outputs.id }}
+        run: |
+          echo "## Go Live Summary" >> $GITHUB_STEP_SUMMARY
+          echo "* Deployed directory: $BACKEND_DIR" >> $GITHUB_STEP_SUMMARY
+          echo "* Status: $(jq -c . /tmp/status.json)" >> $GITHUB_STEP_SUMMARY
+          echo "* Health: $(jq -c . /tmp/health.json)" >> $GITHUB_STEP_SUMMARY
+          echo "* Installer: $(jq -c . /tmp/install.json)" >> $GITHUB_STEP_SUMMARY
+          echo "* Seeded event ID: ${SEED_ID:-none}" >> $GITHUB_STEP_SUMMARY
+          echo "* Revalidate: $(jq -c . /tmp/revalidate.json)" >> $GITHUB_STEP_SUMMARY
+

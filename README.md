@@ -33,6 +33,40 @@ curl -X POST "https://app.quickgig.ph/api/revalidate?secret=$REVALIDATE_SECRET&t
 
 The Go Live workflow triggers this revalidation automatically after deploy.
 
+### Runbook
+
+**Prereqs**
+
+- Vercel Production env `NEXT_PUBLIC_API_URL=https://api.quickgig.ph`
+- GitHub secrets: `HOSTINGER_FTP_HOST`/`FTP_SERVER`, `HOSTINGER_FTP_USER`/`FTP_USERNAME`, `HOSTINGER_FTP_PASS`/`FTP_PASSWORD`, `HOSTINGER_SERVER_DIR`/`HOSTINGER_REMOTE_DIR`, `ADMIN_TOKEN`
+- Optional: `REVALIDATE_SECRET` in both Vercel and GitHub
+
+**How to run**
+
+1. GitHub → Actions → **Go Live**
+2. Fill inputs or accept defaults and run
+
+**What it does**
+
+FTPS deploy → health → installer → seed → revalidate
+
+**Smoke tests**
+
+```
+BASE=https://api.quickgig.ph
+curl -s $BASE/status | jq
+curl -s "$BASE/events/index.php" | jq
+curl -s "$BASE/events/show.php?slug=launch-party" | jq
+
+# Optional: force revalidate (if secret set in Vercel)
+curl -s -X POST "https://app.quickgig.ph/api/revalidate?secret=<REVALIDATE_SECRET>&tag=events"
+```
+
+**Rollback**
+
+- Re-deploy the previous commit via the workflow; or
+- Re-run installer with `RUN_ONCE` (safe)
+
 ## Setup
 
 1. Install dependencies:
