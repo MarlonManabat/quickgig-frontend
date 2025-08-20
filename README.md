@@ -18,6 +18,21 @@ A Next.js application for QuickGig.ph configured for deployment on Vercel.
 * Ensure DevTools Network shows no calls to `quickgig.ph/*.php` (only `/api/session/*`).
 - Rollback: revert this PR to restore any previous behavior.
 
+## Go Live
+
+Configure the following in Vercel before going live:
+
+- `NEXT_PUBLIC_API_URL=https://api.quickgig.ph`
+- `REVALIDATE_SECRET=<random-long-secret>`
+
+To refresh event pages after updates:
+
+```bash
+curl -X POST "https://app.quickgig.ph/api/revalidate?secret=$REVALIDATE_SECRET&tag=events"
+```
+
+The Go Live workflow triggers this revalidation automatically after deploy.
+
 ## Setup
 
 1. Install dependencies:
