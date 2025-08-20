@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { env } from '@/config/env';
 import { track } from '@/lib/track';
 import { register } from '@/lib/auth';
@@ -52,7 +53,7 @@ export default function RegisterPage() {
             {loading ? 'Creating account…' : 'Sign Up'}
           </button>
         </form>
-        <p className="text-sm mt-3">Already have an account? <a className="text-sky-600 font-semibold" href="/login">Login</a></p>
+        <p className="text-sm mt-3">Already have an account? <Link className="text-sky-600 font-semibold" href="/login">Login</Link></p>
       </div>
     </div>
   );

@@ -9,7 +9,8 @@ export function middleware(req: NextRequest) {
     p.startsWith('/dashboard') ||
     p.startsWith('/messages') ||
     p.startsWith('/applications') ||
-    p.startsWith('/settings');
+    p.startsWith('/settings') ||
+    p.startsWith('/account');
 
   if (!needsAuth) return NextResponse.next();
 
@@ -27,9 +28,11 @@ export const config = {
     '/messages/:path*',
     '/applications/:path*',
     '/settings/:path*',
+    '/account/:path*',
     '/dashboard',
     '/messages',
     '/applications',
     '/settings',
+    '/account',
   ],
 };

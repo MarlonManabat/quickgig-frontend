@@ -16,6 +16,7 @@ async function request(path: string, init: RequestInit & { timeout?: number } = 
   const { timeout = 10000, headers, body, ...rest } = init;
   const res = await fetch(url, {
     ...rest,
+    credentials: 'include',
     headers: {
       Accept: 'application/json',
       ...(body ? { 'Content-Type': 'application/json' } : {}),
