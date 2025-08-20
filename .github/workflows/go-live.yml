@@ -43,72 +43,106 @@ jobs:
 
       - name: Install tools
         run: |
-          echo "== Install tools =="
+          set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y jq lftp
+          sudo apt-get install -y --no-install-recommends lftp jq ca-certificates
 
       - name: Deploy backend via FTPS
-        shell: bash
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_PORT: ${{ secrets.FTP_PORT }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          HOSTINGER_SERVER_DIR: ${{ vars.HOSTINGER_SERVER_DIR || secrets.HOSTINGER_SERVER_DIR }}
-          BACKEND_DIR: ${{ env.BACKEND_DIR }}
+          FTP_PORT:   ${{ secrets.FTP_PORT }}
+          FTP_USER:   ${{ secrets.FTP_USERNAME }}
+          FTP_PASS:   ${{ secrets.FTP_PASSWORD }}
+          REMOTE_DIR: ${{ secrets.HOSTINGER_SERVER_DIR }}
         run: |
           set -euo pipefail
 
-          if [ -d api ]; then
-            BACKEND_DIR=api
-          elif [ -d _api.quickgig.ph ]; then
-            BACKEND_DIR=_api.quickgig.ph
+          echo "::group::Sanity checks"
+          : "${FTP_SERVER:?FTP_SERVER missing}"
+          : "${FTP_PORT:?FTP_PORT missing}"
+          : "${FTP_USER:?FTP_USERNAME missing}"
+          : "${FTP_PASS:?FTP_PASSWORD missing}"
+          : "${REMOTE_DIR:?HOSTINGER_SERVER_DIR missing}"
+          echo "FTP_SERVER=$FTP_SERVER"
+          echo "FTP_PORT=$FTP_PORT"
+          echo "REMOTE_DIR=$REMOTE_DIR"
+          lftp --version
+          echo "::endgroup::"
+
+          echo "::group::Resolve backend directory"
+          # Pick the backend folder from repo (supports multiple layouts)
+          if [ -d api.quickgig.ph ]; then
+            BACKEND_DIR="api.quickgig.ph"
           elif [ -d backend ]; then
-            BACKEND_DIR=backend
+            BACKEND_DIR="backend"
+          elif [ -d api ]; then
+            BACKEND_DIR="api"
           else
-            echo "Backend directory not found (expected one of: api, _api.quickgig.ph, backend)" >&2
+            echo "Unable to locate backend directory (tried api.quickgig.ph, backend, api)" >&2
             exit 1
           fi
+          echo "Using BACKEND_DIR=$BACKEND_DIR"
+          echo "::endgroup::"
 
-          echo "== Mirror backend via FTPS =="
+          echo "::group::Probe FTPS connectivity"
+          # Use explicit TLS (ftps://). Disable cert verification for shared hosts; control/data are protected.
+          lftp -d -e "
+            set net:max-retries 1;
+            set net:timeout 15;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate no;
+            open -u ${FTP_USER},${FTP_PASS} -p ${FTP_PORT} ftps://${FTP_SERVER};
+            pwd; ls -la ${REMOTE_DIR};
+            bye
+          " || { echo 'FTPS probe failed'; exit 1; }
+          echo "::endgroup::"
 
-          lftp \
-            -u "${FTP_USERNAME},${FTP_PASSWORD}" \
-            -p "${FTP_PORT}" \
-            -e "set ftp:ssl-force true; set ftp:passive-mode true; set ssl:verify-certificate no; mirror -R --delete --parallel=2 ${BACKEND_DIR} ${HOSTINGER_SERVER_DIR}; bye" \
-            "ftps://${FTP_SERVER}"
+          echo "::group::Mirror backend to remote"
+          # Mirror (reverse upload) with delete to keep remote in sync
+          lftp -e "
+            set net:max-retries 2;
+            set net:timeout 30;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode true;
+            set ssl:verify-certificate no;
+            open -u ${FTP_USER},${FTP_PASS} -p ${FTP_PORT} ftps://${FTP_SERVER};
+            mirror -R --delete --verbose ${BACKEND_DIR} ${REMOTE_DIR};
+            bye
+          " || { echo 'FTPS mirror failed'; exit 1; }
+          echo "::endgroup::"
 
       - name: Verify backend
-        shell: bash
         run: |
-          echo "== Verify backend =="
-          curl -sSf "$BASE/status" | jq .
-          curl -sSf "$BASE/tools/install.php?token=RUN_ONCE" | tee /tmp/install.json
+          set -euo pipefail
+          BASE="https://api.quickgig.ph"
+          curl -fsS "$BASE/status" | jq .
+          curl -fsS "$BASE/tools/install.php?token=RUN_ONCE" | tee /tmp/install.json | jq .
 
       - name: Seed sample event
-        shell: bash
-        env:
-          SLUG: ${{ inputs.slug }}
-          TITLE: ${{ inputs.title }}
-          VENUE: ${{ inputs.venue }}
-          START_TIME: ${{ inputs.start_time }}
         run: |
-          echo "== Seed sample event =="
-          curl -sSf -X POST "$BASE/admin/events/create.php" \
-            -H "X-Admin-Token: $ADMIN_TOKEN" \
+          set -euo pipefail
+          BASE="https://api.quickgig.ph"
+          PAYLOAD=$(jq -nc --arg s "${{ inputs.slug }}" --arg t "${{ inputs.title }}" --arg v "${{ inputs.venue }}" --arg st "${{ inputs.start_time }}" '
+            {
+              slug:$s, title:$t, venue:$v, start_time:$st, status:"published",
+              tickets:[
+                {name:"GA",  price_cents:50000,  quantity_total:100},
+                {name:"VIP", price_cents:112000, quantity_total:20}
+              ]
+            }')
+          curl -fsS -X POST "$BASE/admin/events/create.php" \
             -H "Content-Type: application/json" \
-            --data "{\"slug\":\"$SLUG\",\"title\":\"$TITLE\",\"venue\":\"$VENUE\",\"start_time\":\"$START_TIME\",\"status\":\"published\",\"tickets\":[{\"name\":\"GA\",\"price_cents\":50000,\"quantity_total\":100},{\"name\":\"VIP\",\"price_cents\":112000,\"quantity_total\":20}]}" | jq .
-          echo "== List events =="
-          curl -sSf "$BASE/events/index.php" | jq .
+            -H "X-Admin-Token: $ADMIN_TOKEN" \
+            --data "$PAYLOAD" | tee /tmp/seed.json | jq .
+          curl -fsS "$BASE/events/index.php" | jq '.[0] // .'
 
       - name: Revalidate frontend cache
-        shell: bash
         env:
-          SLUG: ${{ inputs.slug }}
+          REVALIDATE_TOKEN: ${{ secrets.REVALIDATE_TOKEN }}
         run: |
-          echo "== Revalidate frontend cache =="
-          curl -sSf -X POST "$APP_ORIGIN/api/revalidate" \
-            -H "X-Revalidate-Token: $REVALIDATE_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data "{\"tags\":[\"events\",\"event:$SLUG\"]}"
+          set -euo pipefail
+          curl -fsS "https://app.quickgig.ph/api/revalidate?tag=events&secret=${REVALIDATE_TOKEN}" | jq .
 
