@@ -993,3 +993,18 @@ curl -s "$BASE/events/index.php"
 ### Runbook
 
 If `/events/index.php` returns HTML, deploy didn’t run or files aren’t in `public_html/api/`—rerun workflow or check server path.
+
+## Backend Bootstrap (deploy + install + seed)
+
+Deploys the backend, runs the installer, and seeds a sample event.
+
+1. Go to **Actions → Bootstrap backend (deploy + install + seed)**.
+2. Click "Run workflow" and adjust inputs if needed.
+
+Required secrets: `HOSTINGER_*` (SSH or FTP) and `ADMIN_TOKEN`.
+
+Local alternative:
+
+```bash
+ADMIN=<token> BASE=https://api.quickgig.ph npm run bootstrap:backend
+```
