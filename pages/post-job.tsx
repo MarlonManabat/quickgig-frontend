@@ -2,6 +2,8 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Shell from "@/components/Shell";
 import { useRouter } from "next/router";
+import { useRequireUser } from "@/lib/useRequireUser";
+import { uploadPublicFile } from "@/lib/storage";
 
 export default function PostJobPage() {
   const [title, setTitle] = useState("");
@@ -11,17 +13,15 @@ export default function PostJobPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const router = useRouter();
+  const { ready, userId } = useRequireUser();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return setMsg("Please login first.");
-
     const { data, error } = await supabase
       .from("gigs")
-      .insert({ owner: user.id, title, description, budget: budget === "" ? null : Number(budget), city, image_url: imageUrl })
+      .insert({ owner: userId, title, description, budget: budget === "" ? null : Number(budget), city, image_url: imageUrl })
       .select("id")
       .single();
 
@@ -31,6 +31,19 @@ export default function PostJobPage() {
       router.push(`/gigs/${data.id}`);
     }
   }
+
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    try {
+      const url = await uploadPublicFile(f, "gigs");
+      setImageUrl(url);
+    } catch (err: any) {
+      setMsg(err.message ?? String(err));
+    }
+  }
+
+  if (!ready) return <Shell><p>Loading…</p></Shell>;
 
   return (
     <Shell>
@@ -44,8 +57,10 @@ export default function PostJobPage() {
                placeholder="Budget (optional)" value={budget} onChange={(e)=>setBudget(e.target.value as any)} />
         <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
                placeholder="City (optional)" value={city} onChange={(e)=>setCity(e.target.value)} />
-        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
-               placeholder="Image URL (optional)" value={imageUrl} onChange={(e)=>setImageUrl(e.target.value)} />
+        <div className="space-y-2">
+          {imageUrl && <img src={imageUrl} className="rounded max-h-48 object-cover" />}
+          <input type="file" accept="image/*" onChange={onFile} />
+        </div>
         <button className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Publish</button>
       </form>
       {msg && <p className="mt-3">{msg}</p>}
