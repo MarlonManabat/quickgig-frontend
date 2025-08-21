@@ -32,6 +32,11 @@
 
 - Run migration: `supabase/migrations/2025-08-21-applications.sql`
 
+## Realtime messages
+
+- Run migration: `supabase/migrations/2025-08-21T_realtime_messages_and_reads.sql` (enable Realtime on messages and track per-user read markers)
+- Requires publication `supabase_realtime`
+
 ## Supabase health check
 
 - Endpoint: `/api/health` (Pages API)
@@ -42,3 +47,8 @@
 - Complete signup → magic link opens app.quickgig.ph (not root)
 - Check Supabase `profiles` row for the new user
 - Try https://quickgig.ph/login and /post → 302 to app
+- As owner, open application list then a specific application thread
+- As worker in another browser, send a message on that application
+- Owner thread updates without refresh and unread indicator clears after viewing
+- Application list shows a dot for unread messages and clears after opening
+- `/api/health` returns ok

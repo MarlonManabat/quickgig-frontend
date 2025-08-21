@@ -2,10 +2,11 @@ import Shell from "@/components/Shell";
 import MessageItem from "@/components/MessageItem";
 import MessageComposer from "@/components/MessageComposer";
 import { useRequireUser } from "@/lib/useRequireUser";
-import { useInterval } from "@/lib/useInterval";
 import { supabase } from "@/lib/supabaseClient";
+import { subscribeToMessages } from "@/lib/realtime";
+import { markThreadRead } from "@/lib/reads";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function ApplicationThread() {
   const { ready, userId } = useRequireUser();
@@ -16,6 +17,7 @@ export default function ApplicationThread() {
   const [messages, setMessages] = useState<any[]>([]);
   const [offer, setOffer] = useState<any>(null);
   const [tab, setTab] = useState<"messages" | "offer" | "status">("messages");
+  const listRef = useRef<HTMLDivElement>(null);
 
   const isOwner = app && userId && app.owner === userId;
   const isWorker = app && userId && app.worker === userId;
@@ -57,23 +59,31 @@ export default function ApplicationThread() {
   }
 
   useEffect(() => {
-    if (!ready || !id) return;
-    loadApp();
-    loadMessages();
-    loadOffer();
-    localStorage.setItem(`app:lastSeen:${id}`, Date.now().toString());
-  }, [ready, id]);
+    if (!ready || !id || !userId) return;
 
-  useInterval(() => {
-    loadMessages();
-    loadOffer();
-  }, 5000);
+    const init = async () => {
+      await loadApp();
+      await loadMessages();
+      await loadOffer();
+      await markThreadRead(id, userId);
+    };
+    init();
+
+    const off = subscribeToMessages(id, (row) => {
+      setMessages((prev) => [...prev, row]);
+      if (row.sender && row.sender !== userId) {
+        markThreadRead(id, userId).catch(() => {});
+      }
+      queueMicrotask(() => listRef.current?.scrollTo({ top: 1e9, behavior: 'smooth' }));
+    });
+
+    return () => off();
+  }, [ready, id, userId]);
 
   async function sendMessage(body: string) {
     await supabase.from("messages").insert([
       { application_id: id, sender: userId, body },
     ]);
-    loadMessages();
   }
 
   async function createOffer(amount: string, notes: string) {
@@ -113,7 +123,7 @@ export default function ApplicationThread() {
 
       {tab === "messages" && (
         <div className="flex flex-col h-[60vh]">
-          <div className="flex-1 overflow-y-auto mb-2">
+          <div ref={listRef} className="flex-1 overflow-y-auto mb-2">
             {messages.map((m) => (
               <MessageItem key={m.id} msg={m} self={userId!} />
             ))}
