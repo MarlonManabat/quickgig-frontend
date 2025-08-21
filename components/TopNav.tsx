@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import NotificationsBell from "@/components/NotificationsBell";
 
 export default function TopNav() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -16,6 +17,7 @@ export default function TopNav() {
           <Link href="/find-work">Find Work</Link>
           {loggedIn && <Link href="/dashboard/gigs">My Gigs</Link>}
           {loggedIn && <Link href="/applications">Applications</Link>}
+          {loggedIn && <NotificationsBell />}
           <Link href="/post-job" className="rounded px-3 py-1 bg-yellow-400 text-black font-medium">
             Post Job
           </Link>

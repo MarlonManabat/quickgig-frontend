@@ -20,6 +20,7 @@
   - `SUPABASE_SERVICE_ROLE_KEY` = (server-only)
   - `NEXT_PUBLIC_SITE_URL` = https://app.quickgig.ph
   - (optional) `NEXT_PUBLIC_STORAGE_BUCKET` = assets
+  - (optional) `RESEND_API_KEY`, `NOTIFY_FROM`, `APP_URL`
 - Redeploy after saving envs.
 
 ## Hostinger (Root landing at quickgig.ph)
@@ -37,6 +38,10 @@
 - Run migration: `supabase/migrations/2025-08-21T_realtime_messages_and_reads.sql` (enable Realtime on messages and track per-user read markers)
 - Requires publication `supabase_realtime`
 
+## Notifications
+
+- Run migration: `supabase/migrations/2025-08-22_notifications.sql`
+
 ## Supabase health check
 
 - Endpoint: `/api/health` (Pages API)
@@ -51,4 +56,7 @@
 - As worker in another browser, send a message on that application
 - Owner thread updates without refresh and unread indicator clears after viewing
 - Application list shows a dot for unread messages and clears after opening
+- A sends Worker a message → Worker sees bell dot & dropdown updates live
+- Worker opens dropdown → dot clears
+- Owner sends offer → Worker gets `offer` notification; accept → both get `hired`
 - `/api/health` returns ok
