@@ -1,6 +1,8 @@
 import { GetServerSideProps } from "next";
 import Shell from "@/components/Shell";
 import { supabase } from "@/lib/supabaseClient";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id as string;
@@ -10,10 +12,34 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 export default function GigPage({ gig }: { gig: any }) {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
+
   return (
     <Shell>
       <h1 className="text-3xl font-bold mb-2">{gig.title}</h1>
-      {gig.image_url && <img src={gig.image_url} alt="" className="rounded mb-4 max-h-64 object-cover" />}
+      {user?.id !== gig.owner ? (
+        <Link
+          href={`/gigs/${gig.id}/apply`}
+          className="rounded bg-yellow-400 text-black px-3 py-1"
+        >
+          Apply
+        </Link>
+      ) : (
+        <Link href={`/gigs/${gig.id}/applicants`} className="underline">
+          View Applicants
+        </Link>
+      )}
+      {gig.image_url && (
+        <img
+          src={gig.image_url}
+          alt=""
+          className="rounded mb-4 max-h-64 object-cover"
+        />
+      )}
       <p className="opacity-90 mb-4 whitespace-pre-wrap">{gig.description}</p>
       <div className="text-sm opacity-80 space-x-4">
         <span>Budget: {gig.budget ?? "—"}</span>

@@ -28,6 +28,10 @@
 - If `index.php` exists, remove it so `index.html` takes over.
 - `.htaccess` here forwards common routes to the app subdomain.
 
+## Applications MVP
+
+- Run migration: `supabase/migrations/2025-08-21-applications.sql`
+
 ## Supabase health check
 
 - Endpoint: `/api/health` (Pages API)
