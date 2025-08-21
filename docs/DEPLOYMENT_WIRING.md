@@ -42,6 +42,11 @@
 
 - Run migration: `supabase/migrations/2025-08-22_notifications.sql`
 
+## Saved gigs & alerts
+
+- Run migration: `supabase/migrations/2025-08-22_saved_gigs_alerts.sql`
+- (Optional) Cron: `curl -sS https://app.quickgig.ph/api/alert-scan`
+
 ## Supabase health check
 
 - Endpoint: `/api/health` (Pages API)
