@@ -1,12 +1,15 @@
-import { supabase } from './supabaseClient'
+import { supabase } from "./supabaseClient";
 
-export async function uploadUserFile(file: File) {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET || "assets";
 
-  const path = `${user.id}/${Date.now()}-${file.name}`
-  const { error } = await supabase.storage.from('assets').upload(path, file, { upsert: true })
-  if (error) throw error
-  const { data } = supabase.storage.from('assets').getPublicUrl(path)
-  return data.publicUrl
+export async function uploadPublicFile(file: File, prefix = "gigs") {
+  const name = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+  const path = `${prefix}/${name}`;
+  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
+  if (error) throw error;
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl;
 }
