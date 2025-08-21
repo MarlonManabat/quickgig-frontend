@@ -1,52 +1,47 @@
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import { supabase } from '@/lib/supabaseClient'
+import { useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import Shell from "@/components/Shell";
+import { useRouter } from "next/router";
 
-export default function Login() {
-  const [email, setEmail] = useState('')
-  const [msg, setMsg] = useState<string | null>(null)
-  const router = useRouter()
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  useEffect(() => {
-    async function check() {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        const { data } = await supabase.from('profiles').select('id').eq('id', session.user.id).maybeSingle()
-        router.replace(data ? '/post-job' : '/profile')
-      }
-    }
-    check()
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
-      if (session) check()
-    })
-    return () => { sub.subscription.unsubscribe() }
-  }, [router])
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setMsg(null)
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false, emailRedirectTo: `${location.origin}/login` },
-    })
-    setMsg(error ? error.message : 'Check your email for the login link.')
+  async function signIn(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${window.location.origin}/profile` } });
+    if (error) setError(error.message);
+    else setSent(true);
   }
 
   return (
-    <div className="p-4 max-w-sm mx-auto">
-      <h1 className="mb-4 text-xl">Login</h1>
-      <form onSubmit={onSubmit} className="space-y-3">
-        <input
-          className="w-full border p-2"
-          type="email"
-          required
-          placeholder="you@example.com"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-        <button className="w-full bg-blue-500 text-white p-2" type="submit">Send Magic Link</button>
-        {msg && <p className="text-sm">{msg}</p>}
-      </form>
-    </div>
-  )
+    <Shell>
+      <h1 className="text-2xl font-bold mb-4">Login / Sign up</h1>
+      {sent ? (
+        <p className="text-green-400">Magic link sent! Check your email.</p>
+      ) : (
+        <form onSubmit={signIn} className="max-w-md space-y-3">
+          <input
+            type="email"
+            required
+            placeholder="you@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+          />
+          <button className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Send Magic Link</button>
+          {error && <p className="text-red-400">{error}</p>}
+        </form>
+      )}
+      <button
+        onClick={async () => { await supabase.auth.signOut(); router.push("/"); }}
+        className="mt-6 text-sm underline"
+      >
+        Sign out
+      </button>
+    </Shell>
+  );
 }
