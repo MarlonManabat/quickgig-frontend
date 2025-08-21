@@ -7,7 +7,8 @@
     "start": "next start",
     "smoke": "node scripts/smoke.mjs",
     "smoke:local": "node scripts/smoke.mjs",
-    "smoke:prod": "node scripts/smoke-prod.mjs"
+    "smoke:prod": "node scripts/smoke-prod.mjs",
+    "db:mvp:sql": "echo supabase/sql/001_mvp.sql"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",
