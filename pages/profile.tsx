@@ -11,11 +11,13 @@ export default function ProfilePage() {
   const [ratingAvg, setRatingAvg] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setLoading(false); return; }
+      setUserId(user.id);
 
       const { data } = await supabase
         .from("profiles")
@@ -48,6 +50,19 @@ export default function ProfilePage() {
     setStatus(error ? error.message : "Saved!");
   }
 
+  async function reportProfile() {
+    if (!userId) return;
+    const reason = prompt("Why are you reporting this profile?") || "";
+    try {
+      await fetch("/api/reports/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "profile", target_id: userId, reason }),
+      });
+      alert("Reported");
+    } catch (_) {}
+  }
+
   if (loading) return <Shell><p>Loading…</p></Shell>;
 
   return (
@@ -73,6 +88,11 @@ export default function ProfilePage() {
             </li>
           ))}
         </ul>
+      )}
+      {userId && (
+        <button onClick={reportProfile} className="mt-4 text-sm underline">
+          Report Profile
+        </button>
       )}
     </Shell>
   );
