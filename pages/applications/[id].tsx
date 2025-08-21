@@ -5,6 +5,7 @@ import { useRequireUser } from "@/lib/useRequireUser";
 import { supabase } from "@/lib/supabaseClient";
 import { subscribeToMessages } from "@/lib/realtime";
 import { markThreadRead } from "@/lib/reads";
+import { createReview } from "@/lib/reviews";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
@@ -18,6 +19,10 @@ export default function ApplicationThread() {
   const [offer, setOffer] = useState<any>(null);
   const [tab, setTab] = useState<"messages" | "offer" | "status">("messages");
   const listRef = useRef<HTMLDivElement>(null);
+  const [reviewed, setReviewed] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
 
   const isOwner = app && userId && app.owner === userId;
   const isWorker = app && userId && app.worker === userId;
@@ -58,6 +63,17 @@ export default function ApplicationThread() {
     setOffer(data ?? null);
   }
 
+  async function loadReview() {
+    if (!id || !userId) return;
+    const { data } = await supabase
+      .from("reviews")
+      .select("id")
+      .eq("app_id", id)
+      .eq("reviewer", userId)
+      .maybeSingle();
+    setReviewed(!!data);
+  }
+
   useEffect(() => {
     if (!ready || !id || !userId) return;
 
@@ -65,6 +81,7 @@ export default function ApplicationThread() {
       await loadApp();
       await loadMessages();
       await loadOffer();
+      await loadReview();
       await markThreadRead(id, userId);
     };
     init();
@@ -150,6 +167,17 @@ export default function ApplicationThread() {
     await loadApp();
   }
 
+  async function submitReview(e: React.FormEvent) {
+    e.preventDefault();
+    const reviewee = isOwner ? app.worker : app.owner;
+    if (!reviewee || !id) return;
+    await createReview(Number(id), reviewee, rating, comment || undefined);
+    setReviewed(true);
+    setShowReview(false);
+    setComment("");
+    setRating(5);
+  }
+
   if (!ready) return <Shell><p>Loading…</p></Shell>;
   if (!app) return <Shell><p>Not found.</p></Shell>;
 
@@ -199,6 +227,33 @@ export default function ApplicationThread() {
       {tab === "status" && (
         <div>
           <p>Application status: {app.status}</p>
+          { (app.status === 'hired' || app.status === 'completed') && !reviewed && (
+            <button onClick={() => setShowReview(true)} className="mt-2 rounded bg-yellow-400 text-black px-3 py-1">Leave a review</button>
+          )}
+        </div>
+      )}
+      {showReview && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <form onSubmit={submitReview} className="w-80 space-y-2 rounded bg-white p-4 text-black">
+            <div>
+              <label className="mr-2">Rating</label>
+              <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="rounded border px-2 py-1">
+                {[1,2,3,4,5].map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="w-full rounded border px-2 py-1"
+              placeholder="Comment (optional)"
+            />
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setShowReview(false)} className="px-3 py-1 rounded bg-slate-300">Cancel</button>
+              <button type="submit" className="px-3 py-1 rounded bg-yellow-400 text-black">Submit</button>
+            </div>
+          </form>
         </div>
       )}
     </Shell>
