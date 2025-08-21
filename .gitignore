@@ -29,16 +29,12 @@ yarn-error.log*
 # local env files
 .env*
 !.env.example
-!.env.local
-!.env.staging
-!.env.production.example
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # PHP API vendor
 api.quickgig.ph/vendor/
