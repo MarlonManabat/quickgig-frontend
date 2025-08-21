@@ -2,13 +2,14 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "2.43.5",
+    "@supabase/supabase-js": "^2.45.0",
     "next": "14.2.31",
     "react": "^18",
     "react-dom": "^18"
@@ -24,7 +25,7 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": "20.x"
+    "node": ">=18 <22"
   },
   "playwright": {
     "skipBrowserDownload": true
