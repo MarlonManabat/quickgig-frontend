@@ -1,9 +1,4 @@
-// scripts/smoke.mjs
-/* Smoke test for local or configurable base.
-   Usage:
-     node scripts/smoke.mjs
-     SMOKE_BASE=https://app.quickgig.ph node scripts/smoke.mjs
-*/
+// scripts/smoke-prod.mjs
 import { execSync } from "node:child_process";
 
 const HEADER_FILTER = /^(HTTP\/|content-type:|content-length:|server:|location:)/i;
@@ -20,10 +15,12 @@ function showHead(url, label = url) {
 }
 
 (async () => {
-  const base = (process.env.SMOKE_BASE || "http://localhost:3000").replace(/\/$/, "");
-  const ok = get(`${base}/api/health`).trim();
+  // App API health
+  const ok = get("https://app.quickgig.ph/api/health").trim();
   console.log("# /api/health:", ok);
 
-  // Show headers for base
-  showHead(base + "/", base);
+  // Landing + redirects
+  showHead("https://quickgig.ph/", "quickgig.ph");
+  showHead("https://www.quickgig.ph/", "www.quickgig.ph");
+  showHead("https://quickgig.ph/post-job", "quickgig.ph/post-job");
 })();

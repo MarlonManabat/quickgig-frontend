@@ -6,8 +6,8 @@
     "build": "next build",
     "start": "next start",
     "smoke": "node scripts/smoke.mjs",
-    "smoke:local": "SMOKE_BASE=http://localhost:3000 node scripts/smoke.mjs",
-    "smoke:prod": "SMOKE_BASE=https://app.quickgig.ph node scripts/smoke.mjs"
+    "smoke:local": "node scripts/smoke.mjs",
+    "smoke:prod": "node scripts/smoke-prod.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",
