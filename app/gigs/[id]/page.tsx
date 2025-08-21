@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabaseClient'
 
-export default async function Page({ params }: { params: { id: string } }){
-  const { data } = await supabase.from('gigs').select('*').eq('id', params.id).single()
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const { data } = await supabase.from('gigs').select('*').eq('id', id).single()
   if (!data) return <div className="p-6">Not found</div>
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-3">
