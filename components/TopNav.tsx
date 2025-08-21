@@ -15,7 +15,7 @@ export default function TopNav() {
         <div className="ml-auto flex items-center gap-4 text-sm">
           <Link href="/find-work">Find Work</Link>
           {loggedIn && <Link href="/dashboard/gigs">My Gigs</Link>}
-          {loggedIn && <Link href="/dashboard/applications">My Applications</Link>}
+          {loggedIn && <Link href="/applications">Applications</Link>}
           <Link href="/post-job" className="rounded px-3 py-1 bg-yellow-400 text-black font-medium">
             Post Job
           </Link>
