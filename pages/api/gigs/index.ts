@@ -6,7 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'GET') {
     const { q, city } = req.query as { q?: string, city?: string }
-    let query = supabase.from('gigs').select('*').order('created_at', { ascending: false })
+    let query = supabase.from('gigs').select('*').neq('hidden', true).order('created_at', { ascending: false })
     if (q) query = query.ilike('title', `%${q}%`)
     if (city) query = query.ilike('city', `%${city}%`)
     const { data, error } = await query

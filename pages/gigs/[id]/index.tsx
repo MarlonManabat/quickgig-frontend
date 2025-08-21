@@ -13,17 +13,37 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 export default function GigPage({ gig }: { gig: any }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(undefined);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, []);
 
+  async function report() {
+    const reason = prompt("Why are you reporting this gig?") || "";
+    try {
+      await fetch("/api/reports/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "gig", target_id: gig.id, reason }),
+      });
+      alert("Reported");
+    } catch (_) {}
+  }
+
+  if (gig.hidden) {
+    if (user === undefined) return <Shell><p>Loading…</p></Shell>;
+    if (!user || user.id !== gig.owner) return <Shell><p>This gig is unavailable.</p></Shell>;
+  }
+
   return (
     <Shell>
       <div className="mb-2 flex items-center justify-between">
         <h1 className="text-3xl font-bold">{gig.title}</h1>
-        <SaveButton gigId={gig.id} withText />
+        <div className="flex items-center gap-2">
+          <SaveButton gigId={gig.id} withText />
+          <button onClick={report} className="text-sm underline">Report</button>
+        </div>
       </div>
       {user?.id !== gig.owner ? (
         <Link

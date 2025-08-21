@@ -35,6 +35,7 @@ export default function ApplyGig() {
   }
 
   if (!ready || !gig) return <Shell><p>Loading…</p></Shell>;
+  if (gig.hidden) return <Shell><p>This gig is unavailable.</p></Shell>;
 
   return (
     <Shell>

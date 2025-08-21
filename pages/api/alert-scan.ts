@@ -16,6 +16,7 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
       .select("id,title,city")
       .gt("created_at", since)
       .or(`title.ilike.%${a.keyword}%,description.ilike.%${a.keyword}%`)
+      .neq('hidden', true)
     if (a.city) q = q.eq("city", a.city)
     const { data: gigs } = await q
     if (gigs && gigs.length) {

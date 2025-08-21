@@ -21,7 +21,7 @@ export default function FindWorkPage() {
     let ignore = false;
     setLoading(true);
     (async () => {
-      let query = supabase.from("gigs").select("*", { count: "exact" });
+      let query = supabase.from("gigs").select("*", { count: "exact" }).neq('hidden', true);
 
       if (q.trim()) {
         query = query.ilike("title", `%${q}%`).or(`description.ilike.%${q}%`);

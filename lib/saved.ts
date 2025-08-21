@@ -23,6 +23,7 @@ export async function mySaved(limit = 20, from = 0) {
   return supabase
     .from('saved_gigs')
     .select('gig_id, created_at, gigs ( title, city, budget )')
+    .neq('gigs.hidden', true)
     .order('created_at', { ascending: false })
     .range(from, from + limit - 1)
 }
