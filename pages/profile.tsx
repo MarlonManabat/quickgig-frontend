@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Shell from "@/components/Shell";
+import { listReviewsForUser } from "@/lib/reviews";
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+  const [ratingAvg, setRatingAvg] = useState<number | null>(null);
+  const [ratingCount, setRatingCount] = useState<number | null>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -15,14 +19,19 @@ export default function ProfilePage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url")
+        .select("full_name, avatar_url, rating_avg, rating_count")
         .eq("id", user.id)
         .maybeSingle();
 
       if (data) {
         setFullName(data.full_name ?? "");
         setAvatarUrl(data.avatar_url ?? "");
+        setRatingAvg(data.rating_avg ?? null);
+        setRatingCount(data.rating_count ?? null);
       }
+
+      const { data: revs } = await listReviewsForUser(user.id);
+      setReviews(revs ?? []);
       setLoading(false);
     })();
   }, []);
@@ -52,6 +61,19 @@ export default function ProfilePage() {
         <button className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Save</button>
       </form>
       {status && <p className="mt-3">{status}</p>}
+      {ratingCount !== null && (
+        <p className="mt-4">Rating: {ratingAvg ?? 0} ⭐ ({ratingCount})</p>
+      )}
+      {reviews.length > 0 && (
+        <ul className="mt-2 space-y-2">
+          {reviews.map((r) => (
+            <li key={r.id} className="rounded border border-slate-700 p-2">
+              <div>Rating: {'★'.repeat(r.rating)}</div>
+              {r.comment && <p className="text-sm">{r.comment}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
     </Shell>
   );
 }

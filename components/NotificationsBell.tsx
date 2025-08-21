@@ -55,18 +55,24 @@ export default function NotificationsBell() {
                 ? '⭐'
                 : n.kind === 'alert_match'
                 ? '🔔'
+                : n.kind === 'review_received'
+                ? '⭐'
                 : '✅'
             const text =
               n.kind === 'saved_gig_activity'
                 ? 'New application on a gig you saved.'
                 : n.kind === 'alert_match'
                 ? 'New gig matches your alert.'
+                : n.kind === 'review_received'
+                ? `You received a new review (★${n.payload?.rating}).`
                 : n.kind
             const href =
               n.kind === 'saved_gig_activity' && n.payload?.gig_id
                 ? `/gigs/${n.payload.gig_id}`
                 : n.kind === 'alert_match' && n.payload?.gig_id
                 ? `/gigs/${n.payload.gig_id}`
+                : n.kind === 'review_received' && n.payload?.app_id
+                ? `/applications/${n.payload.app_id}`
                 : undefined
             const body = (
               <>
