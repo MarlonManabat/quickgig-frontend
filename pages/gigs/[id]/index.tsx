@@ -3,6 +3,7 @@ import Shell from "@/components/Shell";
 import { supabase } from "@/lib/supabaseClient";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import SaveButton from "@/components/SaveButton";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id as string;
@@ -20,7 +21,10 @@ export default function GigPage({ gig }: { gig: any }) {
 
   return (
     <Shell>
-      <h1 className="text-3xl font-bold mb-2">{gig.title}</h1>
+      <div className="mb-2 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">{gig.title}</h1>
+        <SaveButton gigId={gig.id} withText />
+      </div>
       {user?.id !== gig.owner ? (
         <Link
           href={`/gigs/${gig.id}/apply`}

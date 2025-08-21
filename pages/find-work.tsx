@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Shell from "@/components/Shell";
 import Link from "next/link";
+import SaveButton from "@/components/SaveButton";
 
 const PAGE_SIZE = 12;
 
@@ -70,7 +71,10 @@ export default function FindWorkPage() {
       <ul className="grid sm:grid-cols-2 gap-4">
         {data.map((g: any) => (
           <li key={g.id} className="rounded border border-slate-800 p-4 bg-slate-900">
-            <h3 className="font-semibold text-lg">{g.title}</h3>
+            <div className="flex items-start justify-between">
+              <h3 className="font-semibold text-lg">{g.title}</h3>
+              <SaveButton gigId={g.id} />
+            </div>
             <p className="text-sm opacity-80 line-clamp-2">{g.description}</p>
             <div className="mt-2 flex items-center justify-between text-sm">
               <span>{g.city ?? "—"}</span>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { listNotifications, markAllSeen, subscribeNotifications } from '@/lib/notifications'
 import { supabase } from '@/lib/supabaseClient'
 
@@ -44,15 +45,48 @@ export default function NotificationsBell() {
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-72 rounded-xl border bg-white p-2 text-black shadow">
-          {(items.length ? items : [{ kind: 'message', payload: {}, created_at: new Date().toISOString() }]).map((n, i) => (
-            <div key={n.id ?? i} className="flex items-start gap-2 p-2">
-              <span>{n.kind === 'message' ? '💬' : n.kind === 'offer' ? '📄' : '✅'}</span>
-              <div className="text-sm">
-                <div className="font-medium capitalize">{n.kind}</div>
-                {n.payload?.snippet && <div className="text-gray-600">{n.payload.snippet}</div>}
+          {(items.length ? items : [{ kind: 'message', payload: {}, created_at: new Date().toISOString() }]).map((n, i) => {
+            const icon =
+              n.kind === 'message'
+                ? '💬'
+                : n.kind === 'offer'
+                ? '📄'
+                : n.kind === 'saved_gig_activity'
+                ? '⭐'
+                : n.kind === 'alert_match'
+                ? '🔔'
+                : '✅'
+            const text =
+              n.kind === 'saved_gig_activity'
+                ? 'New application on a gig you saved.'
+                : n.kind === 'alert_match'
+                ? 'New gig matches your alert.'
+                : n.kind
+            const href =
+              n.kind === 'saved_gig_activity' && n.payload?.gig_id
+                ? `/gigs/${n.payload.gig_id}`
+                : n.kind === 'alert_match' && n.payload?.gig_id
+                ? `/gigs/${n.payload.gig_id}`
+                : undefined
+            const body = (
+              <>
+                <span>{icon}</span>
+                <div className="text-sm">
+                  <div className="font-medium">{text}</div>
+                  {n.payload?.snippet && <div className="text-gray-600">{n.payload.snippet}</div>}
+                </div>
+              </>
+            )
+            return href ? (
+              <Link key={n.id ?? i} href={href} className="flex items-start gap-2 p-2">
+                {body}
+              </Link>
+            ) : (
+              <div key={n.id ?? i} className="flex items-start gap-2 p-2">
+                {body}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
