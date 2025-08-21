@@ -1,58 +1,54 @@
-import { useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
-import Protected from '@/components/Protected'
-import { useRouter } from 'next/router'
+import { useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import Shell from "@/components/Shell";
+import { useRouter } from "next/router";
 
-function PostJobForm() {
-  const [form, setForm] = useState({ title: '', description: '', city: '', budget: '' })
-  const [msg, setMsg] = useState<string | null>(null)
-  const router = useRouter()
+export default function PostJobPage() {
+  const [title, setTitle] = useState("");
+  const [description, setDesc] = useState("");
+  const [budget, setBudget] = useState<number | "">("");
+  const [city, setCity] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [msg, setMsg] = useState<string | null>(null);
+  const router = useRouter();
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setMsg(null)
-    if (!form.title || !form.description || !form.city || !form.budget) {
-      setMsg('All fields required')
-      return
-    }
-    const { data: { session } } = await supabase.auth.getSession()
-    const res = await fetch('/api/gigs', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session?.access_token}`,
-      },
-      body: JSON.stringify({ ...form, budget: Number(form.budget) }),
-    })
-    if (res.ok) {
-      const { gig } = await res.json()
-      alert('Gig posted')
-      router.push(`/gigs/${gig.id}`)
-    } else {
-      const err = await res.json()
-      setMsg(err.error || 'Error')
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setMsg(null);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return setMsg("Please login first.");
+
+    const { data, error } = await supabase
+      .from("gigs")
+      .insert({ owner: user.id, title, description, budget: budget === "" ? null : Number(budget), city, image_url: imageUrl })
+      .select("id")
+      .single();
+
+    if (error) setMsg(error.message);
+    else {
+      setMsg("Posted!");
+      router.push(`/gigs/${data.id}`);
     }
   }
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="mb-4 text-xl">Post a Job</h1>
-      <form onSubmit={onSubmit} className="space-y-3">
-        <input className="w-full border p-2" placeholder="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
-        <textarea className="w-full border p-2" placeholder="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-        <input className="w-full border p-2" placeholder="City" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} />
-        <input className="w-full border p-2" placeholder="Budget" type="number" value={form.budget} onChange={e => setForm({ ...form, budget: e.target.value })} />
-        <button className="w-full bg-green-600 text-white p-2" type="submit">Post</button>
-        {msg && <p className="text-sm">{msg}</p>}
+    <Shell>
+      <h1 className="text-2xl font-bold mb-4">Post a Job</h1>
+      <form onSubmit={submit} className="max-w-xl space-y-3">
+        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2" required
+               placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} />
+        <textarea className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2" rows={5}
+               placeholder="Description" value={description} onChange={(e)=>setDesc(e.target.value)} />
+        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+               placeholder="Budget (optional)" value={budget} onChange={(e)=>setBudget(e.target.value as any)} />
+        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+               placeholder="City (optional)" value={city} onChange={(e)=>setCity(e.target.value)} />
+        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+               placeholder="Image URL (optional)" value={imageUrl} onChange={(e)=>setImageUrl(e.target.value)} />
+        <button className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Publish</button>
       </form>
-    </div>
-  )
-}
-
-export default function PostJob() {
-  return (
-    <Protected>
-      <PostJobForm />
-    </Protected>
-  )
+      {msg && <p className="mt-3">{msg}</p>}
+    </Shell>
+  );
 }

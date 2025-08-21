@@ -1,44 +1,43 @@
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import Link from "next/link";
+import Shell from "@/components/Shell";
 
-interface Gig { id: number, title: string, city: string }
+export default function FindWorkPage() {
+  const [data, setData] = useState<any[]>([]);
+  const [error, setError] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-export default function FindWork() {
-  const [gigs, setGigs] = useState<Gig[]>([])
-  const [q, setQ] = useState('')
-  const [city, setCity] = useState('')
-
-  async function load(query = '', cityFilter = '') {
-    const params = new URLSearchParams()
-    if (query) params.set('q', query)
-    if (cityFilter) params.set('city', cityFilter)
-    const res = await fetch('/api/gigs?' + params.toString())
-    const data = await res.json()
-    setGigs(data.gigs || [])
-  }
-
-  useEffect(() => { load() }, [])
-
-  function onSearch(e: React.FormEvent) {
-    e.preventDefault()
-    load(q, city)
-  }
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from("gigs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) setError(error);
+      else setData(data ?? []);
+      setLoading(false);
+    })();
+  }, []);
 
   return (
-    <div className="p-4">
-      <h1 className="mb-4 text-xl">Find Work</h1>
-      <form onSubmit={onSearch} className="flex gap-2 mb-4">
-        <input className="border p-2 flex-1" placeholder="Search" value={q} onChange={e => setQ(e.target.value)} />
-        <input className="border p-2" placeholder="City" value={city} onChange={e => setCity(e.target.value)} />
-        <button className="bg-blue-500 text-white px-4" type="submit">Go</button>
-      </form>
-      <ul className="space-y-2">
-        {gigs.map(g => (
-          <li key={g.id} className="border p-2">
-            <Link href={`/gigs/${g.id}`}><span className="font-bold">{g.title}</span> - {g.city}</Link>
+    <Shell>
+      <h1 className="text-2xl font-bold mb-4">Latest Gigs</h1>
+      {loading && <p>Loading…</p>}
+      {error && <p className="text-red-400">{error.message}</p>}
+      <ul className="grid sm:grid-cols-2 gap-4">
+        {data.map((g: any) => (
+          <li key={g.id} className="rounded border border-slate-800 p-4 bg-slate-900">
+            <h3 className="font-semibold text-lg">{g.title}</h3>
+            <p className="text-sm opacity-80 line-clamp-2">{g.description}</p>
+            <div className="mt-2 flex items-center justify-between text-sm">
+              <span>{g.city ?? "—"}</span>
+              <Link className="underline" href={`/gigs/${g.id}`}>View</Link>
+            </div>
           </li>
         ))}
       </ul>
-    </div>
-  )
+    </Shell>
+  );
 }

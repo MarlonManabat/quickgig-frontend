@@ -1,26 +1,24 @@
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { GetServerSideProps } from "next";
+import Shell from "@/components/Shell";
+import { supabase } from "@/lib/supabaseClient";
 
-interface Gig { id: number, title: string, description: string, city: string, budget: number }
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const id = ctx.params?.id as string;
+  const { data, error } = await supabase.from("gigs").select("*").eq("id", id).single();
+  if (error || !data) return { notFound: true };
+  return { props: { gig: data } };
+};
 
-export default function GigView() {
-  const router = useRouter()
-  const { id } = router.query
-  const [gig, setGig] = useState<Gig | null>(null)
-
-  useEffect(() => {
-    if (!id) return
-    fetch(`/api/gigs/${id}`).then(r => r.json()).then(d => setGig(d.gig))
-  }, [id])
-
-  if (!gig) return null
-
+export default function GigPage({ gig }: { gig: any }) {
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="text-2xl mb-2">{gig.title}</h1>
-      <p className="mb-2">{gig.description}</p>
-      <p className="mb-2">City: {gig.city}</p>
-      <p className="mb-4">Budget: {gig.budget}</p>
-    </div>
-  )
+    <Shell>
+      <h1 className="text-3xl font-bold mb-2">{gig.title}</h1>
+      {gig.image_url && <img src={gig.image_url} alt="" className="rounded mb-4 max-h-64 object-cover" />}
+      <p className="opacity-90 mb-4 whitespace-pre-wrap">{gig.description}</p>
+      <div className="text-sm opacity-80 space-x-4">
+        <span>Budget: {gig.budget ?? "—"}</span>
+        <span>City: {gig.city ?? "—"}</span>
+      </div>
+    </Shell>
+  );
 }

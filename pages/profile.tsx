@@ -1,65 +1,57 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
-import Protected from '@/components/Protected'
-import { useRouter } from 'next/router'
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import Shell from "@/components/Shell";
 
-function ProfileForm() {
-  const [form, setForm] = useState({ full_name: '', city: '', skills: '', role: 'seeker' })
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
+export default function ProfilePage() {
+  const [loading, setLoading] = useState(true);
+  const [fullName, setFullName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
-        if (data) setForm({
-          full_name: data.full_name ?? '',
-          city: data.city ?? '',
-          skills: data.skills ?? '',
-          role: data.role ?? 'seeker',
-        })
-      }
-      setLoading(false)
-    }
-    load()
-  }, [])
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    const { error } = await supabase.from('profiles').upsert({ id: user.id, ...form })
-    if (error) alert(error.message)
-    else {
-      alert('Profile saved')
-      router.push('/post-job')
-    }
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (data) {
+        setFullName(data.full_name ?? "");
+        setAvatarUrl(data.avatar_url ?? "");
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus(null);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return setStatus("Please login.");
+
+    const { error } = await supabase
+      .from("profiles")
+      .upsert({ id: user.id, full_name: fullName, avatar_url: avatarUrl });
+    setStatus(error ? error.message : "Saved!");
   }
 
-  if (loading) return null
+  if (loading) return <Shell><p>Loading…</p></Shell>;
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="mb-4 text-xl">Your Profile</h1>
-      <form onSubmit={onSubmit} className="space-y-3">
-        <input className="w-full border p-2" placeholder="Full name" value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} />
-        <input className="w-full border p-2" placeholder="City" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} />
-        <input className="w-full border p-2" placeholder="Skills" value={form.skills} onChange={e => setForm({ ...form, skills: e.target.value })} />
-        <select className="w-full border p-2" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
-          <option value="seeker">Seeker</option>
-          <option value="client">Client</option>
-        </select>
-        <button className="w-full bg-blue-500 text-white p-2" type="submit">Save</button>
+    <Shell>
+      <h1 className="text-2xl font-bold mb-4">Your Profile</h1>
+      <form onSubmit={save} className="max-w-md space-y-3">
+        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+               placeholder="Full name" value={fullName} onChange={(e)=>setFullName(e.target.value)} />
+        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+               placeholder="Avatar URL" value={avatarUrl} onChange={(e)=>setAvatarUrl(e.target.value)} />
+        <button className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Save</button>
       </form>
-    </div>
-  )
-}
-
-export default function Profile() {
-  return (
-    <Protected>
-      <ProfileForm />
-    </Protected>
-  )
+      {status && <p className="mt-3">{status}</p>}
+    </Shell>
+  );
 }
