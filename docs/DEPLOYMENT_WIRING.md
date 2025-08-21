@@ -5,7 +5,7 @@
 - Auth → URL Configuration
   - **Site URL:** https://app.quickgig.ph
   - **Additional Redirect URLs:**
-    https://app.quickgig.ph/*, https://quickgig.ph/*, https://www.quickgig.ph/*
+    https://app.quickgig.ph/_, https://quickgig.ph/_, https://www.quickgig.ph/*
 - Settings → API → **Allowed Origins (CORS):**
   https://quickgig.ph, https://www.quickgig.ph, https://app.quickgig.ph
 - (Optional) Auth email templates: ensure links point to https://app.quickgig.ph
@@ -27,6 +27,10 @@
 - Upload contents of `/landing_public_html/` to `public_html/`
 - If `index.php` exists, remove it so `index.html` takes over.
 - `.htaccess` here forwards common routes to the app subdomain.
+
+## Supabase health check
+
+- Endpoint: `/api/health` (Pages API)
 
 ## Smoke test
 
