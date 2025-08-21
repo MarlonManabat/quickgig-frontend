@@ -1,0 +1,10 @@
+# Place this as /public_html/.htaccess on Hostinger for quickgig.ph
+RewriteEngine On
+
+# Forward top-level app routes to the app subdomain
+RewriteRule ^(login|signup|post-job|jobs|gigs)/(.*)?$ https://app.quickgig.ph/$1/$2 [R=302,L]
+RewriteRule ^(login|signup|post-job|jobs|gigs)$ https://app.quickgig.ph/$1 [R=302,L]
+
+# Optionally forward everything under /app to the app
+RewriteRule ^app/(.*)$ https://app.quickgig.ph/$1 [R=302,L]
+

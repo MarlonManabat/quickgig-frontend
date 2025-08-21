@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "smoke:health": "node -e \"(async()=>{const f=await fetch(process.env.NEXT_PUBLIC_SITE_URL+'/api/health').then(r=>r.json()).catch(e=>({ok:false,error:String(e)}));console.log(f); if(!f.ok) process.exit(1)})()\"",
+    "smoke:print": "node -e \"console.log('SITE',process.env.NEXT_PUBLIC_SITE_URL);console.log('SUPABASE',process.env.NEXT_PUBLIC_SUPABASE_URL)\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",
