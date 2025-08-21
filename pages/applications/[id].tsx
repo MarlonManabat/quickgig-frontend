@@ -81,21 +81,62 @@ export default function ApplicationThread() {
   }, [ready, id, userId]);
 
   async function sendMessage(body: string) {
-    await supabase.from("messages").insert([
-      { application_id: id, sender: userId, body },
-    ]);
+    await supabase
+      .from("messages")
+      .insert([{ application_id: id, sender: userId, body }])
+
+    const recipient = isOwner ? app.worker : app.owner
+    if (recipient) {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("id", recipient)
+        .single()
+      if (prof?.email) {
+        fetch("/api/notify-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: prof.email,
+            subject: "New message on QuickGig",
+            html: `<p>You have a new message.</p><p><a href="${window.location.origin}/applications/${id}">View conversation</a></p>`,
+          }),
+        }).catch(() => {})
+      }
+    }
   }
 
   async function createOffer(amount: string, notes: string) {
-    await supabase.from("offers").insert([
-      {
-        application_id: id,
-        created_by: userId,
-        amount: amount ? Number(amount) : null,
-        notes: notes || null,
-      },
-    ]);
-    loadOffer();
+    await supabase
+      .from("offers")
+      .insert([
+        {
+          application_id: id,
+          created_by: userId,
+          amount: amount ? Number(amount) : null,
+          notes: notes || null,
+        },
+      ])
+    const recipient = isOwner ? app.worker : app.owner
+    if (recipient) {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("id", recipient)
+        .single()
+      if (prof?.email) {
+        fetch("/api/notify-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: prof.email,
+            subject: "New offer on QuickGig",
+            html: `<p>You have a new offer.</p><p><a href="${window.location.origin}/applications/${id}">View offer</a></p>`,
+          }),
+        }).catch(() => {})
+      }
+    }
+    loadOffer()
   }
 
   async function decide(status: "accepted" | "declined") {
