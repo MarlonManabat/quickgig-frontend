@@ -21,7 +21,7 @@
     "postinstall": "node -e \"process.env.NODE_ENV==='production'?process.exit(0):0\" || npx playwright install --with-deps || true"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2",
+    "@supabase/supabase-js": "^2.45.0",
     "next": "^14 || ^15",
     "react": "^18",
     "react-dom": "^18",
@@ -43,7 +43,8 @@
     "@playwright/test": "^1.48.0",
     "ts-morph": "^24.0.0",
     "fast-glob": "^3.3.2",
-    "start-server-and-test": "^2.0.0"
+    "start-server-and-test": "^2.0.0",
+    "@supabase/supabase-js": "^2.45.0"
   },
   "engines": {
     "node": ">=18.17"
