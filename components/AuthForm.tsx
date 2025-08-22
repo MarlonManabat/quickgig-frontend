@@ -37,12 +37,12 @@ export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   return (
     <form onSubmit={onSubmit} className="max-w-sm space-y-3">
       {mode==='signup' && (
-        <input required className="w-full border p-2 rounded" placeholder="Full name" value={fullName} onChange={e=>setFullName(e.target.value)} />
+        <input required className="input" placeholder="Full name" value={fullName} onChange={e=>setFullName(e.target.value)} />
       )}
-      <input required type="email" className="w-full border p-2 rounded" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
-      <input required type="password" className="w-full border p-2 rounded" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} />
-      <button disabled={loading} className="w-full bg-yellow-400 font-bold rounded p-2">{loading?'Please wait…': mode==='signup'?'Create account':'Login'}</button>
-      {msg && <p className="text-sm text-red-600">{msg}</p>}
+      <input required type="email" className="input" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
+      <input required type="password" className="input" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} />
+      <button disabled={loading} className="btn-primary w-full">{loading?'Please wait…': mode==='signup'?'Create account':'Login'}</button>
+      {msg && <p className="text-sm text-brand-danger">{msg}</p>}
     </form>
   )
 }

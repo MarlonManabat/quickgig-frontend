@@ -47,23 +47,21 @@ export default function Applicants() {
           const last = typeof window !== "undefined" ? localStorage.getItem(`app:lastSeen:${a.id}`) : null;
           const unread = a.latest_message && (!last || new Date(a.latest_message).getTime() > Number(last));
           return (
-            <li key={a.id} className="rounded border border-slate-800 p-4 bg-slate-900">
+            <li key={a.id} className="card p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold">{a.profiles?.full_name ?? "Applicant"}</div>
-                  <div className="text-sm opacity-80">status: {a.status}</div>
-                  {a.cover_letter && <p className="mt-2 opacity-90 whitespace-pre-wrap">{a.cover_letter}</p>}
+                  <div className="font-semibold">{a.profiles?.full_name ?? 'Applicant'}</div>
+                  <div className="text-sm text-brand-subtle">status: {a.status}</div>
+                  {a.cover_letter && <p className="mt-2 whitespace-pre-wrap">{a.cover_letter}</p>}
                 </div>
                 <div className="flex gap-2 items-center">
-                  {unread && <span className="w-2 h-2 rounded-full bg-yellow-400" />}
-                  <Link href={`/applications/${a.id}`} className="rounded bg-slate-700 px-3 py-1">Open Thread</Link>
-                  {a.status !== "accepted" && (
-                    <button onClick={()=>setStatus(a.id,"accepted")}
-                            className="rounded bg-green-500 text-black px-3 py-1">Accept</button>
+                  {unread && <span className="w-2 h-2 rounded-full bg-brand-warning" />}
+                  <Link href={`/applications/${a.id}`} className="btn-secondary">Open Thread</Link>
+                  {a.status !== 'accepted' && (
+                    <button onClick={() => setStatus(a.id, 'accepted')} className="btn bg-brand-success text-white">Accept</button>
                   )}
-                  {a.status !== "rejected" && (
-                    <button onClick={()=>setStatus(a.id,"rejected")}
-                            className="rounded bg-slate-700 px-3 py-1">Reject</button>
+                  {a.status !== 'rejected' && (
+                    <button onClick={() => setStatus(a.id, 'rejected')} className="btn-danger">Reject</button>
                   )}
                 </div>
               </div>

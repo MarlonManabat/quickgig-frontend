@@ -21,7 +21,7 @@ export default function TopNav() {
   }, []);
 
   return (
-    <nav className="w-full sticky top-0 z-20 bg-slate-900/90 border-b border-slate-800 backdrop-blur text-white">
+    <nav className="w-full sticky top-0 z-20 border-b border-brand-border bg-brand-bg backdrop-blur text-brand">
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
         <Link href="/" className="font-semibold">QuickGig.ph</Link>
         <div className="ml-auto flex items-center gap-4 text-sm">
@@ -31,13 +31,13 @@ export default function TopNav() {
           {loggedIn && <Link href="/saved">Saved</Link>}
           {loggedIn && <NotificationsBell />}
           {loggedIn && !eligible && (
-            <Link href="/checkout" className="rounded px-3 py-1 bg-blue-500 text-white font-medium">
+            <Link href="/checkout" className="btn-primary">
               Buy Ticket
             </Link>
           )}
           <Link
             href="/post-job"
-            className={`rounded px-3 py-1 bg-yellow-400 text-black font-medium ${loggedIn && !eligible ? 'opacity-50 pointer-events-none' : ''}`}
+            className={`btn-primary ${loggedIn && !eligible ? 'opacity-50 pointer-events-none' : ''}`}
             title={loggedIn && !eligible ? 'Please buy a ticket (₱10)' : undefined}
           >
             Post Job

@@ -39,14 +39,14 @@ export default function AdminOrders() {
         </thead>
         <tbody>
           {orders.map(o => (
-            <tr key={o.id} className="border-t border-slate-800">
+            <tr key={o.id} className="border-t border-brand-border">
               <td>{o.reference}</td>
               <td>{o.user?.email}</td>
               <td>{o.proof_url && <a href={o.proof_url} className="underline">Link</a>}</td>
               <td>{o.status}</td>
               <td className="space-x-2">
-                <button onClick={()=>decide(o.id,'paid')} className="text-green-400">Approve</button>
-                <button onClick={()=>decide(o.id,'rejected')} className="text-red-400">Reject</button>
+                <button onClick={()=>decide(o.id,'paid')} className="text-brand-success">Approve</button>
+                <button onClick={()=>decide(o.id,'rejected')} className="text-brand-danger">Reject</button>
               </td>
             </tr>
           ))}

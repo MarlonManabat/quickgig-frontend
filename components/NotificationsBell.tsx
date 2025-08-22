@@ -71,19 +71,19 @@ export default function NotificationsBell() {
     <div className="relative">
       <button onClick={toggle} className="relative">
         🔔
-        {count > 0 && <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500" />}
+        {count > 0 && <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-brand-danger" />}
       </button>
       {open && (
-        <div className="fixed right-0 top-0 z-50 h-full w-full max-w-sm overflow-y-auto border bg-white p-4 shadow-lg">
+        <div className="fixed right-0 top-0 z-50 h-full w-full max-w-sm overflow-y-auto border border-brand-border bg-brand-bg p-4 shadow-lg">
           {items.map(n => {
             const href =
               n.type === 'message' && n.payload?.application_id
                 ? `/applications/${n.payload.application_id}`
                 : undefined
             const content = (
-              <div key={n.id} className="mb-2 border-b pb-2 text-sm">
+              <div key={n.id} className="mb-2 border-b border-brand-border pb-2 text-sm">
                 {n.payload?.preview && <div>{n.payload.preview}</div>}
-                <div className="text-xs text-gray-500">{timeAgo(n.created_at)}</div>
+                <div className="text-xs text-brand-subtle">{timeAgo(n.created_at)}</div>
               </div>
             )
             return href ? (
@@ -94,7 +94,7 @@ export default function NotificationsBell() {
               content
             )
           })}
-          {items.length === 0 && <p className="text-sm text-gray-500">No notifications.</p>}
+          {items.length === 0 && <p className="text-sm text-brand-subtle">No notifications.</p>}
         </div>
       )}
     </div>

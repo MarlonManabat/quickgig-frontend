@@ -49,17 +49,17 @@ export default function ApplyGig() {
           placeholder="Short cover letter (optional)"
           value={cover}
           onChange={(e) => setCover(e.target.value)}
-          className="w-full border rounded-md px-3 py-2"
+          className="input"
         />
         <button
-          className="inline-flex items-center rounded-md bg-black text-white px-4 py-2 hover:opacity-90"
+          className="btn-primary"
           disabled={saving}
         >
           {saving ? <Spinner /> : 'Send Application'}
         </button>
       </form>
       {msg && <p className="mt-3">{msg}</p>}
-      <p className="mt-4 text-sm opacity-80"><Link className="underline" href={`/gigs/${gig.id}`}>Back to gig</Link></p>
+      <p className="mt-4 text-sm text-brand-subtle"><Link className="underline" href={`/gigs/${gig.id}`}>Back to gig</Link></p>
     </div>
   );
 }
