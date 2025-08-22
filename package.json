@@ -14,7 +14,10 @@
     "@supabase/supabase-js": "^2",
     "next": "^14 || ^15",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "stripe": "^16.0.0",
+    "raw-body": "^2.5.2",
+    "@supabase/auth-helpers-nextjs": "^0.10.0"
   },
   "devDependencies": {
     "@types/node": "^20",
