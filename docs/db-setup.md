@@ -25,4 +25,5 @@ Migrations are **idempotent**. Apply via CI or:
 * RLS is enabled on all tables.
 * Policies reference `auth.uid()` and helper `is_admin()`.
 * Service role bypasses RLS (server-only actions).
+* Trigger `on_auth_user_created` (see `20250822_profiles_bootstrap_audit.sql`) auto-inserts rows into `public.profiles` for new `auth.users` to satisfy FK and RLS requirements.
 

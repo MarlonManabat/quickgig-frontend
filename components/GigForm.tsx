@@ -1,26 +1,24 @@
 import { useState, ChangeEvent, FormEvent } from "react";
+import { getUserId } from "../utils/session";
+
+interface GigFormValues {
+  title?: string;
+  description?: string;
+  budget?: number | null;
+  city?: string;
+  image_url?: string | null;
+  owner?: string;
+}
 
 interface GigFormProps {
-  initialGig: {
-    title?: string;
-    description?: string;
-    budget?: number | null;
-    city?: string;
-    image_url?: string | null;
-  };
-  onSubmit: (gig: {
-    title?: string;
-    description?: string;
-    budget?: number | null;
-    city?: string;
-    image_url?: string | null;
-  }) => Promise<void> | void;
+  initialGig: GigFormValues;
+  onSubmit: (gig: GigFormValues) => Promise<void> | void;
   onFileUpload?: (file: File) => Promise<string | null>;
   submitLabel?: string;
 }
 
 export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabel = "Save" }: GigFormProps) {
-  const [gig, setGig] = useState<typeof initialGig>(initialGig ?? {});
+  const [gig, setGig] = useState<GigFormValues>(initialGig ?? {});
   const [message, setMessage] = useState<string | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -46,10 +44,19 @@ export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabe
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setMessage(null);
+    const uid = await getUserId();
+    if (!uid) {
+      setMessage("Please sign in");
+      return;
+    }
     try {
-      await onSubmit(gig);
+      await onSubmit({ ...gig, owner: uid });
     } catch (err: any) {
-      setMessage(err.message ?? "An error occurred");
+      if (err?.status === 401 || err?.status === 403) {
+        setMessage("You are not allowed to edit this gig.");
+      } else {
+        setMessage(err.message ?? "An error occurred");
+      }
     }
   };
 

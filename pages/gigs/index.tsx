@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import supabase from '../../utils/supabaseClient';
+import { supabase } from '../../utils/supabaseClient';
 
 export default function GigsList() {
   const [gigs, setGigs] = useState<any[]>([]);

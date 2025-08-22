@@ -4,15 +4,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "lint": "next lint || true",
     "start": "next start",
-    "smoke": "echo \"(placeholder) run e2e happy path later\"",
-    "smoke:local": "node scripts/smoke.mjs",
-    "smoke:prod": "node scripts/smoke-prod.mjs",
-    "db:mvp:sql": "echo supabase/sql/001_mvp.sql",
-    "db:print:audit": "cat supabase/migrations/2025-08-22_supabase_audit.sql",
     "typecheck": "tsc --noEmit",
-    "db:print:a": "echo \"See /supabase/migrations for audit SQL\""
+    "lint": "next lint || true",
+    "smoke": "echo \"(placeholder)\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",

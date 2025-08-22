@@ -1,3 +1,7 @@
-import supabase from '../lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
-export default supabase;
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+// Singleton
+export const supabase = createClient(url, anon);
