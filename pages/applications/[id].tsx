@@ -88,7 +88,9 @@ export default function ApplicationPage() {
           <p className="text-sm text-brand-subtle">Conversation with {counterpart}</p>
         </Card>
         {threadId && <ApplicationThread threadId={threadId} />}
-        {threadId && <MessageComposer threadId={threadId} />}
+        {threadId && user?.id && (
+          <MessageComposer threadId={String(threadId)} userId={user.id} />
+        )}
       </div>
     </main>
   );
