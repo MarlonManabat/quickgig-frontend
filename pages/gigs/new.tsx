@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '@/utils/supabaseClient';
 import GigForm from '@/components/GigForm';
@@ -6,11 +6,27 @@ import { uploadPublicFile } from '@/lib/storage';
 import { useRequireUser } from '@/lib/useRequireUser';
 import { isAccessDenied } from '@/utils/errors';
 import Banner from '@/components/ui/Banner';
+import { hasApprovedOrder } from '@/utils/billing';
 
 export default function NewGig() {
   const router = useRouter();
-  const { ready } = useRequireUser();
+  const { ready, userId } = useRequireUser();
   const [rlsDenied, setRlsDenied] = useState(false);
+  const [allowed, setAllowed] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    if (!ready || !userId) return;
+    (async () => {
+      const ok = await hasApprovedOrder(userId);
+      setAllowed(ok);
+      setChecking(false);
+      if (!ok)
+        router.replace(
+          '/billing?message=' + encodeURIComponent('Complete payment to post jobs.')
+        );
+    })();
+  }, [ready, userId, router]);
 
   const handleSubmit = async (values: any) => {
     setRlsDenied(false);
@@ -40,7 +56,8 @@ export default function NewGig() {
     return await uploadPublicFile(file, 'gigs');
   };
 
-  if (!ready) return null;
+  if (!ready || checking) return null;
+  if (!allowed) return <p data-testid="paywall-redirect">Redirecting...</p>;
 
   return (
     <div className="space-y-4">

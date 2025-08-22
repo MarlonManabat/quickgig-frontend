@@ -1,57 +1,47 @@
+'use client';
 import { useEffect, useState } from 'react';
-import Shell from '@/components/Shell';
 import { supabase } from '@/utils/supabaseClient';
-import { isAdmin } from '@/lib/auth';
 
-export default function AdminOrders() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [allowed, setAllowed] = useState<boolean | null>(null);
-
+export default function OrdersAdmin() {
+  const [user, setUser] = useState<any>(null);
+  const [rows, setRows] = useState<any[]>([]);
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUser(data.user)); }, []);
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (isAdmin(data.user?.email)) {
-        setAllowed(true);
-        const res = await fetch('/api/orders');
-        const d = await res.json();
-        setOrders(d.orders || []);
-      } else {
-        setAllowed(false);
-      }
-    });
-  }, []);
+    if (!user) return;
+    // naive “admin” check; hide if not admin
+    (async () => {
+      const { data: prof } = await supabase.from('profiles').select('admin').eq('id', user.id).single();
+      if (!prof?.admin) return;
+      const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+      setRows(data || []);
+    })();
+  }, [user]);
 
-  async function decide(id: number, decision: 'paid' | 'rejected') {
-    await fetch(`/api/orders/${id}/decide`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ decision }) });
-    const res = await fetch('/api/orders');
-    const d = await res.json();
-    setOrders(d.orders || []);
+  async function setStatus(id: string, status: 'approved' | 'rejected') {
+    await supabase.from('orders').update({ status }).eq('id', id);
+    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    setRows(data || []);
   }
 
-  if (allowed === null) return <Shell><p>Loading…</p></Shell>;
-  if (!allowed) return <Shell><p>Forbidden</p></Shell>;
+  if (!rows.length) return <main className="p-6">No orders or no access.</main>;
 
   return (
-    <Shell>
-      <h1 className="text-2xl font-bold mb-4">All Orders</h1>
-      <table className="w-full text-sm">
-        <thead>
-          <tr><th className="text-left">Ref</th><th>User</th><th>Proof</th><th>Status</th><th></th></tr>
-        </thead>
-        <tbody>
-          {orders.map(o => (
-            <tr key={o.id} className="border-t border-brand-border">
-              <td>{o.reference}</td>
-              <td>{o.user?.email}</td>
-              <td>{o.proof_url && <a href={o.proof_url} className="underline">Link</a>}</td>
-              <td>{o.status}</td>
-              <td className="space-x-2">
-                <button onClick={()=>decide(o.id,'paid')} className="text-brand-success">Approve</button>
-                <button onClick={()=>decide(o.id,'rejected')} className="text-brand-danger">Reject</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Shell>
+    <main className="max-w-3xl mx-auto p-6" data-testid="orders-admin">
+      <h1 className="text-xl font-semibold mb-4">Review orders</h1>
+      <ul className="space-y-3">
+        {rows.map(o => (
+          <li key={o.id} className="border rounded p-3 flex gap-3 justify-between items-center">
+            <div>
+              <div><b>{o.currency} {o.amount}</b> — <span data-testid="order-status">{o.status}</span></div>
+              {o.proof_url && <a href={o.proof_url} target="_blank" rel="noreferrer">Proof</a>}
+            </div>
+            <div className="flex gap-2">
+              <button className="btn-secondary px-3 py-1 rounded" onClick={() => setStatus(o.id, 'rejected')} data-testid="admin-reject">Reject</button>
+              <button className="btn-primary px-3 py-1 rounded" onClick={() => setStatus(o.id, 'approved')} data-testid="admin-approve">Approve</button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </main>
   );
 }
