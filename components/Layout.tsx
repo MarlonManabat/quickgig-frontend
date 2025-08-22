@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Banner from './Banner';
+import NotificationsBell from './NotificationsBell';
+import { supabase } from '@/utils/supabaseClient';
 
 const links = [
   { href: '/gigs', label: 'Find Work' },
@@ -15,6 +17,17 @@ const links = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const banner = typeof router.query.banner === 'string' ? router.query.banner : null;
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (banner) {
@@ -32,15 +45,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-4">
           <Link href="/" className="text-lg font-semibold">QuickGig.ph</Link>
-          <nav className="space-x-4 text-sm">
+          <nav className="flex-1 space-x-4 text-center text-sm">
             {links.map((l) => (
               <Link key={l.href} href={l.href} className={isActive(l.href) ? 'font-bold underline' : undefined}>
                 {l.label}
               </Link>
             ))}
           </nav>
+          {user && <NotificationsBell />}
         </div>
       </header>
       <main className="flex-1">

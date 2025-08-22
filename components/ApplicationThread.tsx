@@ -1,13 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/utils/supabaseClient'
+import { timeAgo } from '@/utils/time'
 
 interface Props {
-  threadId: string
+  threadId: number
 }
 
 export default function ApplicationThread({ threadId }: Props) {
   const [msgs, setMsgs] = useState<any[]>([])
+  const [uid, setUid] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id ?? null))
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -23,14 +29,27 @@ export default function ApplicationThread({ threadId }: Props) {
 
     const channel = supabase
       .channel('thread-' + threadId)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `thread_id=eq.${threadId}` }, (p) => {
-        setMsgs(prev => [...prev, p.new])
-      })
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `thread_id=eq.${threadId}` },
+        payload => setMsgs(prev => [...prev, payload.new as any])
+      )
       .subscribe()
+
+    function onOptimistic(e: any) {
+      setMsgs(prev => [...prev, e.detail])
+    }
+    function onRemove(e: any) {
+      setMsgs(prev => prev.filter(m => m.id !== e.detail))
+    }
+    window.addEventListener('message:optimistic', onOptimistic)
+    window.addEventListener('message:remove', onRemove)
 
     return () => {
       mounted = false
       supabase.removeChannel(channel)
+      window.removeEventListener('message:optimistic', onOptimistic)
+      window.removeEventListener('message:remove', onRemove)
     }
   }, [threadId])
 
@@ -39,15 +58,34 @@ export default function ApplicationThread({ threadId }: Props) {
   }, [msgs])
 
   return (
-    <div ref={listRef} className="flex-1 overflow-y-auto">
-      {msgs.map(m => (
-        <div key={m.id} className="mb-3">
-          <div className="text-xs opacity-70">
-            {(m.profiles?.full_name ?? m.sender) + ' • ' + new Date(m.created_at).toLocaleString()}
+    <div
+      ref={listRef}
+      className="bg-white border rounded-2xl p-3 h-[60vh] overflow-y-auto flex flex-col gap-3"
+    >
+      {msgs.length === 0 && (
+        <p className="text-sm text-center text-gray-500">No messages yet.</p>
+      )}
+      {msgs.map(m => {
+        const isMe = uid && m.sender === uid
+        return (
+          <div key={m.id} className="flex flex-col">
+            <div className={`text-xs mb-1 ${isMe ? 'text-right' : ''}`}>
+              {(isMe ? 'You' : m.profiles?.full_name ?? m.sender) +
+                ' • ' +
+                timeAgo(m.created_at || new Date().toISOString())}
+            </div>
+            <div
+              className={
+                isMe
+                  ? 'bg-black text-white rounded-2xl px-3 py-2 ml-auto max-w-[80%]'
+                  : 'bg-gray-100 text-gray-900 rounded-2xl px-3 py-2 mr-auto max-w-[80%]'
+              }
+            >
+              {m.body}
+            </div>
           </div>
-          <div className="whitespace-pre-wrap">{m.body}</div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
