@@ -7,7 +7,12 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "next lint || true",
-    "smoke": "echo \"(placeholder)\""
+    "smoke": "echo \"(placeholder)\"",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "lint:href": "node scripts/href-lint.mjs",
+    "fix:href": "node scripts/href-codemod.mjs",
+    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx playwright install --with-deps || true; fi"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",
@@ -27,7 +32,9 @@
     "typescript": "^5",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.3",
-    "@typescript-eslint/parser": "^6.21.0"
+    "@typescript-eslint/parser": "^6.21.0",
+    "@playwright/test": "^1.48.0",
+    "ts-morph": "^24.0.0"
   },
   "engines": {
     "node": ">=18.17"
