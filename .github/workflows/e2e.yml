@@ -6,8 +6,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: 20
+          cache: 'npm'
       - run: npm ci
       - run: npx playwright install --with-deps
-      - run: npm run build
-      - run: PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run qa:smoke || true
+      - run: npm run build:prod
+      - run: npm run qa:ci

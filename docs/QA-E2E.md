@@ -4,3 +4,4 @@
 3. Start app: npm run dev
 4. Run tests: npm run test:e2e
 Notes: Production builds (Vercel) exclude tests from typecheck via tsconfig.json.
+CI runs qa:ci

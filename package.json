@@ -14,7 +14,10 @@
     "fix:href": "node scripts/href-codemod.mjs",
     "qa:smoke": "playwright test --config=tests/playwright.config.ts -g '@smoke'",
     "qa:all": "playwright test --config=tests/playwright.config.ts",
-    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx playwright install --with-deps || true; fi"
+    "build:prod": "next build",
+    "start:prod": "next start -p 3000",
+    "qa:ci": "start-server-and-test start:prod http://localhost:3000 \"PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run qa:smoke\"",
+    "postinstall": "node -e \"process.env.NODE_ENV==='production'?process.exit(0):0\" || npx playwright install --with-deps || true"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",
@@ -37,7 +40,8 @@
     "@typescript-eslint/parser": "^6.21.0",
     "@playwright/test": "^1.48.0",
     "ts-morph": "^24.0.0",
-    "fast-glob": "^3.3.2"
+    "fast-glob": "^3.3.2",
+    "start-server-and-test": "^2.0.0"
   },
   "engines": {
     "node": ">=18.17"
