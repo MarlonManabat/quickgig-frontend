@@ -9,7 +9,8 @@
     "smoke": "node scripts/smoke.mjs",
     "smoke:local": "node scripts/smoke.mjs",
     "smoke:prod": "node scripts/smoke-prod.mjs",
-    "db:mvp:sql": "echo supabase/sql/001_mvp.sql"
+    "db:mvp:sql": "echo supabase/sql/001_mvp.sql",
+    "db:print:audit": "cat supabase/migrations/2025-08-22_supabase_audit.sql"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",
