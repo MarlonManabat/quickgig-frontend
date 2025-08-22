@@ -45,3 +45,8 @@ test.describe('@smoke navigation & flows', () => {
     await expect(page.getByTestId('notifications-list')).toBeVisible();
   });
 });
+
+test('@smoke applications id guard', async ({ page }) => {
+  await page.goto('/applications/[id]');
+  await page.waitForURL(/\/applications$/);
+});
