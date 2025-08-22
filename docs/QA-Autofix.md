@@ -14,3 +14,5 @@ npm run fix:href
 npm run build
 PLAYWRIGHT_BASE_URL=https://<preview-or-prod> npm run qa:smoke
 ```
+
+Applications detail fetch now waits for a valid id before requesting data; empty and error states are exposed for testing.
