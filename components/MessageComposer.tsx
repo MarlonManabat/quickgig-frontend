@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/utils/supabaseClient'
 import { isAccessDenied } from '@/utils/errors'
+import Input from '@/components/ui/Input'
+import Button from '@/components/ui/Button'
+import Banner from '@/components/ui/Banner'
 
 interface Props {
   threadId: number
@@ -76,7 +79,7 @@ export default function MessageComposer({ threadId, onSent }: Props) {
 
   return (
     <div className="mt-2">
-      {error && <div className="mb-2 rounded bg-red-100 p-2 text-sm text-red-800">{error}</div>}
+      {error && <Banner kind="error">{error}</Banner>}
       <form
         onSubmit={e => {
           e.preventDefault()
@@ -84,8 +87,9 @@ export default function MessageComposer({ threadId, onSent }: Props) {
         }}
         className="sticky bottom-0 flex gap-2"
       >
-        <textarea
-          className="flex-1 border rounded-md px-3 py-2"
+        <Input
+          as="textarea"
+          className="flex-1"
           value={body}
           onChange={e => setBody(e.target.value)}
           onKeyDown={e => {
@@ -96,14 +100,15 @@ export default function MessageComposer({ threadId, onSent }: Props) {
           }}
           placeholder="Type a message..."
           disabled={sending}
+          rows={2}
         />
-        <button
+        <Button
           type="submit"
           disabled={sending || !body.trim()}
-          className="rounded-md bg-black px-4 py-2 text-white disabled:opacity-50"
+          aria-busy={sending}
         >
           Send
-        </button>
+        </Button>
       </form>
     </div>
   )

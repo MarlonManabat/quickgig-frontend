@@ -2,6 +2,8 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabaseClient';
 import GigForm from '@/components/GigForm';
+import Banner from '@/components/ui/Banner';
+import Spinner from '@/components/ui/Spinner';
 
 export default function GigEditPage() {
   const router = useRouter();
@@ -51,16 +53,17 @@ export default function GigEditPage() {
     router.push(`/gigs/${id}`);
   };
 
-  if (loading) return <p style={{padding:16}}>Loading…</p>;
-  if (!allowed) return <p style={{padding:16}}>⚠️ {msg ?? 'Not allowed'}</p>;
+  if (loading) return <Spinner />;
+  if (!allowed) return <Banner kind="error">{msg ?? 'Not allowed'}</Banner>;
 
   return (
-    <main style={{maxWidth:720,margin:'24px auto',padding:'16px'}}>
+    <div className="space-y-4">
+      <p className="text-sm text-brand-subtle">Gigs / Edit gig</p>
       <h1>Edit gig</h1>
       <GigForm
         initialGig={gig}
         onSubmit={handleSubmit}
       />
-    </main>
+    </div>
   );
 }

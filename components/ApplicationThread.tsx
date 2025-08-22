@@ -60,10 +60,10 @@ export default function ApplicationThread({ threadId }: Props) {
   return (
     <div
       ref={listRef}
-      className="bg-white border rounded-2xl p-3 h-[60vh] overflow-y-auto flex flex-col gap-3"
+      className="card p-3 h-[60vh] overflow-y-auto flex flex-col gap-2"
     >
       {msgs.length === 0 && (
-        <p className="text-sm text-center text-gray-500">No messages yet.</p>
+        <p className="text-sm text-center text-brand-subtle">No messages yet.</p>
       )}
       {msgs.map(m => {
         const isMe = uid && m.sender === uid

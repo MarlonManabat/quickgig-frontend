@@ -2,7 +2,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '@/utils/supabaseClient';
-import Banner from '@/components/Banner';
+import Banner from '@/components/ui/Banner';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Card from '@/components/ui/Card';
 import { getProfile } from '@/utils/session';
 
 export default function AuthPage() {
@@ -40,36 +43,34 @@ export default function AuthPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">{mode === 'login' ? 'Log in' : 'Sign up'}</h1>
+    <Card className="max-w-md mx-auto p-6">
+      <h1>{mode === 'login' ? 'Log in' : 'Sign up'}</h1>
       {msg && <Banner kind="success">{msg}</Banner>}
       {err && <Banner kind="error">{err}</Banner>}
-      <form onSubmit={onSubmit} className="max-w-md">
-        <label htmlFor="email" className="block">Email</label>
-        <input
-          id="email"
-          type="email"
-          className="w-full border rounded-md px-3 py-2 mb-3"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <label htmlFor="password" className="block">Password</label>
-        <input
-          id="password"
-          type="password"
-          className="w-full border rounded-md px-3 py-2 mb-3"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button
-          type="submit"
-          className="inline-flex items-center rounded-md bg-black text-white px-4 py-2 hover:opacity-90"
-          disabled={loading}
-        >
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="email" className="label">Email</label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="label">Password</label>
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <Button type="submit" disabled={loading} aria-busy={loading}>
           {loading ? 'Working…' : mode === 'login' ? 'Log in' : 'Sign up'}
-        </button>
+        </Button>
       </form>
       <p className="mt-4 text-sm">
         {mode === 'login' ? 'No account?' : 'Have an account?'}{' '}
@@ -77,6 +78,6 @@ export default function AuthPage() {
           {mode === 'login' ? 'Sign up' : 'Log in'}
         </button>
       </p>
-    </div>
+    </Card>
   );
 }

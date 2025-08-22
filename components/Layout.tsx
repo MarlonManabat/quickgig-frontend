@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Banner from './Banner';
+import Banner from '@/components/ui/Banner';
 import NotificationsBell from './NotificationsBell';
 import { supabase } from '@/utils/supabaseClient';
 
@@ -18,6 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const banner = typeof router.query.banner === 'string' ? router.query.banner : null;
   const [user, setUser] = useState<any>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -43,27 +44,42 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b">
-        <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-4">
+    <div className="min-h-screen flex flex-col bg-brand-bg text-black">
+      <header className="sticky top-0 z-10 border-b border-brand-border bg-brand-card">
+        <div className="max-w-4xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
           <Link href="/" className="text-lg font-semibold">QuickGig.ph</Link>
-          <nav className="flex-1 space-x-4 text-center text-sm">
-            {links.map((l) => (
-              <Link key={l.href} href={l.href} className={isActive(l.href) ? 'font-bold underline' : undefined}>
-                {l.label}
-              </Link>
-            ))}
+          <button
+            className="sm:hidden"
+            onClick={() => setOpen((o) => !o)}
+            aria-label="Toggle navigation"
+          >
+            ☰
+          </button>
+          <nav
+            className={`${open ? 'block' : 'hidden'} sm:flex sm:items-center sm:gap-4 text-sm`}
+          >
+            {links.map((l) => {
+              const active = isActive(l.href);
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={active ? 'font-semibold underline' : undefined}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {l.label}
+                </Link>
+              );
+            })}
           </nav>
           {user && <NotificationsBell />}
         </div>
       </header>
-      <main className="flex-1">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          {banner && <Banner kind="success">{banner}</Banner>}
-          {children}
-        </div>
+      <main className="flex-1 container-page">
+        {banner && <Banner kind="success">{banner}</Banner>}
+        {children}
       </main>
-      <footer className="border-t text-center py-4 text-sm text-gray-500">
+      <footer className="border-t border-brand-border text-center py-4 text-sm text-brand-subtle">
         © {new Date().getFullYear()} QuickGig.ph
       </footer>
     </div>

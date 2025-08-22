@@ -5,6 +5,9 @@ import MessageComposer from '@/components/MessageComposer'
 import { supabase } from '@/utils/supabaseClient'
 import { getOrCreateThread } from '@/utils/application'
 import { isAccessDenied } from '@/utils/errors'
+import Card from '@/components/ui/Card'
+import Banner from '@/components/ui/Banner'
+import Spinner from '@/components/ui/Spinner'
 
 export default function ApplicationPage() {
   const router = useRouter()
@@ -53,9 +56,9 @@ export default function ApplicationPage() {
     })()
   }, [id])
 
-  if (loading) return <p style={{ padding: 16 }}>Loading…</p>
-  if (error) return <p style={{ padding: 16 }}>⚠️ {error}</p>
-  if (!app) return <p style={{ padding: 16 }}>Not found.</p>
+  if (loading) return <Spinner />
+  if (error) return <Banner kind="error">{error}</Banner>
+  if (!app) return <Banner kind="info">Not found.</Banner>
 
   const counterpart =
     user?.id === app.applicant
@@ -63,11 +66,14 @@ export default function ApplicationPage() {
       : app.profiles?.full_name ?? app.applicant
 
   return (
-    <main className="mx-auto flex h-[80vh] max-w-3xl flex-col gap-2 p-4">
-      <h1 className="text-xl font-bold">{app.gigs?.title}</h1>
-      <p className="text-sm">Conversation with {counterpart}</p>
+    <div className="mx-auto flex h-[80vh] max-w-3xl flex-col gap-4 p-4">
+      <p className="text-sm text-brand-subtle">Applications / View application</p>
+      <Card className="p-4 space-y-1">
+        <h1>{app.gigs?.title}</h1>
+        <p className="text-sm text-brand-subtle">Conversation with {counterpart}</p>
+      </Card>
       {threadId && <ApplicationThread threadId={threadId} />}
       {threadId && <MessageComposer threadId={threadId} />}
-    </main>
+    </div>
   )
 }

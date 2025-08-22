@@ -1,5 +1,8 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { getUserId } from "../utils/session";
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import Banner from '@/components/ui/Banner';
 
 interface GigFormValues {
   title?: string;
@@ -61,58 +64,48 @@ export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabe
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      {message && <p className="text-red-500">{message}</p>}
-      <div>
-        <input
-          className="w-full rounded border border-slate-700 px-3 py-2"
+    <form onSubmit={handleSubmit} className="md:grid md:grid-cols-2 md:gap-6">
+      {message && <Banner kind="error" className="md:col-span-2">{message}</Banner>}
+      <div className="space-y-3 md:col-span-1">
+        <Input
+          className=""
           placeholder="Title"
           name="title"
           value={gig.title ?? ""}
           onChange={handleChange}
         />
-      </div>
-      <div>
-        <textarea
-          className="w-full rounded border border-slate-700 px-3 py-2"
-          placeholder="Description"
+        <Input
+          as="textarea"
           rows={5}
+          placeholder="Description"
           name="description"
           value={gig.description ?? ""}
           onChange={handleChange}
         />
-      </div>
-      <div>
-        <input
-          className="w-full rounded border border-slate-700 px-3 py-2"
+        <Input
           placeholder="Budget"
           name="budget"
           type="number"
           value={gig.budget ?? ""}
           onChange={handleChange}
         />
-      </div>
-      <div>
-        <input
-          className="w-full rounded border border-slate-700 px-3 py-2"
+        <Input
           placeholder="City"
           name="city"
           value={gig.city ?? ""}
           onChange={handleChange}
         />
+        {onFileUpload && (
+          <div>
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+            {gig.image_url && <img src={gig.image_url ?? ''} alt="Gig" className="mt-2 max-w-xs" />}
+          </div>
+        )}
+        <Button type="submit">{submitLabel}</Button>
       </div>
-      {onFileUpload && (
-        <div>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-          {gig.image_url && <img src={gig.image_url ?? ''} alt="Gig" className="mt-2 max-w-xs" />}
-        </div>
-      )}
-      <button
-        type="submit"
-        className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-      >
-        {submitLabel}
-      </button>
+      <div className="md:col-span-1 md:pt-2 text-sm text-brand-subtle">
+        Provide as many details as possible to attract the right applicants.
+      </div>
     </form>
   );
 }
