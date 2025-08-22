@@ -13,7 +13,7 @@ export function useRequireUser() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session?.user) {
-        router.replace(`/login?next=${encodeURIComponent(router.asPath)}`);
+        router.replace(`/auth?next=${encodeURIComponent(router.asPath)}`);
         return;
       }
       setUserId(session.user.id);

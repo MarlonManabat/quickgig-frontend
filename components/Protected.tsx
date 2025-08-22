@@ -8,7 +8,7 @@ export default function Protected({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) router.replace('/login')
+      if (!session) router.replace('/auth')
       else setAllowed(true)
     })
   }, [router])

@@ -2,13 +2,9 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <main className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Welcome to QuickGig</h1>
-      <p className="mb-4">Find freelance gigs or post your own job.</p>
-      <div className="space-x-4">
-        <Link href="/gigs">Browse Gigs</Link>
-        <Link href="/gigs/new">Post a Gig</Link>
-      </div>
-    </main>
+    <div className="flex flex-col items-center gap-4">
+      <Link href="/gigs" className="inline-flex items-center rounded-md bg-black text-white px-4 py-2 hover:opacity-90">Find Work</Link>
+      <Link href="/gigs/new" className="inline-flex items-center rounded-md bg-black text-white px-4 py-2 hover:opacity-90">Post a Job</Link>
+    </div>
   );
 }

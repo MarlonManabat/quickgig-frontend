@@ -1,13 +1,18 @@
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { supabase } from '../../utils/supabaseClient';
-import GigForm from '../../components/GigForm';
-import { uploadPublicFile } from '../../lib/storage';
+import { supabase } from '@/utils/supabaseClient';
+import GigForm from '@/components/GigForm';
+import { uploadPublicFile } from '@/lib/storage';
+import { useRequireUser } from '@/lib/useRequireUser';
+import { isAccessDenied } from '@/utils/errors';
 
 export default function NewGig() {
   const router = useRouter();
+  const { ready } = useRequireUser();
+  const [rlsDenied, setRlsDenied] = useState(false);
 
   const handleSubmit = async (values: any) => {
+    setRlsDenied(false);
     const { data, error } = await supabase
       .from('gigs')
       .insert({
@@ -20,7 +25,13 @@ export default function NewGig() {
       })
       .select()
       .single();
-    if (error) throw error;
+    if (error) {
+      if (isAccessDenied(error)) {
+        setRlsDenied(true);
+        return;
+      }
+      throw error;
+    }
     router.push(`/gigs/${data.id}`);
   };
 
@@ -28,10 +39,12 @@ export default function NewGig() {
     return await uploadPublicFile(file, 'gigs');
   };
 
+  if (!ready) return null;
+
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <p className="mb-2 text-sm"><Link href="/auth" className="underline">Auth</Link></p>
-      <h1 className="text-xl font-bold mb-4">Post a Gig</h1>
+    <div>
+      <h1 className="text-3xl font-bold mb-1">Post a Job</h1>
+      {rlsDenied && <p className="text-sm text-red-600 mb-4">Only job posters can post</p>}
       <GigForm
         initialGig={{}}
         onSubmit={handleSubmit}
