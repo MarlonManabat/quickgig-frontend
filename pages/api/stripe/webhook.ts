@@ -1,14 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import getRawBody from "raw-body";
-import { stripe } from "@/lib/stripe";
+import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 export const config = { api: { bodyParser: false } };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).end("Method Not Allowed");
+  }
   const buf = await getRawBody(req);
   const sig = req.headers["stripe-signature"] as string;
   let evt;
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" });
   try {
     evt = stripe.webhooks.constructEvent(buf, sig, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (e: any) {

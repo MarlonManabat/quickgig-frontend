@@ -17,6 +17,12 @@ Run migration:
 supabase/migrations/2025-08-22_payments.sql
 ```
 
+## Vercel
+Set the following Environment Variables in Vercel and redeploy after clearing the build cache:
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
 ## Smoke Test
 1. Owner → Settings/Payouts → Connect → complete onboarding (test mode) → webhook updates profile → status shows ✅.
 2. Attempt to create an offer when not payout_ready → blocked by UI; if bypassed, DB RLS prevents it.
