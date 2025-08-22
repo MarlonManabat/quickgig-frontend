@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import { useRouter } from 'next/router'
 
-export function useRequireAuth(redirectTo: string = '/login') {
+export function useRequireAuth(redirectTo: string = '/auth') {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<null | { id: string }>(null)

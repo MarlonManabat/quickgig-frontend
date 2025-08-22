@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { supabase } from '../../utils/supabaseClient';
+import { supabase } from '@/utils/supabaseClient';
+import { getProfile } from '@/utils/session';
 
 export default function GigsList() {
   const [gigs, setGigs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [canPostJob, setCanPostJob] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const profile = await getProfile();
+      setCanPostJob(!!profile?.can_post_job);
+    })();
+  }, []);
 
   useEffect(() => {
     async function fetchGigs() {
@@ -26,12 +35,13 @@ export default function GigsList() {
   }, []);
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <p className="mb-2 text-sm"><Link href="/auth" className="underline">Auth</Link></p>
-      <h1 className="text-xl font-bold mb-4">Gigs</h1>
-      <div className="mb-4">
-        <Link href="/gigs/new" className="text-blue-500 underline">Post a Gig</Link>
-      </div>
+    <div>
+      {canPostJob && (
+        <div className="mb-4 text-right">
+          <Link href="/gigs/new" className="inline-flex items-center rounded-md bg-black text-white px-4 py-2 hover:opacity-90">Post a Job</Link>
+        </div>
+      )}
+      <h1 className="text-3xl font-bold mb-4">Gigs</h1>
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
