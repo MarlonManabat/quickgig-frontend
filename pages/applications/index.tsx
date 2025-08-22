@@ -17,7 +17,7 @@ export default function ApplicationsList() {
       const { data } = await supabase
         .from("applications")
         .select("id, status, created_at, gigs(id,title,city)")
-        .eq("worker", userId)
+        .eq("applicant", userId)
         .order("created_at", { ascending: false });
       const apps = data ?? [];
       const withUnread = await Promise.all(

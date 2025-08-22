@@ -45,33 +45,33 @@ export default function NotificationsBell() {
       </button>
       {open && (
         <div className="absolute right-0 mt-2 w-72 rounded-xl border bg-white p-2 text-black shadow">
-          {(items.length ? items : [{ kind: 'message', payload: {}, created_at: new Date().toISOString() }]).map((n, i) => {
+          {(items.length ? items : [{ type: 'message', payload: {}, created_at: new Date().toISOString() }]).map((n, i) => {
             const icon =
-              n.kind === 'message'
+              n.type === 'message'
                 ? '💬'
-                : n.kind === 'offer'
+                : n.type === 'offer'
                 ? '📄'
-                : n.kind === 'saved_gig_activity'
+                : n.type === 'saved_gig_activity'
                 ? '⭐'
-                : n.kind === 'alert_match'
+                : n.type === 'alert_match'
                 ? '🔔'
-                : n.kind === 'review_received'
+                : n.type === 'review_received'
                 ? '⭐'
                 : '✅'
             const text =
-              n.kind === 'saved_gig_activity'
+              n.type === 'saved_gig_activity'
                 ? 'New application on a gig you saved.'
-                : n.kind === 'alert_match'
+                : n.type === 'alert_match'
                 ? 'New gig matches your alert.'
-                : n.kind === 'review_received'
+                : n.type === 'review_received'
                 ? `You received a new review (★${n.payload?.rating}).`
-                : n.kind
+                : n.type
             const href =
-              n.kind === 'saved_gig_activity' && n.payload?.gig_id
+              n.type === 'saved_gig_activity' && n.payload?.gig_id
                 ? `/gigs/${n.payload.gig_id}`
-                : n.kind === 'alert_match' && n.payload?.gig_id
+                : n.type === 'alert_match' && n.payload?.gig_id
                 ? `/gigs/${n.payload.gig_id}`
-                : n.kind === 'review_received' && n.payload?.app_id
+                : n.type === 'review_received' && n.payload?.app_id
                 ? `/applications/${n.payload.app_id}`
                 : undefined
             const body = (
