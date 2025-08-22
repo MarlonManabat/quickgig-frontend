@@ -13,7 +13,7 @@ export default function AdminOrders() {
         setAllowed(true);
         const res = await fetch('/api/orders');
         const d = await res.json();
-        setOrders(d.orders || []);
+        setOrders((d.orders || []).filter(o => o.status !== 'paid' && o.status !== 'rejected'));
       } else {
         setAllowed(false);
       }
@@ -24,7 +24,7 @@ export default function AdminOrders() {
     await fetch(`/api/orders/${id}/decide`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ decision }) });
     const res = await fetch('/api/orders');
     const d = await res.json();
-    setOrders(d.orders || []);
+    setOrders((d.orders || []).filter(o => o.status !== 'paid' && o.status !== 'rejected'));
   }
 
   if (allowed === null) return <Shell><p>Loading…</p></Shell>;
@@ -32,7 +32,7 @@ export default function AdminOrders() {
 
   return (
     <Shell>
-      <h1 className="text-2xl font-bold mb-4">All Orders</h1>
+      <h1 className="text-2xl font-bold mb-4">Pending Orders</h1>
       <table className="w-full text-sm">
         <thead>
           <tr><th className="text-left">Ref</th><th>User</th><th>Proof</th><th>Status</th><th></th></tr>
