@@ -27,3 +27,4 @@ Migrations are **idempotent**. Apply via CI or:
 * Service role bypasses RLS (server-only actions).
 * Trigger `on_auth_user_created` (see `20250822_profiles_bootstrap_audit.sql`) auto-inserts rows into `public.profiles` for new `auth.users` to satisfy FK and RLS requirements.
 
+- 20250822_add_published_to_gigs_audit.sql: adds `gigs.published` and a trigger to sync with `status`. Legacy code that queries `published` now works; new code should prefer `status` ('draft'|'published'|'closed').
