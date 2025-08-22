@@ -19,10 +19,15 @@ export default function Billing() {
     if (!user || !file) return;
     setSubmitting(true);
     try {
-      const proofUrl = await uploadPaymentProof(user.id, file);
+      const result = await uploadPaymentProof(user.id, file);
       // create a new pending order with proof
       const { error } = await supabase.from('orders').insert({
-        user_id: user.id, amount: 0, currency: 'PHP', status: 'pending', proof_url: proofUrl, method: 'gcash'
+        user_id: user.id,
+        amount: 0,
+        currency: 'PHP',
+        status: 'pending',
+        proof_url: result.publicUrl,
+        method: 'gcash'
       });
       if (error) throw error;
       const { data } = await supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false });

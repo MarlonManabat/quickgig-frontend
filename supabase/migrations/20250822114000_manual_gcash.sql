@@ -13,9 +13,10 @@ create table if not exists public.orders (
 
 create index if not exists orders_user_idx on public.orders(user_id, created_at desc);
 
--- Storage bucket for proofs
-insert into storage.buckets (id, name, public) values ('payment-proofs','payment-proofs', false)
-on conflict (id) do nothing;
+-- Ensure bucket exists and is public (idempotent)
+insert into storage.buckets (id, name, public)
+values ('payment-proofs','payment-proofs', true)
+on conflict (id) do update set public = excluded.public;
 
 -- RLS (simple defaults; adjust if you already enforce)
 alter table public.orders enable row level security;
