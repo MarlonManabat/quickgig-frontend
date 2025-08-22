@@ -19,10 +19,13 @@ export default function GigViewPage() {
   const [appId, setAppId] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!id || typeof id !== 'string') return // wait for router ready
+    // Normalize the router param
+    const gid = Array.isArray(id) ? id[0] : id
+    if (!gid) return // wait for router to hydrate
+
     let mounted = true
 
-    (async () => {
+    ;(async () => {
       try {
         // get session user id (may be null)
         const { data: u } = await supabase.auth.getUser()
@@ -33,7 +36,7 @@ export default function GigViewPage() {
         const { data, error } = await supabase
           .from('gigs')
           .select('*')
-          .eq('id', id)
+          .eq('id', gid)
           .maybeSingle()
 
         if (error) throw error
@@ -52,19 +55,21 @@ export default function GigViewPage() {
           const { data: app } = await supabase
             .from('applications')
             .select('id')
-            .eq('gig_id', id)
+            .eq('gig_id', gid)
             .eq('applicant', me)
             .maybeSingle()
           setAppId(app?.id ?? null)
         }
-      } catch (e:any) {
+      } catch (e: any) {
         if (mounted) setErr(e.message ?? 'Error loading gig')
       } finally {
         if (mounted) setLoading(false)
       }
     })()
 
-    return () => { mounted = false }
+    return () => {
+      mounted = false
+    }
   }, [id])
 
   async function apply() {
