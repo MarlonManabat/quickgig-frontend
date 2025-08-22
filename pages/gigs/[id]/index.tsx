@@ -7,6 +7,7 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Banner from '@/components/ui/Banner'
 import Spinner from '@/components/ui/Spinner'
+import IdGate from '@/components/IdGate'
 
 type Gig = {
   id: string; owner: string; title: string; description?: string;
@@ -88,32 +89,36 @@ export default function GigViewPage() {
     }
   }
 
-  if (loading) return <Spinner />
-  if (err) return <Banner kind="error">{err}</Banner>
-  if (!gig) return <Banner kind="info">Not found</Banner>
-
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-brand-subtle">Gigs / View gig</p>
-      <div className="flex items-center justify-between">
-        <h1>{gig.title}</h1>
-        {isOwner && (
-          <Link href={`/gigs/${gig.id}/edit`} className="btn-secondary">Edit</Link>
-        )}
+  let content: React.ReactNode
+  if (loading) content = <Spinner />
+  else if (err) content = <Banner kind="error">{err}</Banner>
+  else if (!gig) content = <Banner kind="info">Not found</Banner>
+  else {
+    content = (
+      <div className="space-y-4">
+        <p className="text-sm text-brand-subtle">Gigs / View gig</p>
+        <div className="flex items-center justify-between">
+          <h1 data-testid="gig-title">{gig.title}</h1>
+          {isOwner && (
+            <Link href={`/gigs/${gig.id}/edit`} className="btn-secondary">Edit</Link>
+          )}
+        </div>
+        <Card className="p-4 space-y-2">
+          {gig.description && <p>{gig.description}</p>}
+          <p className="text-sm text-brand-subtle">
+            {gig.location ?? '—'} · ₱{gig.budget ?? '—'} · {gig.status}
+          </p>
+          {!isOwner && userId && (
+            appId ? (
+              <Link href={`/applications/${appId}`} className="btn-secondary">View application</Link>
+            ) : (
+              <Button onClick={apply}>Apply</Button>
+            )
+          )}
+        </Card>
       </div>
-      <Card className="p-4 space-y-2">
-        {gig.description && <p>{gig.description}</p>}
-        <p className="text-sm text-brand-subtle">
-          {gig.location ?? '—'} · ₱{gig.budget ?? '—'} · {gig.status}
-        </p>
-        {!isOwner && userId && (
-          appId ? (
-            <Link href={`/applications/${appId}`} className="btn-secondary">View application</Link>
-          ) : (
-            <Button onClick={apply}>Apply</Button>
-          )
-        )}
-      </Card>
-    </div>
-  )
+    )
+  }
+
+  return <IdGate id={id}>{content}</IdGate>
 }

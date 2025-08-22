@@ -66,7 +66,11 @@ export default function GigsList() {
           {gigs.map((gig) => (
             <li key={gig.id}>
               <Card className="p-4">
-                <Link href={`/gigs/${gig.id}`} className="text-lg font-semibold">
+                <Link
+                  href={`/gigs/${gig.id}`}
+                  className="text-lg font-semibold"
+                  data-testid="gig-card"
+                >
                   {gig.title}
                 </Link>
                 <p className="text-sm text-brand-subtle">

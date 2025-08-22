@@ -8,6 +8,7 @@ import { isAccessDenied } from '@/utils/errors'
 import Card from '@/components/ui/Card'
 import Banner from '@/components/ui/Banner'
 import Spinner from '@/components/ui/Spinner'
+import IdGate from '@/components/IdGate'
 
 export default function ApplicationPage() {
   const router = useRouter()
@@ -56,24 +57,27 @@ export default function ApplicationPage() {
     })()
   }, [id])
 
-  if (loading) return <Spinner />
-  if (error) return <Banner kind="error">{error}</Banner>
-  if (!app) return <Banner kind="info">Not found.</Banner>
+  let content: React.ReactNode
+  if (loading) content = <Spinner />
+  else if (error) content = <Banner kind="error">{error}</Banner>
+  else if (!app) content = <Banner kind="info">Not found.</Banner>
+  else {
+    const counterpart =
+      user?.id === app.applicant
+        ? app.gigs?.profiles?.full_name ?? app.gigs?.owner
+        : app.profiles?.full_name ?? app.applicant
+    content = (
+      <div className="mx-auto flex h-[80vh] max-w-3xl flex-col gap-4 p-4">
+        <p className="text-sm text-brand-subtle">Applications / View application</p>
+        <Card className="p-4 space-y-1">
+          <h1 data-testid="application-title">{app.gigs?.title}</h1>
+          <p className="text-sm text-brand-subtle">Conversation with {counterpart}</p>
+        </Card>
+        {threadId && <ApplicationThread threadId={threadId} />}
+        {threadId && <MessageComposer threadId={threadId} />}
+      </div>
+    )
+  }
 
-  const counterpart =
-    user?.id === app.applicant
-      ? app.gigs?.profiles?.full_name ?? app.gigs?.owner
-      : app.profiles?.full_name ?? app.applicant
-
-  return (
-    <div className="mx-auto flex h-[80vh] max-w-3xl flex-col gap-4 p-4">
-      <p className="text-sm text-brand-subtle">Applications / View application</p>
-      <Card className="p-4 space-y-1">
-        <h1>{app.gigs?.title}</h1>
-        <p className="text-sm text-brand-subtle">Conversation with {counterpart}</p>
-      </Card>
-      {threadId && <ApplicationThread threadId={threadId} />}
-      {threadId && <MessageComposer threadId={threadId} />}
-    </div>
-  )
+  return <IdGate id={id}>{content}</IdGate>
 }

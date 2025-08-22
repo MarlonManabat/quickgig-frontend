@@ -11,7 +11,6 @@ const links = [
   { href: '/applications', label: 'Applications' },
   { href: '/saved', label: 'Saved' },
   { href: '/gigs/new', label: 'Post Job' },
-  { href: '/auth', label: 'Auth' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -71,6 +70,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               );
             })}
+            {user ? (
+              <Link href="/profile" data-testid="nav-profile">Profile</Link>
+            ) : (
+              <Link href="/auth" data-testid="nav-login">Auth</Link>
+            )}
           </nav>
           {user && <NotificationsBell />}
         </div>
