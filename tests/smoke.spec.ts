@@ -50,3 +50,16 @@ test('@smoke applications id guard', async ({ page }) => {
   await page.goto('/applications/[id]');
   await page.waitForURL(/\/applications$/);
 });
+
+test('@smoke messages thread opens', async ({ page }) => {
+  await page.goto('/messages');
+  const thread = page.getByTestId('thread-row').first();
+  if (await thread.count() === 0) test.skip();
+  await thread.click();
+  await expect(page.getByTestId('chat-input')).toBeVisible();
+});
+
+test('@smoke notifications renders', async ({ page }) => {
+  await page.goto('/notifications');
+  await expect(page.getByTestId('notifications-list')).toBeVisible();
+});
