@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/utils/supabaseClient';
 
 export function subscribeToMessages(appId: string, onInsert: (row: any) => void) {
   const channel = supabase

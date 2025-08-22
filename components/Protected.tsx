@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/utils/supabaseClient'
 
 export default function Protected({ children }: { children: ReactNode }) {
   const [allowed, setAllowed] = useState(false)

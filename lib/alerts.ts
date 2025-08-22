@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/utils/supabaseClient'
 
 export async function listAlerts() {
   return supabase.from('gig_alerts').select('*').order('created_at', { ascending: false })

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Shell from '@/components/Shell';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/utils/supabaseClient';
 import { isAdmin } from '@/lib/auth';
 
 export default function AdminOrders() {

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createServerClient } from '@/lib/supabaseClient';
+import { createServerClient } from '@/utils/supabaseClient';
 import { isAdmin } from '@/lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

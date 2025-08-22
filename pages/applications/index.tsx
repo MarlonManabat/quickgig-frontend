@@ -1,7 +1,7 @@
 import Shell from "@/components/Shell";
 import { useRequireUser } from "@/lib/useRequireUser";
 import Link from "next/link";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/utils/supabaseClient";
 import { getUnreadCount } from "@/lib/reads";
 import { useEffect, useState } from "react";
 
