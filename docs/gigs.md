@@ -28,10 +28,13 @@ Authenticated users can create a gig via `/gigs/new`. The page uses the reusable
 2. Inserts a new row into the `gigs` table with the provided values and the current user's `id`.
 3. Redirects to `/gigs/{id}` after a successful insert.
 
+If no user is signed in, the form shows a friendly "Please sign in" message and skips the insert.
+
 ## Viewing and editing
 
 - **View:** `/gigs/[id].tsx` displays a single gig. It fetches the gig by id; anyone can view published gigs.
 - **Edit:** `/gigs/[id]/edit.tsx` allows the owner of the gig to update the fields. It reuses `GigForm` and updates the record via `supabase.from('gigs').update().eq('id', id)`. The page is gated by `useRequireUser` and checks that the current user matches the gig's `user_id` before allowing edits.
+  RLS errors surface "You are not allowed to edit this gig."
 
 ## Row‑level security
 
