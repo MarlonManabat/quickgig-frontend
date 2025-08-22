@@ -25,10 +25,10 @@ export default function TopNav() {
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
         <Link href="/" className="font-semibold">QuickGig.ph</Link>
         <div className="ml-auto flex items-center gap-4 text-sm">
-          <Link href="/find-work">Find Work</Link>
-          {loggedIn && <Link href="/dashboard/gigs">My Gigs</Link>}
-          {loggedIn && <Link href="/applications">Applications</Link>}
-          {loggedIn && <Link href="/saved">Saved</Link>}
+          <Link href="/find-work" data-testid="nav-find">Find Work</Link>
+          {loggedIn && <Link href="/dashboard/gigs" data-testid="nav-my-gigs">My Gigs</Link>}
+          {loggedIn && <Link href="/applications" data-testid="nav-apps">Applications</Link>}
+          {loggedIn && <Link href="/saved" data-testid="nav-saved">Saved</Link>}
           {loggedIn && <NotificationsBell />}
           {loggedIn && !eligible && (
             <Link href="/checkout" className="btn-primary">
@@ -37,12 +37,13 @@ export default function TopNav() {
           )}
           <Link
             href="/post-job"
+            data-testid="nav-post"
             className={`btn-primary ${loggedIn && !eligible ? 'opacity-50 pointer-events-none' : ''}`}
             title={loggedIn && !eligible ? 'Please buy a ticket (₱10)' : undefined}
           >
             Post Job
           </Link>
-          <Link href="/auth">Auth</Link>
+          <Link href="/auth" data-testid="nav-auth">Auth</Link>
         </div>
       </div>
     </nav>

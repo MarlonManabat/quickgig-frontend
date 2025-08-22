@@ -61,6 +61,7 @@ export default function ApplicationThread({ threadId }: Props) {
     <div
       ref={listRef}
       className="card p-3 h-[60vh] overflow-y-auto flex flex-col gap-2"
+      data-testid="thread-list"
     >
       {msgs.length === 0 && (
         <p className="text-sm text-center text-brand-subtle">No messages yet.</p>

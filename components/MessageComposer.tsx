@@ -101,11 +101,13 @@ export default function MessageComposer({ threadId, onSent }: Props) {
           placeholder="Type a message..."
           disabled={sending}
           rows={2}
+          data-testid="composer-input"
         />
         <Button
           type="submit"
-          disabled={sending || !body.trim()}
+          disabled={sending || !body.trim()} 
           aria-busy={sending}
+          data-testid="composer-send"
         >
           Send
         </Button>

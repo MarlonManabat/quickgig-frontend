@@ -64,9 +64,9 @@ export default function GigsList() {
       ) : (
         <ul className="space-y-4">
           {gigs.map((gig) => (
-            <li key={gig.id}>
+            <li key={gig.id} data-testid="gig-card">
               <Card className="p-4">
-                <Link href={`/gigs/${gig.id}`} className="text-lg font-semibold">
+                <Link href={`/gigs/${gig.id}`} data-testid="gig-open" className="text-lg font-semibold">
                   {gig.title}
                 </Link>
                 <p className="text-sm text-brand-subtle">
