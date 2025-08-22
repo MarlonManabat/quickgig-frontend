@@ -1,0 +1,9 @@
+RewriteEngine On
+# Force HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# www -> apex
+RewriteCond %{HTTP_HOST} ^www\.quickgig\.ph$ [NC]
+RewriteRule ^(.*)$ https://quickgig.ph/$1 [L,R=301]
+# Forward common app routes to app subdomain
+RewriteRule ^(login|signup|find|post|jobs|gig|dashboard)(/.*)?$ https://app.quickgig.ph/$1$2 [L,R=302]

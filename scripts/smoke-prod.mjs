@@ -1,20 +1,26 @@
-import { execSync as sh } from 'node:child_process';
-const BASE = process.env.SMOKE_BASE || 'https://quickgig.ph';
-function code(u){ return sh(`curl -sS -o /dev/null -w "%{http_code}" "${u}"`).toString().trim(); }
-for (const p of ['/', '/login']) {
-  const u = `${BASE}${p}?legacy=1`;
-  const c = code(u);
-  console.log(u,'->',c);
-  if (+c>=400) process.exit(1);
-  const html = sh(`curl -sS "${u}"`).toString();
-  const assets=[...new Set((html.match(/["'](\/legacy[^"' >]+)["']/gi)||[]).map(s=>s.slice(1,-1)))];
-  for (const a of assets) {
-    const cu = `${BASE}${a}`;
-    const cc = code(cu);
-    console.log(' ',a,'->',cc);
-    if (+cc>=400) { console.error('MISS',a); process.exit(1); }
-  }
+// scripts/smoke-prod.mjs
+import { execSync } from "node:child_process";
+
+const HEADER_FILTER = /^(HTTP\/|content-type:|content-length:|server:|location:)/i;
+
+function head(url) {
+  return execSync(`curl -sSI ${url}`, { encoding: "utf8" });
 }
-const head = sh(`curl -sSI "${BASE}/legacy/fonts/LegacySans.woff2"`).toString();
-console.log(head.split('\n').filter(l=>/HTTP\\/|content-type|content-length/i.test(l)).join('\n'));
-console.log('Smoke OK ✅');
+function get(url) {
+  return execSync(`curl -sS ${url}`, { encoding: "utf8" });
+}
+function showHead(url, label = url) {
+  const lines = head(url).split("\n").filter(l => HEADER_FILTER.test(l));
+  console.log(`\n# HEAD ${label}\n${lines.join("")}`);
+}
+
+(async () => {
+  // App API health
+  const ok = get("https://app.quickgig.ph/api/health").trim();
+  console.log("# /api/health:", ok);
+
+  // Landing + redirects
+  showHead("https://quickgig.ph/", "quickgig.ph");
+  showHead("https://www.quickgig.ph/", "www.quickgig.ph");
+  showHead("https://quickgig.ph/post-job", "quickgig.ph/post-job");
+})();

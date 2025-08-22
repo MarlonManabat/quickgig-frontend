@@ -1,0 +1,4 @@
+# .vercelignore
+landing_public_html/**
+docs/**
+**/*.md
