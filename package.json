@@ -12,6 +12,8 @@
     "test:e2e:ui": "playwright test --ui",
     "lint:href": "node scripts/href-lint.mjs",
     "fix:href": "node scripts/href-codemod.mjs",
+    "qa:smoke": "playwright test --config=tests/playwright.config.ts -g '@smoke'",
+    "qa:all": "playwright test --config=tests/playwright.config.ts",
     "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx playwright install --with-deps || true; fi"
   },
   "dependencies": {
@@ -34,7 +36,8 @@
     "eslint-config-next": "^14.2.3",
     "@typescript-eslint/parser": "^6.21.0",
     "@playwright/test": "^1.48.0",
-    "ts-morph": "^24.0.0"
+    "ts-morph": "^24.0.0",
+    "fast-glob": "^3.3.2"
   },
   "engines": {
     "node": ">=18.17"

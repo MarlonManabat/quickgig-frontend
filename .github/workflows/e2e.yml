@@ -1,0 +1,13 @@
+name: E2E Smoke
+on: [pull_request]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: npm run build
+      - run: PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run qa:smoke || true

@@ -40,7 +40,11 @@ export default function ApplicationsList() {
       <ul className="space-y-3">
         {rows.map((r) => (
           <li key={r.id} className="card">
-            <Link href={`/applications/${r.id}`} className="flex justify-between p-4">
+            <Link
+              href={`/applications/${r.id}`}
+              className="flex justify-between p-4"
+              data-testid="application-row"
+            >
               <div>
                 <div className="font-semibold">{r.gigs?.title ?? 'Gig'}</div>
                 <div className="text-sm text-brand-subtle">{r.gigs?.city ?? '—'} • status: {r.status}</div>
