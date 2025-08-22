@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Shell from "@/components/Shell";
 import { useRouter } from "next/router";
@@ -14,6 +14,11 @@ export default function PostJobPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const router = useRouter();
   const { ready, userId } = useRequireUser();
+  const [eligible, setEligible] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch('/api/users/me/eligibility').then(r => r.json()).then(d => setEligible(d.canPost)).catch(()=>setEligible(false));
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,7 +48,8 @@ export default function PostJobPage() {
     }
   }
 
-  if (!ready) return <Shell><p>Loading…</p></Shell>;
+  if (!ready || eligible === null) return <Shell><p>Loading…</p></Shell>;
+  if (!eligible) return <Shell><p>Please buy a ticket first. <a className="underline" href="/checkout">Go to checkout</a>.</p></Shell>;
 
   return (
     <Shell>
