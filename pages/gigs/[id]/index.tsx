@@ -104,7 +104,7 @@ export default function GigViewPage() {
       <Card className="p-4 space-y-2">
         {gig.description && <p>{gig.description}</p>}
         <p className="text-sm text-brand-subtle">
-          {gig.location ?? gig.city ?? '—'} · ₱{gig.budget ?? '—'} · {gig.status}
+          {gig.location ?? '—'} · ₱{gig.budget ?? '—'} · {gig.status}
         </p>
         {!isOwner && userId && (
           appId ? (
