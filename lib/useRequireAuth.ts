@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 
 export function useRequireAuth(redirectTo: string = '/login') {
   const router = useRouter()
