@@ -82,6 +82,7 @@ export default function ProfilePage() {
               id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
+              data-testid="profile-name"
             />
           </div>
           <div>
@@ -92,7 +93,7 @@ export default function ProfilePage() {
               onChange={(e) => setAvatarUrl(e.target.value)}
             />
           </div>
-          <Button type="submit" disabled={saving} aria-busy={saving}>
+          <Button type="submit" disabled={saving} aria-busy={saving} data-testid="profile-save">
             {saving ? <Spinner /> : 'Save'}
           </Button>
         </form>

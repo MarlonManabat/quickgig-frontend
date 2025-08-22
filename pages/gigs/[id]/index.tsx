@@ -98,7 +98,7 @@ export default function GigViewPage() {
       <div className="flex items-center justify-between">
         <h1>{gig.title}</h1>
         {isOwner && (
-          <Link href={`/gigs/${gig.id}/edit`} className="btn-secondary">Edit</Link>
+          <Link href={`/gigs/${gig.id}/edit`} className="btn-secondary" data-testid="edit-gig-btn">Edit</Link>
         )}
       </div>
       <Card className="p-4 space-y-2">
@@ -110,7 +110,7 @@ export default function GigViewPage() {
           appId ? (
             <Link href={`/applications/${appId}`} className="btn-secondary">View application</Link>
           ) : (
-            <Button onClick={apply}>Apply</Button>
+            <Button onClick={apply} data-testid="apply-btn">Apply</Button>
           )
         )}
       </Card>

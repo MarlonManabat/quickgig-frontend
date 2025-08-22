@@ -56,6 +56,7 @@ export default function AuthPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            data-testid={mode === 'login' ? 'login-email' : 'signup-email'}
           />
         </div>
         <div>
@@ -66,9 +67,15 @@ export default function AuthPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            data-testid={mode === 'login' ? 'login-password' : 'signup-password'}
           />
         </div>
-        <Button type="submit" disabled={loading} aria-busy={loading}>
+        <Button
+          type="submit"
+          disabled={loading}
+          aria-busy={loading}
+          data-testid={mode === 'login' ? 'login-submit' : 'signup-submit'}
+        >
           {loading ? 'Working…' : mode === 'login' ? 'Log in' : 'Sign up'}
         </Button>
       </form>

@@ -69,9 +69,9 @@ export default function NotificationsBell() {
 
   return (
     <div className="relative">
-      <button onClick={toggle} className="relative">
+      <button onClick={toggle} className="relative" data-testid="nav-bell">
         🔔
-        {count > 0 && <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-brand-danger" />}
+        {count > 0 && <span data-testid="bell-badge" className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-brand-danger" />}
       </button>
       {open && (
         <div className="fixed right-0 top-0 z-50 h-full w-full max-w-sm overflow-y-auto border border-brand-border bg-brand-bg p-4 shadow-lg">
@@ -81,7 +81,7 @@ export default function NotificationsBell() {
                 ? `/applications/${n.payload.application_id}`
                 : undefined
             const content = (
-              <div key={n.id} className="mb-2 border-b border-brand-border pb-2 text-sm">
+              <div key={n.id} data-testid="notif-item" className="mb-2 border-b border-brand-border pb-2 text-sm">
                 {n.payload?.preview && <div>{n.payload.preview}</div>}
                 <div className="text-xs text-brand-subtle">{timeAgo(n.created_at)}</div>
               </div>
