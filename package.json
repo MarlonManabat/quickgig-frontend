@@ -1,33 +1,73 @@
 {
-  "name": "quickgig-frontend",
+  "name": "frontend",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "smoke": "node scripts/smoke.mjs",
-    "smoke:local": "node scripts/smoke.mjs",
+    "start": "next start -p 3000",
+    "lint": "eslint .",
+    "lint:ci": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "check:api": "node tools/check_api.mjs",
+    "check:api:soft": "node tools/check_live_api.mjs || true",
+    "check:app": "node tools/check_app.mjs",
+    "check:appassets": "node tools/check_app_assets.mjs",
+    "check:app:soft": "node tools/check_live_app.mjs || true",
+    "check:dns:app": "node tools/check_dns_app.mjs",
+    "check:jobs": "node tools/check_jobs_api.mjs || true",
+    "check:legacy": "node tools/check_no_socket_on_legacy.mjs",
+    "smoke": "node tools/smoke.mjs",
+    "api:check": "npm run check:api",
+    "test:e2e": "playwright test",
+    "test:e2e:smoke": "playwright test -c ./playwright.config.ts --grep @smoke",
+    "playwright:install": "playwright install --with-deps",
+    "scan:appdomain": "node tools/scan_app_domain.mjs",
+    "scan:links": "node tools/check_links.mjs",
+    "bootstrap": "node tools/dev/bootstrap.mjs",
+    "legacy:sync": "node tools/legacy/sync.js",
+    "legacy:verify": "node tools/legacy_verify.mjs",
+    "legacy:tree": "node -e \"import('fs').then(fs=>{const {readdirSync, statSync}=fs.default;function tree(d,p=''){for(const f of readdirSync(d)){const fp=d+'/'+f;const s=statSync(fp);console.log(p+(s.isDirectory()?'📁 ':'📄 ')+f); if(s.isDirectory()) tree(fp,p+'  ');} } try{tree('public/legacy');}catch(e){console.log('public/legacy not found');}})\"",
+    "legacy:check": "node tools/legacy_verify.mjs --pretty",
+    "legacy:import": "node tools/import_from_dir.mjs",
+    "test": "tsc src/lib/flags.ts src/lib/legacy/renderLegacy.ts src/lib/legacy/__tests__/sanitize.test.ts --module commonjs --target ES2019 --esModuleInterop --outDir dist-test && node --test dist-test/legacy/__tests__/sanitize.test.js",
+    "legacy:verify:strict": "node scripts/legacy-verify-strict.mjs",
     "smoke:prod": "node scripts/smoke-prod.mjs",
-    "db:mvp:sql": "echo supabase/sql/001_mvp.sql"
+    "legacy:font:install": "node scripts/legacy-font-install.mjs",
+    "font:status": "node scripts/font-status.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2",
-    "next": "^14 || ^15",
+    "@next/bundle-analyzer": "^15.4.6",
+    "@supabase/auth-helpers-nextjs": "0.10.0",
+    "axios": "^1.11.0",
+    "cheerio": "1.0.0-rc.12",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.539.0",
+    "next": "14.2.31",
+    "raw-body": "3.0.0",
     "react": "^18",
     "react-dom": "^18",
-    "stripe": "^16.0.0",
-    "raw-body": "^2.5.2",
-    "@supabase/auth-helpers-nextjs": "^0.10.0"
+    "socket.io-client": "^4.8.1",
+    "stripe": "18.4.0",
+    "tailwind-merge": "^3.3.1",
+    "webpack-bundle-analyzer": "^4.10.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "critters": "^0.0.23",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.31",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=18 <22"
+    "node": ">=18"
+  },
+  "playwright": {
+    "skipBrowserDownload": true
   }
 }
