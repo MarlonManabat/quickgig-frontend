@@ -1,74 +1,69 @@
-import { GetServerSideProps } from "next";
-import Shell from "@/components/Shell";
-import { supabase } from "@/utils/supabaseClient";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import SaveButton from "@/components/SaveButton";
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/utils/supabaseClient';
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const id = ctx.params?.id as string;
-  const { data, error } = await supabase.from("gigs").select("*").eq("id", id).single();
-  if (error || !data) return { notFound: true };
-  return { props: { gig: data } };
+type Gig = {
+  id: string; owner: string; title: string; description?: string;
+  budget?: number; location?: string; status: 'draft'|'published'|'closed';
 };
 
-export default function GigPage({ gig }: { gig: any }) {
-  const [user, setUser] = useState<any>(undefined);
+export default function GigViewPage() {
+  const router = useRouter();
+  const { id } = router.query;
+  const [gig, setGig] = useState<Gig | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-  }, []);
+    if (!id || typeof id !== 'string') return; // wait for router ready
+    let mounted = true;
 
-  async function report() {
-    const reason = prompt("Why are you reporting this gig?") || "";
-    try {
-      await fetch("/api/reports/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "gig", target_id: gig.id, reason }),
-      });
-      alert("Reported");
-    } catch (_) {}
-  }
+    (async () => {
+      try {
+        // get session user id (may be null)
+        const { data: u } = await supabase.auth.getUser();
+        const me = u.user?.id ?? null;
 
-  if (gig.hidden) {
-    if (user === undefined) return <Shell><p>Loading…</p></Shell>;
-    if (!user || user.id !== gig.owner) return <Shell><p>This gig is unavailable.</p></Shell>;
-  }
+        // fetch the gig
+        const { data, error } = await supabase
+          .from('gigs')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (!data) { setErr('Not found'); return; }
+
+        // Enforce published visibility for non-owners
+        if (data.status !== 'published' && data.owner !== me) {
+          setErr('This gig is not public.');
+          return;
+        }
+
+        if (!mounted) return;
+        setGig(data as Gig);
+        setIsOwner(!!me && data.owner === me);
+      } catch (e:any) {
+        if (mounted) setErr(e.message ?? 'Error loading gig');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [id]);
+
+  if (loading) return <p style={{padding:16}}>Loading…</p>;
+  if (err) return <p style={{padding:16}}>⚠️ {err}</p>;
+  if (!gig) return <p style={{padding:16}}>Not found</p>;
 
   return (
-    <Shell>
-      <div className="mb-2 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{gig.title}</h1>
-        <div className="flex items-center gap-2">
-          <SaveButton gigId={gig.id} withText />
-          <button onClick={report} className="text-sm underline">Report</button>
-        </div>
-      </div>
-      {user?.id !== gig.owner ? (
-        <Link
-          href={`/gigs/${gig.id}/apply`}
-          className="rounded bg-yellow-400 text-black px-3 py-1"
-        >
-          Apply
-        </Link>
-      ) : (
-        <Link href={`/gigs/${gig.id}/applicants`} className="underline">
-          View Applicants
-        </Link>
-      )}
-      {gig.image_url && (
-        <img
-          src={gig.image_url}
-          alt=""
-          className="rounded mb-4 max-h-64 object-cover"
-        />
-      )}
-      <p className="opacity-90 mb-4 whitespace-pre-wrap">{gig.description}</p>
-      <div className="text-sm opacity-80 space-x-4">
-        <span>Budget: {gig.budget ?? "—"}</span>
-        <span>City: {gig.city ?? "—"}</span>
-      </div>
-    </Shell>
+    <main style={{maxWidth:720,margin:'24px auto',padding:'16px'}}>
+      <h1>{gig.title}</h1>
+      {gig.description && <p>{gig.description}</p>}
+      <p>Budget: {gig.budget ?? '—'} | Location: {gig.location ?? '—'} | Status: {gig.status}</p>
+      {isOwner && <p><a href={`/gigs/${gig.id}/edit`}>Edit gig</a></p>}
+    </main>
   );
 }

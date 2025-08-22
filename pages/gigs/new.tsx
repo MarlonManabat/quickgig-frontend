@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { supabase } from '../../utils/supabaseClient';
 import GigForm from '../../components/GigForm';
 import { uploadPublicFile } from '../../lib/storage';
@@ -29,6 +30,7 @@ export default function NewGig() {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
+      <p className="mb-2 text-sm"><Link href="/auth" className="underline">Auth</Link></p>
       <h1 className="text-xl font-bold mb-4">Post a Gig</h1>
       <GigForm
         initialGig={{}}
