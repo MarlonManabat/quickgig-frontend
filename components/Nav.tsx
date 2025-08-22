@@ -27,7 +27,7 @@ export default function Nav() {
       {session ? (
         <button onClick={logout}>Logout</button>
       ) : (
-        <Link href="/login">Login</Link>
+        <Link href="/auth">Auth</Link>
       )}
     </nav>
   )

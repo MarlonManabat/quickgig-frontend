@@ -46,3 +46,5 @@ The database enforces row‑level security (RLS). Policies should ensure:
 - Inserting a gig automatically sets `user_id` to `auth.uid()`.
 
 These rules are defined in the Supabase project and should be kept in sync with this frontend implementation.
+
+Gig detail page hides drafts for non-owners; edit page requires ownership. Auth at `/auth`.

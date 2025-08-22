@@ -42,7 +42,7 @@ export default function TopNav() {
           >
             Post Job
           </Link>
-          <Link href="/login">Login</Link>
+          <Link href="/auth">Auth</Link>
         </div>
       </div>
     </nav>
