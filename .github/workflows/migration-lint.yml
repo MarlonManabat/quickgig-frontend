@@ -1,0 +1,23 @@
+name: Migration filename lint
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+  push:
+    paths:
+      - "supabase/migrations/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check migration filenames
+        run: |
+          bad=$(ls supabase/migrations | grep -vE '^[0-9]{14}_.+\.sql$' || true)
+          if [ -n "$bad" ]; then
+            echo "The following migration files have invalid names:"
+            echo "$bad"
+            exit 1
+          fi
+          echo "Migration filenames OK"

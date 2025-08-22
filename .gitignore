@@ -39,3 +39,6 @@ yarn-error.log*
 # PHP API vendor
 api.quickgig.ph/vendor/
 api.quickgig.ph/.env
+
+# Supabase local state
+.supabase/
