@@ -10,6 +10,7 @@ export default function ProfilePage() {
   const [status, setStatus] = useState<string | null>(null);
   const [ratingAvg, setRatingAvg] = useState<number | null>(null);
   const [ratingCount, setRatingCount] = useState<number | null>(null);
+  const [payoutReady, setPayoutReady] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -21,7 +22,7 @@ export default function ProfilePage() {
 
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url, rating_avg, rating_count")
+        .select("full_name, avatar_url, rating_avg, rating_count, stripe_payout_ready")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -30,6 +31,7 @@ export default function ProfilePage() {
         setAvatarUrl(data.avatar_url ?? "");
         setRatingAvg(data.rating_avg ?? null);
         setRatingCount(data.rating_count ?? null);
+        setPayoutReady(!!data.stripe_payout_ready);
       }
 
       const { data: revs } = await listReviewsForUser(user.id);
@@ -68,6 +70,9 @@ export default function ProfilePage() {
   return (
     <Shell>
       <h1 className="text-2xl font-bold mb-4">Your Profile</h1>
+      {payoutReady && (
+        <span className="mb-4 inline-block rounded bg-green-600 px-2 py-1 text-xs">Payout Ready</span>
+      )}
       <form onSubmit={save} className="max-w-md space-y-3">
         <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
                placeholder="Full name" value={fullName} onChange={(e)=>setFullName(e.target.value)} />
