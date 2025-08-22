@@ -4,6 +4,7 @@ import ApplicationThread from '@/components/ApplicationThread'
 import MessageComposer from '@/components/MessageComposer'
 import { supabase } from '@/utils/supabaseClient'
 import { getOrCreateThread } from '@/utils/application'
+import { isAccessDenied } from '@/utils/errors'
 
 export default function ApplicationPage() {
   const router = useRouter()
@@ -23,17 +24,15 @@ export default function ApplicationPage() {
           .eq('id', id)
           .maybeSingle()
         if (appErr) {
-          if (appErr.status === 401 || appErr.status === 403) {
-            setError("You don’t have access to this application.")
+          if (isAccessDenied(appErr)) {
+            setError("You don't have access to this application.")
           } else {
             setError(appErr.message)
           }
-          setLoading(false)
           return
         }
         if (!data) {
           setError('Application not found')
-          setLoading(false)
           return
         }
         setApp(data)
