@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Shell from '@/components/Shell';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/utils/supabaseClient';
 import { isAdminEmail } from '@/lib/authz';
 import Link from 'next/link';
 

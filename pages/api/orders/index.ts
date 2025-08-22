@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createServerClient } from '@/lib/supabaseClient';
+import { createServerClient } from '@/utils/supabaseClient';
 import { TICKET_PRICE_PHP, makeRef } from '@/lib/payments';
 import { isAdmin } from '@/lib/auth';
 

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 import Shell from "@/components/Shell";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/utils/supabaseClient";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SaveButton from "@/components/SaveButton";

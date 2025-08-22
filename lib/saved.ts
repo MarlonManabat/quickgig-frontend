@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/utils/supabaseClient'
 
 export async function isSaved(gigId: number) {
   const { data } = await supabase

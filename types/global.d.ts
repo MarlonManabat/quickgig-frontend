@@ -6,3 +6,5 @@ declare module '*.svg';
 declare module '*.gif';
 declare module '*.webp';
 declare module '*.pdf';
+declare module 'stripe';
+declare module 'raw-body';

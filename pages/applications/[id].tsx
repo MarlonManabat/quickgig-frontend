@@ -2,7 +2,7 @@ import Shell from "@/components/Shell";
 import MessageItem from "@/components/MessageItem";
 import MessageComposer from "@/components/MessageComposer";
 import { useRequireUser } from "@/lib/useRequireUser";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/utils/supabaseClient";
 import { subscribeToMessages } from "@/lib/realtime";
 import { markThreadRead } from "@/lib/reads";
 import { createReview } from "@/lib/reviews";

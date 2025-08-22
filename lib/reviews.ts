@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/utils/supabaseClient';
 
 export async function createReview(appId: number, reviewee: string, rating: number, comment?: string) {
   return supabase.from('reviews').insert({ app_id: appId, reviewee, rating, comment });

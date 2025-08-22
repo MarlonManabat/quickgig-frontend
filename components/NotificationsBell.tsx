@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { listNotifications, markAllSeen, subscribeNotifications } from '@/lib/notifications'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/utils/supabaseClient'
 
 export default function NotificationsBell() {
   const [userId, setUserId] = useState<string | null>(null)

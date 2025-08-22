@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/utils/supabaseClient'
 import type { Session } from '@supabase/supabase-js'
 
 export default function Nav() {

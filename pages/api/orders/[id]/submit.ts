@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createServerClient } from '@/lib/supabaseClient';
+import { createServerClient } from '@/utils/supabaseClient';
 
 function validProof(urlStr: string) {
   try {

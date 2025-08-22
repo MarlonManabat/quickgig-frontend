@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/utils/supabaseClient'
 
 export async function listNotifications(limit = 20) {
   return supabase

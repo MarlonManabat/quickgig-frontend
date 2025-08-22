@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/utils/supabaseClient";
 import NotificationsBell from "@/components/NotificationsBell";
 
 export default function TopNav() {
