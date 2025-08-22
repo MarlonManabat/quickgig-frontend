@@ -13,4 +13,5 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npm run build:prod
+      - run: npm run seed
       - run: npm run qa:ci
