@@ -263,6 +263,16 @@ export default function ApplicationThread() {
 function OfferForm({ onCreate }: { onCreate: (amount: string, notes: string) => Promise<void> }) {
   const [amount, setAmount] = useState("");
   const [notes, setNotes] = useState("");
+  const [payoutReady, setPayoutReady] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      const uid = data.user?.id;
+      if (!uid) return setPayoutReady(false);
+      const { data: p } = await supabase.from("profiles").select("stripe_payout_ready").eq("id", uid).single();
+      setPayoutReady(!!p?.stripe_payout_ready);
+    });
+  }, []);
   return (
     <form
       onSubmit={async (e) => {
@@ -287,9 +297,14 @@ function OfferForm({ onCreate }: { onCreate: (amount: string, notes: string) => 
         className="w-full rounded bg-slate-800 px-3 py-2"
         placeholder="Notes"
       />
-      <button type="submit" className="rounded bg-yellow-400 text-black px-3 py-1">
+      <button type="submit" disabled={payoutReady === false} className="rounded bg-yellow-400 text-black px-3 py-1 disabled:opacity-50">
         Create Offer
       </button>
+      {payoutReady === false && (
+        <p className="text-sm">
+          <a href="/settings/payouts" className="underline">Connect payouts</a> to send offers.
+        </p>
+      )}
     </form>
   );
 }

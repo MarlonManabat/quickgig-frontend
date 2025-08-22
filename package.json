@@ -11,10 +11,13 @@
     "db:mvp:sql": "echo supabase/sql/001_mvp.sql"
   },
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.8",
     "@supabase/supabase-js": "^2",
     "next": "^14 || ^15",
+    "raw-body": "^2",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "stripe": "^14"
   },
   "devDependencies": {
     "@types/node": "^20",
