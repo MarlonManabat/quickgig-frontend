@@ -1,7 +1,12 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { supabase } from '@/utils/supabaseClient'
 import { getOrCreateApplication, getOrCreateThread } from '@/utils/application'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
+import Banner from '@/components/ui/Banner'
+import Spinner from '@/components/ui/Spinner'
 
 type Gig = {
   id: string; owner: string; title: string; description?: string;
@@ -83,23 +88,32 @@ export default function GigViewPage() {
     }
   }
 
-  if (loading) return <p style={{padding:16}}>Loading…</p>
-  if (err) return <p style={{padding:16}}>⚠️ {err}</p>
-  if (!gig) return <p style={{padding:16}}>Not found</p>
+  if (loading) return <Spinner />
+  if (err) return <Banner kind="error">{err}</Banner>
+  if (!gig) return <Banner kind="info">Not found</Banner>
 
   return (
-    <main style={{maxWidth:720,margin:'24px auto',padding:'16px'}}>
-      <h1>{gig.title}</h1>
-      {gig.description && <p>{gig.description}</p>}
-      <p>Budget: {gig.budget ?? '—'} | Location: {gig.location ?? '—'} | Status: {gig.status}</p>
-      {isOwner && <p><a href={`/gigs/${gig.id}/edit`}>Edit gig</a></p>}
-      {!isOwner && userId && (
-        appId ? (
-          <p><a href={`/applications/${appId}`}>View application</a></p>
-        ) : (
-          <button onClick={apply} className="rounded bg-yellow-400 text-black px-3 py-1">Apply</button>
-        )
-      )}
-    </main>
+    <div className="space-y-4">
+      <p className="text-sm text-brand-subtle">Gigs / View gig</p>
+      <div className="flex items-center justify-between">
+        <h1>{gig.title}</h1>
+        {isOwner && (
+          <Link href={`/gigs/${gig.id}/edit`} className="btn-secondary">Edit</Link>
+        )}
+      </div>
+      <Card className="p-4 space-y-2">
+        {gig.description && <p>{gig.description}</p>}
+        <p className="text-sm text-brand-subtle">
+          {gig.location ?? gig.city ?? '—'} · ₱{gig.budget ?? '—'} · {gig.status}
+        </p>
+        {!isOwner && userId && (
+          appId ? (
+            <Link href={`/applications/${appId}`} className="btn-secondary">View application</Link>
+          ) : (
+            <Button onClick={apply}>Apply</Button>
+          )
+        )}
+      </Card>
+    </div>
   )
 }

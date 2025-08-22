@@ -5,6 +5,7 @@ import GigForm from '@/components/GigForm';
 import { uploadPublicFile } from '@/lib/storage';
 import { useRequireUser } from '@/lib/useRequireUser';
 import { isAccessDenied } from '@/utils/errors';
+import Banner from '@/components/ui/Banner';
 
 export default function NewGig() {
   const router = useRouter();
@@ -42,9 +43,10 @@ export default function NewGig() {
   if (!ready) return null;
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-1">Post a Job</h1>
-      {rlsDenied && <p className="text-sm text-red-600 mb-4">Only job posters can post</p>}
+    <div className="space-y-4">
+      <p className="text-sm text-brand-subtle">Gigs / Post job</p>
+      <h1>Post a Job</h1>
+      {rlsDenied && <Banner kind="error">Only job posters can post</Banner>}
       <GigForm
         initialGig={{}}
         onSubmit={handleSubmit}

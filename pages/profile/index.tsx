@@ -2,8 +2,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '@/utils/supabaseClient';
-import Banner from '@/components/Banner';
-import Spinner from '@/components/Spinner';
+import Banner from '@/components/ui/Banner';
+import Spinner from '@/components/ui/Spinner';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 import { getProfile, getUserId } from '@/utils/session';
 import { isAccessDenied } from '@/utils/errors';
 
@@ -65,36 +68,35 @@ export default function ProfilePage() {
   if (!loaded) return <p>Loading...</p>;
 
   return (
-    <div>
-      {onboarding && <p className="text-sm mb-4">Step 1 of 2 — Complete your profile</p>}
+    <div className="space-y-4">
+      <p className="text-sm text-brand-subtle">Profile</p>
+      {onboarding && <Banner kind="info">Step 1 of 2 — Complete your profile</Banner>}
       {status && <Banner kind="success">{status}</Banner>}
       {error && <Banner kind="error">{error}</Banner>}
-      <div className="max-w-md rounded-md border p-4">
-        <h1 className="text-3xl font-bold mb-4">Your Profile</h1>
-        <form onSubmit={save}>
-          <label htmlFor="fullName" className="block">Full name</label>
-          <input
-            id="fullName"
-            className="w-full border rounded-md px-3 py-2 mb-3"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-          <label htmlFor="avatar" className="block">Avatar URL</label>
-          <input
-            id="avatar"
-            className="w-full border rounded-md px-3 py-2 mb-3"
-            value={avatarUrl}
-            onChange={(e) => setAvatarUrl(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="inline-flex items-center rounded-md bg-black text-white px-4 py-2 hover:opacity-90"
-            disabled={saving}
-          >
+      <Card className="max-w-md p-6">
+        <h1 className="mb-4">Your Profile</h1>
+        <form onSubmit={save} className="space-y-4">
+          <div>
+            <label htmlFor="fullName" className="label">Full name</label>
+            <Input
+              id="fullName"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="avatar" className="label">Avatar URL</label>
+            <Input
+              id="avatar"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+            />
+          </div>
+          <Button type="submit" disabled={saving} aria-busy={saving}>
             {saving ? <Spinner /> : 'Save'}
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }
