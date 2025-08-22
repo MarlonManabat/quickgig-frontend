@@ -40,19 +40,19 @@ export default function MyGigs() {
     <Shell>
       <h1 className="text-2xl font-bold mb-4">My Gigs</h1>
       {loading && <p>Loading…</p>}
-      {error && <p className="text-red-400">{error.message}</p>}
+      {error && <p className="text-brand-danger">{error.message}</p>}
       <ul className="space-y-3">
         {data.map((g: any) => (
-          <li key={g.id} className="rounded border border-slate-800 p-4 bg-slate-900">
+          <li key={g.id} className="card p-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-semibold">{g.title}</div>
-                <div className="text-sm opacity-80">{g.city ?? "—"} • #{g.id}</div>
+                <div className="text-sm text-brand-subtle">{g.city ?? '—'} • #{g.id}</div>
               </div>
               <div className="flex gap-3">
                 <Link className="underline" href={`/gigs/${g.id}`}>View</Link>
                 <Link className="underline" href={`/gigs/${g.id}/edit`}>Edit</Link>
-                <button onClick={() => del(g.id)} className="underline text-red-300">Delete</button>
+                <button onClick={() => del(g.id)} className="underline text-brand-danger">Delete</button>
               </div>
             </div>
           </li>

@@ -39,15 +39,15 @@ export default function ApplicationsList() {
       {loading && <p>Loading…</p>}
       <ul className="space-y-3">
         {rows.map((r) => (
-            <li key={r.id} className="rounded border border-slate-800 bg-slate-900">
-              <Link href={`/applications/${r.id}`} className="flex justify-between p-4">
-                <div>
-                  <div className="font-semibold">{r.gigs?.title ?? "Gig"}</div>
-                  <div className="text-sm opacity-80">{r.gigs?.city ?? "—"} • status: {r.status}</div>
-                </div>
-                {r.unread > 0 && <span className="w-2 h-2 rounded-full bg-yellow-400 self-center" />}
-              </Link>
-            </li>
+          <li key={r.id} className="card">
+            <Link href={`/applications/${r.id}`} className="flex justify-between p-4">
+              <div>
+                <div className="font-semibold">{r.gigs?.title ?? 'Gig'}</div>
+                <div className="text-sm text-brand-subtle">{r.gigs?.city ?? '—'} • status: {r.status}</div>
+              </div>
+              {r.unread > 0 && <span className="w-2 h-2 rounded-full bg-brand-warning self-center" />}
+            </Link>
+          </li>
         ))}
         {!loading && rows.length === 0 && <p>No applications.</p>}
       </ul>

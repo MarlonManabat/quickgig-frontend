@@ -11,13 +11,17 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#111111", // primary text/buttons (near-black)
-          accent: "#16A34A", // success/CTA accent (green-600)
-          subtle: "#6B7280", // gray-500 text
-          bg: "#F9FAFB", // page background
-          card: "#FFFFFF", // card background
-          border: "#E5E7EB", // gray-200
-          danger: "#DC2626", // red-600
+          DEFAULT: '#111827', // text
+          bg: '#ffffff', // background
+          surface: '#f9fafb', // cards
+          accent: '#2563eb', // CTA / primary
+          'accent-hover': '#1e40af',
+          border: '#e5e7eb',
+          subtle: '#6b7280', // metadata/muted
+          success: '#10b981',
+          warning: '#f59e0b',
+          danger: '#ef4444',
+          info: '#3b82f6',
         },
       },
       boxShadow: {

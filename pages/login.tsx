@@ -21,7 +21,7 @@ export default function LoginPage() {
     <Shell>
       <h1 className="text-2xl font-bold mb-4">Login / Sign up</h1>
       {sent ? (
-        <p className="text-green-400">Magic link sent! Check your email.</p>
+        <p className="text-brand-success">Magic link sent! Check your email.</p>
       ) : (
         <form onSubmit={signIn} className="max-w-md space-y-3">
           <input
@@ -30,10 +30,10 @@ export default function LoginPage() {
             placeholder="you@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+            className="input"
           />
-          <button className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Send Magic Link</button>
-          {error && <p className="text-red-400">{error}</p>}
+          <button className="btn-primary">Send Magic Link</button>
+          {error && <p className="text-brand-danger">{error}</p>}
         </form>
       )}
       <button

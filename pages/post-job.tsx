@@ -55,19 +55,19 @@ export default function PostJobPage() {
     <Shell>
       <h1 className="text-2xl font-bold mb-4">Post a Job</h1>
       <form onSubmit={submit} className="max-w-xl space-y-3">
-        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2" required
+        <input className="input" required
                placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} />
-        <textarea className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2" rows={5}
+        <textarea className="input" rows={5}
                placeholder="Description" value={description} onChange={(e)=>setDesc(e.target.value)} />
-        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+        <input className="input"
                placeholder="Budget (optional)" value={budget} onChange={(e)=>setBudget(e.target.value as any)} />
-        <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2"
+        <input className="input"
                placeholder="City (optional)" value={city} onChange={(e)=>setCity(e.target.value)} />
         <div className="space-y-2">
           {imageUrl && <img src={imageUrl} className="rounded max-h-48 object-cover" />}
           <input type="file" accept="image/*" onChange={onFile} />
         </div>
-        <button className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Publish</button>
+        <button className="btn-primary">Publish</button>
       </form>
       {msg && <p className="mt-3">{msg}</p>}
     </Shell>

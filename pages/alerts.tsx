@@ -35,21 +35,21 @@ export default function AlertsPage() {
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           placeholder="Keyword"
-          className="flex-1 rounded bg-slate-900 border border-slate-700 px-3 py-2"
+          className="input flex-1"
         />
         <input
           value={city}
           onChange={(e) => setCity(e.target.value)}
           placeholder="City (optional)"
-          className="rounded bg-slate-900 border border-slate-700 px-3 py-2"
+          className="input"
         />
-        <button type="submit" className="rounded bg-yellow-400 text-black px-3 py-2">
+        <button type="submit" className="btn-primary">
           Add
         </button>
       </form>
       <ul>
         {items.map((a) => (
-          <li key={a.id} className="flex items-center justify-between border-b border-slate-800 py-2">
+          <li key={a.id} className="flex items-center justify-between border-b border-brand-border py-2">
             <span>
               {a.keyword}
               {a.city ? ` - ${a.city}` : ""}
@@ -60,7 +60,7 @@ export default function AlertsPage() {
           </li>
         ))}
         {items.length === 0 && (
-          <li className="py-4 text-center opacity-70">No alerts.</li>
+          <li className="py-4 text-center text-brand-subtle">No alerts.</li>
         )}
       </ul>
     </Shell>

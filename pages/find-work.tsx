@@ -56,26 +56,26 @@ export default function FindWorkPage() {
 
       <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <input value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search title/description"
-               className="rounded bg-slate-900 border border-slate-700 px-3 py-2" />
+               className="input" />
         <input value={city} onChange={(e)=>setCity(e.target.value)} placeholder="City"
-               className="rounded bg-slate-900 border border-slate-700 px-3 py-2" />
+               className="input" />
         <input value={minBudget} onChange={(e)=>setMinBudget(e.target.value)} placeholder="Min budget"
-               className="rounded bg-slate-900 border border-slate-700 px-3 py-2" />
+               className="input" />
         <input value={maxBudget} onChange={(e)=>setMaxBudget(e.target.value)} placeholder="Max budget"
-               className="rounded bg-slate-900 border border-slate-700 px-3 py-2" />
+               className="input" />
       </div>
 
       {loading && <p>Loading…</p>}
-      {error && <p className="text-red-400">{error.message}</p>}
+      {error && <p className="text-brand-danger">{error.message}</p>}
 
       <ul className="grid sm:grid-cols-2 gap-4">
         {data.map((g: any) => (
-          <li key={g.id} className="rounded border border-slate-800 p-4 bg-slate-900">
+          <li key={g.id} className="card p-4">
             <div className="flex items-start justify-between">
               <h3 className="font-semibold text-lg">{g.title}</h3>
               <SaveButton gigId={g.id} />
             </div>
-            <p className="text-sm opacity-80 line-clamp-2">{g.description}</p>
+            <p className="text-sm text-brand-subtle line-clamp-2">{g.description}</p>
             <div className="mt-2 flex items-center justify-between text-sm">
               <span>{g.city ?? "—"}</span>
               <Link className="underline" href={`/gigs/${g.id}`}>View</Link>
@@ -85,9 +85,9 @@ export default function FindWorkPage() {
       </ul>
 
       <div className="mt-6 flex items-center gap-3">
-        <button disabled={page<=1} onClick={()=>setPage(p=>Math.max(1,p-1))} className="px-3 py-1 rounded border border-slate-800 disabled:opacity-50">Prev</button>
-        <span className="text-sm opacity-80">Page {page} / {pages}</span>
-        <button disabled={page>=pages} onClick={()=>setPage(p=>Math.min(pages,p+1))} className="px-3 py-1 rounded border border-slate-800 disabled:opacity-50">Next</button>
+        <button disabled={page<=1} onClick={()=>setPage(p=>Math.max(1,p-1))} className="px-3 py-1 rounded border border-brand-border disabled:opacity-50">Prev</button>
+        <span className="text-sm text-brand-subtle">Page {page} / {pages}</span>
+        <button disabled={page>=pages} onClick={()=>setPage(p=>Math.min(pages,p+1))} className="px-3 py-1 rounded border border-brand-border disabled:opacity-50">Next</button>
       </div>
     </Shell>
   );

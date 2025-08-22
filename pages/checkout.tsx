@@ -33,12 +33,12 @@ export default function CheckoutPage() {
       <p className="mb-4">Send ₱{TICKET_PRICE_PHP} via GCash then upload the proof.</p>
       <img src={process.env.GCASH_QR_URL || '/assets/gcash-qr.png'} alt="GCash QR" className="max-w-xs mb-4" />
       {!order ? (
-        <button onClick={createOrder} className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Create Order</button>
+        <button onClick={createOrder} className="btn-primary">Create Order</button>
       ) : (
         <form onSubmit={submitProof} className="space-y-3 max-w-md">
           <p>Reference: <span className="font-mono">{order.reference}</span></p>
-          <input className="w-full rounded bg-slate-900 border border-slate-700 px-3 py-2" placeholder="Proof image URL" value={proofUrl} onChange={e=>setProofUrl(e.target.value)} />
-          <button className="rounded bg-yellow-400 text-black font-medium px-4 py-2">Submit</button>
+          <input className="input" placeholder="Proof image URL" value={proofUrl} onChange={e=>setProofUrl(e.target.value)} />
+          <button className="btn-primary">Submit</button>
         </form>
       )}
       {msg && <p className="mt-3">{msg}</p>}

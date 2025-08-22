@@ -44,8 +44,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-brand-bg text-black">
-      <header className="sticky top-0 z-10 border-b border-brand-border bg-brand-card">
+    <div className="min-h-screen flex flex-col bg-brand-bg text-brand">
+      <header className="sticky top-0 z-10 border-b border-brand-border bg-brand-surface">
         <div className="max-w-4xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
           <Link href="/" className="text-lg font-semibold">QuickGig.ph</Link>
           <button

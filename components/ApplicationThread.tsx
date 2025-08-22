@@ -69,7 +69,7 @@ export default function ApplicationThread({ threadId }: Props) {
         const isMe = uid && m.sender === uid
         return (
           <div key={m.id} className="flex flex-col">
-            <div className={`text-xs mb-1 ${isMe ? 'text-right' : ''}`}>
+            <div className={`text-xs mb-1 text-brand-subtle ${isMe ? 'text-right' : ''}`}>
               {(isMe ? 'You' : m.profiles?.full_name ?? m.sender) +
                 ' • ' +
                 timeAgo(m.created_at || new Date().toISOString())}
@@ -77,8 +77,8 @@ export default function ApplicationThread({ threadId }: Props) {
             <div
               className={
                 isMe
-                  ? 'bg-black text-white rounded-2xl px-3 py-2 ml-auto max-w-[80%]'
-                  : 'bg-gray-100 text-gray-900 rounded-2xl px-3 py-2 mr-auto max-w-[80%]'
+                  ? 'bg-brand-accent text-white rounded-2xl px-3 py-2 ml-auto max-w-[80%]'
+                  : 'bg-brand-surface text-brand rounded-2xl px-3 py-2 mr-auto max-w-[80%]'
               }
             >
               {m.body}

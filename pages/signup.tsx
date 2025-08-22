@@ -37,15 +37,15 @@ export default function Signup() {
       <h1 className="mb-4 text-xl">Sign Up</h1>
       <form onSubmit={onSubmit} className="space-y-3">
         <input
-          className="w-full border p-2"
+          className="input"
           type="email"
           required
           placeholder="you@example.com"
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
-        <button className="w-full bg-green-600 text-white p-2" type="submit">Send Magic Link</button>
-        {msg && <p className="text-sm">{msg}</p>}
+        <button className="btn-primary w-full" type="submit">Send Magic Link</button>
+        {msg && <p className="text-sm text-brand-subtle">{msg}</p>}
       </form>
     </div>
   )
