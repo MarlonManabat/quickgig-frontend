@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
-import '../utils/consoleFail';
+import { failOnConsoleErrors } from '../utils/consoleFail';
 
-test('primary nav works without console errors', async ({ page }) => {
+test('primary nav works without console errors', async ({ page }, testInfo) => {
+  failOnConsoleErrors(page, testInfo);
   await page.goto('/');
   await expect(page.getByTestId('nav-find')).toBeVisible();
   const taps = ['nav-find','nav-my-gigs','nav-apps','nav-saved','nav-auth'];

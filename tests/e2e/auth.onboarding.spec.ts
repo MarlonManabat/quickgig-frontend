@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { signUpOrLogin } from '../utils/auth';
-import '../utils/consoleFail';
+import { failOnConsoleErrors } from '../utils/consoleFail';
 
-test('signup → profile → gigs', async ({ page }) => {
+test('signup → profile → gigs', async ({ page }, testInfo) => {
+  failOnConsoleErrors(page, testInfo);
   const email = `user+${Date.now()}@example.com`;
   await signUpOrLogin(page, email, 'Password123!');
   if (page.url().includes('/profile')) {

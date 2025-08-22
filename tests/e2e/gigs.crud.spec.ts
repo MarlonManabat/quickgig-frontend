@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { signUpOrLogin } from '../utils/auth';
-import '../utils/consoleFail';
+import { failOnConsoleErrors } from '../utils/consoleFail';
 
-test('create & view a gig (if posting is allowed)', async ({ page }) => {
+test('create & view a gig (if posting is allowed)', async ({ page }, testInfo) => {
+  failOnConsoleErrors(page, testInfo);
   const email = `owner+${Date.now()}@example.com`;
   await signUpOrLogin(page, email, 'Password123!');
   await page.getByTestId('nav-post').click();

@@ -76,4 +76,4 @@ project.getSourceFiles().forEach(sf => {
   if (dirty) sf.saveSync();
 });
 
-console.log(`fix-href: updated ${changed} occurrence(s)`);
+console.log(`href-codemod: updated ${changed} occurrence(s)`);

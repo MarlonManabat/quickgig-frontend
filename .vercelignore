@@ -2,3 +2,7 @@
 landing_public_html/**
 docs/**
 **/*.md
+tests
+e2e
+playwright-report
+.playwright

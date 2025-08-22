@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 import { signUpOrLogin } from '../utils/auth';
-import '../utils/consoleFail';
+import { failOnConsoleErrors } from '../utils/consoleFail';
 
-test('apply → thread → message → bell deep link', async ({ page }) => {
+test('apply → thread → message → bell deep link', async ({ page }, testInfo) => {
+  failOnConsoleErrors(page, testInfo);
   const email = `applicant+${Date.now()}@example.com`;
   await signUpOrLogin(page, email, 'Password123!');
   await page.goto('/gigs');
