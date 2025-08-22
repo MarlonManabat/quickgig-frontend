@@ -4,6 +4,7 @@ import Shell from "@/components/Shell";
 import { useRouter } from "next/router";
 import { useRequireUser } from "@/lib/useRequireUser";
 import { uploadPublicFile } from "@/lib/storage";
+import { hasApprovedOrder } from "@/utils/billing";
 
 export default function PostJobPage() {
   const [title, setTitle] = useState("");
@@ -14,11 +15,21 @@ export default function PostJobPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const router = useRouter();
   const { ready, userId } = useRequireUser();
-  const [eligible, setEligible] = useState<boolean | null>(null);
+  const [allowed, setAllowed] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    fetch('/api/users/me/eligibility').then(r => r.json()).then(d => setEligible(d.canPost)).catch(()=>setEligible(false));
-  }, []);
+    if (!ready || !userId) return;
+    (async () => {
+      const ok = await hasApprovedOrder(userId);
+      setAllowed(ok);
+      setChecking(false);
+      if (!ok)
+        router.replace(
+          '/billing?message=' + encodeURIComponent('Complete payment to post jobs.')
+        );
+    })();
+  }, [ready, userId, router]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,8 +59,8 @@ export default function PostJobPage() {
     }
   }
 
-  if (!ready || eligible === null) return <Shell><p>Loading…</p></Shell>;
-  if (!eligible) return <Shell><p>Please buy a ticket first. <a className="underline" href="/checkout">Go to checkout</a>.</p></Shell>;
+  if (!ready || checking) return <Shell><p>Loading…</p></Shell>;
+  if (!allowed) return <Shell><p data-testid="paywall-redirect">Redirecting...</p></Shell>;
 
   return (
     <Shell>

@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { supabase } from '@/utils/supabaseClient';
-import { getProfile } from '@/utils/session';
+import { hasApprovedOrder } from '@/utils/billing';
 import Card from '@/components/ui/Card';
 import Empty from '@/components/ui/Empty';
 import Spinner from '@/components/ui/Spinner';
 import Banner from '@/components/ui/Banner';
 
 export default function GigsList() {
+  const router = useRouter();
   const [gigs, setGigs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [canPostJob, setCanPostJob] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const profile = await getProfile();
-      setCanPostJob(!!profile?.can_post_job);
-    })();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, []);
 
   useEffect(() => {
@@ -38,12 +38,28 @@ export default function GigsList() {
     fetchGigs();
   }, []);
 
+  const handlePostJob = async () => {
+    const {
+      data: { user: current },
+    } = await supabase.auth.getUser();
+    if (!current) {
+      router.push('/auth');
+      return;
+    }
+    const ok = await hasApprovedOrder(current.id);
+    if (!ok) {
+      setRedirecting(true);
+      router.push('/billing?message=' + encodeURIComponent('Complete payment to post jobs.'));
+      return;
+    }
+    router.push('/gigs/new');
+  };
+
   return (
     <div className="space-y-4">
+      {redirecting && <p data-testid="paywall-redirect">Redirecting...</p>}
       <div className="text-right">
-        {canPostJob && (
-          <Link href="/gigs/new" className="btn-primary">Post Job</Link>
-        )}
+        <button onClick={handlePostJob} className="btn-primary">Post Job</button>
       </div>
       <h1>Gigs</h1>
       {loading ? (
@@ -54,8 +70,8 @@ export default function GigsList() {
         <Empty
           title="No gigs found"
           action={
-            canPostJob ? (
-              <Link href="/gigs/new" className="btn-primary">Post a Job</Link>
+            user ? (
+              <button onClick={handlePostJob} className="btn-primary">Post a Job</button>
             ) : (
               <Link href="/auth" className="btn-primary">Sign in</Link>
             )
