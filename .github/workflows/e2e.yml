@@ -13,4 +13,9 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npm run build:prod
+      - name: Seed demo data (if secrets present)
+        run: npm run seed
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - run: npm run qa:ci
