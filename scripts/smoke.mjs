@@ -24,6 +24,10 @@ function showHead(url, label = url) {
   const ok = get(`${base}/api/health`).trim();
   console.log("# /api/health:", ok);
 
-  // Show headers for base
-  showHead(base + "/", base);
+  const dash = get(`${base}/dashboard/orders`);
+  console.log("# /dashboard/orders has price", /Ticket price/i.test(dash));
+
+  showHead(`${base}/admin/orders`, `${base}/admin/orders`);
+
+  console.log("# notifications: skipped (auth required)");
 })();
