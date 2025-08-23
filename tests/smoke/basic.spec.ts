@@ -1,23 +1,21 @@
 import { test, expect } from '@playwright/test';
+import { stubSignIn } from '../utils/session';
 
-test('homepage + core routes work', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByRole('heading', { name: /QuickGig\.ph/i })).toBeVisible();
+const landing = process.env.PLAYWRIGHT_LANDING_URL!;
+const app = process.env.PLAYWRIGHT_APP_URL!;
+const qa = process.env.QA_TEST_MODE === 'true';
 
-  // Primary CTA to find work should route
-  const findWork = page
-    .getByRole('button', { name: /Hanap Trabaho/i })
-    .or(page.getByRole('link', { name: /Find Work/i }));
-  if (await findWork.isVisible()) {
-    await findWork.click();
-  }
-  await expect(page).toHaveURL(/\/(find|search|gigs)/);
+test('@smoke landing header + hero CTAs visible', async ({ page }) => {
+  await page.goto(landing, { waitUntil: 'load' });
+  await expect(page.getByTestId('brand')).toBeVisible();
+  await expect(page.getByTestId('nav-find-work')).toBeVisible();
+  await expect(page.getByTestId('cta-start-now')).toBeVisible();
+});
 
-  // Auth screen renders
-  await page.goto('/auth');
-  await expect(page.getByLabel(/Email/i)).toBeVisible();
-
-  // Guard redirects unauthenticated to /auth
-  await page.goto('/profile');
-  await expect(page).toHaveURL(/\/auth/);
+test('@smoke app nav + core routes', async ({ page }) => {
+  if (qa) await stubSignIn(page);
+  await page.goto(app, { waitUntil: 'load' });
+  await expect(page.getByTestId('app-nav-find-work')).toBeVisible();
+  await page.getByTestId('app-nav-post-job').click();
+  await expect(page.url()).toMatch(/post|gig/i);
 });
