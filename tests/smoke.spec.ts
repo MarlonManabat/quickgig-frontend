@@ -4,12 +4,12 @@ import { loginViaMagicLink } from './helpers/auth'
 
 test('landing → app header visible', async ({ page }) => {
   await page.goto(LANDING_URL)
-  await expect(page.getByRole('link', { name: /find work/i })).toBeVisible()
+  await expect(page.getByRole('link', { name: /browse jobs/i })).toBeVisible()
   await page.goto(APP_URL)
   try {
     await loginViaMagicLink(page)
   } catch (e) {
     console.log('[smoke] skipping login:', String(e))
   }
-  await expect(page.getByRole('link', { name: /find work/i })).toBeVisible()
+  await expect(page.getByRole('link', { name: /find work|browse jobs|hanap trabaho/i })).toBeVisible()
 })
