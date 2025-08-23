@@ -48,46 +48,53 @@ export default function ProfilePage() {
     setSaving(true);
     setStatus(null);
     setError(null);
-    const { data: u } = await supabase.auth.getUser();
-    const uid = u?.user?.id;
-    if (!uid) {
-      setError(copy.profile.noAccess);
-      setSaving(false);
-      return;
-    }
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not logged in');
+
+      let avatarUrl: string | undefined;
       if (avatar) {
         if (!avatar.type.startsWith('image/')) {
           throw new Error('Hindi ma-upload ang photo—paki-check ang file mo.');
         }
-        const up = await uploadImage('avatars', uid, avatar);
-        await supabase.from('profiles').update({ avatar_url: up.publicUrl }).eq('id', uid);
-        setStatus('Na-upload na ang photo!');
+        const up = await uploadImage('avatars', user.id, avatar);
+        avatarUrl = up.publicUrl;
       }
+
+      const payload = {
+        id: user.id,
+        full_name: fullName,
+        avatar_url: avatarUrl ?? profile?.avatar_url ?? null,
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .upsert({ id: uid, full_name: fullName });
+        .upsert(payload, { onConflict: 'id' });
+
       if (error) {
+        console.error('Profile save error:', error.message);
         if (isAccessDenied(error)) setError(copy.profile.noAccess);
         else setError(error.message);
-        setSaving(false);
         return;
       }
+
+      setStatus(avatarUrl ? 'Na-upload na ang photo!' : 'Saved!');
     } catch (err: any) {
       setError(err.message || 'Hindi ma-upload ang photo—paki-check ang file mo.');
-      setSaving(false);
       return;
+    } finally {
+      setSaving(false);
+      setTimeout(() => {
+        if (onboarding) {
+          const dest = canPostJob
+            ? '/gigs/new?banner=Let%27s%20post%20your%20first%20job'
+            : '/gigs?banner=Profile%20complete%20—%20start%20exploring%20gigs';
+          router.replace(dest);
+        }
+      }, 2000);
     }
-    if (!avatar) setStatus('Saved!');
-    setSaving(false);
-    setTimeout(() => {
-      if (onboarding) {
-        const dest = canPostJob
-          ? '/gigs/new?banner=Let%27s%20post%20your%20first%20job'
-          : '/gigs?banner=Profile%20complete%20—%20start%20exploring%20gigs';
-        router.replace(dest);
-      }
-    }, 2000);
   }
 
   if (!loaded) return <p>Loading...</p>;
