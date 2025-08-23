@@ -6,6 +6,7 @@ import FormShell from '@/components/forms/FormShell';
 import EmailField from '@/components/forms/EmailField';
 import FieldRow from '@/components/forms/FieldRow';
 import { focusFromQuery } from '@/utils/focusTarget';
+import { toast } from '@/utils/toast';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
@@ -23,17 +24,26 @@ export default function AuthPage() {
     setLoading(true);
     setStatus(null);
     setError(null);
-    const next = (router.query.next as string) || '/find-work';
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
-    });
-    if (error) {
-      setError('Hindi valid ang login—paki-check ang email mo.');
-    } else {
-      setStatus(`Nagpadala kami ng Magic Link sa ${email}. I-open mo ang email mo at i-tap ang link para makapasok.`);
+    const intended = router.query?.next as string | undefined;
+    try {
+      localStorage.setItem('postAuthRedirect', intended || '/profile');
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${location.origin}/auth/callback`,
+          shouldCreateUser: true,
+        },
+      });
+      if (error) throw error;
+      toast.success('Magic link sent! Please check your email.');
+      setStatus(
+        `Nagpadala kami ng Magic Link sa ${email}. I-open mo ang email mo at i-tap ang link para makapasok.`
+      );
+      setTimeout(() => setStatus(null), 30000);
+    } catch (err: any) {
+      const msg = err.message || 'Hindi valid ang login—paki-check ang email mo.';
+      setError(msg);
+      toast.error(msg);
     }
     setLoading(false);
   }

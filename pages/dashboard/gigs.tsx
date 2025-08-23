@@ -5,7 +5,7 @@ import { supabase } from "@/utils/supabaseClient";
 import { useEffect, useState } from "react";
 
 export default function MyGigs() {
-  const { ready, userId } = useRequireUser();
+  const { ready, userId, timedOut } = useRequireUser();
   const [data, setData] = useState<any[]>([]);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +34,21 @@ export default function MyGigs() {
     if (!error) load();
   }
 
-  if (!ready) return <Shell><p>Loading…</p></Shell>;
+  if (!ready)
+    return (
+      <Shell>
+        {timedOut ? (
+          <p>
+            Hindi ma-load ang auth.{' '}
+            <Link className="underline" href="/auth">
+              Go to Login
+            </Link>
+          </p>
+        ) : (
+          <p>Loading…</p>
+        )}
+      </Shell>
+    );
 
   return (
     <Shell>

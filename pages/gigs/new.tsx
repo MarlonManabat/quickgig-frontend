@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { supabase } from '@/utils/supabaseClient';
 import GigForm from '@/components/GigForm';
 import { uploadPublicFile } from '@/lib/storage';
@@ -11,7 +12,7 @@ import { focusFromQuery } from '@/utils/focusTarget';
 
 export default function NewGig() {
   const router = useRouter();
-  const { ready, userId } = useRequireUser();
+  const { ready, userId, timedOut } = useRequireUser();
   const [rlsDenied, setRlsDenied] = useState(false);
   const [allowed, setAllowed] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -58,7 +59,17 @@ export default function NewGig() {
     return await uploadPublicFile(file, 'gigs');
   };
 
-  if (!ready || checking) return null;
+  if (!ready || checking)
+    return timedOut ? (
+      <p>
+        Hindi ma-load ang auth.{' '}
+        <Link className="underline" href="/auth">
+          Go to Login
+        </Link>
+      </p>
+    ) : (
+      <p>Loading…</p>
+    );
   if (!allowed) return <p data-testid="paywall-redirect">Redirecting...</p>;
 
   return (

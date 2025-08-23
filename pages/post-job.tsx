@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useRequireUser } from "@/lib/useRequireUser";
 import { uploadPublicFile } from "@/lib/storage";
 import { hasApprovedOrder } from "@/utils/billing";
+import Link from "next/link";
 
 export default function PostJobPage() {
   const [title, setTitle] = useState("");
@@ -14,7 +15,7 @@ export default function PostJobPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const router = useRouter();
-  const { ready, userId } = useRequireUser();
+  const { ready, userId, timedOut } = useRequireUser();
   const [allowed, setAllowed] = useState(false);
   const [checking, setChecking] = useState(true);
 
@@ -59,7 +60,21 @@ export default function PostJobPage() {
     }
   }
 
-  if (!ready || checking) return <Shell><p>Loading…</p></Shell>;
+  if (!ready || checking)
+    return (
+      <Shell>
+        {timedOut ? (
+          <p>
+            Hindi ma-load ang auth.{' '}
+            <Link className="underline" href="/auth">
+              Go to Login
+            </Link>
+          </p>
+        ) : (
+          <p>Loading…</p>
+        )}
+      </Shell>
+    );
   if (!allowed) return <Shell><p data-testid="paywall-redirect">Redirecting...</p></Shell>;
 
   return (

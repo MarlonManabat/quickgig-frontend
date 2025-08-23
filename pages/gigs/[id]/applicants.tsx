@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 
 export default function Applicants() {
-  const { ready, userId } = useRequireUser();
+  const { ready, userId, timedOut } = useRequireUser();
   const router = useRouter();
   const id = router.query.id as string | undefined;
 
@@ -37,7 +37,21 @@ export default function Applicants() {
     setRows((r)=>r.map(x=>x.id===appId?{...x,status}:x));
   }
 
-  if (!ready || !gig) return <Shell><p>Loading…</p></Shell>;
+  if (!ready || !gig)
+    return (
+      <Shell>
+        {timedOut ? (
+          <p>
+            Hindi ma-load ang auth.{' '}
+            <Link className="underline" href="/auth">
+              Go to Login
+            </Link>
+          </p>
+        ) : (
+          <p>Loading…</p>
+        )}
+      </Shell>
+    );
 
   return (
     <Shell>
