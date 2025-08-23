@@ -11,72 +11,80 @@ on:
         type: boolean
         default: false
 
+concurrency: e2e-${{ github.ref }}
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      CI: true
       PLAYWRIGHT_LANDING_URL: https://quickgig.ph
       PLAYWRIGHT_APP_URL: https://app.quickgig.ph
       QA_TEST_MODE: true
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'npm' }
-
-      - name: Install deps
-        run: npm ci --legacy-peer-deps
-
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-
-      - name: Seed demo data
-        run: npm run qa:seed
-
-      - name: Run smoke tests
-        run: npm run qa:smoke
-
-      - name: Upload report (on failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with: { name: playwright-report-smoke, path: test-results }
-
-  full-e2e:
-    if: |
-      github.ref == 'refs/heads/main' ||
-      (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'run-full-e2e')) ||
-      (github.event_name == 'workflow_dispatch' && inputs.run_full == 'true')
-    needs: [smoke]
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    env:
-      PLAYWRIGHT_LANDING_URL: https://quickgig.ph
-      PLAYWRIGHT_APP_URL: https://app.quickgig.ph
-      QA_TEST_MODE: true
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'npm' }
-
-      - name: Install deps
-        run: npm ci --legacy-peer-deps
-
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-
-      - name: Seed demo data
-        run: npm run qa:seed
-
-      - name: Run full E2E
-        run: npm run qa:e2e
-
-      - name: Upload report (always)
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Use public npm registry
+        run: echo "registry=https://registry.npmjs.org/" > .npmrc
+      - run: npm ci --no-audit --no-fund --legacy-peer-deps
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/seed-demo.js
+      - run: node scripts/session-stub.js
+      - run: npm run qa:smoke
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
-        with: { name: playwright-report-full, path: test-results }
+        with:
+          name: smoke-artifacts
+          path: |
+            test-results/**
+            playwright-report/**
+            **/*.zip
+
+  full-e2e:
+    needs: smoke
+    if: |
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_full == 'true') ||
+      (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'run-full-e2e'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+      PLAYWRIGHT_LANDING_URL: https://quickgig.ph
+      PLAYWRIGHT_APP_URL: https://app.quickgig.ph
+      QA_TEST_MODE: true
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Use public npm registry
+        run: echo "registry=https://registry.npmjs.org/" > .npmrc
+      - run: npm ci --no-audit --no-fund --legacy-peer-deps
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/seed-demo.js
+      - run: node scripts/session-stub.js
+      - run: npm run qa:e2e
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-artifacts
+          path: |
+            test-results/**
+            playwright-report/**
+            **/*.zip

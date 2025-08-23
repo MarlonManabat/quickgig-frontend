@@ -10,6 +10,7 @@ node_modules/
 coverage/
 test-results/
 playwright-report/
+.playwright/
 traces/
 
 # next.js
