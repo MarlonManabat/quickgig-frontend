@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import Shell from "@/components/Shell";
 import { useRouter } from "next/router";
+import { copy } from "@/copy";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ export default function LoginPage() {
 
   return (
     <Shell>
-      <h1 className="text-2xl font-bold mb-4">Login / Sign up</h1>
+      <h1 className="text-2xl font-bold mb-4">{copy.auth.loginTitle} / {copy.auth.signup}</h1>
       {sent ? (
         <p className="text-brand-success">Magic link sent! Check your email.</p>
       ) : (
@@ -27,12 +28,12 @@ export default function LoginPage() {
           <input
             type="email"
             required
-            placeholder="you@email.com"
+            placeholder={copy.auth.email}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="input"
           />
-          <button className="btn-primary">Send Magic Link</button>
+          <button className="btn-primary">{copy.auth.login}</button>
           {error && <p className="text-brand-danger">{error}</p>}
         </form>
       )}

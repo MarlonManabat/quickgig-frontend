@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import Banner from '@/components/ui/Banner';
 import NotificationsBell from './NotificationsBell';
 import { supabase } from '@/utils/supabaseClient';
+import { copy } from '@/copy';
 
 const links = [
-  { href: '/gigs', label: 'Find Work' },
-  { href: '/gigs?mine=1', label: 'My Gigs' },
-  { href: '/applications', label: 'Applications' },
-  { href: '/saved', label: 'Saved' },
-  { href: '/gigs/new', label: 'Post Job' },
+  { href: '/gigs', label: copy.nav.findWork },
+  { href: '/gigs?mine=1', label: copy.nav.myGigs },
+  { href: '/applications', label: copy.nav.applications },
+  { href: '/saved', label: copy.nav.saved },
+  { href: '/gigs/new', label: copy.nav.postJob },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -73,7 +74,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {user ? (
               <Link href="/profile" data-testid="nav-profile">Profile</Link>
             ) : (
-              <Link href="/auth" data-testid="nav-login">Auth</Link>
+              <Link href="/auth" data-testid="nav-login">{copy.nav.auth}</Link>
             )}
           </nav>
           {user && <NotificationsBell />}

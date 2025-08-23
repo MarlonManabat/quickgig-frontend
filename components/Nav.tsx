@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '@/utils/supabaseClient'
 import type { Session } from '@supabase/supabase-js'
+import { copy } from '@/copy'
 
 export default function Nav() {
   const [session, setSession] = useState<Session | null>(null)
@@ -22,12 +23,12 @@ export default function Nav() {
   return (
     <nav className="p-4 border-b mb-4 flex gap-4">
       <Link href="/">Home</Link>
-      <Link href="/find-work">Find Work</Link>
-      <Link href="/post-job">Post Job</Link>
+      <Link href="/find-work">{copy.nav.findWork}</Link>
+      <Link href="/post-job">{copy.nav.postJob}</Link>
       {session ? (
         <button onClick={logout}>Logout</button>
       ) : (
-        <Link href="/auth">Auth</Link>
+        <Link href="/auth">{copy.nav.auth}</Link>
       )}
     </nav>
   )

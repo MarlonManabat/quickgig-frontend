@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import NotificationsBell from "@/components/NotificationsBell";
+import { copy } from "@/copy";
 
 export default function TopNav() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -25,10 +26,10 @@ export default function TopNav() {
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
         <Link href="/" className="font-semibold">QuickGig.ph</Link>
         <div className="ml-auto flex items-center gap-4 text-sm">
-          <Link href="/find-work">Find Work</Link>
-          {loggedIn && <Link href="/dashboard/gigs">My Gigs</Link>}
-          {loggedIn && <Link href="/applications">Applications</Link>}
-          {loggedIn && <Link href="/saved">Saved</Link>}
+          <Link href="/find-work">{copy.nav.findWork}</Link>
+          {loggedIn && <Link href="/dashboard/gigs">{copy.nav.myGigs}</Link>}
+          {loggedIn && <Link href="/applications">{copy.nav.applications}</Link>}
+          {loggedIn && <Link href="/saved">{copy.nav.saved}</Link>}
           {loggedIn && <NotificationsBell />}
           {loggedIn && !eligible && (
             <Link href="/checkout" className="btn-primary">
@@ -40,9 +41,9 @@ export default function TopNav() {
             className={`btn-primary ${loggedIn && !eligible ? 'opacity-50 pointer-events-none' : ''}`}
             title={loggedIn && !eligible ? 'Please buy a ticket (₱10)' : undefined}
           >
-            Post Job
+            {copy.nav.postJob}
           </Link>
-          <Link href="/auth">Auth</Link>
+          <Link href="/auth">{copy.nav.auth}</Link>
         </div>
       </div>
     </nav>
