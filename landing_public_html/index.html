@@ -16,26 +16,30 @@
     <link rel="icon" href="/favicon.png" />
   </head>
   <body>
-    <header class="header">
+    <header class="header" data-theme-brand="quickgig">
       <div class="container row">
-        <a href="/" class="brand"><strong>QuickGig.ph</strong></a>
+        <a href="/" class="brand" data-testid="brand"><strong>QuickGig.ph</strong></a>
         <nav>
           <a href="#features">Features</a>
           <a
             href="https://app.quickgig.ph/find?utm_source=landing&utm_medium=nav&utm_campaign=home_nav"
+            data-testid="nav-find-work"
             >Find Work</a
           >
           <a
             href="https://app.quickgig.ph/post?utm_source=landing&utm_medium=nav&utm_campaign=home_nav"
+            data-testid="nav-post-job"
             >Post Job</a
           >
           <a
             href="https://app.quickgig.ph/login?utm_source=landing&utm_medium=nav&utm_campaign=home_nav"
+            data-testid="nav-login"
             >Login</a
           >
           <a
             class="btn btn-primary"
             href="https://app.quickgig.ph/signup?utm_source=landing&utm_medium=nav&utm_campaign=home_nav"
+            data-testid="nav-signup"
             >Sign Up</a
           >
         </nav>
@@ -58,11 +62,13 @@
           <a
             class="btn btn-primary"
             href="https://app.quickgig.ph/signup?utm_source=landing&utm_medium=cta&utm_campaign=home_hero"
+            data-testid="cta-start-now"
             >Simulan Na!</a
           >
           <a
             class="btn btn-ghost"
             href="https://app.quickgig.ph/find?utm_source=landing&utm_medium=cta&utm_campaign=home_hero"
+            data-testid="cta-browse-jobs"
             >Browse Jobs</a
           >
         </div>
@@ -96,9 +102,9 @@
       <div class="container footer-row">
         <small>© <span id="year"></span> QuickGig.ph</small>
         <nav class="footer-nav">
-          <a href="https://app.quickgig.ph/terms">Terms</a>
-          <a href="https://app.quickgig.ph/privacy">Privacy</a>
-          <a href="https://app.quickgig.ph">Open the App</a>
+          <a href="https://app.quickgig.ph/terms" data-testid="footer-terms">Terms</a>
+          <a href="https://app.quickgig.ph/privacy" data-testid="footer-privacy">Privacy</a>
+          <a href="https://app.quickgig.ph" data-testid="footer-open-app">Open the App</a>
         </nav>
       </div>
     </footer>

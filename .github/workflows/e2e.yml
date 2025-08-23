@@ -1,9 +1,15 @@
-name: E2E Smoke
+name: E2E
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      run_full:
+        description: "Run full E2E suite"
+        type: boolean
+        default: false
 
 jobs:
   smoke:
@@ -14,46 +20,63 @@ jobs:
       PLAYWRIGHT_APP_URL: https://app.quickgig.ph
       QA_TEST_MODE: true
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: 'npm' }
 
       - name: Install deps
-        run: npm install --no-audit --no-fund --legacy-peer-deps
+        run: npm ci --legacy-peer-deps
 
-      - name: Install Playwright browsers
+      - name: Install Playwright
         run: npx playwright install --with-deps
 
-      - name: Seed demo data (optional)
-        if: ${{ env.SUPABASE_SERVICE_ROLE_KEY != '' }}
-        run: |
-          if npm run | grep -q "^  seed"; then
-            npm run seed
-          else
-            echo "No seed script; skipping."
-          fi
+      - name: Seed demo data
+        run: npm run qa:seed
 
       - name: Run smoke tests
-        run: |
-          if npm run | grep -q "^  qa:smoke"; then
-            npm run qa:smoke -- --retries=2 --global-timeout=900000
-          else
-            npx playwright test tests/smoke --reporter=line --retries=2 --global-timeout=900000
-          fi
+        run: npm run qa:smoke
 
-      - name: Upload Playwright report (on failure)
+      - name: Upload report (on failure)
         if: failure()
         uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report
+        with: { name: playwright-report-smoke, path: test-results }
 
+  full-e2e:
+    if: |
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'run-full-e2e')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_full == 'true')
+    needs: [smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      PLAYWRIGHT_LANDING_URL: https://quickgig.ph
+      PLAYWRIGHT_APP_URL: https://app.quickgig.ph
+      QA_TEST_MODE: true
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: 'npm' }
+
+      - name: Install deps
+        run: npm ci --legacy-peer-deps
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Seed demo data
+        run: npm run qa:seed
+
+      - name: Run full E2E
+        run: npm run qa:e2e
+
+      - name: Upload report (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: playwright-report-full, path: test-results }

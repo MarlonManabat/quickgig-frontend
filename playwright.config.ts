@@ -2,13 +2,18 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 45_000,
-  retries: 0,
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
+  retries: 2,
+  workers: 2,
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'off',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
+    { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
+  ],
+  reporter: [['list'], ['html', { outputFolder: 'test-results', open: 'never' }]],
 });

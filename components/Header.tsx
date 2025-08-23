@@ -7,11 +7,11 @@ import { supabase } from '@/utils/supabaseClient';
 import { copy } from '@/copy';
 
 const links = [
-  { href: '/gigs', label: copy.nav.findWork },
-  { href: '/gigs?mine=1', label: copy.nav.myGigs },
-  { href: '/applications', label: copy.nav.applications },
-  { href: '/saved', label: copy.nav.saved },
-  { href: '/gigs/new', label: copy.nav.postJob },
+  { href: '/gigs', label: copy.nav.findWork, id: 'app-nav-find-work' },
+  { href: '/gigs?mine=1', label: copy.nav.myGigs, id: 'app-nav-my-gigs' },
+  { href: '/applications', label: copy.nav.applications, id: 'app-nav-applications' },
+  { href: '/saved', label: copy.nav.saved, id: 'app-nav-saved' },
+  { href: '/gigs/new', label: copy.nav.postJob, id: 'app-nav-post-job' },
 ];
 
 function IconMenu() {
@@ -53,6 +53,7 @@ export default function Header() {
   return (
     <header
       data-app-header
+      data-theme-brand="quickgig"
       className="sticky top-0 z-40 bg-header-bg text-header-text border-b border-white/10"
     >
       <Container className="flex h-16 items-center justify-between">
@@ -66,6 +67,7 @@ export default function Header() {
               <LinkSafe
                 key={l.href}
                 href={l.href}
+                data-testid={l.id}
                 className={`${active ? 'opacity-100 underline underline-offset-4' : 'opacity-90 hover:opacity-100'} h-11 min-h-[44px] inline-flex items-center`}
               >
                 {l.label}
@@ -86,6 +88,7 @@ export default function Header() {
           {user ? (
             <LinkSafe
               href="/profile"
+              data-testid="app-nav-account"
               className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm opacity-90 hover:opacity-100"
             >
               {copy.nav.auth}
@@ -94,12 +97,14 @@ export default function Header() {
             <>
               <LinkSafe
                 href="/auth"
+                data-testid="app-login"
                 className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm opacity-90 hover:opacity-100"
               >
                 Mag-login
               </LinkSafe>
               <LinkSafe
                 href="/signup"
+                data-testid="app-signup"
                 className="hidden md:inline-flex btn-primary h-11 min-h-[44px]"
               >
                 Sign Up
@@ -115,22 +120,32 @@ export default function Header() {
               <LinkSafe
                 key={l.href}
                 href={l.href}
+                data-testid={l.id}
                 className="h-11 min-h-[44px] flex items-center px-3"
               >
                 {l.label}
               </LinkSafe>
             ))}
             {user ? (
-              <LinkSafe href="/profile" className="h-11 min-h-[44px] flex items-center px-3">
+              <LinkSafe
+                href="/profile"
+                data-testid="app-nav-account"
+                className="h-11 min-h-[44px] flex items-center px-3"
+              >
                 {copy.nav.auth}
               </LinkSafe>
             ) : (
-              <LinkSafe href="/auth" className="h-11 min-h-[44px] flex items-center px-3">
+              <LinkSafe
+                href="/auth"
+                data-testid="app-login"
+                className="h-11 min-h-[44px] flex items-center px-3"
+              >
                 Mag-login
               </LinkSafe>
             )}
             <LinkSafe
               href="/signup"
+              data-testid="app-signup"
               className="btn-primary w-full h-11 min-h-[44px] rounded-xl text-center flex items-center justify-center"
             >
               Sign Up
