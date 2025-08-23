@@ -1,19 +1,12 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
-  testDir: './tests',
   timeout: 60_000,
-  expect: { timeout: 10_000 },
-  retries: 2,
-  workers: 2,
-  use: {
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    video: 'off',
-  },
+  retries: process.env.CI ? 1 : 0,
+  use: { headless: true, trace: 'on-first-retry' },
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],
   projects: [
-    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'chromium-mobile', use: { ...devices['Pixel 7'] } },
-  ],
-  reporter: [['list'], ['html', { outputFolder: 'test-results', open: 'never' }]],
-});
+    { name: 'smoke', testMatch: /smoke\.spec\.ts$/ },
+    { name: 'full-e2e', testMatch: /full\.e2e\.spec\.ts$/ }
+  ]
+})
