@@ -18,6 +18,32 @@ async function first(table) {
 }
 
 (async () => {
+  // demo user & profile
+  const demoEmail = process.env.SEED_DEMO_EMAIL || 'demo@example.com';
+  try {
+    const { data: existing } = await supabase.auth.admin.getUserByEmail(demoEmail);
+    let demo = existing?.user;
+    if (!demo) {
+      const { data } = await supabase.auth.admin.createUser({ email: demoEmail, email_confirm: true });
+      demo = data.user;
+      console.log('[seed] created demo user:', demoEmail);
+    }
+    if (demo) {
+      await supabase.from('profiles').upsert(
+        {
+          id: demo.id,
+          full_name: '',
+          role: 'user',
+          can_post_job: false,
+          is_admin: false,
+        },
+        { onConflict: 'id', ignoreDuplicates: true }
+      );
+    }
+  } catch (err) {
+    console.log('[seed] demo user skipped:', err.message);
+  }
+
   // demo gig
   if (!(await first('gigs'))) {
     await supabase.from('gigs').insert({ title: 'Demo Gig', description: 'Seeded', owner: 'seed-owner' });

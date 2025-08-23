@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { stubAuth } from './utils/stubAuth';
 
 test('nav audit', async ({ page }) => {
+  await stubAuth(page);
   const targets: { id: string; path: string | RegExp; marker: string | string[] }[] = [
     { id: 'nav-find', path: '/gigs', marker: 'gigs-list' },
     { id: 'nav-my-gigs', path: '/gigs?mine=1', marker: 'my-gigs' },
