@@ -20,13 +20,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Upsert users + profiles
     const createUser = async (email: string) => {
-      const { data: user } = await supa.auth.admin.getUserByEmail(email)
-      let uid = user?.user?.id
+      // Try to find an existing user
+      const { data: users } = await supa.auth.admin.listUsers({ email })
+      let uid = users?.users?.[0]?.id
+
       if (!uid) {
-        const { data } = await supa.auth.admin.createUser({ email, email_confirm: true })
+        const { data, error: createErr } = await supa.auth.admin.createUser({
+          email,
+          email_confirm: true,
+        })
+        if (createErr) throw createErr
         uid = data.user?.id!
       }
-      await supa.from('profiles').upsert({ id: uid, email, full_name: email.split('@')[0], is_admin: false })
+
+      await supa.from('profiles').upsert({
+        id: uid,
+        email,
+        full_name: email.split('@')[0],
+        is_admin: false,
+      })
+
       return uid!
     }
 
