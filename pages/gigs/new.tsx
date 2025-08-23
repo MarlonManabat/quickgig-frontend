@@ -7,6 +7,7 @@ import { useRequireUser } from '@/lib/useRequireUser';
 import { isAccessDenied } from '@/utils/errors';
 import Banner from '@/components/ui/Banner';
 import { hasApprovedOrder } from '@/utils/billing';
+import { focusFromQuery } from '@/utils/focusTarget';
 
 export default function NewGig() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function NewGig() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    focusFromQuery('focus', { title: '#title' });
     if (!ready || !userId) return;
     (async () => {
       const ok = await hasApprovedOrder(userId);

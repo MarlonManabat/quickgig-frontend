@@ -7,6 +7,7 @@ import Card from '@/components/ui/Card';
 import Empty from '@/components/ui/Empty';
 import Spinner from '@/components/ui/Spinner';
 import Banner from '@/components/ui/Banner';
+import { focusFromQuery } from '@/utils/focusTarget';
 
 export default function GigsList() {
   const router = useRouter();
@@ -15,8 +16,10 @@ export default function GigsList() {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [redirecting, setRedirecting] = useState(false);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
+    focusFromQuery('focus', { search: '#search' });
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, []);
 
@@ -65,6 +68,13 @@ export default function GigsList() {
         <button onClick={handlePostJob} className="btn-primary">Post Job</button>
       </div>
       <h1>Gigs</h1>
+      <input
+        id="search"
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search gigs"
+        className="w-full max-w-md" />
       {loading ? (
         <Spinner />
       ) : error ? (
