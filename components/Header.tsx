@@ -68,6 +68,7 @@ export default function Header() {
                 key={l.href}
                 href={l.href}
                 data-testid={l.id}
+                app-nav={l.href}
                 className={`${active ? 'opacity-100 underline underline-offset-4' : 'opacity-90 hover:opacity-100'} h-11 min-h-[44px] inline-flex items-center`}
               >
                 {l.label}
@@ -89,6 +90,7 @@ export default function Header() {
             <LinkSafe
               href="/profile"
               data-testid="app-nav-account"
+              app-nav="/profile"
               className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm opacity-90 hover:opacity-100"
             >
               {copy.nav.auth}
@@ -98,6 +100,7 @@ export default function Header() {
               <LinkSafe
                 href="/auth"
                 data-testid="app-login"
+                app-nav="/auth"
                 className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm opacity-90 hover:opacity-100"
               >
                 Mag-login
@@ -105,6 +108,7 @@ export default function Header() {
               <LinkSafe
                 href="/signup"
                 data-testid="app-signup"
+                app-nav="/signup"
                 className="hidden md:inline-flex btn-primary h-11 min-h-[44px]"
               >
                 Sign Up
@@ -121,6 +125,7 @@ export default function Header() {
                 key={l.href}
                 href={l.href}
                 data-testid={l.id}
+                app-nav={l.href}
                 className="h-11 min-h-[44px] flex items-center px-3"
               >
                 {l.label}
@@ -130,6 +135,7 @@ export default function Header() {
               <LinkSafe
                 href="/profile"
                 data-testid="app-nav-account"
+                app-nav="/profile"
                 className="h-11 min-h-[44px] flex items-center px-3"
               >
                 {copy.nav.auth}
@@ -138,6 +144,7 @@ export default function Header() {
               <LinkSafe
                 href="/auth"
                 data-testid="app-login"
+                app-nav="/auth"
                 className="h-11 min-h-[44px] flex items-center px-3"
               >
                 Mag-login
@@ -146,6 +153,7 @@ export default function Header() {
             <LinkSafe
               href="/signup"
               data-testid="app-signup"
+              app-nav="/signup"
               className="btn-primary w-full h-11 min-h-[44px] rounded-xl text-center flex items-center justify-center"
             >
               Sign Up

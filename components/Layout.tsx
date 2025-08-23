@@ -74,6 +74,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   className={active ? 'font-semibold underline' : undefined}
                   aria-current={active ? 'page' : undefined}
                   data-testid={l.id}
+                  app-nav={l.href}
                 >
                   {l.label}
                 </Link>
@@ -84,14 +85,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 href="/admin"
                 className={isActive('/admin') ? 'font-semibold underline' : undefined}
                 data-testid="app-nav-admin"
+                app-nav="/admin"
               >
                 {copy.admin.title}
               </Link>
             )}
             {user ? (
-              <Link href="/profile" data-testid="app-nav-account">Profile</Link>
+              <Link href="/profile" data-testid="app-nav-account" app-nav="/profile">Profile</Link>
             ) : (
-              <Link href="/auth" data-testid="app-login">{copy.nav.auth}</Link>
+              <Link href="/auth" data-testid="app-login" app-nav="/auth">{copy.nav.auth}</Link>
             )}
           </nav>
           {user && <NotificationsBell />}
