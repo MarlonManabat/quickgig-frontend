@@ -60,7 +60,7 @@ export default function NewGig() {
   if (!allowed) return <p data-testid="paywall-redirect">Redirecting...</p>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="gig-editor">
       <p className="text-sm text-brand-subtle">Gigs / Post job</p>
       <h1>Post a Job</h1>
       {rlsDenied && <Banner kind="error">Only job posters can post</Banner>}

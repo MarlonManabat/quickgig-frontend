@@ -37,7 +37,7 @@ export default function ApplicationsList() {
     <Shell>
       <h1 className="text-2xl font-bold mb-4">My Applications</h1>
       {loading && <p>Loading…</p>}
-      <ul className="space-y-3">
+      <ul className="space-y-3" data-testid="applications-list">
         {rows.map((r) => (
           <li key={r.id} className="card">
             <Link

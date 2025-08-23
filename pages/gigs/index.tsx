@@ -56,7 +56,10 @@ export default function GigsList() {
   };
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      data-testid={router.query.mine === '1' ? 'my-gigs' : 'gigs-list'}
+    >
       {redirecting && <p data-testid="paywall-redirect">Redirecting...</p>}
       <div className="text-right">
         <button onClick={handlePostJob} className="btn-primary">Post Job</button>

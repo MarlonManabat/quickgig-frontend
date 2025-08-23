@@ -1,9 +1,12 @@
 name: E2E Smoke
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches: [main]
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -18,4 +21,5 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - run: npm run qa:nav
       - run: npm run qa:ci

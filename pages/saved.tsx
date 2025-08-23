@@ -16,7 +16,7 @@ export default function SavedPage() {
     <Shell>
       <h1 className="text-2xl font-bold mb-4">Saved Gigs</h1>
       <Link href="/alerts" className="underline text-sm">Manage Alerts</Link>
-      <table className="mt-4 w-full text-left text-sm">
+      <table className="mt-4 w-full text-left text-sm" data-testid="saved-list">
         <thead>
           <tr className="border-b border-slate-800">
             <th className="py-2">Title</th>
