@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { supabase } from '@/utils/supabaseClient'
+import { copy } from '@/copy'
 
 export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   const [email, setEmail] = useState('')
@@ -37,11 +38,11 @@ export default function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
   return (
     <form onSubmit={onSubmit} className="max-w-sm space-y-3">
       {mode==='signup' && (
-        <input required className="input" placeholder="Full name" value={fullName} onChange={e=>setFullName(e.target.value)} />
+        <input required className="input" placeholder={copy.profile.fullName} value={fullName} onChange={e=>setFullName(e.target.value)} />
       )}
-      <input required type="email" className="input" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
-      <input required type="password" className="input" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} />
-      <button disabled={loading} className="btn-primary w-full">{loading?'Please wait…': mode==='signup'?'Create account':'Login'}</button>
+      <input required type="email" className="input" placeholder={copy.auth.email} value={email} onChange={e=>setEmail(e.target.value)} />
+      <input required type="password" className="input" placeholder={copy.auth.password} value={password} onChange={e=>setPassword(e.target.value)} />
+      <button disabled={loading} className="btn-primary w-full">{loading?'Please wait…': mode==='signup'?copy.auth.signup:copy.auth.login}</button>
       {msg && <p className="text-sm text-brand-danger">{msg}</p>}
     </form>
   )

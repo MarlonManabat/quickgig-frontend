@@ -1,0 +1,32 @@
+export const copy = {
+  nav: {
+    findWork: 'Hanap Trabaho',
+    myGigs: 'My Gigs',
+    applications: 'Applications',
+    saved: 'Saved',
+    postJob: 'Mag-post ng Gig',
+    auth: 'Account',
+    admin: 'Admin',
+  },
+  auth: {
+    signupTitle: 'Gumawa ng account',
+    loginTitle: 'Mag-login',
+    email: 'Email address',
+    password: 'Password',
+    signup: 'Sign up',
+    login: 'Login',
+  },
+  profile: {
+    step: 'Step 1 of 2 — Kumpletuhin ang profile',
+    heading: 'Iyong Profile',
+    fullName: 'Buong pangalan',
+    photoLabel: 'Profile picture (larawan)',
+    photoHelp: 'PNG/JPG hanggang ~2MB',
+    uploadBtn: 'I-upload ang larawan',
+    save: 'I-save',
+    noAccess: 'Di puwedeng i-edit ang profile ng ibang tao.',
+  },
+  billing: {
+    paywallMsg: 'Para makapag-post ng gig, mag-upload muna ng GCash resibo. Ire-review ng admin.',
+  },
+};
