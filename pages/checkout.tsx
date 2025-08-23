@@ -31,7 +31,12 @@ export default function CheckoutPage() {
     <Shell>
       <h1 className="text-2xl font-bold mb-4">Buy Ticket</h1>
       <p className="mb-4">Send ₱{TICKET_PRICE_PHP} via GCash then upload the proof.</p>
-      <img src={process.env.GCASH_QR_URL || '/assets/gcash-qr.png'} alt="GCash QR" className="max-w-xs mb-4" />
+      <img
+        src={process.env.GCASH_QR_URL || '/assets/gcash-qr.png'}
+        alt="GCash QR"
+        loading="lazy"
+        className="max-w-xs mb-4"
+      />
       {!order ? (
         <button onClick={createOrder} className="btn-primary">Create Order</button>
       ) : (

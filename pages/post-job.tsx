@@ -90,7 +90,14 @@ export default function PostJobPage() {
         <input className="input"
                placeholder="City (optional)" value={city} onChange={(e)=>setCity(e.target.value)} />
         <div className="space-y-2">
-          {imageUrl && <img src={imageUrl} className="rounded max-h-48 object-cover" />}
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt="Gig image preview"
+              loading="lazy"
+              className="rounded max-h-48 object-cover"
+            />
+          )}
           <input type="file" accept="image/*" onChange={onFile} />
         </div>
         <button className="btn-primary">Publish</button>
