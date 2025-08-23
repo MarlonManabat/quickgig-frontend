@@ -17,8 +17,12 @@ export default function AuthCallback() {
         if (err) throw new Error(decodeURIComponent(err));
 
         if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession({ code });
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) throw error;
+        } else {
+          // Optional fallback for legacy hash links
+          // const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+          // if (error) throw error;
         }
 
         const {
