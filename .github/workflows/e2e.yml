@@ -34,12 +34,47 @@ jobs:
           cache: 'npm'
       - name: Use public npm registry
         run: echo "registry=https://registry.npmjs.org/" > .npmrc
-      - run: npm ci --no-audit --no-fund --legacy-peer-deps
+      - name: Detect package manager
+        id: pm
+        run: |
+          echo "pm=npm" >> $GITHUB_OUTPUT
+          if [ -f pnpm-lock.yaml ]; then echo "pm=pnpm" >> $GITHUB_OUTPUT; fi
+          if [ -f yarn.lock ]; then echo "pm=yarn" >> $GITHUB_OUTPUT; fi
+      - name: Enable Corepack (yarn/pnpm)
+        if: ${{ steps.pm.outputs.pm != 'npm' }}
+        run: corepack enable
+      - name: Cache deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.pnpm-store
+            **/node_modules
+          key: ${{ runner.os }}-${{ steps.pm.outputs.pm }}-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml', '**/yarn.lock') }}
+      - name: Install deps
+        run: |
+          case "${{ steps.pm.outputs.pm }}" in
+            pnpm)
+              corepack prepare pnpm@9 --activate
+              pnpm install --frozen-lockfile
+              ;;
+            yarn)
+              corepack prepare yarn@4 --activate
+              yarn install --immutable
+              ;;
+            *)
+              if [ -f package-lock.json ]; then
+                npm ci --legacy-peer-deps --no-audit
+              else
+                npm install --legacy-peer-deps --no-audit
+              fi
+              ;;
+          esac
       - run: npx playwright install --with-deps chromium
       - run: node scripts/seed-demo.js
       - run: node scripts/session-stub.js
       - run: npm run qa:smoke
-      - name: Upload artifacts
+      - name: Upload artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -47,7 +82,8 @@ jobs:
           path: |
             test-results/**
             playwright-report/**
-            **/*.zip
+            playwright/.cache/**
+          if-no-files-found: ignore
 
   full-e2e:
     needs: smoke
@@ -74,12 +110,47 @@ jobs:
           cache: 'npm'
       - name: Use public npm registry
         run: echo "registry=https://registry.npmjs.org/" > .npmrc
-      - run: npm ci --no-audit --no-fund --legacy-peer-deps
+      - name: Detect package manager
+        id: pm
+        run: |
+          echo "pm=npm" >> $GITHUB_OUTPUT
+          if [ -f pnpm-lock.yaml ]; then echo "pm=pnpm" >> $GITHUB_OUTPUT; fi
+          if [ -f yarn.lock ]; then echo "pm=yarn" >> $GITHUB_OUTPUT; fi
+      - name: Enable Corepack (yarn/pnpm)
+        if: ${{ steps.pm.outputs.pm != 'npm' }}
+        run: corepack enable
+      - name: Cache deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ~/.pnpm-store
+            **/node_modules
+          key: ${{ runner.os }}-${{ steps.pm.outputs.pm }}-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml', '**/yarn.lock') }}
+      - name: Install deps
+        run: |
+          case "${{ steps.pm.outputs.pm }}" in
+            pnpm)
+              corepack prepare pnpm@9 --activate
+              pnpm install --frozen-lockfile
+              ;;
+            yarn)
+              corepack prepare yarn@4 --activate
+              yarn install --immutable
+              ;;
+            *)
+              if [ -f package-lock.json ]; then
+                npm ci --legacy-peer-deps --no-audit
+              else
+                npm install --legacy-peer-deps --no-audit
+              fi
+              ;;
+          esac
       - run: npx playwright install --with-deps chromium
       - run: node scripts/seed-demo.js
       - run: node scripts/session-stub.js
       - run: npm run qa:e2e
-      - name: Upload artifacts
+      - name: Upload artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -87,4 +158,5 @@ jobs:
           path: |
             test-results/**
             playwright-report/**
-            **/*.zip
+            playwright/.cache/**
+          if-no-files-found: ignore
