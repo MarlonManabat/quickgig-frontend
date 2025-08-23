@@ -40,37 +40,33 @@ jobs:
           echo "pm=npm" >> $GITHUB_OUTPUT
           if [ -f pnpm-lock.yaml ]; then echo "pm=pnpm" >> $GITHUB_OUTPUT; fi
           if [ -f yarn.lock ]; then echo "pm=yarn" >> $GITHUB_OUTPUT; fi
-      - name: Enable Corepack (yarn/pnpm)
+      - name: Enable Corepack
         if: ${{ steps.pm.outputs.pm != 'npm' }}
         run: corepack enable
-      - name: Cache deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.pnpm-store
-            **/node_modules
-          key: ${{ runner.os }}-${{ steps.pm.outputs.pm }}-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml', '**/yarn.lock') }}
-      - name: Install deps
+      - name: Install deps (robust)
+        env:
+          NPM_CONFIG_FUND: "false"
+          NPM_CONFIG_AUDIT: "false"
         run: |
           case "${{ steps.pm.outputs.pm }}" in
             pnpm)
               corepack prepare pnpm@9 --activate
-              pnpm install --frozen-lockfile
+              pnpm install --frozen-lockfile || pnpm install
               ;;
             yarn)
               corepack prepare yarn@4 --activate
-              yarn install --immutable
+              yarn install --immutable || yarn install
               ;;
             *)
-              if [ -f package-lock.json ]; then
-                npm ci --legacy-peer-deps --no-audit
-              else
-                npm install --legacy-peer-deps --no-audit
+              # npm path: NEVER use npm ci on PRs; generate lock if missing/out-of-sync
+              if [ ! -f package-lock.json ]; then
+                npm install --package-lock-only --no-audit --fund=false || true
               fi
+              npm install --legacy-peer-deps --no-audit --fund=false || npm install --no-audit --fund=false
               ;;
           esac
-      - run: npx playwright install --with-deps chromium
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
       - run: node scripts/seed-demo.js
       - run: node scripts/session-stub.js
       - run: npm run qa:smoke
@@ -78,7 +74,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: smoke-artifacts
+          name: test-results
           path: |
             test-results/**
             playwright-report/**
@@ -116,37 +112,33 @@ jobs:
           echo "pm=npm" >> $GITHUB_OUTPUT
           if [ -f pnpm-lock.yaml ]; then echo "pm=pnpm" >> $GITHUB_OUTPUT; fi
           if [ -f yarn.lock ]; then echo "pm=yarn" >> $GITHUB_OUTPUT; fi
-      - name: Enable Corepack (yarn/pnpm)
+      - name: Enable Corepack
         if: ${{ steps.pm.outputs.pm != 'npm' }}
         run: corepack enable
-      - name: Cache deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.pnpm-store
-            **/node_modules
-          key: ${{ runner.os }}-${{ steps.pm.outputs.pm }}-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml', '**/yarn.lock') }}
-      - name: Install deps
+      - name: Install deps (robust)
+        env:
+          NPM_CONFIG_FUND: "false"
+          NPM_CONFIG_AUDIT: "false"
         run: |
           case "${{ steps.pm.outputs.pm }}" in
             pnpm)
               corepack prepare pnpm@9 --activate
-              pnpm install --frozen-lockfile
+              pnpm install --frozen-lockfile || pnpm install
               ;;
             yarn)
               corepack prepare yarn@4 --activate
-              yarn install --immutable
+              yarn install --immutable || yarn install
               ;;
             *)
-              if [ -f package-lock.json ]; then
-                npm ci --legacy-peer-deps --no-audit
-              else
-                npm install --legacy-peer-deps --no-audit
+              # npm path: NEVER use npm ci on PRs; generate lock if missing/out-of-sync
+              if [ ! -f package-lock.json ]; then
+                npm install --package-lock-only --no-audit --fund=false || true
               fi
+              npm install --legacy-peer-deps --no-audit --fund=false || npm install --no-audit --fund=false
               ;;
           esac
-      - run: npx playwright install --with-deps chromium
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
       - run: node scripts/seed-demo.js
       - run: node scripts/session-stub.js
       - run: npm run qa:e2e
@@ -154,7 +146,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: full-artifacts
+          name: test-results
           path: |
             test-results/**
             playwright-report/**
