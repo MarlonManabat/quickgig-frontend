@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import toast from "@/utils/toast";
 
 export default function Applicants() {
   const { ready, userId, timedOut } = useRequireUser();
@@ -33,6 +34,14 @@ export default function Applicants() {
   }, [ready, id]);
 
   async function setStatus(appId: number, status: "accepted"|"rejected") {
+    if (status === 'accepted') {
+      const { data: ok, error } = await supabase.rpc('debit_tickets', { p_user: userId, p_reason: 'hire', p_ref: appId })
+      if (error || !ok) {
+        toast.error("You're out of tickets. Add tickets to confirm the hire.")
+        router.push('/pay')
+        return
+      }
+    }
     await supabase.from("applications").update({ status }).eq("id", appId);
     setRows((r)=>r.map(x=>x.id===appId?{...x,status}:x));
   }
