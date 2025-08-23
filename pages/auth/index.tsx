@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '@/utils/supabaseClient';
 import FormShell from '@/components/forms/FormShell';
-import EmailField from '@/components/forms/EmailField';
+import EmailField from '@/components/ui/EmailField';
 import FieldRow from '@/components/forms/FieldRow';
 import { focusFromQuery } from '@/utils/focusTarget';
 import { toast } from '@/utils/toast';
@@ -62,11 +62,9 @@ export default function AuthPage() {
         <FieldRow>
           <EmailField
             id="email"
-            label="Email address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoFocus
+            onChange={setEmail}
+            error={error || undefined}
           />
         </FieldRow>
         <button
@@ -77,7 +75,6 @@ export default function AuthPage() {
         >
           {loading ? '...' : 'Send Magic Link'}
         </button>
-        {error && <p className="text-sm text-[color:var(--text)]/80">{error}</p>}
       </form>
     </FormShell>
   );

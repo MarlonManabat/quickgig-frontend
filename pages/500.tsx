@@ -1,13 +1,10 @@
-import LinkSafe from '@/components/LinkSafe';
-import { H1 } from '@/components/ui/Text';
-
-export default function FiveHundred() {
+export default function Error500(){
   return (
-    <div className="py-20 text-center space-y-4">
-      <H1>May problema sa server</H1>
-      <LinkSafe href="/find" className="text-link underline">
-        Bumalik sa Hanap Trabaho
-      </LinkSafe>
-    </div>
-  );
+    <main className="min-h-[60vh] flex items-center justify-center text-center p-8">
+      <div>
+        <h1 className="text-3xl font-semibold mb-2">Something went wrong</h1>
+        <a href="/" className="px-4 py-2 rounded bg-black text-white">Back home</a>
+      </div>
+    </main>
+  )
 }
