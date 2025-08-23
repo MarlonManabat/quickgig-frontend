@@ -13,12 +13,12 @@
     --hero-from: #0ea5a3;
     --hero-to: #065f46;
   }
-  html, body { @apply bg-surface-base text-brand-foreground; }
+  html, body { @apply bg-surface text-text; }
   h1 { @apply text-3xl font-bold tracking-tight; }
   h2 { @apply text-2xl font-semibold; }
   h3 { @apply text-xl font-semibold; }
-  p  { @apply text-[15px] leading-6 text-brand-foreground; }
-  a  { @apply text-brand-primary hover:text-brand-accent; }
+  p  { @apply text-[15px] leading-6 text-text; }
+  a  { @apply text-link hover:opacity-80; }
 }
 
 @layer components {

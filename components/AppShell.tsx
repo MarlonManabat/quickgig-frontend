@@ -4,9 +4,9 @@ import Footer from './Footer';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-surface-base text-brand-foreground">
+    <div className="min-h-screen bg-surface text-text flex flex-col">
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="container flex-1 py-6 bg-surface">{children}</main>
       <Footer />
     </div>
   );
