@@ -1,6 +1,6 @@
 export const copy = {
   nav: {
-    findWork: 'Hanap Trabaho',
+    findWork: 'Maghanap ng Trabaho',
     myGigs: 'My Gigs',
     applications: 'Applications',
     saved: 'Saved',
