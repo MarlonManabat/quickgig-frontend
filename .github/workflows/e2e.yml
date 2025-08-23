@@ -29,7 +29,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-smoke
           path: |
             test-results/**
             playwright-report/**
@@ -59,7 +59,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-full-e2e
           path: |
             test-results/**
             playwright-report/**
