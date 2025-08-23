@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
-import Shell from "@/components/Shell";
 import { useRouter } from "next/router";
 import { copy } from "@/copy";
+import FormShell from "@/components/FormShell";
+import EmailField from "@/components/fields/EmailField";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,30 +20,31 @@ export default function LoginPage() {
   }
 
   return (
-    <Shell>
-      <h1 className="text-2xl font-bold mb-4">{copy.auth.loginTitle} / {copy.auth.signup}</h1>
+    <FormShell title={`${copy.auth.loginTitle} / ${copy.auth.signup}`}> 
       {sent ? (
         <p className="text-brand-success">Magic link sent! Check your email.</p>
       ) : (
-        <form onSubmit={signIn} className="max-w-md space-y-3">
-          <input
-            type="email"
+        <form onSubmit={signIn} className="space-y-3">
+          <EmailField
             required
-            placeholder={copy.auth.email}
+            label={copy.auth.email}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="input"
+            testId="auth-email"
           />
-          <button className="btn-primary">{copy.auth.login}</button>
+          <button className="btn-primary" type="submit">{copy.auth.login}</button>
           {error && <p className="text-brand-danger">{error}</p>}
         </form>
       )}
       <button
-        onClick={async () => { await supabase.auth.signOut(); router.push("/"); }}
+        onClick={async () => {
+          await supabase.auth.signOut();
+          router.push("/");
+        }}
         className="mt-6 text-sm underline"
       >
         Sign out
       </button>
-    </Shell>
+    </FormShell>
   );
 }

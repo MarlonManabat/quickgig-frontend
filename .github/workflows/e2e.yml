@@ -16,6 +16,9 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npm run build:prod
+      - name: UI width check
+        run: npm run qa:ui
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
       - name: Seed demo data (if secrets present)
         run: npm run seed
         env:

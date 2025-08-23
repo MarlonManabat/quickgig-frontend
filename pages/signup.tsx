@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '@/utils/supabaseClient'
+import FormShell from '@/components/FormShell'
+import EmailField from '@/components/fields/EmailField'
+import { copy } from '@/copy'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -33,20 +36,17 @@ export default function Signup() {
   }
 
   return (
-    <div className="p-4 max-w-sm mx-auto">
-      <h1 className="mb-4 text-xl">Sign Up</h1>
+    <FormShell title={copy.auth.signupTitle}>
       <form onSubmit={onSubmit} className="space-y-3">
-        <input
-          className="input"
-          type="email"
+        <EmailField
           required
-          placeholder="you@example.com"
+          label={copy.auth.email}
           value={email}
           onChange={e => setEmail(e.target.value)}
         />
         <button className="btn-primary w-full" type="submit">Send Magic Link</button>
         {msg && <p className="text-sm text-brand-subtle">{msg}</p>}
       </form>
-    </div>
+    </FormShell>
   )
 }
