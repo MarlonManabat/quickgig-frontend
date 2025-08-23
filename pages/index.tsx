@@ -16,9 +16,21 @@ export default function Home() {
       <h1>QuickGig.ph</h1>
       <p>Connect with opportunities — find work or hire talent quickly.</p>
       <div className="flex justify-center gap-4">
-        <Link href="/gigs" className="btn-primary">{copy.nav.findWork}</Link>
+        <Link
+          href="/gigs"
+          className="btn-primary cta-find"
+          data-testid="cta-find"
+        >
+          {copy.nav.findWork}
+        </Link>
         {canPost && (
-          <Link href="/gigs/new" className="btn-secondary">{copy.nav.postJob}</Link>
+          <Link
+            href="/gigs/new"
+            className="btn-secondary cta-post"
+            data-testid="cta-post"
+          >
+            {copy.nav.postJob}
+          </Link>
         )}
       </div>
     </Card>

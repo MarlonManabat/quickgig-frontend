@@ -7,11 +7,11 @@ import { supabase } from '@/utils/supabaseClient';
 import { copy } from '@/copy';
 
 const links = [
-  { href: '/gigs', label: copy.nav.findWork },
-  { href: '/gigs?mine=1', label: copy.nav.myGigs },
-  { href: '/applications', label: copy.nav.applications },
-  { href: '/saved', label: copy.nav.saved },
-  { href: '/gigs/new', label: copy.nav.postJob },
+  { href: '/gigs', label: copy.nav.findWork, id: 'nav-find' },
+  { href: '/gigs?mine=1', label: copy.nav.myGigs, id: 'nav-my-gigs' },
+  { href: '/applications', label: copy.nav.applications, id: 'nav-applications' },
+  { href: '/saved', label: copy.nav.saved, id: 'nav-saved' },
+  { href: '/gigs/new', label: copy.nav.postJob, id: 'nav-post' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -66,6 +66,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   href={l.href}
                   className={active ? 'font-semibold underline' : undefined}
                   aria-current={active ? 'page' : undefined}
+                  data-testid={l.id}
                 >
                   {l.label}
                 </Link>

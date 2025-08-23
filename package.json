@@ -17,6 +17,7 @@
     "build:prod": "next build",
     "start:prod": "next start -p 3000",
     "qa:ci": "start-server-and-test start:prod http://localhost:3000 \"PLAYWRIGHT_BASE_URL=http://localhost:3000 npm run qa:smoke\"",
+    "qa:nav": "start-server-and-test start:prod http://localhost:3000 \"PLAYWRIGHT_BASE_URL=http://localhost:3000 npx playwright test tests/nav.audit.spec.ts --config=tests/playwright.config.ts\"",
     "seed": "node scripts/seed.mjs",
     "postinstall": "node -e \"process.env.NODE_ENV==='production'?process.exit(0):0\" || npx playwright install --with-deps || true"
   },
