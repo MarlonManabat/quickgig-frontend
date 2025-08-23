@@ -1,124 +1,47 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { supabase } from '@/utils/supabaseClient'
-import { getOrCreateApplication, getOrCreateThread } from '@/utils/application'
-import Card from '@/components/ui/Card'
-import Button from '@/components/ui/Button'
-import Banner from '@/components/ui/Banner'
-import Spinner from '@/components/ui/Spinner'
-import IdGate from '@/components/IdGate'
+import { getGig, applyToGig, toggleSave } from '@/lib/gigs/api'
 
-type Gig = {
-  id: string; owner: string; title: string; description?: string;
-  budget?: number; location?: string; status: 'draft'|'published'|'closed';
-};
-
-export default function GigViewPage() {
+export default function GigDetail() {
   const router = useRouter()
-  const { id } = router.query
-  const [gig, setGig] = useState<Gig | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [isOwner, setIsOwner] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
-  const [userId, setUserId] = useState<string | null>(null)
-  const [appId, setAppId] = useState<string | null>(null)
+  const id = Number(Array.isArray(router.query.id) ? router.query.id[0] : router.query.id)
+  const [gig, setGig] = useState<any>(null)
+  const [saved, setSaved] = useState(false)
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
-    // Normalize the router param
-    const gid = Array.isArray(id) ? id[0] : id
-    if (!gid) return // wait for router to hydrate
-
-    let mounted = true
-
-    ;(async () => {
-      try {
-        // get session user id (may be null)
-        const { data: u } = await supabase.auth.getUser()
-        const me = u.user?.id ?? null
-        setUserId(me)
-
-        // fetch the gig
-        const { data, error } = await supabase
-          .from('gigs')
-          .select('*')
-          .eq('id', gid)
-          .maybeSingle()
-
-        if (error) throw error
-        if (!data) { setErr('Not found'); return }
-
-        // Enforce published visibility for non-owners
-        if (data.status !== 'published' && data.owner !== me) {
-          setErr('This gig is not public.')
-          return
-        }
-
-        if (!mounted) return
-        setGig(data as Gig)
-        setIsOwner(!!me && data.owner === me)
-        if (me && data.owner !== me) {
-          const { data: app } = await supabase
-            .from('applications')
-            .select('id')
-            .eq('gig_id', gid)
-            .eq('applicant', me)
-            .maybeSingle()
-          setAppId(app?.id ?? null)
-        }
-      } catch (e: any) {
-        if (mounted) setErr(e.message ?? 'Error loading gig')
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    })()
-
-    return () => {
-      mounted = false
-    }
+    if (!id) return
+    getGig(id).then(({ data }) => setGig(data))
   }, [id])
 
-  async function apply() {
-    if (!userId || !gig) return
+  const saveToggle = async () => {
+    const next = !saved
+    setSaved(next)
     try {
-      const app = await getOrCreateApplication(gig.id, userId)
-      await getOrCreateThread(app.id)
-      router.push(`/applications/${app.id}`)
-    } catch (e:any) {
-      alert(e.message ?? 'Failed to apply')
+      await toggleSave(id, next)
+    } catch {
+      setSaved(!next)
     }
   }
 
-  let content: React.ReactNode
-  if (loading) content = <Spinner />
-  else if (err) content = <Banner kind="error">{err}</Banner>
-  else if (!gig) content = <Banner kind="info">Not found</Banner>
-  else {
-    content = (
-      <div className="space-y-4">
-        <p className="text-sm text-brand-subtle">Gigs / View gig</p>
-        <div className="flex items-center justify-between">
-          <h1 data-testid="gig-title">{gig.title}</h1>
-          {isOwner && (
-            <Link href={`/gigs/${gig.id}/edit`} className="btn-secondary">Edit</Link>
-          )}
-        </div>
-        <Card className="p-4 space-y-2">
-          {gig.description && <p>{gig.description}</p>}
-          <p className="text-sm text-brand-subtle">
-            {gig.location ?? '—'} · ₱{gig.budget ?? '—'} · {gig.status}
-          </p>
-          {!isOwner && userId && (
-            appId ? (
-              <Link href={`/applications/${appId}`} className="btn-secondary">View application</Link>
-            ) : (
-              <Button onClick={apply}>Apply</Button>
-            )
-          )}
-        </Card>
-      </div>
-    )
+  const apply = async () => {
+    await applyToGig(id, message)
+    alert('Application submitted')
   }
 
-  return <IdGate id={id}>{content}</IdGate>
+  if (!gig) return null
+
+  return (
+    <main className="p-4 space-y-4">
+      <h1 className="text-2xl font-semibold">{gig.title}</h1>
+      <p>{gig.description}</p>
+      <button onClick={saveToggle} className="text-blue-600 text-sm">
+        {saved ? 'Unsave' : 'Save'}
+      </button>
+      <div className="space-y-2">
+        <textarea value={message} onChange={e => setMessage(e.target.value)} className="w-full border p-2" placeholder="Message" />
+        <button onClick={apply} className="px-4 py-2 bg-black text-white rounded">Apply</button>
+      </div>
+    </main>
+  )
 }

@@ -1,68 +1,32 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { supabase } from '@/utils/supabaseClient';
-import { toast } from '@/utils/toast';
+import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/router'
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AuthCallback() {
-  const [msg, setMsg] = useState('Signing you in…');
-  const router = useRouter();
+  const supabase = useRef(createBrowserSupabaseClient()).current
+  const router = useRouter()
 
   useEffect(() => {
     const run = async () => {
-      try {
-        const url = new URL(window.location.href);
-        const code = url.searchParams.get('code');
-        const err = url.searchParams.get('error_description');
-        if (err) throw new Error(decodeURIComponent(err));
-
-        if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) throw error;
-        } else {
-          // Optional fallback for legacy hash links
-          // const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
-          // if (error) throw error;
-        }
-
-        const {
-          data: { user },
-          error: userErr,
-        } = await supabase.auth.getUser();
-        if (userErr) throw userErr;
-        if (!user) throw new Error('No user after callback');
-
-        const fullName =
-          (user.user_metadata &&
-            (user.user_metadata.full_name || user.user_metadata.name)) ||
-          user.email?.split('@')[0] ||
-          'User';
-
-        const { data: existing } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        const updates: any = { id: user.id, full_name: fullName };
-        if (!existing || !existing.role) updates.role = 'user';
-        const { error: upErr } = await supabase
-          .from('profiles')
-          .upsert(updates, { onConflict: 'id' });
-        if (upErr) throw upErr;
-
-        const dest =
-          localStorage.getItem('postAuthRedirect') || '/profile';
-        localStorage.removeItem('postAuthRedirect');
-        router.replace(dest);
-      } catch (e: any) {
-        console.error(e);
-        setMsg(`Login failed: ${e.message || e}`);
-        toast.error(e.message || 'Login failed');
+      const code = (router.query.code as string) || ''
+      if (!code) { router.replace('/'); return }
+      const k = `auth:code:${code}`
+      const seen = localStorage.getItem(k)
+      if (!seen) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (error) console.error(error)
+        localStorage.setItem(k, String(Date.now()))
+        setTimeout(() => localStorage.removeItem(k), 5 * 60 * 1000)
       }
-    };
-    run();
-  }, [router]);
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.replace('/'); return }
+      const { data: prof } = await supabase.from('profiles')
+        .select('full_name').eq('id', user.id).maybeSingle()
+      router.replace(!prof?.full_name ? '/profile' : '/')
+    }
+    run()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.code])
 
-  return <p style={{ padding: 24 }}>{msg}</p>;
+  return null
 }
