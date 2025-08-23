@@ -6,7 +6,7 @@ import Link from "next/link";
 import Spinner from "@/components/Spinner";
 
 export default function ApplyGig() {
-  const { ready, userId } = useRequireUser();
+  const { ready, userId, timedOut } = useRequireUser();
   const router = useRouter();
   const id = router.query.id as string | undefined;
 
@@ -37,7 +37,17 @@ export default function ApplyGig() {
     setSaving(false);
   }
 
-  if (!ready || !gig) return <p>Loading…</p>;
+  if (!ready || !gig)
+    return timedOut ? (
+      <p>
+        Hindi ma-load ang auth.{' '}
+        <Link className="underline" href="/auth">
+          Go to Login
+        </Link>
+      </p>
+    ) : (
+      <p>Loading…</p>
+    );
   if (gig.hidden) return <p>This gig is unavailable.</p>;
 
   return (

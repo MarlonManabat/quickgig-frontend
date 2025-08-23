@@ -21,6 +21,13 @@ PR10 uses SWR for conditional fetch. Applications detail embeds:
 - gig:gigs(..., owner_profile:profiles(full_name))
 - applicant_profile:profiles!applications_applicant_fkey(full_name)
 
+## Passwordless Auth
+
+- Callback path `/auth/callback`
+- `postAuthRedirect` is stored in `localStorage` to remember the intended page
+- First sign-in upserts the user's profile row
+- Supabase Auth settings must include the callback URL
+
 ## Admin seeding
 
 Set `SEED_ADMIN_EMAIL` locally and in CI so an account is marked as admin during seeding.
