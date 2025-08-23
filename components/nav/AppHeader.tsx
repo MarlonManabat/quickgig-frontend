@@ -23,9 +23,14 @@ export default function AppHeader(){
   return (
     <header className="bg-black text-white">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.svg" alt="QuickGig logo" width={24} height={24} priority />
-          <span className="font-semibold">QuickGig</span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/logo-horizontal.png"
+            alt="QuickGig.ph"
+            width={140}
+            height={32}
+            priority
+          />
         </Link>
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
           <Link href="/gigs">Find work</Link>
