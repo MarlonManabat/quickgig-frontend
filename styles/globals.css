@@ -3,17 +3,27 @@
 @tailwind utilities;
 
 @layer base {
-  html, body { @apply bg-brand-bg text-brand; }
+  :root {
+    --brand-primary: #0ea5a3;
+    --brand-accent: #facc15;
+    --brand-muted: #475569;
+    --brand-foreground: #0f172a;
+    --surface-base: #ffffff;
+    --surface-raised: #f9fafb;
+    --hero-from: #0ea5a3;
+    --hero-to: #065f46;
+  }
+  html, body { @apply bg-surface-base text-brand-foreground; }
   h1 { @apply text-3xl font-bold tracking-tight; }
   h2 { @apply text-2xl font-semibold; }
   h3 { @apply text-xl font-semibold; }
-  p  { @apply text-[15px] leading-6 text-brand; }
-  a  { @apply text-brand hover:text-brand-accent; }
+  p  { @apply text-[15px] leading-6 text-brand-foreground; }
+  a  { @apply text-brand-primary hover:text-brand-accent; }
 }
 
 @layer components {
   .container-page { @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8; }
-  .card { @apply bg-brand-surface shadow-card rounded-xl2 border border-brand-border; }
+  .card { @apply bg-surface-raised shadow-soft rounded-2xl border border-brand-border; }
   .btn { @apply inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition; }
   .btn-secondary { @apply btn border border-brand-border bg-brand-bg hover:bg-brand-surface; }
   .btn-danger { @apply btn bg-brand-danger text-white hover:opacity-90; }
@@ -40,6 +50,16 @@
 
 @layer utilities {
   .min-w-0 { min-width: 0; }
+  .bg-hero {
+    background:
+      radial-gradient(1200px 500px at 20% -10%, rgba(255,255,255,0.25), transparent 60%),
+      linear-gradient(135deg, var(--hero-from), var(--hero-to));
+  }
+  .text-gradient {
+    background-image: linear-gradient(to right, var(--brand-primary), var(--brand-accent));
+    -webkit-background-clip: text;
+    color: transparent;
+  }
 }
 
 @layer base {
