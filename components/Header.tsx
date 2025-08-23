@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import LinkSafe from './LinkSafe';
 import { supabase } from '@/utils/supabaseClient';
 import { copy } from '@/copy';
@@ -32,17 +33,20 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-20 bg-brand-foreground text-white shadow-soft">
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
-        <LinkSafe href="/" className="font-semibold">QuickGig.ph</LinkSafe>
-        <nav className="hidden md:flex items-center gap-6 text-sm">
+    <header className="sticky top-0 z-40 bg-header-bg text-header-text border-b border-white/10">
+      <div className="container flex h-14 items-center justify-between">
+        <LinkSafe href="/" className="flex items-center gap-2">
+          <Image src="/logo.svg" alt="QuickGig.ph" width={28} height={28} priority />
+          <span className="font-semibold">QuickGig.ph</span>
+        </LinkSafe>
+        <nav className="hidden md:flex items-center gap-4 text-sm">
           {links.map((l) => {
             const active = isActive(l.href);
             return (
               <LinkSafe
                 key={l.href}
                 href={l.href}
-                className={active ? 'underline underline-offset-4' : undefined}
+                className={`${active ? 'underline underline-offset-4' : ''} hover:text-white/90`}
               >
                 {l.label}
               </LinkSafe>
@@ -51,15 +55,15 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-4">
           {user ? (
-            <LinkSafe href="/profile" className="text-sm">
+            <LinkSafe href="/profile" className="text-sm hover:text-white/90">
               {copy.nav.auth}
             </LinkSafe>
           ) : (
             <>
-              <LinkSafe href="/auth" className="text-sm">
+              <LinkSafe href="/auth" className="text-sm hover:text-white/90">
                 Mag-login
               </LinkSafe>
-              <LinkSafe href="/auth" className="text-sm font-semibold">
+              <LinkSafe href="/auth" className="text-sm font-semibold hover:text-white/90">
                 Gumawa ng account
               </LinkSafe>
             </>

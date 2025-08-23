@@ -1,4 +1,5 @@
 import type { AppProps } from "next/app";
+import "../styles/theme.css";
 import "../styles/globals.css";
 import "../styles/accessibility.css";
 import AppShell from "@/components/AppShell";
