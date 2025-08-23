@@ -5,6 +5,7 @@ import Banner from '@/components/ui/Banner';
 import NotificationsBell from './NotificationsBell';
 import { supabase } from '@/utils/supabaseClient';
 import { copy } from '@/copy';
+import { isAdmin } from '@/utils/admin';
 
 const links = [
   { href: '/gigs', label: copy.nav.findWork, id: 'nav-find' },
@@ -19,6 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const banner = typeof router.query.banner === 'string' ? router.query.banner : null;
   const [user, setUser] = useState<any>(null);
   const [open, setOpen] = useState(false);
+  const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -28,6 +30,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return () => {
       listener.subscription.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    isAdmin().then(setAdmin).catch(() => setAdmin(false));
   }, []);
 
   useEffect(() => {
@@ -72,6 +78,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               );
             })}
+            {admin && (
+              <Link
+                href="/admin"
+                className={isActive('/admin') ? 'font-semibold underline' : undefined}
+                data-testid="nav-admin"
+              >
+                {copy.admin.title}
+              </Link>
+            )}
             {user ? (
               <Link href="/profile" data-testid="nav-profile">Profile</Link>
             ) : (

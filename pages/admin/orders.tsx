@@ -10,8 +10,8 @@ export default function OrdersAdmin() {
     if (!user) return;
     // naive “admin” check; hide if not admin
     (async () => {
-      const { data: prof } = await supabase.from('profiles').select('admin').eq('id', user.id).single();
-      if (!prof?.admin) return;
+      const { data: prof } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single();
+      if (!prof?.is_admin) return;
       const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
       setRows(data || []);
     })();

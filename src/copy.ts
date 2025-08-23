@@ -29,4 +29,15 @@ export const copy = {
   billing: {
     paywallMsg: 'Para makapag-post ng gig, mag-upload muna ng GCash resibo. Ire-review ng admin.',
   },
+  admin: {
+    title: 'Admin Dashboard',
+    orders: 'Mga Order / Bayad',
+    users: 'Mga User',
+    gigs: 'Mga Gig',
+    applications: 'Mga Application',
+    pending: 'Nakapila',
+    last7d: 'Huling 7 araw',
+    view: 'Tingnan',
+    noAccess: 'Kailangan ng admin access.',
+  },
 };

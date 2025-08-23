@@ -26,3 +26,9 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - run: npm run qa:nav
       - run: npm run qa:ci
+      - name: Admin guard
+        run: npm run qa:admin
+        env:
+          PW_ADMIN_EMAIL: ${{ secrets.PW_ADMIN_EMAIL }}
+          PW_ADMIN_PASS:  ${{ secrets.PW_ADMIN_PASS }}
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
