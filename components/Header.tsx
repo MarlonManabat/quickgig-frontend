@@ -57,8 +57,15 @@ export default function Header() {
       className="sticky top-0 z-40 bg-header-bg text-header-text border-b border-white/10"
     >
       <Container className="flex h-16 items-center justify-between">
-        <LinkSafe href="/" className="flex items-center h-11 min-h-[44px]">
-          <Image src="/logo-horizontal.png" alt="QuickGig.ph" width={140} height={32} priority />
+        <LinkSafe href="/" className="flex items-center h-11 min-h-[44px] gap-2">
+          <Image
+            src="/logo/quickgig.svg"
+            alt="QuickGig.ph"
+            width={28}
+            height={28}
+            priority
+          />
+          <span className="font-semibold">QuickGig.ph</span>
         </LinkSafe>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {links.map((l) => {
