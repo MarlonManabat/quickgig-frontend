@@ -55,19 +55,18 @@ export default function Header() {
       data-app-header
       className="sticky top-0 z-40 bg-header-bg text-header-text border-b border-white/10"
     >
-      <Container className="flex h-14 items-center justify-between">
-        <LinkSafe href="/" className="flex items-center gap-2 h-11 min-h-[44px]">
-          <Image src="/logo.svg" alt="QuickGig.ph" width={28} height={28} priority />
-          <span className="font-semibold">QuickGig.ph</span>
+      <Container className="flex h-16 items-center justify-between">
+        <LinkSafe href="/" className="flex items-center h-11 min-h-[44px]">
+          <Image src="/logo-horizontal.png" alt="QuickGig.ph" width={140} height={32} priority />
         </LinkSafe>
-        <nav className="hidden md:flex items-center gap-4 text-sm">
+        <nav className="hidden md:flex items-center gap-6 text-sm">
           {links.map((l) => {
             const active = isActive(l.href);
             return (
               <LinkSafe
                 key={l.href}
                 href={l.href}
-                className={`${active ? 'underline underline-offset-4' : ''} h-11 min-h-[44px] inline-flex items-center hover:text-white/90`}
+                className={`${active ? 'opacity-100 underline underline-offset-4' : 'opacity-90 hover:opacity-100'} h-11 min-h-[44px] inline-flex items-center`}
               >
                 {l.label}
               </LinkSafe>
@@ -77,7 +76,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <button
             data-testid="menu-toggle"
-            className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg text-brand-fg"
+            className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg text-white"
             aria-label="Open menu"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
@@ -87,23 +86,31 @@ export default function Header() {
           {user ? (
             <LinkSafe
               href="/profile"
-              className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm hover:text-white/90"
+              className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm opacity-90 hover:opacity-100"
             >
               {copy.nav.auth}
             </LinkSafe>
           ) : (
-            <LinkSafe
-              href="/auth"
-              className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm hover:text-white/90"
-            >
-              Mag-login
-            </LinkSafe>
+            <>
+              <LinkSafe
+                href="/auth"
+                className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm opacity-90 hover:opacity-100"
+              >
+                Mag-login
+              </LinkSafe>
+              <LinkSafe
+                href="/signup"
+                className="hidden md:inline-flex btn-primary h-11 min-h-[44px]"
+              >
+                Sign Up
+              </LinkSafe>
+            </>
           )}
         </div>
       </Container>
       {open && (
-        <div className="md:hidden border-t border-white/10 bg-brand-bg text-brand-fg">
-          <nav className="grid gap-1 p-3">
+        <div className="md:hidden fixed inset-0 z-30 bg-header-bg text-white pt-16">
+          <nav className="grid gap-1 p-6">
             {links.map((l) => (
               <LinkSafe
                 key={l.href}

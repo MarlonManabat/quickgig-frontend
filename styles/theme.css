@@ -1,8 +1,9 @@
 :root{
   --surface:#ffffff;
   --surface-muted:#f6f7f9;
-  --text:#0b1220;
-  --header-bg:#0b2a3a;
+  --text:#0f172a;
+  --brand-surface:#0b1d1f;
+  --header-bg:var(--brand-surface);
   --header-text:#ffffff;
   --link:#0b5fff;
 }

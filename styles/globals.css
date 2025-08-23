@@ -46,7 +46,9 @@ html, body { background: var(--surface, #fff); }
     @apply w-full text-base md:text-lg leading-6 px-3 py-3 border rounded-lg;
   }
   label { @apply block text-sm font-medium mb-1; }
-  .btn-primary { @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700; }
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-xl bg-brand-accent text-brand-foreground shadow-[0_6px_20px_rgba(250,204,21,0.35)] hover:bg-brand-accent/90;
+  }
 }
 
 @layer utilities {

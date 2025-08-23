@@ -14,8 +14,8 @@ const config: Config = {
           DEFAULT: '#111827', // text
           bg: '#ffffff', // background
           surface: '#f9fafb', // cards
-          accent: '#2563eb', // CTA / primary
-          'accent-hover': '#1e40af',
+          accent: '#facc15', // CTA / primary
+          'accent-hover': '#eab308',
           border: '#e5e7eb',
           subtle: '#6b7280', // metadata/muted
           success: '#10b981',
