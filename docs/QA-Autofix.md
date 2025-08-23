@@ -20,3 +20,7 @@ Note: PR10 uses SWR for conditional client-side fetch; added "swr" as a dependen
 PR10 uses SWR for conditional fetch. Applications detail embeds:
 - gig:gigs(..., owner_profile:profiles(full_name))
 - applicant_profile:profiles!applications_applicant_fkey(full_name)
+
+## Admin seeding
+
+Set `SEED_ADMIN_EMAIL` locally and in CI so an account is marked as admin during seeding.

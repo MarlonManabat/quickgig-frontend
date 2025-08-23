@@ -31,6 +31,12 @@ async function first(table) {
   if (!(await first('messages'))) {
     await supabase.from('messages').insert({ thread_id: '00000000-0000-0000-0000-000000000000', sender_id: 'seed', body: 'hello' });
   }
+  // mark admin
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || process.env.ADMIN_EMAILS?.split(',')[0];
+  if (adminEmail) {
+    await supabase.from('profiles').update({ is_admin: true }).eq('email', adminEmail.trim());
+    console.log('[seed] marked admin:', adminEmail);
+  }
   console.log('[seed] done');
 })();
 
