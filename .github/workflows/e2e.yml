@@ -5,71 +5,25 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
-    inputs:
-      run_full:
-        description: "Run full E2E suite"
-        type: boolean
-        default: false
-
-concurrency: e2e-${{ github.ref }}
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     env:
-      CI: true
       PLAYWRIGHT_LANDING_URL: https://quickgig.ph
       PLAYWRIGHT_APP_URL: https://app.quickgig.ph
-      QA_TEST_MODE: true
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+      QA_TEST_MODE: "true"
+      QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Use public npm registry
-        run: echo "registry=https://registry.npmjs.org/" > .npmrc
-      - name: Detect package manager
-        id: pm
-        run: |
-          echo "pm=npm" >> $GITHUB_OUTPUT
-          if [ -f pnpm-lock.yaml ]; then echo "pm=pnpm" >> $GITHUB_OUTPUT; fi
-          if [ -f yarn.lock ]; then echo "pm=yarn" >> $GITHUB_OUTPUT; fi
-      - name: Enable Corepack
-        if: ${{ steps.pm.outputs.pm != 'npm' }}
-        run: corepack enable
+        with: { node-version: 20 }
       - name: Install deps (robust)
-        env:
-          NPM_CONFIG_FUND: "false"
-          NPM_CONFIG_AUDIT: "false"
-        run: |
-          case "${{ steps.pm.outputs.pm }}" in
-            pnpm)
-              corepack prepare pnpm@9 --activate
-              pnpm install --frozen-lockfile || pnpm install
-              ;;
-            yarn)
-              corepack prepare yarn@4 --activate
-              yarn install --immutable || yarn install
-              ;;
-            *)
-              # npm path: NEVER use npm ci on PRs; generate lock if missing/out-of-sync
-              if [ ! -f package-lock.json ]; then
-                npm install --package-lock-only --no-audit --fund=false || true
-              fi
-              npm install --legacy-peer-deps --no-audit --fund=false || npm install --no-audit --fund=false
-              ;;
-          esac
-      - name: Install Chromium for Playwright
+        run: npm install --legacy-peer-deps --no-audit
+      - name: Install Playwright
         run: npx playwright install --with-deps chromium
-      - run: node scripts/seed-demo.js
-      - run: node scripts/session-stub.js
-      - run: npm run qa:smoke
+      - name: Run smoke
+        run: npm run qa:smoke
       - name: Upload artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,70 +32,27 @@ jobs:
           path: |
             test-results/**
             playwright-report/**
-            playwright/.cache/**
           if-no-files-found: ignore
 
   full-e2e:
-    needs: smoke
-    if: |
-      github.ref == 'refs/heads/main' ||
-      (github.event_name == 'workflow_dispatch' && inputs.run_full == 'true') ||
-      (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'run-full-e2e'))
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     env:
-      CI: true
       PLAYWRIGHT_LANDING_URL: https://quickgig.ph
       PLAYWRIGHT_APP_URL: https://app.quickgig.ph
-      QA_TEST_MODE: true
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+      QA_TEST_MODE: "true"
+      QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
+      QA_TEST_EMAIL_ADMIN: ${{ secrets.QA_TEST_EMAIL_ADMIN || secrets.QA_TEST_EMAIL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Use public npm registry
-        run: echo "registry=https://registry.npmjs.org/" > .npmrc
-      - name: Detect package manager
-        id: pm
-        run: |
-          echo "pm=npm" >> $GITHUB_OUTPUT
-          if [ -f pnpm-lock.yaml ]; then echo "pm=pnpm" >> $GITHUB_OUTPUT; fi
-          if [ -f yarn.lock ]; then echo "pm=yarn" >> $GITHUB_OUTPUT; fi
-      - name: Enable Corepack
-        if: ${{ steps.pm.outputs.pm != 'npm' }}
-        run: corepack enable
+        with: { node-version: 20 }
       - name: Install deps (robust)
-        env:
-          NPM_CONFIG_FUND: "false"
-          NPM_CONFIG_AUDIT: "false"
-        run: |
-          case "${{ steps.pm.outputs.pm }}" in
-            pnpm)
-              corepack prepare pnpm@9 --activate
-              pnpm install --frozen-lockfile || pnpm install
-              ;;
-            yarn)
-              corepack prepare yarn@4 --activate
-              yarn install --immutable || yarn install
-              ;;
-            *)
-              # npm path: NEVER use npm ci on PRs; generate lock if missing/out-of-sync
-              if [ ! -f package-lock.json ]; then
-                npm install --package-lock-only --no-audit --fund=false || true
-              fi
-              npm install --legacy-peer-deps --no-audit --fund=false || npm install --no-audit --fund=false
-              ;;
-          esac
-      - name: Install Chromium for Playwright
+        run: npm install --legacy-peer-deps --no-audit
+      - name: Install Playwright
         run: npx playwright install --with-deps chromium
-      - run: node scripts/seed-demo.js
-      - run: node scripts/session-stub.js
-      - run: npm run qa:e2e
+      - name: Run full e2e
+        run: npm run qa:full
       - name: Upload artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
@@ -150,5 +61,4 @@ jobs:
           path: |
             test-results/**
             playwright-report/**
-            playwright/.cache/**
           if-no-files-found: ignore
