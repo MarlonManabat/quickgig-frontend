@@ -7,6 +7,6 @@ export default defineConfig({
   reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],
   projects: [
     { name: 'smoke', testMatch: /smoke\.spec\.ts$/ },
-    { name: 'full-e2e', testMatch: /full\.e2e\.spec\.ts$/ }
+    { name: 'full-e2e', testMatch: /\.e2e\.spec\.ts$/ }
   ]
 })
