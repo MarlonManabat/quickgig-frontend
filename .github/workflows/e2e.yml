@@ -14,6 +14,7 @@ jobs:
       PLAYWRIGHT_APP_URL: https://app.quickgig.ph
       QA_TEST_MODE: "true"
       QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
+      QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,6 +44,7 @@ jobs:
       QA_TEST_MODE: "true"
       QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
       QA_TEST_EMAIL_ADMIN: ${{ secrets.QA_TEST_EMAIL_ADMIN || secrets.QA_TEST_EMAIL }}
+      QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
