@@ -1,10 +1,12 @@
 name: E2E
 
 on:
-  pull_request:
   push:
     branches: [ main ]
+  pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '15 7 * * *'   # daily 07:15 UTC
 
 jobs:
   smoke:

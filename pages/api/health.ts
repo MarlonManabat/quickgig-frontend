@@ -1,20 +1,15 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    return res.status(500).json({ ok: false, error: "Missing Supabase envs" });
-  }
-
-  try {
-    const r = await fetch(`${url}/rest/v1/`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
-    });
-    const ok = r.ok;
-    return res.status(ok ? 200 : 500).json({ ok, r: `${r.status} : ${r.status}` });
-  } catch (e: any) {
-    return res.status(500).json({ ok: false, error: String(e?.message ?? e) });
-  }
+  const env = {
+    NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+  };
+  res.status(200).json({
+    ok: env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    env,
+    commit: process.env.VERCEL_GIT_COMMIT_SHA || null,
+    ts: new Date().toISOString(),
+  });
 }
