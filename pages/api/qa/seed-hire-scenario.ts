@@ -19,32 +19,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
 
     // Upsert users + profiles
-    const createUser = async (email: string) => {
-      // Try to find an existing user
-      const { data: users } = await supa.auth.admin.listUsers({ email })
-      let uid = users?.users?.[0]?.id
-
-      if (!uid) {
-        const { data, error: createErr } = await supa.auth.admin.createUser({
-          email,
-          email_confirm: true,
-        })
-        if (createErr) throw createErr
-        uid = data.user?.id!
-      }
-
-      await supa.from('profiles').upsert({
-        id: uid,
+    const createOrFindUser = async (email: string) => {
+      // 1) Try to create the user (idempotent for our purposes)
+      const created = await supa.auth.admin.createUser({
         email,
-        full_name: email.split('@')[0],
-        is_admin: false,
+        email_confirm: true,
       })
 
-      return uid!
+      if (created.data?.user?.id) {
+        const uid = created.data.user.id
+        await supa.from('profiles').upsert({
+          id: uid,
+          email,
+          full_name: email.split('@')[0],
+          is_admin: false,
+        })
+        return uid
+      }
+
+      // 2) If already exists, search via listUsers pagination
+      let page = 1
+      const perPage = 200
+      while (true) {
+        const { data, error } = await supa.auth.admin.listUsers({ page, perPage })
+        if (error) throw error
+
+        const match = data.users.find(
+          (u) => (u.email ?? '').toLowerCase() === email.toLowerCase()
+        )
+        if (match) {
+          const uid = match.id
+          await supa.from('profiles').upsert({
+            id: uid,
+            email,
+            full_name: email.split('@')[0],
+            is_admin: false,
+          })
+          return uid
+        }
+
+        if (data.users.length < perPage) break
+        page += 1
+      }
+
+      throw new Error(`Could not create or find user for ${email}`)
     }
 
-    const employerId = await createUser(employerEmail)
-    const workerId = await createUser(workerEmail)
+    const employerId = await createOrFindUser(employerEmail)
+    const workerId = await createOrFindUser(workerEmail)
 
     // Make employer NOT admin and reset tickets to 0
     await supa.from('profiles').update({ is_admin: false }).eq('id', employerId)
