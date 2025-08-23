@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { supabase } from '@/utils/supabaseClient';
 import FormShell from '@/components/forms/FormShell';
 import EmailField from '@/components/forms/EmailField';
@@ -11,6 +12,7 @@ export default function AuthPage() {
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     focusFromQuery('focus', { email: '#email' });
@@ -21,9 +23,15 @@ export default function AuthPage() {
     setLoading(true);
     setStatus(null);
     setError(null);
-    const { error } = await supabase.auth.signInWithOtp({ email });
+    const next = (router.query.next as string) || '/find-work';
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    });
     if (error) {
-      setError('May problema sa pagpapadala. Paki-try uli.');
+      setError('Hindi valid ang login—paki-check ang email mo.');
     } else {
       setStatus(`Nagpadala kami ng Magic Link sa ${email}. I-open mo ang email mo at i-tap ang link para makapasok.`);
     }

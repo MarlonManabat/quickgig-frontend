@@ -57,8 +57,12 @@ export default function ProfilePage() {
     }
     try {
       if (avatar) {
+        if (!avatar.type.startsWith('image/')) {
+          throw new Error('Hindi ma-upload ang photo—paki-check ang file mo.');
+        }
         const up = await uploadImage('avatars', uid, avatar);
         await supabase.from('profiles').update({ avatar_url: up.publicUrl }).eq('id', uid);
+        setStatus('Na-upload na ang photo!');
       }
       const { error } = await supabase
         .from('profiles')
@@ -70,11 +74,11 @@ export default function ProfilePage() {
         return;
       }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Hindi ma-upload ang photo—paki-check ang file mo.');
       setSaving(false);
       return;
     }
-    setStatus('Saved!');
+    if (!avatar) setStatus('Saved!');
     setSaving(false);
     setTimeout(() => {
       if (onboarding) {
