@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { getUserId } from "../utils/session";
 import Input from '@/components/ui/Input';
+import Textarea from '@/components/ui/Textarea';
 import Button from '@/components/ui/Button';
 import Banner from '@/components/ui/Banner';
 
@@ -75,8 +76,7 @@ export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabe
           value={gig.title ?? ""}
           onChange={handleChange}
         />
-        <Input
-          as="textarea"
+        <Textarea
           rows={5}
           placeholder="Description"
           name="description"
