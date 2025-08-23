@@ -1,18 +1,8 @@
-import * as React from 'react';
+import { cn } from '@utils/cn';
+import React from 'react';
 
-interface ContainerProps {
-  children: React.ReactNode;
-  variant?: 'form' | 'content';
-  className?: string;
-}
+export const Container = ({ className, ...p }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div {...p} className={cn('mx-auto w-full max-w-[1100px] px-4 sm:px-6 md:px-8', className)} />
+);
 
-export default function Container({
-  children,
-  variant = 'content',
-  className = '',
-}: ContainerProps) {
-  const max = variant === 'form' ? 'max-w-[700px]' : 'max-w-6xl';
-  return (
-    <div className={`${max} mx-auto px-4 sm:px-6 lg:px-8 ${className}`.trim()}>{children}</div>
-  );
-}
+export default Container;

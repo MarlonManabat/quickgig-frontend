@@ -6,6 +6,7 @@ import NotificationsBell from './NotificationsBell';
 import { supabase } from '@/utils/supabaseClient';
 import { copy } from '@/copy';
 import { isAdmin } from '@/utils/admin';
+import Container from './Container';
 
 const links = [
   { href: '/gigs', label: copy.nav.findWork, id: 'nav-find' },
@@ -96,9 +97,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {user && <NotificationsBell />}
         </div>
       </header>
-      <main className="flex-1 container-page">
+      <main className="flex-1">
         {banner && <Banner kind="success">{banner}</Banner>}
-        {children}
+        <Container>{children}</Container>
       </main>
       <footer className="border-t border-brand-border text-center py-4 text-sm text-brand-subtle">
         © {new Date().getFullYear()} QuickGig.ph

@@ -6,7 +6,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className = '', ...props }, ref) => (
     <input
       ref={ref}
-      className={`w-full rounded-2xl border border-brand-border bg-surface-base px-3 py-2 text-brand-foreground placeholder-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-primary ${className}`.trim()}
+      className={`h-11 min-h-[44px] w-full rounded-xl border border-brand-border bg-surface-base px-4 text-base md:text-lg text-brand-foreground placeholder-brand-muted focus:outline-none focus:ring-2 focus:ring-brand-primary ${className}`.trim()}
       {...props}
     />
   )

@@ -1,5 +1,7 @@
-'use client';
+"use client";
 import { ReactNode } from 'react';
+import Container from '../Container';
+import { H1, P } from '../ui/Text';
 
 interface Props {
   title?: ReactNode;
@@ -9,10 +11,10 @@ interface Props {
 
 export default function FormShell({ title, description, children }: Props) {
   return (
-    <main className="mx-auto w-full max-w-[700px] px-4 sm:px-0">
-      {title && <h1 className="text-2xl font-semibold mb-2">{title}</h1>}
-      {description && <p className="mb-4 text-brand-subtle text-sm">{description}</p>}
+    <Container className="max-w-[700px] w-full">
+      {title && <H1 className="mb-2">{title}</H1>}
+      {description && <P className="mb-4 text-brand-subtle text-sm">{description}</P>}
       <div className="grid gap-4">{children}</div>
-    </main>
+    </Container>
   );
 }

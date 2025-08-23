@@ -51,10 +51,15 @@ export default function AuthPage() {
             autoFocus
           />
         </FieldRow>
-        <button type="submit" disabled={loading} aria-busy={loading} className="btn-primary w-full sm:w-auto">
+        <button
+          type="submit"
+          disabled={loading}
+          aria-busy={loading}
+          className="btn-primary w-full sm:w-auto h-11 rounded-xl"
+        >
           {loading ? '...' : 'Send Magic Link'}
         </button>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-[color:var(--text)]/80">{error}</p>}
       </form>
     </FormShell>
   );
