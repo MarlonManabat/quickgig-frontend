@@ -68,3 +68,8 @@ html, body { background: var(--surface, #fff); }
 @layer base {
   input[type="email"] { font-size: 16px; }
 }
+
+:where(a, button, [role="button"], input, select, textarea):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

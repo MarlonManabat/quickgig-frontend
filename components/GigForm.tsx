@@ -99,7 +99,14 @@ export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabe
         {onFileUpload && (
           <div>
             <input type="file" accept="image/*" onChange={handleFileChange} />
-            {gig.image_url && <img src={gig.image_url ?? ''} alt="Gig" className="mt-2 max-w-xs" />}
+            {gig.image_url && (
+              <img
+                src={gig.image_url ?? ''}
+                alt="Gig"
+                loading="lazy"
+                className="mt-2 max-w-xs"
+              />
+            )}
           </div>
         )}
         <Button type="submit">{submitLabel}</Button>
