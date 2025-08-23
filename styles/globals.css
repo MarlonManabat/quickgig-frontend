@@ -1,3 +1,4 @@
+html, body { background: var(--surface, #fff); }
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

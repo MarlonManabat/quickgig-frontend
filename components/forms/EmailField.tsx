@@ -35,7 +35,7 @@ const EmailField = React.forwardRef<HTMLInputElement, Props>(function EmailField
         inputMode="email"
         autoComplete="email"
         spellCheck={false}
-        className="block w-full min-w-0 rounded-lg border border-gray-300 bg-white px-3 py-2 text-base leading-6 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-transparent focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-60"
+        className="block h-11 w-full min-w-0 rounded-xl border border-gray-300 bg-white px-4 text-base md:text-lg leading-6 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-transparent focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-60"
         aria-invalid={!!error}
         aria-describedby={describedBy}
         {...rest}
@@ -46,7 +46,7 @@ const EmailField = React.forwardRef<HTMLInputElement, Props>(function EmailField
         </p>
       )}
       {error && (
-        <p id={errorId} className="mt-1 text-sm text-red-600">
+        <p id={errorId} className="mt-1 text-sm text-[color:var(--text)]/80">
           {error}
         </p>
       )}
