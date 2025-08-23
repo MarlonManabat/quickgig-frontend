@@ -5,6 +5,8 @@ import { supabase } from '@/utils/supabaseClient';
 import Banner from '@/components/ui/Banner';
 import { getProfile } from '@/utils/session';
 import { copy } from '@/copy';
+import FormShell from '@/components/FormShell';
+import EmailField from '@/components/fields/EmailField';
 
 export default function AuthPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -41,36 +43,31 @@ export default function AuthPage() {
   }
 
   return (
-    <main className="max-w-xl w-full mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-4">
-        {mode === 'login' ? copy.auth.loginTitle : copy.auth.signupTitle}
-      </h1>
+    <FormShell title={mode === 'login' ? copy.auth.loginTitle : copy.auth.signupTitle}>
       {msg && <Banner kind="success">{msg}</Banner>}
       {err && <Banner kind="error">{err}</Banner>}
       <form onSubmit={onSubmit} className="space-y-4">
+        <EmailField
+          id="email"
+          label={copy.auth.email}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
         <div>
-          <label htmlFor="email" className="block text-sm font-medium">{copy.auth.email}</label>
-          <input
-            id="email"
-            type="email"
-            className="w-full"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium">{copy.auth.password}</label>
+          <label htmlFor="password" className="block text-sm font-medium mb-1">
+            {copy.auth.password}
+          </label>
           <input
             id="password"
             type="password"
-            className="w-full"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="w-full text-base md:text-lg leading-6 px-3 py-3 border rounded-lg"
           />
         </div>
-        <button type="submit" disabled={loading} aria-busy={loading} className="btn-primary px-4 py-2 rounded">
+        <button type="submit" disabled={loading} aria-busy={loading} className="btn-primary">
           {loading ? '...' : mode === 'login' ? copy.auth.login : copy.auth.signup}
         </button>
       </form>
@@ -80,6 +77,6 @@ export default function AuthPage() {
           {mode === 'login' ? copy.auth.signup : copy.auth.login}
         </button>
       </p>
-    </main>
+    </FormShell>
   );
 }
