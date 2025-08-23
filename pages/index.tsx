@@ -17,21 +17,28 @@ export default function Home() {
       <p>Connect with opportunities — find work or hire talent quickly.</p>
       <div className="flex justify-center gap-4">
         <Link
-          href="/gigs"
-          className="btn-primary cta-find"
-          data-testid="cta-find"
+          href="/gigs?focus=search"
+          className="btn-primary"
+          data-testid="cta-findwork"
         >
           {copy.nav.findWork}
         </Link>
         {canPost && (
           <Link
-            href="/gigs/new"
-            className="btn-secondary cta-post"
-            data-testid="cta-post"
+            href="/gigs/new?focus=title"
+            className="btn-secondary"
+            data-testid="cta-postjob"
           >
             {copy.nav.postJob}
           </Link>
         )}
+        <Link
+          href="/auth?focus=email"
+          className="btn-secondary"
+          data-testid="cta-auth"
+        >
+          Sign up / Mag-login
+        </Link>
       </div>
     </Card>
   );

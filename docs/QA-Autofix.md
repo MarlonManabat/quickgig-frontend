@@ -24,3 +24,25 @@ PR10 uses SWR for conditional fetch. Applications detail embeds:
 ## Admin seeding
 
 Set `SEED_ADMIN_EMAIL` locally and in CI so an account is marked as admin during seeding.
+
+## Forms
+
+Standard form components live in `components/forms`:
+
+```
+<FormShell title="...">
+  <EmailField id="email" label="Email address" value={email} onChange={...} />
+</FormShell>
+```
+
+Inputs use responsive full-width classes and a `min-w-0` wrapper via `FieldRow` to prevent clipping.
+
+### CTA focus convention
+
+CTA links can pass `?focus=` in the query string. Destination pages call `focusFromQuery` to focus a selector:
+
+```
+focusFromQuery('focus', { email: '#email', search: '#search', title: '#title' });
+```
+
+QA screenshots should capture the focused field after navigation when testing CTAs.

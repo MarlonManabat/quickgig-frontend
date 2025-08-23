@@ -68,6 +68,7 @@ export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabe
       {message && <Banner kind="error" className="md:col-span-2">{message}</Banner>}
       <div className="space-y-3 md:col-span-1">
         <Input
+          id="title"
           className=""
           placeholder="Title"
           name="title"
