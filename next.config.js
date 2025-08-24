@@ -5,6 +5,7 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/find', destination: '/', permanent: true },
+      { source: '/post', destination: '/', permanent: false },
       { source: '/login', destination: '/', permanent: true },
       { source: '/signup', destination: '/', permanent: true },
     ];
