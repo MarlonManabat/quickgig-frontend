@@ -39,14 +39,20 @@ export function useSeekerApplications(userId?: string) {
             const app: any = { id: r.id, status: r.status, [c.jobCol]: r[c.jobCol] };
 
             if (r[c.jobCol] && c.titleJoin) {
-              const { data: t } = await supabase
-                .from(c.titleJoin.table)
-                .select(`${c.titleJoin.titleCol}`)
-                .eq(c.titleJoin.idCol as any, r[c.jobCol])
-                .maybeSingle();
+              try {
+                // Fully opt-out of generics to prevent recursive type instantiation
+                const tRes: any = await (supabase as any)
+                  .from(c.titleJoin.table as any)
+                  .select(c.titleJoin.titleCol as any)
+                  .eq(c.titleJoin.idCol as any, r[c.jobCol] as any)
+                  .maybeSingle();
 
-              if (t && t[c.titleJoin.titleCol] != null) {
-                app[c.titleJoin.mapTo] = t[c.titleJoin.titleCol];
+                const titleVal = tRes?.data?.[c.titleJoin.titleCol];
+                if (titleVal != null) {
+                  (app as any)[c.titleJoin.mapTo] = titleVal;
+                }
+              } catch {
+                // ignore hydration errors; app row still renders
               }
             }
 
