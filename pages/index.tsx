@@ -4,12 +4,22 @@ import Card from '@/components/ui/Card';
 import { H1, P } from '@/components/ui/Text';
 import { getProfile } from '@/utils/session';
 import { copy } from '@/copy';
+import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/router';
 
 export default function Home() {
   const [canPost, setCanPost] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     getProfile().then((p) => setCanPost(!!p?.can_post_job));
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) router.replace('/home');
+    })();
   }, []);
 
   return (

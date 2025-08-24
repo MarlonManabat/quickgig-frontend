@@ -22,7 +22,7 @@ export default function AuthCallback() {
       if (!user) { router.replace('/'); return }
       const { data: prof } = await supabase.from('profiles')
         .select('full_name').eq('id', user.id).maybeSingle()
-      router.replace(!prof?.full_name ? '/profile' : '/')
+      router.replace(!prof?.full_name ? '/profile' : '/home')
     }
     run()
     // eslint-disable-next-line react-hooks/exhaustive-deps

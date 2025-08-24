@@ -26,7 +26,7 @@ export default function AuthPage() {
     setError(null);
     const intended = router.query?.next as string | undefined;
     try {
-      localStorage.setItem('postAuthRedirect', intended || '/profile');
+      localStorage.setItem('postAuthRedirect', intended || '/home');
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
