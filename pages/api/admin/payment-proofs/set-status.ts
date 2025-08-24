@@ -7,6 +7,8 @@ export default async function handler(req:NextApiRequest,res:NextApiResponse){
   const supabase = createServerSupabaseClient({ req, res })
   const { data:{ user } } = await supabase.auth.getUser()
   if (!user) return res.status(401).end()
+  const allowed = (process.env.ADMIN_EMAILS||'').split(',').map(e=>e.trim().toLowerCase()).filter(Boolean)
+  if (!allowed.includes((user.email||'').toLowerCase())) return res.status(404).end('Not Found')
   const { id, status, reason } = req.body||{}
   if (!['approved','flagged'].includes(status)) return res.status(400).json({error:'invalid status'})
 

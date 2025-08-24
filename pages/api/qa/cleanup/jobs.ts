@@ -8,6 +8,7 @@ function assertQA(req: NextApiRequest) {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (process.env.QA_ENABLED !== 'true') return res.status(404).end('Not Found');
   try {
     assertQA(req);
     const { titlePrefix } = req.body || {};

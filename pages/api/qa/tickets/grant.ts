@@ -24,6 +24,7 @@ async function findUserId(supa: any, email: string): Promise<string> {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (process.env.QA_ENABLED !== 'true') return res.status(404).end('Not Found');
   try {
     assertQA(req);
     const { email, amount } = req.body || {};
