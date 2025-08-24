@@ -22,9 +22,9 @@ export default function Nav() {
 
   return (
     <nav className="p-4 border-b mb-4 flex gap-4">
-      <Link href="/">Home</Link>
-      <Link href="/find-work">{copy.nav.findWork}</Link>
-      <Link href="/post-job">{copy.nav.postJob}</Link>
+      <Link href="/home">Home</Link>
+      <Link href="/find">{copy.nav.findWork}</Link>
+      <Link href="/post">{copy.nav.postJob}</Link>
       {session ? (
         <button onClick={logout}>Logout</button>
       ) : (
