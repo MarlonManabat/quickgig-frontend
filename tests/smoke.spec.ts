@@ -5,19 +5,18 @@ const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ??
   'https://app.quickgig.ph';
 
-// Accept root (with optional query/fragment)
-const rootRe = new RegExp(
-  `^${APP_URL.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}/?(?:[?#].*)?$`,
-  'i'
-);
+const esc = (s: string) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+const base = APP_URL.replace(/\/+$/, '');
 
-// TEMP: accept legacy /post as we roll out landing change + app redirect
-const postRe = new RegExp(
-  `^${APP_URL.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}/post(?:[?#].*)?$`,
-  'i'
-);
+// Accept root with optional query/fragment
+const rootRe = new RegExp(`^${esc(base)}/?(?:[?#].*)?$`, 'i');
 
-const acceptable = (href: string) => rootRe.test(href) || postRe.test(href); // TODO: remove postRe soon
+// TEMP: accept legacy routes while caches/CDN propagate, remove soon.
+const findRe = new RegExp(`^${esc(base)}/find(?:[?#].*)?$`, 'i');
+const postRe = new RegExp(`^${esc(base)}/post(?:[?#].*)?$`, 'i');
+
+const acceptable = (href: string | null | undefined) =>
+  !!href && (rootRe.test(href) || findRe.test(href) || postRe.test(href)); // TODO: drop findRe & postRe
 
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -26,39 +25,21 @@ test.beforeEach(async ({ page }) => {
 test('landing → app header visible', async ({ page }) => {
   await page.goto('https://quickgig.ph');
 
-  // ---- Find work CTA (accept: "Find work" | "Browse jobs" | "Maghanap ng Trabaho") ----
-  const ctaText = /find work|browse jobs|maghanap ng trabaho/i;
-  const cta = page.locator('a,button').filter({ hasText: ctaText }).first();
-  await expect(cta).toBeVisible({ timeout: 10000 });
-  const tag = await cta.evaluate((n) => n.tagName.toLowerCase());
-
-  if (tag === 'a') {
+  const checkCta = async (name: RegExp) => {
+    const cta = page.getByRole('link', { name }).first();
+    await expect(cta).toBeVisible({ timeout: 10000 });
     const href = await cta.getAttribute('href');
-    console.log('[smoke] Found CTA link:', href);
-    expect(acceptable(href ?? '')).toBeTruthy(); // TODO: tighten to rootRe only after deploy settles
-  } else {
+    console.log('[smoke] CTA href:', href);
+    expect(acceptable(href)).toBeTruthy(); // TEMP relaxed
     await Promise.all([
       page.waitForURL(rootRe, { timeout: 10_000 }),
       cta.click(),
     ]);
     await page.goBack({ waitUntil: 'load' }).catch(() => {});
-  }
+  };
 
-  // ---- Post job CTA ----
-  const postCta = page.locator('a,button').filter({ hasText: /post job/i }).first();
-  await expect(postCta).toBeVisible({ timeout: 10000 });
-  const postTag = await postCta.evaluate((n) => n.tagName.toLowerCase());
-  if (postTag === 'a') {
-    const href = await postCta.getAttribute('href');
-    console.log('[smoke] Found CTA link:', href);
-    expect(acceptable(href ?? '')).toBeTruthy(); // TODO: tighten to rootRe only after deploy settles
-  } else {
-    await Promise.all([
-      page.waitForURL(rootRe, { timeout: 10_000 }),
-      postCta.click(),
-    ]);
-    await page.goBack({ waitUntil: 'load' }).catch(() => {});
-  }
+  await checkCta(/find work|browse jobs|maghanap ng trabaho/i);
+  await checkCta(/post job/i);
 
   // ---- Header logo (prefer href, else click) ----
   const logoLink = page
@@ -67,7 +48,7 @@ test('landing → app header visible', async ({ page }) => {
   if (await logoLink.isVisible().catch(() => false)) {
     await expect(logoLink).toBeVisible({ timeout: 10000 });
     const href = await logoLink.getAttribute('href');
-    console.log('[smoke] Found logo link:', href);
+    console.log('[smoke] Logo href:', href);
     expect(href, 'href should exist').not.toBeNull();
     expect(href!).toMatch(rootRe);
   } else {
