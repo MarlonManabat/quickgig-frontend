@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { stubSignIn } from './utils/session';
 
 const APP_URL =
   process.env.APP_URL ??
@@ -60,4 +61,10 @@ test('landing → app header visible', async ({ page }) => {
       logoBtn.click(),
     ]);
   }
+});
+
+test('app notifications bell visible after login', async ({ page }) => {
+  await stubSignIn(page);
+  await page.goto(APP_URL + '/');
+  await expect(page.locator('a[aria-label="Notifications"]')).toBeVisible();
 });

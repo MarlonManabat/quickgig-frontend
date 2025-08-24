@@ -104,3 +104,87 @@ export async function emitNotification(p: NotifPayload) {
 
   await sendEmail({ to, subject, html })
 }
+
+export type NotifyEvent =
+  | { type: 'job_posted'; jobId: string; actorUserId: string; targetUserIds: string[] }
+  | {
+      type: 'job_applied'
+      jobId: string
+      applicationId: string
+      actorUserId: string
+      targetUserIds: string[]
+    }
+  | {
+      type: 'payment_approved'
+      actorUserId: string
+      targetUserId: string
+      ticketsAdded: number
+    }
+  | {
+      type: 'payment_rejected'
+      actorUserId: string
+      targetUserId: string
+      reason?: string
+    }
+
+export async function sendNotification(evt: NotifyEvent): Promise<void> {
+  switch (evt.type) {
+    case 'job_posted': {
+      const link = `${process.env.NEXT_PUBLIC_APP_URL}/gigs/${evt.jobId}`
+      await Promise.all(
+        evt.targetUserIds.map((uid) =>
+          emitNotification({
+            userId: uid,
+            type: 'job_completed',
+            title: 'New job posted',
+            body: 'A new job was posted.',
+            link
+          })
+        )
+      )
+      break
+    }
+    case 'job_applied': {
+      const link = `${process.env.NEXT_PUBLIC_APP_URL}/applications/${evt.applicationId}`
+      await Promise.all(
+        evt.targetUserIds.map((uid) =>
+          emitNotification({
+            userId: uid,
+            type: 'offer_sent',
+            title: 'New application received',
+            body: 'Someone applied to your job.',
+            link
+          })
+        )
+      )
+      break
+    }
+    case 'payment_approved': {
+      const link = `${process.env.NEXT_PUBLIC_APP_URL}/account/wallet`
+      await emitNotification({
+        userId: evt.targetUserId,
+        type: 'gcash_approved',
+        title: 'GCash top-up approved',
+        body: `We added ${evt.ticketsAdded} ticket(s) to your balance. Salamat!`,
+        link,
+        uniq: `gcash_approved:${evt.actorUserId}:${evt.targetUserId}`
+      })
+      break
+    }
+    case 'payment_rejected': {
+      const link = `${process.env.NEXT_PUBLIC_APP_URL}/account/wallet`
+      const body = `We couldn't verify your GCash payment.${
+        evt.reason ? ` Reason: ${evt.reason}` : ''
+      }`
+      await emitNotification({
+        userId: evt.targetUserId,
+        type: 'gcash_rejected',
+        title: 'GCash top-up rejected',
+        body,
+        link,
+        uniq: `gcash_rejected:${evt.actorUserId}:${evt.targetUserId}`
+      })
+      break
+    }
+  }
+}

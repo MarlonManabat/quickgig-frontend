@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { emitNotification } from '@/lib/notifications'
+import { sendNotification } from '@/lib/notifications'
 
 export default async function handler(req:NextApiRequest,res:NextApiResponse){
   if (req.method!=='POST') return res.status(405).end()
@@ -19,23 +19,19 @@ export default async function handler(req:NextApiRequest,res:NextApiResponse){
   const qty = Number(process.env.NEXT_PUBLIC_TICKETS_PER_PROOF || '0')
   if (employerId) {
     if (status === 'approved') {
-      await emitNotification({
-        userId: employerId,
-        type: 'gcash_approved',
-        title: 'GCash top-up approved',
-        body: `We added ${qty} ticket(s) to your balance. Salamat!`,
-        link: `${process.env.NEXT_PUBLIC_APP_URL}/account/wallet`,
-        uniq: `gcash_approved:${id}`,
+      await sendNotification({
+        type: 'payment_approved',
+        actorUserId: user.id,
+        targetUserId: employerId,
+        ticketsAdded: qty,
       })
     }
     if (status === 'flagged') {
-      await emitNotification({
-        userId: employerId,
-        type: 'gcash_rejected',
-        title: 'GCash top-up rejected',
-        body: `We couldn’t verify your GCash payment. Reason: ${reason || 'N/A'}. You can resubmit from your wallet.`,
-        link: `${process.env.NEXT_PUBLIC_APP_URL}/account/wallet`,
-        uniq: `gcash_rejected:${id}`,
+      await sendNotification({
+        type: 'payment_rejected',
+        actorUserId: user.id,
+        targetUserId: employerId,
+        reason,
       })
     }
   }
