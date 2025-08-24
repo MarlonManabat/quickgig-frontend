@@ -35,16 +35,22 @@ export function useSeekerApplications(userId?: string) {
         if (!error && data) {
           const rows: Application[] = [];
           for (const r of data as any[]) {
-            const app: Application = { id: r.id, status: r.status, [c.jobCol]: r[c.jobCol] };
+            // Build with 'any' to avoid recursive/union explosion in TS
+            const app: any = { id: r.id, status: r.status, [c.jobCol]: r[c.jobCol] };
+
             if (r[c.jobCol] && c.titleJoin) {
               const { data: t } = await supabase
                 .from(c.titleJoin.table)
                 .select(`${c.titleJoin.titleCol}`)
                 .eq(c.titleJoin.idCol as any, r[c.jobCol])
                 .maybeSingle();
-              if (t?.[c.titleJoin.titleCol]) (app as any)[c.titleJoin.mapTo] = t[c.titleJoin.titleCol];
+
+              if (t && t[c.titleJoin.titleCol] != null) {
+                app[c.titleJoin.mapTo] = t[c.titleJoin.titleCol];
+              }
             }
-            rows.push(app);
+
+            rows.push(app as Application);
           }
           if (!cancelled) {
             setApps(rows);
