@@ -1,15 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 const APP_URL = process.env.APP_URL ?? 'https://app.quickgig.ph';
-const appRootRe = new RegExp(`^${APP_URL.replace('.', '\.').replace('/', '\/')}\/?(?:[?#].*)?$`, 'i');
-const appRootOrFindRe = new RegExp(
-  `^${APP_URL.replace('.', '\.').replace('/', '\/')}(?:/(?:find)?/?)?(?:[?#].*)?$`,
-  'i',
-);
-const appPostRe = new RegExp(
-  `^${APP_URL.replace('.', '\.').replace('/', '\/')}/post\/?(?:[?#].*)?$`,
-  'i',
-);
+const escapeRe = (url: string) => url.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+const appRootRe = new RegExp(`^${escapeRe(APP_URL)}\\/?$`, 'i');
+const appRootOrFindRe = new RegExp(`^${escapeRe(APP_URL)}/(find)?$`, 'i');
+const appRootOrPostRe = new RegExp(`^${escapeRe(APP_URL)}/(post)?$`, 'i');
 
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -44,12 +39,12 @@ test('landing → app header visible', async ({ page }) => {
     const href = await postJobLink.getAttribute('href');
     console.log('[smoke] Found CTA link:', href);
     expect(href, 'href should exist').not.toBeNull();
-    expect(href!).toMatch(appPostRe);
+    expect(href!).toMatch(appRootOrPostRe);
   } else {
     const postJobBtn = page.getByRole('button', { name: /post job/i });
     await expect(postJobBtn).toBeVisible();
     await Promise.all([
-      page.waitForURL(appPostRe),
+      page.waitForURL(appRootOrPostRe),
       postJobBtn.click(),
     ]);
     await page.goBack({ waitUntil: 'load' }).catch(() => {});
