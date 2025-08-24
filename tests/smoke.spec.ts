@@ -1,15 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 const APP_URL = process.env.APP_URL ?? 'https://app.quickgig.ph';
-const appRootRe = new RegExp(`^${APP_URL.replace('.', '\.').replace('/', '\/')}\/?(?:[?#].*)?$`, 'i');
-const appRootOrFindRe = new RegExp(
-  `^${APP_URL.replace('.', '\.').replace('/', '\/')}(?:/(?:find)?/?)?(?:[?#].*)?$`,
-  'i',
-);
-const appPostRe = new RegExp(
-  `^${APP_URL.replace('.', '\.').replace('/', '\/')}/post\/?(?:[?#].*)?$`,
-  'i',
-);
+const escapedAppUrl = APP_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const appRootRe = new RegExp('^' + escapedAppUrl + '/?$', 'i');
+const appPostRe = new RegExp('^' + escapedAppUrl + '/post/?$', 'i');
 
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -20,19 +14,18 @@ test('landing → app header visible', async ({ page }) => {
 
   // ---- Find work CTA (accept: "Find work" | "Browse jobs" | "Maghanap ng Trabaho") ----
   const ctaText = /find work|browse jobs|maghanap ng trabaho/i;
-  const findWorkLink = page.getByRole('link', { name: ctaText });
-  if (await findWorkLink.isVisible().catch(() => false)) {
-    await expect(findWorkLink).toBeVisible();
-    const href = await findWorkLink.getAttribute('href');
-    console.log('[smoke] Found CTA link:', href);
-    expect(href, 'href should exist').not.toBeNull();
-    expect(href!).toMatch(appRootOrFindRe);
+  const findWorkCta = page.locator('a,button').filter({ hasText: ctaText }).first();
+  await expect(findWorkCta).toBeVisible({ timeout: 15000 });
+  const ctaTag = await findWorkCta.evaluate(n => n.tagName.toLowerCase());
+  if (ctaTag === 'a') {
+    const href = await findWorkCta.getAttribute('href');
+    console.log('[smoke] CTA <a> href:', href);
+    await expect(findWorkCta).toHaveAttribute('href', appRootRe);
   } else {
-    const findWorkBtn = page.getByRole('button', { name: ctaText });
-    await expect(findWorkBtn).toBeVisible();
+    console.log('[smoke] CTA <' + ctaTag + '> click');
     await Promise.all([
-      page.waitForURL(appRootOrFindRe),
-      findWorkBtn.click(),
+      page.waitForURL(appRootRe, { timeout: 15000 }),
+      findWorkCta.click(),
     ]);
     await page.goBack({ waitUntil: 'load' }).catch(() => {});
   }
@@ -56,21 +49,20 @@ test('landing → app header visible', async ({ page }) => {
   }
 
   // ---- Header logo (prefer href, else click) ----
-  const logoLink = page
-    .locator('a[aria-label="QuickGig"], a[aria-label="QuickGig.ph"], header a:has(img)')
+  const headerLogo = page
+    .locator('header a:has(img), header button:has(img), header a:has-text(/QuickGig(\\.ph)?/i), header button:has-text(/QuickGig(\\.ph)?/i)')
     .first();
-  if (await logoLink.isVisible().catch(() => false)) {
-    await expect(logoLink).toBeVisible();
-    const href = await logoLink.getAttribute('href');
-    console.log('[smoke] Found logo link:', href);
-    expect(href, 'href should exist').not.toBeNull();
-    expect(href!).toMatch(appRootRe);
+  await expect(headerLogo).toBeVisible({ timeout: 15000 });
+  const logoTag = await headerLogo.evaluate(n => n.tagName.toLowerCase());
+  if (logoTag === 'a') {
+    const href = await headerLogo.getAttribute('href');
+    console.log('[smoke] Logo <a> href:', href);
+    await expect(headerLogo).toHaveAttribute('href', appRootRe);
   } else {
-    const logoBtn = page.locator('header button:has(img)').first();
-    await expect(logoBtn).toBeVisible();
+    console.log('[smoke] Logo <' + logoTag + '> click');
     await Promise.all([
-      page.waitForURL(appRootRe),
-      logoBtn.click(),
+      page.waitForURL(appRootRe, { timeout: 15000 }),
+      headerLogo.click(),
     ]);
   }
 });
