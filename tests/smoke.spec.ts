@@ -80,3 +80,11 @@ test(
     await expect(bell).toBeVisible();
   },
 );
+
+test('wallet submit visible after login (skips if no demo creds)', async ({ page }) => {
+  const email = getDemoEmail('user');
+  test.skip(!email, 'No demo user email available via env or optional fixture');
+  await stubSignIn(page, email!);
+  await page.goto(APP_URL + '/wallet');
+  await expect(page.getByTestId('submit-receipt')).toBeVisible();
+});

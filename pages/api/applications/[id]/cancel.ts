@@ -8,5 +8,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!user) { res.status(401).json({ error: 'unauthorized' }); return; }
   const { error } = await supabase.rpc('app_cancel', { p_app_id: req.query.id })
   if (error) { res.status(400).json({ error: error.message }); return; }
+  await supabase.rpc('rpc_refund_match_tickets', {
+    p_match: req.query.id,
+  }).catch(() => {});
   res.json({ ok: true })
 }
