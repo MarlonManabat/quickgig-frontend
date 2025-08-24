@@ -1,5 +1,5 @@
+import 'server-only'
 import { Resend } from 'resend'
-import nodemailer from 'nodemailer'
 import { createClient } from '@supabase/supabase-js'
 
 const FROM = process.env.NOTIF_EMAIL_FROM || 'QuickGig <no-reply@quickgig.ph>'
@@ -10,21 +10,39 @@ const SMTP_PASS = process.env.SMTP_PASS
 const SMTP_PORT = Number(process.env.SMTP_PORT || '587')
 const SMTP_SECURE = (process.env.SMTP_SECURE || 'false') === 'true'
 
-function emailTransport() {
-  if (RESEND_API_KEY) return new Resend(RESEND_API_KEY)
-  if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
-    return nodemailer.createTransport({
-      host: SMTP_HOST, port: SMTP_PORT, secure: SMTP_SECURE,
-      auth: { user: SMTP_USER, pass: SMTP_PASS }
-    })
+async function createSmtpTransport() {
+  const mod = await import('nodemailer')
+  return mod.default({
+    host: SMTP_HOST!,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE,
+    auth: { user: SMTP_USER!, pass: SMTP_PASS! }
+  })
+}
+
+async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
+  if (RESEND_API_KEY) {
+    const resend = new Resend(RESEND_API_KEY)
+    await resend.emails.send({ from: FROM, to, subject, html })
+    return
   }
-  return null
+  if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
+    const tx = await createSmtpTransport()
+    await tx.sendMail({ from: FROM, to, subject, html })
+    return
+  }
+  console.log('[notif/email disabled]', { to, subject })
 }
 
 export type NotifPayload = {
   userId: string
   email?: string
-  type: 'offer_sent'|'offer_accepted'|'job_completed'|'gcash_approved'|'gcash_rejected'
+  type:
+    | 'offer_sent'
+    | 'offer_accepted'
+    | 'job_completed'
+    | 'gcash_approved'
+    | 'gcash_rejected'
   title: string
   body: string
   link?: string
@@ -52,18 +70,25 @@ export async function emitNotification(p: NotifPayload) {
     .select()
     .maybeSingle()
 
-  if (insErr && !(`${insErr.message}`.includes('duplicate key') || `${insErr.details}`.includes('already exists'))) {
+  if (
+    insErr &&
+    !(`${insErr.message}`.includes('duplicate key') ||
+      `${insErr.details}`.includes('already exists'))
+  ) {
     throw insErr
   }
 
-  const tx = emailTransport()
   let to = p.email
   if (!to) {
-    const { data: prof } = await supa.from('profiles').select('email').eq('id', p.userId).maybeSingle()
+    const { data: prof } = await supa
+      .from('profiles')
+      .select('email')
+      .eq('id', p.userId)
+      .maybeSingle()
     to = prof?.email || undefined
   }
-  if (!tx || !to) {
-    console.log('[notif]', p.type, '→', to || p.userId, '|', p.title)
+  if (!to) {
+    console.log('[notif]', p.type, '→', p.userId, '|', p.title)
     return
   }
 
@@ -77,9 +102,5 @@ export async function emitNotification(p: NotifPayload) {
     </div>
   `
 
-  if (RESEND_API_KEY) {
-    await (tx as Resend).emails.send({ from: FROM, to, subject, html })
-  } else {
-    await (tx as nodemailer.Transporter).sendMail({ from: FROM, to, subject, html })
-  }
+  await sendEmail({ to, subject, html })
 }
