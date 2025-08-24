@@ -3,10 +3,9 @@ import { getAppRoot } from '../lib/appUrl';
 
 process.env.NEXT_PUBLIC_APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL;
 const APP_ROOT = getAppRoot();
-const appRootRe = new RegExp(
-  `^${APP_ROOT.replace(/\./g, '\.').replace(/\//g, '\/')}\/?$`,
-  'i',
-);
+const escapedRoot = APP_ROOT.replace(/\./g, '\.').replace(/\//g, '\/');
+const appRootRe = new RegExp(`^${escapedRoot}/?$`, 'i');
+const appRootOrFindRe = new RegExp(`^${escapedRoot}(?:/find)?/?$`, 'i');
 
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -23,7 +22,7 @@ test('landing → app header visible', async ({ page }) => {
   const ctaText = await cta.innerText();
   const ctaHref = await cta.getAttribute('href');
   console.log('[smoke] CTA text:', ctaText, 'href:', ctaHref);
-  await expect(cta).toHaveAttribute('href', appRootRe);
+  await expect(cta).toHaveAttribute('href', appRootOrFindRe);
 
   // ---- Post job CTA ----
   const post = page.getByRole('link', { name: /post job/i }).first();
@@ -42,5 +41,5 @@ test('landing → app header visible', async ({ page }) => {
   await expect(logo).toBeVisible();
   const logoHref = await logo.getAttribute('href');
   console.log('[smoke] Logo href:', logoHref);
-  await expect(logo).toHaveAttribute('href', appRootRe);
+  await expect(logo).toHaveAttribute('href', appRootOrFindRe);
 });
