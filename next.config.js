@@ -4,9 +4,9 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },        // prevent CI failing on eslint/parser fetch
   async redirects() {
     return [
+      { source: '/find', destination: '/', permanent: true },
       { source: '/login', destination: '/', permanent: true },
       { source: '/signup', destination: '/', permanent: true },
-      { source: '/find', destination: '/', permanent: true },
     ];
   },
 };
