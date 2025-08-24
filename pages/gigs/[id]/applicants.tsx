@@ -13,6 +13,7 @@ export default function Applicants() {
 
   const [rows, setRows] = useState<any[]>([]);
   const [gig, setGig] = useState<any>(null);
+  const [balance, setBalance] = useState<number>(0);
 
   useEffect(() => {
     if (!ready || !id) return;
@@ -33,6 +34,18 @@ export default function Applicants() {
     })();
   }, [ready, id]);
 
+  useEffect(() => {
+    if (!ready || !userId) return;
+    (async () => {
+      const { data } = await supabase
+        .from('tickets_balances')
+        .select('balance')
+        .eq('user_id', userId)
+        .maybeSingle();
+      setBalance(data?.balance ?? 0);
+    })();
+  }, [ready, userId]);
+
   async function setStatus(appId: number, status: "accepted"|"rejected") {
     if (status === 'accepted') {
       const { data: ok, error } = await supabase.rpc('debit_tickets', { p_user: userId, p_reason: 'hire', p_ref: appId })
@@ -41,6 +54,7 @@ export default function Applicants() {
         router.push('/pay')
         return
       }
+      setBalance(b => b - 1)
     }
     await supabase.from("applications").update({ status }).eq("id", appId);
     setRows((r)=>r.map(x=>x.id===appId?{...x,status}:x));
@@ -81,7 +95,14 @@ export default function Applicants() {
                   {unread && <span className="w-2 h-2 rounded-full bg-brand-warning" />}
                   <Link href={`/applications/${a.id}`} className="btn-secondary">Open Thread</Link>
                   {a.status !== 'accepted' && (
-                    <button onClick={() => setStatus(a.id, 'accepted')} className="btn bg-brand-success text-white">Accept</button>
+                    <button
+                      onClick={() => setStatus(a.id, 'accepted')}
+                      disabled={balance <= 0}
+                      title={balance <= 0 ? 'Kulang ang tickets — bumili muna.' : undefined}
+                      className={`btn bg-brand-success text-white${balance <= 0 ? ' opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      Accept
+                    </button>
                   )}
                   {a.status !== 'rejected' && (
                     <button onClick={() => setStatus(a.id, 'rejected')} className="btn-danger">Reject</button>

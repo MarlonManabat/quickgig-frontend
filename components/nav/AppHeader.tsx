@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/utils/supabaseClient'
 import AppHeaderNotifications from '@/components/AppHeaderNotifications'
+import AppHeaderTickets from '@/components/AppHeaderTickets'
 import AppLogo from '@/components/AppLogo'
 
 export default function AppHeader(){
@@ -43,6 +44,7 @@ export default function AppHeader(){
               <span className="ml-2 px-2 py-0.5 rounded-full bg-black text-white text-xs">{balance}</span>
             </Link>
           )}
+          <AppHeaderTickets />
           <AppHeaderNotifications />
         </nav>
         <details className="md:hidden">

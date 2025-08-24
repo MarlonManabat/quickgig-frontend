@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
+import AppHeaderTickets from "@/components/AppHeaderTickets";
 import { copy } from "@/copy";
 import { TICKET_PRICE_PHP } from "@/lib/payments";
 
@@ -31,6 +32,7 @@ export default function TopNav() {
           {loggedIn && <Link href="/dashboard/gigs">{copy.nav.myGigs}</Link>}
           {loggedIn && <Link href="/applications">{copy.nav.applications}</Link>}
           {loggedIn && <Link href="/saved">{copy.nav.saved}</Link>}
+          {loggedIn && <AppHeaderTickets />}
           {loggedIn && <AppHeaderNotifications />}
           {loggedIn && !eligible && (
             <Link href="/checkout" className="btn-primary">
