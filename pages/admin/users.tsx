@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import AdminTable from '@/components/AdminTable';
-import { listUsers, suspendUser, unsuspendUser } from '@/lib/admin';
+import { listUsers, suspendUser, unsuspendUser, purgeUserContent } from '@/lib/admin';
 
 export default function AdminUsers() {
   const [rows, setRows] = useState<any[]>([]);
@@ -26,6 +26,12 @@ export default function AdminUsers() {
     await load();
   };
 
+  const handlePurge = async (id: string) => {
+    const days = Number(process.env.ACCOUNT_RETENTION_DAYS ?? 30);
+    await purgeUserContent(id, days);
+    await load();
+  };
+
   return (
     <main className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Users</h1>
@@ -41,6 +47,8 @@ export default function AdminUsers() {
             <th>Email</th>
             <th>Role</th>
             <th>Suspended</th>
+            <th>Delete requested</th>
+            <th>Deleted</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -50,7 +58,18 @@ export default function AdminUsers() {
               <td>{u.email}</td>
               <td>{u.role}</td>
               <td>{u.suspended_at ? 'yes' : 'no'}</td>
+              <td>{u.delete_requested_at ? new Date(u.delete_requested_at).toLocaleString() : ''}</td>
+              <td>{u.deleted_at ? new Date(u.deleted_at).toLocaleString() : ''}</td>
               <td>
+                {u.deleted_at && (
+                  <button
+                    onClick={() => handlePurge(u.id)}
+                    data-testid="admin-purge-user"
+                    className="underline text-sm mr-2"
+                  >
+                    Purge content now
+                  </button>
+                )}
                 {u.suspended_at ? (
                   <button
                     onClick={() => handleUnsuspend(u.id)}
