@@ -15,6 +15,7 @@ jobs:
       APP_URL: https://app.quickgig.ph
       PLAYWRIGHT_LANDING_URL: https://quickgig.ph
       PLAYWRIGHT_APP_URL: https://app.quickgig.ph
+      NEXT_PUBLIC_APP_URL: https://app.quickgig.ph
       QA_TEST_MODE: "true"
       QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
       QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
