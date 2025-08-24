@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/utils/supabaseClient'
+import AppHeaderNotifications from '@/components/AppHeaderNotifications'
 
 export default function AppHeader(){
   const [balance, setBalance] = useState<number | null>(null)
@@ -41,12 +42,14 @@ export default function AppHeader(){
               <span className="ml-2 px-2 py-0.5 rounded-full bg-black text-white text-xs">{balance}</span>
             </Link>
           )}
+          <AppHeaderNotifications />
         </nav>
         <details className="md:hidden">
           <summary aria-label="Open menu" className="cursor-pointer">Menu</summary>
           <div className="mt-2 flex flex-col">
             <Link href="/gigs" className="py-2">Find work</Link>
             <Link href="/gigs/new" className="py-2">Post job</Link>
+            <Link href="/notifications" className="py-2">Notifications</Link>
             {balance !== null && (
               <Link href="/pay" className="py-2">
                 Add tickets ({balance})
