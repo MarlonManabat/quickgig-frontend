@@ -4,7 +4,7 @@ export async function listUsers({ q = "", limit = 50, offset = 0 } = {}) {
   // expects profiles has: id, email, role, suspended_at, created_at
   let query = supabase
     .from("profiles")
-    .select("id, email, role, suspended_at, created_at")
+    .select("id, email, role, suspended_at, created_at, delete_requested_at, deleted_at")
     .order("created_at", { ascending: false });
   if (q) query = query.ilike("email", `%${q}%`);
   return query.range(offset, offset + limit - 1);
@@ -57,4 +57,8 @@ export async function suspendUser(id: string) {
 }
 export async function unsuspendUser(id: string) {
   return supabase.rpc("admin_unsuspend_user", { p_user: id });
+}
+
+export async function purgeUserContent(id: string, days: number) {
+  return supabase.rpc("purge_user_content", { p_user: id, p_days: days });
 }
