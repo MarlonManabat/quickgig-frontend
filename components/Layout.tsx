@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Banner from '@/components/ui/Banner';
 import AppHeaderNotifications from '@/components/AppHeaderNotifications';
+import AppHeaderTickets from '@/components/AppHeaderTickets';
 import { supabase } from '@/utils/supabaseClient';
 import { copy } from '@/copy';
 import { isAdmin } from '@/utils/admin';
@@ -96,6 +97,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Link href="/auth" data-testid="app-login" app-nav="/auth">{copy.nav.auth}</Link>
             )}
           </nav>
+          {user && <AppHeaderTickets />}
           {user && <AppHeaderNotifications />}
         </div>
       </header>
