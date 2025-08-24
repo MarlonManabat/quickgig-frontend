@@ -1,49 +1,67 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+const PUBLIC_ALLOW = new Set([
+  '/', '/home', '/find', '/post',
+  '/onboarding/role', '/login', '/signup', '/profile' // /profile allowed; page enforces completeness itself
+]);
 
-  if (
+function isAssetOrApi(pathname: string) {
+  return (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/auth') ||
     pathname.startsWith('/favicon') ||
     pathname.startsWith('/robots') ||
-    pathname.startsWith('/sitemap')
-  ) {
-    return NextResponse.next();
-  }
+    pathname.startsWith('/sitemap') ||
+    /\.[a-zA-Z0-9]+$/.test(pathname)
+  );
+}
+
+export async function middleware(req: NextRequest) {
+  const { pathname, searchParams } = req.nextUrl;
+  if (isAssetOrApi(pathname)) return NextResponse.next();
 
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
   const { data: { user } } = await supabase.auth.getUser();
 
+  // 1) Logged-out → never force redirects (no loops)
   if (!user) return res;
 
+  // 2) Read profile server-side (role + basic completeness fields)
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role_pref')
+    .select('role_pref, first_name, city, avatar_url')
     .eq('id', user.id)
     .maybeSingle();
 
-  const role = profile?.role_pref as 'worker' | 'employer' | null;
+  const role = (profile?.role_pref ?? null) as 'worker' | 'employer' | null;
+  const profileIncomplete = !profile || !profile.first_name || !profile.city || !profile.avatar_url;
 
+  // 3) Never redirect from public allowlist (prevents /home loops)
+  if (PUBLIC_ALLOW.has(pathname)) {
+    return res;
+  }
+
+  // 4) Profile incomplete? Allow only public allowlist and /profile; redirect others to /profile
+  if (profileIncomplete && pathname !== '/profile') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/profile';
+    return NextResponse.redirect(url);
+  }
+
+  // 5) No role yet: allow them to reach /onboarding/role; block dashboards
   if (!role) {
     if (pathname.startsWith('/dashboard/')) {
       const url = req.nextUrl.clone();
-      url.pathname = '/home';
+      url.pathname = '/onboarding/role';
       return NextResponse.redirect(url);
     }
     return res;
   }
 
-  if (pathname === '/home') {
-    const url = req.nextUrl.clone();
-    url.pathname = role === 'worker' ? '/dashboard/worker' : '/dashboard/employer';
-    return NextResponse.redirect(url);
-  }
-
+  // 6) Normalize dashboards to the correct one (single redirect)
   if (pathname.startsWith('/dashboard/')) {
     const desired = role === 'worker' ? '/dashboard/worker' : '/dashboard/employer';
     if (pathname !== desired) {
@@ -53,9 +71,10 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // 7) Default: no redirect
   return res;
 }
 
 export const config = {
-  matcher: ['/((?!.*\\.).*)'],
+  matcher: ['/((?!.*\\.).*)'], // all pages without file extension
 };

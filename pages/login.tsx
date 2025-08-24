@@ -24,13 +24,16 @@ export default function AuthPage() {
     setLoading(true);
     setStatus(null);
     setError(null);
-    const intended = router.query?.next as string | undefined;
+    const next = router.query?.next as string | undefined;
+    const role = router.query?.role as string | undefined;
     try {
-      localStorage.setItem('postAuthRedirect', intended || '/home');
+      const qp = new URLSearchParams();
+      if (next) qp.set('next', next);
+      if (role) qp.set('role', role);
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${location.origin}/auth/callback`,
+          emailRedirectTo: `${location.origin}/auth/callback${qp.toString() ? `?${qp.toString()}` : ''}`,
           shouldCreateUser: true,
         },
       });
