@@ -78,7 +78,7 @@ export default function FindWorkPage() {
             <p className="text-sm text-brand-subtle line-clamp-2">{g.description}</p>
             <div className="mt-2 flex items-center justify-between text-sm">
               <span>{g.city ?? "—"}</span>
-              <Link className="underline" href={`/gigs/${g.id}`}>View</Link>
+              <Link className="underline" href={`/gigs/${g.id}`} prefetch>View</Link>
             </div>
           </li>
         ))}
@@ -91,4 +91,8 @@ export default function FindWorkPage() {
       </div>
     </Shell>
   );
+}
+
+export async function getStaticProps() {
+  return { props: {}, revalidate: 60 };
 }

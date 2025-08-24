@@ -8,7 +8,10 @@ export default function Document() {
     <Html lang="en">
       <Head>
         {preconnectHref && (
-          <link rel="preconnect" href={preconnectHref} crossOrigin="" />
+          <>
+            <link rel="preconnect" href={preconnectHref} crossOrigin="" />
+            <link rel="dns-prefetch" href={preconnectHref} />
+          </>
         )}
         <meta name="theme-color" content="#000000" />
         <meta name="color-scheme" content="light only" />

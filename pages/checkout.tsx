@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Shell from '@/components/Shell';
+import Image from 'next/image';
 import {
   TICKET_PRICE_PHP,
   FREE_TICKETS_ON_SIGNUP,
@@ -48,10 +49,13 @@ export default function CheckoutPage() {
           <span> {GCASH_NOTES}</span>
         )}
       </p>
-      <img
+      <Image
         src={GCASH_QR_URL}
         alt="GCash QR"
-        loading="lazy"
+        width={200}
+        height={200}
+        placeholder="blur"
+        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mO8dOnSfwAIhwNqCMJy1AAAAABJRU5ErkJggg=="
         className="max-w-xs mb-4"
       />
       {!order ? (
