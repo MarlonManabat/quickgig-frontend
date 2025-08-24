@@ -9,6 +9,7 @@ import AppFooter from "@/components/nav/AppFooter";
 import Container from "@/components/Container";
 import { useEffect } from "react";
 import { setupErrlog } from "@/lib/errlog";
+import { qgSans } from "@/lib/fonts";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           content="Find work or hire quickly with simple, ticket-based matches."
         />
       </Head>
-      <div className="min-h-screen bg-surface text-text flex flex-col">
+      <div className={`${qgSans.className} min-h-screen bg-surface text-text flex flex-col`}>
         {!isError && <AppHeader />}
         <main className="flex-1 py-6 bg-surface">
           <Container>
@@ -43,9 +44,4 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
-// (Next.js feature) export web-vitals to console for now
-export function reportWebVitals(metric: any) {
-  // CLS, LCP, FID, FCP, TTFB, INP
-  // eslint-disable-next-line no-console
-  console.log('[web-vitals]', metric);
-}
+export { reportWebVitals } from "@/lib/vitals";
