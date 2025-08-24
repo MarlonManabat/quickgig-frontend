@@ -25,9 +25,9 @@ export default function TopNav() {
   return (
     <nav className="w-full sticky top-0 z-20 border-b border-brand-border bg-brand-bg backdrop-blur text-brand">
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
-        <Link href="/" className="font-semibold">QuickGig.ph</Link>
+        <Link href="/home" className="font-semibold">QuickGig.ph</Link>
         <div className="ml-auto flex items-center gap-4 text-sm">
-          <Link href="/find-work">{copy.nav.findWork}</Link>
+          <Link href="/find">{copy.nav.findWork}</Link>
           {loggedIn && <Link href="/dashboard/gigs">{copy.nav.myGigs}</Link>}
           {loggedIn && <Link href="/applications">{copy.nav.applications}</Link>}
           {loggedIn && <Link href="/saved">{copy.nav.saved}</Link>}
@@ -38,7 +38,7 @@ export default function TopNav() {
             </Link>
           )}
           <Link
-            href="/post-job"
+            href="/post"
             className={`btn-primary ${loggedIn && !eligible ? 'opacity-50 pointer-events-none' : ''}`}
             title={
               loggedIn && !eligible

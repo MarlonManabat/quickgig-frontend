@@ -6,6 +6,7 @@ import { getProfile } from '@/utils/session';
 import { copy } from '@/copy';
 import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
+import { getRolePref } from '@/lib/rolePref';
 
 export default function Home() {
   const [canPost, setCanPost] = useState(false);
@@ -17,8 +18,14 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data?.session) router.replace('/home');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const pref = await getRolePref(user.id);
+      if (!pref) {
+        router.replace('/onboarding/role');
+      } else {
+        router.replace(pref === 'worker' ? '/find' : '/post');
+      }
     })();
   }, []);
 
@@ -28,7 +35,7 @@ export default function Home() {
       <P>Connect with opportunities — find work or hire talent quickly.</P>
       <div className="flex justify-center gap-4">
         <Link
-          href="/gigs?focus=search"
+          href="/find"
           className="btn-primary"
           data-testid="cta-findwork"
         >
@@ -36,7 +43,7 @@ export default function Home() {
         </Link>
         {canPost && (
           <Link
-            href="/gigs/new?focus=title"
+            href="/post"
             className="btn-secondary"
             data-testid="cta-postjob"
           >

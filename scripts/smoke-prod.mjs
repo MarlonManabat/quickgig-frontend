@@ -22,5 +22,5 @@ function showHead(url, label = url) {
   // Landing + redirects
   showHead("https://quickgig.ph/", "quickgig.ph");
   showHead("https://www.quickgig.ph/", "www.quickgig.ph");
-  showHead("https://quickgig.ph/post-job", "quickgig.ph/post-job");
+  showHead("https://quickgig.ph/post", "quickgig.ph/post");
 })();

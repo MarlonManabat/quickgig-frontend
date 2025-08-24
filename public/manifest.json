@@ -44,7 +44,7 @@
       "name": "Find Work",
       "short_name": "Find Work",
       "description": "Browse available gigs and jobs",
-      "url": "/find-work",
+      "url": "/find",
       "icons": [
         {
           "src": "/logo-icon.png",
@@ -57,7 +57,7 @@
       "name": "Post Job",
       "short_name": "Post Job",
       "description": "Post a new job or gig",
-      "url": "/post-job",
+      "url": "/post",
       "icons": [
         {
           "src": "/logo-icon.png",

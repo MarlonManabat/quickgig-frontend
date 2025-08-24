@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import { getRolePref } from '@/lib/rolePref'
 
 export default function AuthCallback() {
   const supabase = useRef(createBrowserSupabaseClient()).current
@@ -22,7 +23,12 @@ export default function AuthCallback() {
       if (!user) { router.replace('/'); return }
       const { data: prof } = await supabase.from('profiles')
         .select('full_name').eq('id', user.id).maybeSingle()
-      router.replace(!prof?.full_name ? '/profile' : '/home')
+      if (!prof?.full_name) {
+        router.replace('/profile')
+        return
+      }
+      const pref = await getRolePref(user.id)
+      router.replace(!pref ? '/onboarding/role' : pref === 'worker' ? '/find' : '/post')
     }
     run()
     // eslint-disable-next-line react-hooks/exhaustive-deps
