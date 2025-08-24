@@ -73,3 +73,15 @@ html, body { background: var(--surface, #fff); }
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
+
+:root{
+  --qg-teal:#059669; --qg-teal-deep:#065F46; --qg-gold:#F5C33D;
+  --qg-navy:#0B2239; --qg-surface:#F8FAFC; --qg-text-light:#fff;
+}
+.qg-header{background:var(--qg-teal-deep); color:var(--qg-text-light);}
+.qg-link{color:#E5F9F3;} .qg-link:hover{color:#CFF7EC;}
+.qg-btn{border-radius:12px; font-weight:600; line-height:1.25; transition:transform .05s, box-shadow .2s;}
+.qg-btn:active{transform:translateY(1px);}
+.qg-btn--primary{background:var(--qg-gold); color:#1A1A1A; box-shadow:0 6px 16px rgba(245,195,61,.35);}
+.qg-btn--outline{background:transparent; color:var(--qg-text-light); border:2px solid #CFF7EC;}
+.qg-btn--outline:hover{background:rgba(255,255,255,.08);}

@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/utils/supabaseClient'
 import AppHeaderNotifications from '@/components/AppHeaderNotifications'
+import AppLogo from '@/components/AppLogo'
 
 export default function AppHeader(){
   const [balance, setBalance] = useState<number | null>(null)
@@ -21,23 +21,17 @@ export default function AppHeader(){
 
   const highlight = balance === 0 && balance !== null
 
-  return (
-    <header className="bg-black text-white">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/logo-horizontal.png"
-            alt="QuickGig.ph"
-            width={140}
-            height={32}
-            priority
-          />
-        </Link>
+    return (
+      <header className="qg-header">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/" className="flex items-center">
+            <AppLogo size={32} />
+          </Link>
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
           <Link href="/gigs">Find work</Link>
           <Link href="/gigs/new">Post job</Link>
           {balance !== null && (
-            <Link href="/pay" className={highlight ? 'btn-primary' : 'px-3 py-1 rounded bg-white text-black'}>
+          <Link href="/pay" className={highlight ? 'qg-btn qg-btn--primary' : 'px-3 py-1 rounded bg-white text-black'}>
               Add tickets
               <span className="ml-2 px-2 py-0.5 rounded-full bg-black text-white text-xs">{balance}</span>
             </Link>
