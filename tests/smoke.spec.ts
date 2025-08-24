@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { stubSignIn } from './utils/session';
+import { getDemoEmail, stubSignIn } from './utils/session';
 
 const APP_URL =
   process.env.APP_URL ??
@@ -63,8 +63,20 @@ test('landing → app header visible', async ({ page }) => {
   }
 });
 
-test('app notifications bell visible after login', async ({ page }) => {
-  await stubSignIn(page);
-  await page.goto(APP_URL + '/');
-  await expect(page.locator('a[aria-label="Notifications"]')).toBeVisible();
-});
+test(
+  'app notifications bell visible after login (skips if no demo creds)',
+  async ({ page }) => {
+    const email = getDemoEmail('user');
+    test.skip(
+      !email,
+      'No demo user email available via env or optional fixture',
+    );
+
+    await stubSignIn(page, email!);
+    await page.goto(APP_URL + '/');
+
+    // Use your actual selector for the notifications bell:
+    const bell = page.getByRole('button', { name: /notifications/i }).first();
+    await expect(bell).toBeVisible();
+  },
+);

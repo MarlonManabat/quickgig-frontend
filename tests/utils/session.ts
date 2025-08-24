@@ -1,9 +1,37 @@
 import { Page } from '@playwright/test';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
-export function getDemoEmail(kind: 'user' | 'admin' = 'user') {
-  const json = JSON.parse(readFileSync('test-results/demo-session.json', 'utf-8'));
-  return kind === 'admin' ? json.admin : json.user;
+type Kind = 'user' | 'admin';
+
+function readOptionalJsonFile(): any | null {
+  const candidates = [
+    join(process.cwd(), 'tests', 'testdata', 'demo-session.json'),
+    join(process.cwd(), 'test-results', 'demo-session.json'),
+  ];
+  for (const p of candidates) {
+    if (existsSync(p)) {
+      try {
+        return JSON.parse(readFileSync(p, 'utf-8'));
+      } catch {
+        /* noop */
+      }
+    }
+  }
+  return null;
+}
+
+/** Returns a demo email for the given kind, or null if not available. */
+export function getDemoEmail(kind: Kind = 'user'): string | null {
+  const envEmail =
+    (kind === 'admin' ? process.env.DEMO_ADMIN_EMAIL : process.env.DEMO_USER_EMAIL) ??
+    null;
+  if (envEmail) return envEmail;
+
+  const json = readOptionalJsonFile();
+  if (!json) return null;
+
+  return kind === 'admin' ? json.admin ?? null : json.user ?? null;
 }
 
 /**

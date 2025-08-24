@@ -17,6 +17,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 - `npm run build` - build for production
 - `npm start` - run production build
 
+## Testing
+
+```bash
+# Optional: provide demo emails for smoke specs
+export DEMO_USER_EMAIL="qa-user@example.com"
+export DEMO_ADMIN_EMAIL="qa-admin@example.com"
+```
+
 ## Smoke tests
 
 ```
