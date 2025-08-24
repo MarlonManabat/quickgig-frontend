@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { loginViaMagicLink } from '../helpers/auth';
 
 type Kind = 'user' | 'admin';
 
@@ -40,4 +41,13 @@ export function getDemoEmail(kind: Kind = 'user'): string | null {
  */
 export async function stubSignIn(page: Page, email = getDemoEmail()) {
   await page.addInitScript(([e]) => localStorage.setItem('TEST_SESSION_EMAIL', e), [email]);
+}
+
+/** Log in using either QA stub or magic link helper */
+export async function loginAs(page: Page, email: string) {
+  if (process.env.QA_TEST_MODE === 'true') {
+    await stubSignIn(page, email);
+  } else {
+    await loginViaMagicLink(page, email);
+  }
 }
