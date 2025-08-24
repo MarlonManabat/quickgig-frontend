@@ -18,28 +18,28 @@
   <body>
     <header class="header" data-theme-brand="quickgig">
         <div class="container row">
-        <a href="https://app.quickgig.ph/" class="brand" data-testid="brand-link" data-app-root>
+        <a href="/" class="brand" data-testid="brand-link" data-app-root>
             <img src="/brand/quickgig-badge.png" alt="QuickGig.ph" width="28" height="28" />
           <strong>QuickGig.ph</strong>
         </a>
         <nav>
           <a href="#features">Features</a>
           <a
-            href="https://app.quickgig.ph/"
+            href="/start?intent=worker"
             data-testid="cta-find-work"
             aria-label="Maghanap ng trabaho sa QuickGig app"
             data-app-root
             >Maghanap ng Trabaho</a
           >
           <a
-            href="https://app.quickgig.ph/"
+            href="/start?intent=employer"
             data-testid="nav-post-job"
             aria-label="Post job on QuickGig app"
             data-app-root
             >Post Job</a
           >
           <a
-            href="https://app.quickgig.ph/"
+            href="/login"
             data-testid="nav-login"
             aria-label="Log in to QuickGig app"
             data-app-root
@@ -47,7 +47,7 @@
           >
           <a
               class="btn btn-primary"
-              href="https://app.quickgig.ph/"
+              href="/login"
               data-testid="cta-signup"
               aria-label="Sign up on QuickGig app"
               data-app-root
@@ -72,14 +72,15 @@
         <div class="actions">
             <a
               class="qg-btn qg-btn--primary"
-              href="/home"
+              href="/start?intent=worker"
               data-testid="cta-start-now"
               aria-label="Open QuickGig app"
+              data-app-root
               >Simulan Na!</a
             >
             <a
               class="btn btn-ghost"
-              href="https://app.quickgig.ph/"
+              href="/start?intent=worker"
               data-testid="cta-browse-jobs"
               aria-label="Maghanap ng trabaho sa QuickGig app"
               data-app-root
@@ -118,7 +119,7 @@
         <nav class="footer-nav">
           <a href="/terms" data-testid="footer-terms" aria-label="QuickGig terms">Terms</a>
           <a href="/privacy" data-testid="footer-privacy" aria-label="QuickGig privacy">Privacy</a>
-          <a href="https://app.quickgig.ph/" data-testid="footer-open-app" aria-label="Open the QuickGig app" data-app-root>Open the App</a>
+          <a href="/start?intent=worker" data-testid="footer-open-app" aria-label="Open the QuickGig app" data-app-root>Open the App</a>
         </nav>
       </div>
     </footer>
@@ -127,9 +128,11 @@
         window.NEXT_PUBLIC_APP_URL ||
         window.APP_URL ||
         'https://app.quickgig.ph';
-      const appRoot = `${APP_URL.replace(/\/+$/, '')}/`;
+      const appRoot = APP_URL.replace(/\/+$/, '');
       document.querySelectorAll('[data-app-root]').forEach((el) => {
-        el.setAttribute('href', appRoot);
+        const path = el.getAttribute('href') || '/';
+        const normalized = path.startsWith('/') ? path : `/${path}`;
+        el.setAttribute('href', `${appRoot}${normalized}`);
       });
       document.getElementById('year').textContent = new Date().getFullYear();
     </script>

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 
 const PUBLIC_ALLOW = new Set([
-  '/', '/home', '/find', '/post',
+  '/', '/home', '/find', '/post', '/start',
   '/onboarding/role', '/login', '/signup', '/profile' // /profile allowed; page enforces completeness itself
 ]);
 
@@ -37,7 +37,7 @@ export async function middleware(req: NextRequest) {
     .maybeSingle();
 
   const role = (profile?.role_pref ?? null) as 'worker' | 'employer' | null;
-  const profileIncomplete = !profile || !profile.first_name || !profile.city || !profile.avatar_url;
+  const profileIncomplete = !profile || !profile.first_name || !profile.city;
 
   // 3) Never redirect from public allowlist (prevents /home loops)
   if (PUBLIC_ALLOW.has(pathname)) {
@@ -48,6 +48,9 @@ export async function middleware(req: NextRequest) {
   if (profileIncomplete && pathname !== '/profile') {
     const url = req.nextUrl.clone();
     url.pathname = '/profile';
+    // preserve original target so profile can send them back
+    const original = req.nextUrl.pathname + (req.nextUrl.search ?? '');
+    url.search = `?next=${encodeURIComponent(original)}`;
     return NextResponse.redirect(url);
   }
 

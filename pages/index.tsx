@@ -4,30 +4,14 @@ import Card from '@/components/ui/Card';
 import { H1, P } from '@/components/ui/Text';
 import { getProfile } from '@/utils/session';
 import { copy } from '@/copy';
-import { supabase } from '@/lib/supabaseClient';
-import { useRouter } from 'next/router';
-import { getRolePref } from '@/lib/rolePref';
 
 export default function Home() {
   const [canPost, setCanPost] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     getProfile().then((p) => setCanPost(!!p?.can_post_job));
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const pref = await getRolePref(user.id);
-      if (!pref) {
-        router.replace('/onboarding/role');
-      } else {
-        router.replace(pref === 'worker' ? '/find' : '/post');
-      }
-    })();
-  }, []);
 
   return (
     <Card className="p-6 text-center space-y-4">
@@ -35,7 +19,7 @@ export default function Home() {
       <P>Connect with opportunities — find work or hire talent quickly.</P>
       <div className="flex justify-center gap-4">
         <Link
-          href="/find"
+          href="/start?intent=worker"
           className="btn-primary"
           data-testid="cta-findwork"
         >
@@ -43,7 +27,7 @@ export default function Home() {
         </Link>
         {canPost && (
           <Link
-            href="/post"
+            href="/start?intent=employer"
             className="btn-secondary"
             data-testid="cta-postjob"
           >
