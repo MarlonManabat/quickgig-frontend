@@ -1,6 +1,21 @@
 import { useState, useMemo } from 'react';
-import { REGIONS_PH, CITIES_BY_REGION } from '@/lib/locationsPH';
+import {
+  REGIONS,
+  getCitiesForRegion,
+  type RegionKey,
+} from '@/lib/locations/phRegions';
 import { createJob } from '@/lib/jobs';
+
+function regionLabelFromKey(key: string | undefined) {
+  return REGIONS.find(r => r.key === key)?.label ?? '';
+}
+
+function cityLabelFromKey(regionKey: string, cityKey: string) {
+  const match = getCitiesForRegion(regionKey as RegionKey).find(
+    c => c.value === cityKey,
+  );
+  return match?.label ?? '';
+}
 
 export default function PostJobPage() {
   const [title, setTitle] = useState('');
@@ -11,7 +26,10 @@ export default function PostJobPage() {
   const [address, setAddress] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const cities = useMemo(() => (region ? CITIES_BY_REGION[region] ?? [] : []), [region]);
+  const cities = useMemo(
+    () => getCitiesForRegion((region || null) as RegionKey | null),
+    [region],
+  );
   const locationDisabled = isOnline;
 
   async function onSubmit(e: any) {
@@ -22,8 +40,12 @@ export default function PostJobPage() {
         title: title.trim(),
         company: company.trim() || undefined,
         is_online: isOnline,
-        location_region: locationDisabled ? null : region || null,
-        location_city: locationDisabled ? null : city || null,
+        location_region: locationDisabled
+          ? null
+          : regionLabelFromKey(region) || null,
+        location_city: locationDisabled
+          ? null
+          : cityLabelFromKey(region, city) || null,
         location_address: locationDisabled ? null : address.trim() || null,
       });
       window.location.href = '/find';
@@ -70,9 +92,9 @@ export default function PostJobPage() {
             required={!isOnline}
           >
             <option value="">Select Region</option>
-            {REGIONS_PH.map(r => (
-              <option key={r} value={r}>
-                {r}
+            {REGIONS.map(r => (
+              <option key={r.key} value={r.key}>
+                {r.label}
               </option>
             ))}
           </select>
@@ -86,8 +108,8 @@ export default function PostJobPage() {
           >
             <option value="">{region ? 'Select City' : 'Select Region first'}</option>
             {cities.map(c => (
-              <option key={c} value={c}>
-                {c}
+              <option key={c.value} value={c.value}>
+                {c.label}
               </option>
             ))}
           </select>
