@@ -28,7 +28,9 @@
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/auth-helpers-shared": "^0.7.0",
     "set-cookie-parser": "^2.6.0",
-    "swr": "^2.2.5"
+    "swr": "^2.2.5",
+    "resend": "^1.0.0",
+    "nodemailer": "^6.9.8"
   },
   "devDependencies": {
     "@types/node": "^20",
