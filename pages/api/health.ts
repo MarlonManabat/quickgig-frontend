@@ -1,15 +1,22 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { createClient } from '@supabase/supabase-js'
+import { env } from '@/lib/env'
 
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
-  const env = {
-    NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-  };
+  let supabaseStatus: 'ok' | 'error' = 'ok'
+  try {
+    const supa = createClient(env.supabaseUrl, env.supabaseAnon)
+    const { error } = await supa.from('profiles').select('id').limit(1)
+    if (error) supabaseStatus = 'error'
+  } catch {
+    supabaseStatus = 'error'
+  }
+
+  const ok = supabaseStatus === 'ok'
   res.status(200).json({
-    ok: env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    env,
-    commit: process.env.VERCEL_GIT_COMMIT_SHA || null,
-    ts: new Date().toISOString(),
-  });
+    ok,
+    time: new Date().toISOString(),
+    env: process.env.VERCEL ? 'vercel' : 'local',
+    supabase: supabaseStatus,
+  })
 }

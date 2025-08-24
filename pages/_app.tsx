@@ -8,13 +8,13 @@ import AppHeader from "@/components/nav/AppHeader";
 import AppFooter from "@/components/nav/AppFooter";
 import Container from "@/components/Container";
 import { useEffect } from "react";
-import { setupClientMonitoring } from "@/lib/monitoring";
+import { setupErrlog } from "@/lib/errlog";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isError = router.pathname === '/404' || router.pathname === '/500';
   useEffect(() => {
-    setupClientMonitoring();
+    setupErrlog();
   }, []);
   return (
     <>
