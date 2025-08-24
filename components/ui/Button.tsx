@@ -1,7 +1,14 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'outline' | 'subtle' | 'destructive' | 'qg-primary' | 'qg-outline';
+  variant?:
+    | 'primary'
+    | 'outline'
+    | 'subtle'
+    | 'destructive'
+    | 'qg-primary'
+    | 'qg-outline'
+    | 'qg-white';
 }
 
 export default function Button({ variant = 'primary', className = '', ...props }: ButtonProps) {
@@ -16,7 +23,8 @@ export default function Button({ variant = 'primary', className = '', ...props }
     destructive: 'bg-brand-danger text-white hover:bg-brand-danger/90',
     'qg-primary': 'qg-btn qg-btn--primary',
     'qg-outline': 'qg-btn qg-btn--outline',
+    'qg-white': 'qg-btn qg-btn--white',
   };
-  const useBase = variant !== 'qg-primary' && variant !== 'qg-outline';
+  const useBase = !['qg-primary', 'qg-outline', 'qg-white'].includes(variant);
   return <button className={`${useBase ? base : ''} ${styles[variant]} ${className}`.trim()} {...props} />;
 }

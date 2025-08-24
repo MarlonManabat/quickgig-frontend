@@ -31,7 +31,14 @@ export default function AppHeader(){
           <Link href="/gigs">Find work</Link>
           <Link href="/gigs/new">Post job</Link>
           {balance !== null && (
-          <Link href="/pay" className={highlight ? 'qg-btn qg-btn--primary' : 'px-3 py-1 rounded bg-white text-black'}>
+            <Link
+              href="/pay"
+              className={`inline-flex items-center ${
+                highlight
+                  ? 'qg-btn qg-btn--primary px-3 py-1'
+                  : 'qg-btn qg-btn--white px-3 py-1'
+              }`}
+            >
               Add tickets
               <span className="ml-2 px-2 py-0.5 rounded-full bg-black text-white text-xs">{balance}</span>
             </Link>
