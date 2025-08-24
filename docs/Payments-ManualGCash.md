@@ -5,6 +5,7 @@ This feature gates job posting behind a manual payment review.
 ## Enable the paywall
 
 Set `NEXT_PUBLIC_REQUIRE_PAYMENT=true` in your environment (see `.env.example`). When unset or `false`, the site allows posting jobs without payment.
+Configure ticket pricing and bonus via `TICKET_PRICE_PHP` (default ₱20) and `FREE_TICKETS_ON_SIGNUP` (default 3). GCash instructions are driven by `GCASH_PAYEE_NAME`, `GCASH_NUMBER`, `GCASH_QR_URL`, and optional `GCASH_NOTES`.
 
 ## Database setup
 

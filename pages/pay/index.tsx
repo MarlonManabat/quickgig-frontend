@@ -1,15 +1,26 @@
 import { useState, useEffect } from 'react'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
+import {
+  TICKET_PRICE_PHP,
+  FREE_TICKETS_ON_SIGNUP,
+} from '@/lib/payments'
 
 export default function PayPage(){
   const supabase = createBrowserSupabaseClient()
   const [file, setFile] = useState<File|null>(null)
   const [rows, setRows] = useState<any[]>([])
+  const [balance, setBalance] = useState<number>(0)
 
   const load = async ()=>{
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('payment_proofs').select('*').eq('user_id', user.id).order('created_at', { ascending:false })
+    const { data: balanceRow } = await supabase.from('ticket_balances').select('balance').single()
+    setBalance(balanceRow?.balance ?? 0)
+    const { data } = await supabase
+      .from('payment_proofs')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending:false })
     setRows(data||[])
   }
   useEffect(()=>{ load() },[])
@@ -33,6 +44,10 @@ export default function PayPage(){
   return (
     <main className="max-w-xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Upload payment proof</h1>
+      <p>
+        Tickets cost ₱{TICKET_PRICE_PHP} each. You received {FREE_TICKETS_ON_SIGNUP} free
+        tickets on signup. Current balance: {balance}.
+      </p>
       <form onSubmit={submit} className="space-y-3">
         <input type="file" accept="image/png,image/jpeg" onChange={e=>setFile(e.target.files?.[0]||null)} />
         <button className="px-4 py-2 rounded bg-black text-white">Submit</button>

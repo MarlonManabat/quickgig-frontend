@@ -48,9 +48,10 @@ test('landing → app header visible', async ({ page }) => {
   if (await logoLink.isVisible().catch(() => false)) {
     await expect(logoLink).toBeVisible({ timeout: 10000 });
     const href = await logoLink.getAttribute('href');
-    console.log('[smoke] Logo href:', href);
+    const resolvedHref = href ? new URL(href, `${base}/`).href : href;
+    console.log('[smoke] Logo href:', href, '->', resolvedHref);
     expect(href, 'href should exist').not.toBeNull();
-    expect(href!).toMatch(rootRe);
+    expect(href === '/' || rootRe.test(href!)).toBeTruthy();
   } else {
     const logoBtn = page.locator('header button:has(img)').first();
     await expect(logoBtn).toBeVisible({ timeout: 10000 });

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import NotificationsBell from "@/components/NotificationsBell";
 import { copy } from "@/copy";
+import { TICKET_PRICE_PHP } from "@/lib/payments";
 
 export default function TopNav() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -39,7 +40,11 @@ export default function TopNav() {
           <Link
             href="/post-job"
             className={`btn-primary ${loggedIn && !eligible ? 'opacity-50 pointer-events-none' : ''}`}
-            title={loggedIn && !eligible ? 'Please buy a ticket (₱10)' : undefined}
+            title={
+              loggedIn && !eligible
+                ? `Please buy a ticket (₱${TICKET_PRICE_PHP})`
+                : undefined
+            }
           >
             {copy.nav.postJob}
           </Link>
