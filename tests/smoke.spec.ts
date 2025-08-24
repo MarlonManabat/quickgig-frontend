@@ -12,16 +12,61 @@ test('landing → app header visible', async ({ page }) => {
 
   // Accept English or Taglish copy for the main CTA.
   // Note: “Maghanap ng Trabaho” is the correct Taglish form.
-  const findWorkCta = page.getByRole('link', {
+  const findWorkLink = page.getByRole('link', {
     name: /find work|browse jobs|maghanap ng trabaho/i,
   });
-  await expect(findWorkCta).toHaveAttribute('href', appRootRe);
+  if (await findWorkLink.isVisible().catch(() => false)) {
+    try {
+      await expect(findWorkLink).toHaveAttribute('href', appRootRe);
+    } catch (err) {
+      console.log('CTA href:', await findWorkLink.getAttribute('href'));
+      throw err;
+    }
+  } else {
+    // fallback to button
+    const findWorkBtn = page.getByRole('button', {
+      name: /find work|browse jobs|maghanap ng trabaho/i,
+    });
+    await expect(findWorkBtn).toBeVisible();
+    await Promise.all([
+      page.waitForURL(appRootRe),
+      findWorkBtn.click(),
+    ]);
+  }
 
   // “Post job” should deep-link to the app root for now.
-  const postJobCta = page.getByRole('link', { name: /post job/i });
-  await expect(postJobCta).toHaveAttribute('href', appRootRe);
+  const postJobLink = page.getByRole('link', { name: /post job/i });
+  if (await postJobLink.isVisible().catch(() => false)) {
+    try {
+      await expect(postJobLink).toHaveAttribute('href', appRootRe);
+    } catch (err) {
+      console.log('CTA href:', await postJobLink.getAttribute('href'));
+      throw err;
+    }
+  } else {
+    const postJobBtn = page.getByRole('button', { name: /post job/i });
+    await expect(postJobBtn).toBeVisible();
+    await Promise.all([
+      page.waitForURL(appRootRe),
+      postJobBtn.click(),
+    ]);
+  }
 
   // Header logo link (landing’s logo linking to app root)
   const logoLink = page.getByRole('link', { name: /quickgig\.ph|quickgig/i });
-  await expect(logoLink).toHaveAttribute('href', appRootRe);
+  if (await logoLink.isVisible().catch(() => false)) {
+    try {
+      await expect(logoLink).toHaveAttribute('href', appRootRe);
+    } catch (err) {
+      console.log('CTA href:', await logoLink.getAttribute('href'));
+      throw err;
+    }
+  } else {
+    const logoBtn = page.getByRole('button', { name: /quickgig\.ph|quickgig/i });
+    await expect(logoBtn).toBeVisible();
+    await Promise.all([
+      page.waitForURL(appRootRe),
+      logoBtn.click(),
+    ]);
+  }
 });
