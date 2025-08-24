@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import LinkSafe from './LinkSafe';
 import Container from './Container';
 import { supabase } from '@/utils/supabaseClient';
 import { copy } from '@/copy';
+import AppLogo from '@/components/AppLogo';
 
 const links = [
   { href: '/gigs', label: copy.nav.findWork, id: 'app-nav-find-work' },
@@ -50,23 +50,16 @@ export default function Header() {
     return router.pathname === href;
   }
 
-  return (
-    <header
-      data-app-header
-      data-theme-brand="quickgig"
-      className="sticky top-0 z-40 bg-header-bg text-header-text border-b border-white/10"
-    >
+    return (
+      <header
+        data-app-header
+        data-theme-brand="quickgig"
+        className="sticky top-0 z-40 qg-header border-b border-white/10"
+      >
       <Container className="flex h-16 items-center justify-between">
-        <LinkSafe href="/" className="flex items-center h-11 min-h-[44px] gap-2">
-          <Image
-            src="/logo/quickgig.svg"
-            alt="QuickGig.ph"
-            width={28}
-            height={28}
-            priority
-          />
-          <span className="font-semibold">QuickGig.ph</span>
-        </LinkSafe>
+          <LinkSafe href="/" className="flex items-center h-11 min-h-[44px] gap-2">
+            <AppLogo />
+          </LinkSafe>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {links.map((l) => {
             const active = isActive(l.href);
@@ -108,7 +101,7 @@ export default function Header() {
                 href="/auth"
                 data-testid="app-login"
                 app-nav="/auth"
-                className="hidden md:inline-flex h-11 min-h-[44px] items-center text-sm opacity-90 hover:opacity-100"
+                className="hidden md:inline-flex qg-btn qg-btn--outline h-11 min-h-[44px]"
               >
                 Mag-login
               </LinkSafe>
@@ -116,7 +109,7 @@ export default function Header() {
                 href="/signup"
                 data-testid="app-signup"
                 app-nav="/signup"
-                className="hidden md:inline-flex btn-primary h-11 min-h-[44px]"
+                className="hidden md:inline-flex qg-btn qg-btn--primary h-11 min-h-[44px]"
               >
                 Sign Up
               </LinkSafe>
@@ -148,23 +141,23 @@ export default function Header() {
                 {copy.nav.auth}
               </LinkSafe>
             ) : (
+                <LinkSafe
+                  href="/auth"
+                  data-testid="app-login"
+                  app-nav="/auth"
+                  className="qg-btn qg-btn--outline w-full h-11 min-h-[44px] flex items-center justify-center"
+                >
+                  Mag-login
+                </LinkSafe>
+              )}
               <LinkSafe
-                href="/auth"
-                data-testid="app-login"
-                app-nav="/auth"
-                className="h-11 min-h-[44px] flex items-center px-3"
+                href="/signup"
+                data-testid="app-signup"
+                app-nav="/signup"
+                className="qg-btn qg-btn--primary w-full h-11 min-h-[44px] text-center flex items-center justify-center"
               >
-                Mag-login
+                Sign Up
               </LinkSafe>
-            )}
-            <LinkSafe
-              href="/signup"
-              data-testid="app-signup"
-              app-nav="/signup"
-              className="btn-primary w-full h-11 min-h-[44px] rounded-xl text-center flex items-center justify-center"
-            >
-              Sign Up
-            </LinkSafe>
           </nav>
         </div>
       )}
