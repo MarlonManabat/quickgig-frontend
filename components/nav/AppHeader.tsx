@@ -23,14 +23,15 @@ export default function AppHeader(){
   return (
     <header className="bg-black text-white">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center gap-2">
           <Image
-            src="/logo-horizontal.png"
+            src="/logo/quickgig.svg"
             alt="QuickGig.ph"
-            width={140}
-            height={32}
+            width={28}
+            height={28}
             priority
           />
+          <span className="font-semibold">QuickGig.ph</span>
         </Link>
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
           <Link href="/gigs">Find work</Link>
