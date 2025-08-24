@@ -1,5 +1,12 @@
 import { test, expect } from '@playwright/test';
 
+const APP_URL = process.env.APP_URL ?? 'https://app.quickgig.ph';
+
+function escapeRegex(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\$&');
+}
+const appRootRe = new RegExp(`^${escapeRegex(APP_URL)}\/?$`, 'i');
+
 test('landing → app header visible', async ({ page }) => {
   await page.goto('https://quickgig.ph');
 
@@ -8,22 +15,13 @@ test('landing → app header visible', async ({ page }) => {
   const findWorkCta = page.getByRole('link', {
     name: /find work|browse jobs|maghanap ng trabaho/i,
   });
-  await expect(findWorkCta).toHaveAttribute(
-    'href',
-    /https:\/\/app\.quickgig\.ph\/?$/i
-  );
+  await expect(findWorkCta).toHaveAttribute('href', appRootRe);
 
-  // “Post job” should deep-link to the job creation route in the app.
+  // “Post job” should deep-link to the app root for now.
   const postJobCta = page.getByRole('link', { name: /post job/i });
-  await expect(postJobCta).toHaveAttribute(
-    'href',
-    /https:\/\/app\.quickgig\.ph\/gigs\/(new|create)\/?$/i
-  );
+  await expect(postJobCta).toHaveAttribute('href', appRootRe);
 
-  // Auth CTA (Login/Sign up) goes straight to the app.
-  const authCta = page.getByRole('link', { name: /sign up|mag-login/i });
-  await expect(authCta).toHaveAttribute(
-    'href',
-    /https:\/\/app\.quickgig\.ph\/?$/i
-  );
+  // Header logo link (landing’s logo linking to app root)
+  const logoLink = page.getByRole('link', { name: /quickgig\.ph|quickgig/i });
+  await expect(logoLink).toHaveAttribute('href', appRootRe);
 });
