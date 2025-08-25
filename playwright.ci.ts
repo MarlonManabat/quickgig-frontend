@@ -1,14 +1,14 @@
-import { defineConfig } from '@playwright/test';
-import baseConfig from './playwright.config';
+import base from './playwright.config';
+import type { PlaywrightTestConfig } from '@playwright/test';
 
-export default defineConfig({
-  // Inherit anything defined in the base config if present
-  ...(baseConfig as any),
-  reporter: [['github'], ...((baseConfig as any)?.reporter ?? [])],
+const config: PlaywrightTestConfig = {
+  ...base,
   use: {
-    ...((baseConfig as any)?.use ?? {}),
+    ...base.use,
+    baseURL: process.env.BASE_URL ?? 'http://localhost:3000',
     video: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
   },
-});
+  reporter: [['github'], ...(base.reporter ?? [])],
+};
+
+export default config;

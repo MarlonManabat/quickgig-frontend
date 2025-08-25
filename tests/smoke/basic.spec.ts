@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const app = process.env.PLAYWRIGHT_APP_URL!;
+const app = process.env.BASE_URL!;
 
 test('app nav and auth redirect', async ({ page }) => {
   const response = await page.goto(app, { waitUntil: 'load' });
