@@ -18,7 +18,9 @@
     "analyze": "ANALYZE=true next build",
     "build:profile": "NODE_OPTIONS='--trace-deopt --trace_gc' next build",
     "seed": "node scripts/seed.mjs",
-    "postinstall": "node -e \"process.env.NODE_ENV==='production'?process.exit(0):0\" || npx playwright install --with-deps || true"
+    "postinstall": "node -e \"process.env.NODE_ENV==='production'?process.exit(0):0\" || npx playwright install --with-deps || true",
+    "ci:install": "npm ci --no-audit --no-fund",
+    "ci:check-lock": "git diff --exit-code -- package-lock.json"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",
@@ -36,7 +38,7 @@
     "swr": "^2.2.5"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^15.0.0",
+    "@next/bundle-analyzer": "^15.5.0",
     "@playwright/test": "^1.48.0",
     "@supabase/supabase-js": "^2.45.0",
     "@types/cookie": "^0.6.0",

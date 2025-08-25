@@ -1,8 +1,5 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-
-module.exports = withBundleAnalyzer({
+/** @type {import('next').NextConfig} */
+const baseConfig = {
   reactStrictMode: true,
   images: { formats: ['image/avif', 'image/webp'] },
   eslint: { ignoreDuringBuilds: true }, // prevent CI failing on eslint/parser fetch
@@ -35,4 +32,11 @@ module.exports = withBundleAnalyzer({
       { source: '/jobs/:path*', destination: '/find', permanent: true },
     ];
   },
-});
+};
+
+const withAnalyzer =
+  process.env.ANALYZE === 'true'
+    ? require('@next/bundle-analyzer')({ enabled: true })
+    : (cfg) => cfg;
+
+module.exports = withAnalyzer(baseConfig);

@@ -26,8 +26,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - name: Install deps (robust)
-        run: npm install --legacy-peer-deps --no-audit
+      - name: Install deps
+        run: npm run ci:install
+      - name: Verify lockfile unchanged
+        run: npm run ci:check-lock
+      - name: Get Vercel Preview URL
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: node scripts/get-vercel-preview-url.mjs > url.txt
+      - run: echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       - name: Run smoke
@@ -62,8 +71,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - name: Install deps (robust)
-        run: npm install --legacy-peer-deps --no-audit
+      - name: Install deps
+        run: npm run ci:install
+      - name: Verify lockfile unchanged
+        run: npm run ci:check-lock
+      - name: Get Vercel Preview URL
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: node scripts/get-vercel-preview-url.mjs > url.txt
+      - run: echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       - name: Run full e2e
