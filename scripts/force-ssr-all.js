@@ -23,10 +23,12 @@ function walk(dir) {
 }
 
 function hasGSSP(src) {
-  return /export\s+(async\s+)?function\s+getServerSideProps\b/.test(src)
-      || /export\s*{\s*getServerSideProps\s*as\s*\w+\s*}/.test(src)
-      || /export\s*{\s*getServerSideProps\s*}/.test(src)
-      || /export\s*{\s*forceSSR\s*as\s*getServerSideProps\s*}/.test(src);
+  return (
+    /export\s+(?:async\s+)?function\s+getServerSideProps\b/.test(src) ||
+    /export\s+(?:const|let|var)\s+getServerSideProps\s*[:=]/.test(src) ||
+    /export\s*{\s*getServerSideProps\b/.test(src) ||
+    /export\s*{\s*forceSSR\s*as\s*getServerSideProps\s*}/.test(src)
+  );
 }
 
 const files = fs.existsSync(ROOT) ? walk(ROOT) : [];
