@@ -1,2 +1,2 @@
 // Compatibility re-export for legacy imports
-export { supabase } from "../utils/supabaseClient";
+export { supabase, createServerClient } from "../utils/supabaseClient";
