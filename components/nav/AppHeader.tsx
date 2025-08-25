@@ -30,7 +30,7 @@ export default function AppHeader(){
   const highlight = balance === 0 && balance !== null
 
     return (
-      <header className="qg-header h-14">
+      <header data-testid="app-header" className="qg-header h-14">
         <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <AppLogo size={32} />

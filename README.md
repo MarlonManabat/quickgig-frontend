@@ -11,6 +11,8 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
+For CI runs, configure the variables listed in `.env.example.ci` as repository secrets so Playwright tests can seed state.
+
 ## Scripts
 
 - `npm run dev` - start development server

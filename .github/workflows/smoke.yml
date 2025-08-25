@@ -1,0 +1,38 @@
+name: Smoke
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_ENABLE_SEED: 'true'
+      QA_TEST_MODE: 'true'
+      QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
+      TEST_LOGIN_SECRET: ${{ secrets.TEST_LOGIN_SECRET }}
+      TEST_LOGIN_ENABLED: 'true'
+      NEXT_PUBLIC_TEST_LOGIN_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps
+        run: npm install --legacy-peer-deps --no-audit
+      - name: Build
+        run: npm run build
+      - name: Start app
+        run: npm run start & npx wait-on ${{ env.BASE_URL }}
+      - name: Install Playwright (with system deps)
+        run: npx playwright install --with-deps
+      - name: Run smoke
+        run: npx playwright test tests/smoke.spec.ts --reporter=github
