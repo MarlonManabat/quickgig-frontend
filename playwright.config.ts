@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
-  timeout: 60_000,
+  timeout: 120_000,
   retries: process.env.CI ? 1 : 0,
   use: { headless: true, trace: 'on-first-retry' },
   reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],

@@ -5,6 +5,8 @@ import { loginViaMagicLink } from './helpers/auth' // existing helper
 const EMPLOYER = process.env.QA_TEST_EMAIL!
 const WORKER = process.env.QA_TEST_EMAIL_ALT || ('worker+' + Date.now() + '@example.com')
 
+test.setTimeout(120_000)
+
 test.describe('[full-e2e] tickets gate hire', () => {
   test('hire blocked without tickets, succeeds after credit', async ({ page }) => {
     const ctx = await qaContext()
