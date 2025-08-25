@@ -21,3 +21,5 @@ export default function EditGig() {
     </main>
   )
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

@@ -72,3 +72,5 @@ export default function ApplicationsList() {
     </Shell>
   );
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

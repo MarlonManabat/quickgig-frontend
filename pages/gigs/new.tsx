@@ -13,3 +13,5 @@ export default function NewGig() {
     </main>
   )
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

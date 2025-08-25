@@ -16,18 +16,17 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       TEST_ENABLE_SEED: 'true'
-      QA_TEST_MODE: 'true'
-      QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
-      TEST_LOGIN_SECRET: ${{ secrets.TEST_LOGIN_SECRET }}
-      TEST_LOGIN_ENABLED: 'true'
-      NEXT_PUBLIC_TEST_LOGIN_ENABLED: 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Setup Node 18 + npm@9
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '18.20.4'
+          cache: 'npm'
+      - name: Pin npm@9
+        run: npm i -g npm@9 && npm -v
       - name: Install deps
-        run: npm install --legacy-peer-deps --no-audit
+        run: bash .github/scripts/ci-install.sh
       - name: Build
         run: npm run build
       - name: Start app

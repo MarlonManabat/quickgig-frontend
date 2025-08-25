@@ -48,3 +48,5 @@ export default function MessagesList() {
   );
 }
 
+export { forceSSR as getServerSideProps } from '@/lib/ssr'
+

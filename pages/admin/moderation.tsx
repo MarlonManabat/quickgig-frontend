@@ -97,3 +97,5 @@ export default function ModerationPage() {
     </Shell>
   );
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

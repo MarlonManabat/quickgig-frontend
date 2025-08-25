@@ -41,3 +41,5 @@ export default function AdminHome() {
     </main>
   );
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

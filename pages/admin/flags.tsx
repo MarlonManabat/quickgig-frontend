@@ -92,3 +92,5 @@ export default function AdminFlags() {
     </main>
   );
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'
