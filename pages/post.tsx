@@ -1,61 +1,63 @@
-import { useState, useMemo } from 'react';
-import {
-  REGIONS,
-  getCitiesForRegion,
-  type RegionKey,
-} from '@/lib/locations/phRegions';
+import { useState, useEffect } from 'react';
+import { getRegions, getCities, RegionOption, CityOption } from '@/lib/locations';
 import { createJob } from '@/lib/jobs';
-
-function regionLabelFromKey(key: string | undefined) {
-  return REGIONS.find(r => r.key === key)?.label ?? '';
-}
-
-function cityLabelFromKey(regionKey: string, cityKey: string) {
-  const match = getCitiesForRegion(regionKey as RegionKey).find(
-    c => c.value === cityKey,
-  );
-  return match?.label ?? '';
-}
+import { requireTicket } from '@/lib/tickets';
+import { useRequireUser } from '@/lib/useRequireUser';
 
 export default function PostJobPage() {
+  const { ready, userId, timedOut } = useRequireUser();
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');
   const [isOnline, setIsOnline] = useState(false);
+  const [regions, setRegions] = useState<RegionOption[]>([]);
+  const [cities, setCities] = useState<CityOption[]>([]);
   const [region, setRegion] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const cities = useMemo(
-    () => getCitiesForRegion((region || null) as RegionKey | null),
-    [region],
-  );
+  useEffect(() => {
+    getRegions().then(setRegions);
+  }, []);
+
+  useEffect(() => {
+    if (region) getCities(region).then(setCities);
+    else setCities([]);
+  }, [region]);
+
   const locationDisabled = isOnline;
+  const regionLabel = regions.find(r => r.value === region)?.label || '';
+  const cityLabel = cities.find(c => c.value === city)?.label || '';
 
   async function onSubmit(e: any) {
     e.preventDefault();
+    if (!userId) return;
     setBusy(true);
     try {
+      await requireTicket(userId, 'post_job');
       await createJob({
         title: title.trim(),
         company: company.trim() || undefined,
         is_online: isOnline,
-        location_region: locationDisabled
-          ? null
-          : regionLabelFromKey(region) || null,
-        location_city: locationDisabled
-          ? null
-          : cityLabelFromKey(region, city) || null,
-        location_address: locationDisabled ? null : address.trim() || null,
+        region: locationDisabled ? null : regionLabel || null,
+        city: locationDisabled ? null : cityLabel || null,
+        address: locationDisabled ? null : address.trim() || null,
       });
       window.location.href = '/find';
     } catch (err: any) {
-      console.error(err);
-      alert('Could not post job');
+      if (err.message?.includes('Insufficient tickets')) {
+        alert('Kulang ang tickets para mag-post. Tap the bell to contact Support.');
+      } else {
+        console.error(err);
+        alert('Could not post job');
+      }
     } finally {
       setBusy(false);
     }
   }
+
+  if (!ready)
+    return <p className="p-6">{timedOut ? 'Auth timeout' : 'Loading...'}</p>;
 
   return (
     <main className="max-w-2xl mx-auto p-6">
@@ -78,6 +80,12 @@ export default function PostJobPage() {
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={isOnline} onChange={e => setIsOnline(e.target.checked)} />
           Online Job
+          <span
+            className="text-xs text-gray-500"
+            title="Online Job = work-from-anywhere; hindi kailangan ng exact address."
+          >
+            ⓘ
+          </span>
         </label>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -92,8 +100,8 @@ export default function PostJobPage() {
             required={!isOnline}
           >
             <option value="">Select Region</option>
-            {REGIONS.map(r => (
-              <option key={r.key} value={r.key}>
+            {regions.map(r => (
+              <option key={r.value} value={r.value}>
                 {r.label}
               </option>
             ))}

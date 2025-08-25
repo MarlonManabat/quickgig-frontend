@@ -24,6 +24,9 @@ export default function AdminHome() {
         <Link href="/admin/payments" className="underline">
           Payments
         </Link>
+        <Link href="/admin/tickets" className="underline">
+          Tickets
+        </Link>
         <Link href="/admin/reviews" className="underline">
           Reviews
         </Link>

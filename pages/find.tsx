@@ -1,22 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import {
-  REGIONS,
-  getCitiesForRegion,
-  type RegionKey,
-} from '@/lib/locations/phRegions';
-
-function regionLabelFromKey(key: string | undefined) {
-  return REGIONS.find(r => r.key === key)?.label ?? '';
-}
-
-function cityLabelFromKey(regionKey: string, cityKey: string) {
-  const match = getCitiesForRegion(regionKey as RegionKey).find(
-    c => c.value === cityKey,
-  );
-  return match?.label ?? '';
-}
+import { getRegions, getCities, RegionOption, CityOption } from '@/lib/locations';
 
 export default function FindJobs() {
   const r = useRouter();
@@ -24,32 +9,28 @@ export default function FindJobs() {
   const [city, setCity] = useState((r.query.city as string) || '');
   const [isOnline, setIsOnline] = useState(r.query.online === 'true');
   const [jobs, setJobs] = useState<any[]>([]);
+  const [regions, setRegions] = useState<RegionOption[]>([]);
+  const [cities, setCities] = useState<CityOption[]>([]);
 
-  const ALL_REGIONS = { label: 'All regions', value: '' };
-  const ALL_CITIES = { label: 'All cities', value: '' };
+  useEffect(() => {
+    getRegions().then(setRegions);
+  }, []);
 
-  const regionOptions = [
-    ALL_REGIONS,
-    ...REGIONS.map(r => ({ label: r.label, value: r.key })),
-  ];
-  const cityOptions = [
-    ALL_CITIES,
-    ...getCitiesForRegion((region || null) as RegionKey | null).map(c => ({
-      label: c.label,
-      value: c.value,
-    })),
-  ];
+  useEffect(() => {
+    if (region) getCities(region).then(setCities);
+    else setCities([]);
+  }, [region]);
+
+  const regionLabel = regions.find(r => r.value === region)?.label || '';
+  const cityLabel = cities.find(c => c.value === city)?.label || '';
 
   async function load() {
     let q = supabase
       .from('jobs')
-      .select(
-        'id,title,company,is_online,location_region,location_city,location_address,created_at',
-      )
+      .select('id,title,company,is_online,region,city,address,created_at')
       .order('created_at', { ascending: false });
-    if (region) q = q.eq('location_region', regionLabelFromKey(region));
-    if (region && city)
-      q = q.eq('location_city', cityLabelFromKey(region, city));
+    if (regionLabel) q = q.eq('region', regionLabel);
+    if (regionLabel && cityLabel) q = q.eq('city', cityLabel);
     if (isOnline) q = q.eq('is_online', true);
     const { data } = await q;
     setJobs(data ?? []);
@@ -57,7 +38,10 @@ export default function FindJobs() {
 
   useEffect(() => {
     load();
-  }, [region, city, isOnline]);
+  }, [regionLabel, cityLabel, isOnline]);
+
+  const regionOptions = [{ label: 'All regions', value: '' }, ...regions];
+  const cityOptions = [{ label: 'All cities', value: '' }, ...cities];
 
   return (
     <main className="max-w-6xl mx-auto p-4">
@@ -108,10 +92,10 @@ export default function FindJobs() {
             <div className="text-sm text-gray-600">
               {j.is_online
                 ? 'Online Job'
-                : [j.location_city, j.location_region]
+                : [j.city, j.region]
                     .filter(Boolean)
                     .join(', ') +
-                  (j.location_address ? ` — ${j.location_address}` : '')}
+                  (j.address ? ` — ${j.address}` : '')}
             </div>
           </li>
         ))}
