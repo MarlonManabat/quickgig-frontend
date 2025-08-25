@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const workerId = (app as any)?.applicant_id || (app as any)?.worker
   const employerId = gig?.owner_id
   const gigTitle = gig?.title
-  const gigId = (app as any)?.gig_id
+  const id = (app as any)?.gig_id
   for (const target of [employerId, workerId]) {
     if (target && gigTitle) {
       await emitNotification({
@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         type: 'job_completed',
         title: 'Gig marked completed',
         body: `“${gigTitle}” has been marked completed.`,
-        link: `${process.env.NEXT_PUBLIC_APP_URL}/gigs/${gigId}`,
+        link: `${process.env.NEXT_PUBLIC_APP_URL}/gigs/${id}`,
         uniq: `job_completed:${appId}:${target}`,
       })
     }

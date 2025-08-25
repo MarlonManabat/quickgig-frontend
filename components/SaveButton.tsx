@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
 import { isSaved, toggleSave } from "@/lib/saved"
 
-export default function SaveButton({ gigId, className = "", withText = false }: { gigId: number; className?: string; withText?: boolean }) {
+export default function SaveButton({ id, className = "", withText = false }: { id: number; className?: string; withText?: boolean }) {
   const [saved, setSaved] = useState(false)
   useEffect(() => {
-    isSaved(gigId).then(setSaved)
-  }, [gigId])
+    isSaved(id).then(setSaved)
+  }, [id])
   const onClick = async () => {
-    const s = await toggleSave(gigId)
+    const s = await toggleSave(id)
     setSaved(s)
   }
   return (

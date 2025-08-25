@@ -8,9 +8,9 @@ export default function SavedPage() {
   useEffect(() => {
     mySaved(100, 0).then(({ data }) => setItems(data ?? []))
   }, [])
-  const remove = async (gigId: number) => {
-    await toggleSave(gigId)
-    setItems((prev) => prev.filter((i) => i.gig_id !== gigId))
+  const remove = async (id: number) => {
+    await toggleSave(id)
+    setItems((prev) => prev.filter((i) => i.gig_id !== id))
   }
   return (
     <Shell>

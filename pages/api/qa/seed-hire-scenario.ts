@@ -87,7 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({
       ok: true,
       employerId, workerId,
-      gigId: gig!.id, applicationId: app!.id,
+      id: gig!.id, applicationId: app!.id,
       hireUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/applications/${app!.id}`
     })
   } catch (e: any) {

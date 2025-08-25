@@ -73,7 +73,7 @@ export default function FindWorkPage() {
           <li key={g.id} className="card p-4">
             <div className="flex items-start justify-between">
               <h3 className="font-semibold text-lg">{g.title}</h3>
-              <SaveButton gigId={g.id} />
+              <SaveButton id={g.id} />
             </div>
             <p className="text-sm text-brand-subtle line-clamp-2">{g.description}</p>
             <div className="mt-2 flex items-center justify-between text-sm">

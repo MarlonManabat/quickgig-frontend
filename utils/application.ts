@@ -1,17 +1,17 @@
 import { supabase } from '@/utils/supabaseClient'
 
-export async function getOrCreateApplication(gigId: string, applicantId: string, coverLetter?: string) {
+export async function getOrCreateApplication(id: string, applicantId: string, coverLetter?: string) {
   const { data, error } = await supabase
     .from('applications')
     .select('*')
-    .eq('gig_id', gigId)
+    .eq('gig_id', id)
     .eq('applicant', applicantId)
     .maybeSingle()
   if (error) throw error
   if (data) return data
   const { data: inserted, error: insErr } = await supabase
     .from('applications')
-    .insert({ gig_id: gigId, applicant: applicantId, cover_letter: coverLetter || null })
+    .insert({ gig_id: id, applicant: applicantId, cover_letter: coverLetter || null })
     .select()
     .single()
   if (insErr) throw insErr
