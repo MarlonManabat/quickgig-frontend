@@ -93,6 +93,3 @@ export default function FindWorkPage() {
   );
 }
 
-export async function getStaticProps() {
-  return { props: {}, revalidate: 60 };
-}
