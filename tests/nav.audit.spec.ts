@@ -4,17 +4,17 @@ import { stubAuth } from './utils/stubAuth';
 test('nav audit', async ({ page }) => {
   await stubAuth(page);
   const targets: { id: string; path: string | RegExp; marker: string | string[] }[] = [
-    { id: 'nav-find', path: '/gigs', marker: 'gigs-list' },
+    { id: 'nav-find', path: '/find', marker: 'gigs-list' },
     { id: 'nav-my-gigs', path: '/gigs?mine=1', marker: 'my-gigs' },
     { id: 'nav-applications', path: '/applications', marker: 'applications-list' },
     { id: 'nav-saved', path: '/saved', marker: 'saved-list' },
-    { id: 'nav-post', path: /\/(billing|gigs\/new)/, marker: ['paywall-redirect', 'gig-editor'] },
+    { id: 'nav-post', path: /\/(billing|post)/, marker: ['paywall-redirect', 'gig-editor'] },
     { id: 'nav-profile', path: '/profile', marker: 'profile-save' },
   ];
 
   const ctaMap: Record<string, { path: string | RegExp; marker: string | string[] }> = {
-    'cta-find': { path: '/gigs', marker: 'gigs-list' },
-    'cta-post': { path: /\/(billing|gigs\/new)/, marker: ['paywall-redirect', 'gig-editor'] },
+    'cta-find': { path: '/find', marker: 'gigs-list' },
+    'cta-post': { path: /\/(billing|post)/, marker: ['paywall-redirect', 'gig-editor'] },
   };
 
   await page.goto('/');

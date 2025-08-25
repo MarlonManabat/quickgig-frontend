@@ -23,7 +23,7 @@ test('create gig → save → upload proof → admin approves', async ({ page, b
   if (await postJob.isVisible({ timeout: 2000 }).catch(() => false)) {
     await postJob.click()
   } else {
-    await page.goto(`${APP_URL}/gigs/new`)
+    await page.goto(`${APP_URL}/post`)
   }
   await page.waitForLoadState('domcontentloaded')
 
@@ -62,7 +62,7 @@ test('create gig → save → upload proof → admin approves', async ({ page, b
   ])
   if (!navigated) {
     // Fallback: open from list by title if present; otherwise continue
-    await page.goto(`${APP_URL}/gigs`)
+    await page.goto(`${APP_URL}/find`)
     const item = page.getByRole('link', { name: /Playwright Test Gig/i }).first()
     if (await item.isVisible().catch(() => false)) {
       await item.click()

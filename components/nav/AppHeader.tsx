@@ -7,12 +7,19 @@ import AppLogo from '@/components/AppLogo'
 
 export default function AppHeader(){
   const [balance, setBalance] = useState<number | null>(null)
+  const [user, setUser] = useState<any>(null)
+  const [role, setRole] = useState<'worker' | 'employer' | null>(null)
 
   useEffect(()=>{
     supabase.auth.getUser().then(async ({ data }) => {
       const user = data.user
+      setUser(user)
       if (!user) return
-      const { data: prof } = await supabase.from('profiles').select('can_post_job, can_post').single()
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('can_post_job, can_post, role_pref')
+        .single()
+      setRole((prof?.role_pref as 'worker' | 'employer' | null) ?? null)
       const canPost = prof?.can_post_job ?? prof?.can_post
       if (!canPost) return
       const { data: bal, error } = await supabase.from('ticket_balances').select('balance').single()
@@ -29,8 +36,19 @@ export default function AppHeader(){
             <AppLogo size={32} />
           </Link>
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
-          <Link href="/gigs">Find work</Link>
-          <Link href="/gigs/new">Post job</Link>
+          {!user && (
+            <>
+              <Link href="/start?intent=worker">Find work</Link>
+              <Link href="/start?intent=employer">Post job</Link>
+            </>
+          )}
+          {user && role === 'worker' && <Link href="/find">Find work</Link>}
+          {user && role === 'employer' && (
+            <>
+              <Link href="/post">Post job</Link>
+              <Link href="/find">Find work</Link>
+            </>
+          )}
           {balance !== null && (
             <Link
               href="/pay"
@@ -50,8 +68,21 @@ export default function AppHeader(){
         <details className="md:hidden">
           <summary aria-label="Open menu" className="cursor-pointer">Menu</summary>
           <div className="mt-2 flex flex-col">
-            <Link href="/gigs" className="py-2">Find work</Link>
-            <Link href="/gigs/new" className="py-2">Post job</Link>
+            {!user && (
+              <>
+                <Link href="/start?intent=worker" className="py-2">Find work</Link>
+                <Link href="/start?intent=employer" className="py-2">Post job</Link>
+              </>
+            )}
+            {user && role === 'worker' && (
+              <Link href="/find" className="py-2">Find work</Link>
+            )}
+            {user && role === 'employer' && (
+              <>
+                <Link href="/post" className="py-2">Post job</Link>
+                <Link href="/find" className="py-2">Find work</Link>
+              </>
+            )}
             <Link href="/notifications" className="py-2">Notifications</Link>
             {balance !== null && (
               <Link href="/pay" className="py-2">

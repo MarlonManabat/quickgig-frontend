@@ -9,6 +9,6 @@ test('app nav and auth redirect', async ({ page }) => {
   await expect(page.getByTestId('app-nav-find-work')).toBeVisible();
   await page.getByTestId('app-login').click();
   await expect(page).toHaveURL(/auth/);
-  const res = await page.goto(`${app}/gigs`, { waitUntil: 'load' });
+  const res = await page.goto(`${app}/find`, { waitUntil: 'load' });
   expect(res?.status()).toBe(200);
 });

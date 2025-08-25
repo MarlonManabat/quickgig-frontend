@@ -34,13 +34,6 @@ export default function Home() {
             {copy.nav.postJob}
           </Link>
         )}
-        <Link
-          href="/auth?focus=email"
-          className="btn-secondary"
-          data-testid="cta-auth"
-        >
-          Sign up / Mag-login
-        </Link>
       </div>
     </Card>
   );
