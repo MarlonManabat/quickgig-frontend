@@ -7,7 +7,18 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(process.cwd(), 'pages');
-const SKIP_FILES = new Set(['_app.tsx','_app.jsx','_document.tsx','_document.jsx','_error.tsx','_error.jsx']);
+const SKIP_FILES = new Set([
+  '_app.tsx',
+  '_app.jsx',
+  '_document.tsx',
+  '_document.jsx',
+  '_error.tsx',
+  '_error.jsx',
+  '404.tsx',
+  '404.jsx',
+  '500.tsx',
+  '500.jsx',
+]);
 
 function walk(dir) {
   const out = [];
