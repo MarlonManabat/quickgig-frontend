@@ -1,21 +1,33 @@
 import { test, expect } from '@playwright/test'
 import { stubSignIn } from '../utils/session'
 import { createClient } from '@supabase/supabase-js'
+import { seedAndGet } from '../helpers/seed'
 
-const app = process.env.PLAYWRIGHT_APP_URL!
+const app = process.env.BASE_URL!
 const qa = process.env.QA_TEST_MODE === 'true'
 
 const employerEmail = 'demo-user@quickgig.test'
-const employerId = '00000000-0000-0000-0000-000000000001'
-const workerId = '00000000-0000-0000-0000-000000000002'
 
 test('@full hire requires tickets', async ({ page }) => {
+  const { employerId, workerId } = await seedAndGet(app, process.env.QA_TEST_SECRET!)
   if (qa) await stubSignIn(page, employerEmail)
 
-  const supa = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+  const supa = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
   await supa.from('ticket_balances').upsert({ user_id: employerId, balance: 0 })
-  const { data: gig } = await supa.from('gigs').insert({ owner: employerId, title: 'Hire Test', description: 'hire', budget: 1 }).select('id').single()
-  const { data: appRow } = await supa.from('applications').insert({ gig_id: gig!.id, worker: workerId, status: 'applied' }).select('id').single()
+  const { data: gig } = await supa
+    .from('gigs')
+    .insert({ owner_id: employerId, title: 'Hire Test', description: 'hire', price: 1, tags: ['e2e'] })
+    .select('id')
+    .single()
+  const { data: appRow } = await supa
+    .from('applications')
+    .insert({ gig_id: gig!.id, applicant_id: workerId, status: 'applied' })
+    .select('id')
+    .single()
 
   await page.goto(`${app}/gigs/${gig!.id}/applicants`)
   page.on('dialog', d => d.accept())

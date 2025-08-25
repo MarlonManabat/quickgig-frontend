@@ -20,6 +20,11 @@ function isAssetOrApi(pathname: string) {
 
 export async function middleware(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
+  if (pathname === '/api/test/seed') {
+    return process.env.QA_TEST_MODE === 'true'
+      ? NextResponse.next()
+      : NextResponse.json({ error: 'Not Found' }, { status: 404 });
+  }
   if (isAssetOrApi(pathname)) return NextResponse.next();
 
   const res = NextResponse.next();

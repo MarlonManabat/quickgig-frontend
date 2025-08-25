@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { loginAs } from './utils/session';
 import { qaUpsertUser, qaGetTickets, qaCleanupJobs } from './utils/qa';
 
-const APP = process.env.PLAYWRIGHT_APP_URL || 'https://app.quickgig.ph';
+const APP = process.env.BASE_URL || 'https://app.quickgig.ph';
 
 test.setTimeout(120_000);
 

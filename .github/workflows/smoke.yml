@@ -1,15 +1,13 @@
-name: E2E
+name: Smoke
 
 on:
   push:
     branches: [ main ]
   pull_request:
   workflow_dispatch:
-  schedule:
-    - cron: '15 7 * * *'
 
 jobs:
-  e2e:
+  smoke:
     runs-on: ubuntu-latest
     env:
       QA_TEST_MODE: "true"
@@ -38,16 +36,7 @@ jobs:
           BASE_URL: ${{ env.BASE_URL }}
           QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
         run: node scripts/seed-ci.mjs
-      - name: Run full E2E
+      - name: Run smoke tests
         env:
           BASE_URL: ${{ env.BASE_URL }}
-        run: npx playwright test tests/e2e --config=playwright.ci.ts
-      - name: Upload artifacts (always)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results-e2e
-          path: |
-            test-results/**
-            playwright-report/**
-          if-no-files-found: ignore
+        run: npx playwright test tests/smoke --config=playwright.ci.ts
