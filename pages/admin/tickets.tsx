@@ -17,7 +17,7 @@ export default function AdminTickets() {
           .from('tickets_ledger')
           .select('delta,reason,created_at')
           .eq('user_id', b.user_id)
-          .order('created_at', { descending: true })
+          .order('created_at', { ascending: false })
           .limit(10);
         return { user_id: b.user_id, balance: b.balance, entries: entries ?? [] };
       })
