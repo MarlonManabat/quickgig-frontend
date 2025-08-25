@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createServerClient } from '@/utils/supabaseClient'
+import { requireSupabaseForApi } from '@/lib/supabase/server'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const supabase = createServerClient()
+  const supabase = requireSupabaseForApi(req, res)
 
   if (req.method === 'GET') {
     const { q, city } = req.query as { q?: string, city?: string }
@@ -16,8 +16,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'POST') {
     const token = req.headers.authorization?.replace('Bearer ', '')
-    const { data: { user } } = await supabase.auth.getUser(token)
-    if (!user) return res.status(401).json({ error: 'unauthorized' })
+    const { data: { user }, error: userErr } = await supabase.auth.getUser(token)
+    if (userErr || !user) return res.status(401).json({ error: 'unauthorized' })
     const { title, description, city, budget } = req.body
     if (!title || !description || !city || budget === undefined) {
       return res.status(400).json({ error: 'missing fields' })
