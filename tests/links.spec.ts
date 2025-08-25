@@ -42,3 +42,18 @@ test.describe('No dead links on landing', () => {
     }
   });
 });
+
+test.describe('legacy routes redirect', () => {
+  test('old paths forward to start flow', async ({ request }) => {
+    const cases: Array<[string, string]> = [
+      ['/simulan', '/start?intent=worker'],
+      ['/signup', '/start'],
+    ];
+    for (const [src, dest] of cases) {
+      const res = await request.get(src, { maxRedirects: 0 });
+      expect(res.status(), `${src} should redirect`).toBeGreaterThanOrEqual(300);
+      expect(res.status()).toBeLessThan(400);
+      expect(res.headers()['location']).toBe(dest);
+    }
+  });
+});
