@@ -1,13 +1,32 @@
-import { cookies, headers } from 'next/headers';
-import { createServerClient } from '@supabase/auth-helpers-nextjs';
+import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 
-export function getSupabaseServer(): SupabaseClient | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) {
-    console.warn('[supabase] Server envs missing; returning null');
+// For getServerSideProps
+export function getSupabaseForGSSP(
+  ctx: GetServerSidePropsContext
+): SupabaseClient | null {
+  const hasEnv =
+    !!(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) &&
+    !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!hasEnv) {
+    console.warn('[supabase] Missing envs in SSR; returning null');
     return null;
   }
-  return createServerClient(url, anon, { cookies, headers });
+  return createPagesServerClient(ctx);
+}
+
+// For API routes (Pages Router)
+export function getSupabaseForApi(
+  req: NextApiRequest,
+  res: NextApiResponse
+): SupabaseClient | null {
+  const hasEnv =
+    !!(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) &&
+    !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!hasEnv) {
+    console.warn('[supabase] Missing envs in API; returning null');
+    return null;
+  }
+  return createPagesServerClient({ req, res });
 }
