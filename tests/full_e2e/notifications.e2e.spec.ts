@@ -1,14 +1,16 @@
 import { test, expect } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import { stubSignIn } from '../utils/session'
+import { disableAnimations } from '../utils/test-login'
 
-const app = process.env.PLAYWRIGHT_APP_URL!
+const app = process.env.NEXT_PUBLIC_APP_URL!
 const employerEmail = 'demo-user@quickgig.test'
 const employerId = '00000000-0000-0000-0000-000000000001'
 const workerEmail = 'new-user@quickgig.test'
 const workerId = '00000000-0000-0000-0000-000000000002'
 
 test('notifications flow', async ({ page }) => {
+  await disableAnimations(page)
   const supa = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -36,14 +38,22 @@ test('notifications flow', async ({ page }) => {
 
   await stubSignIn(page, workerEmail)
   await page.goto(`${app}/`)
-  await expect(page.locator('a[aria-label="Notifications"] span')).toHaveText('1')
+  await page.waitForLoadState('networkidle')
+  const notifLink = page.getByRole('link', { name: 'Notifications' })
+  await expect(notifLink.locator('span')).toHaveText('1')
 
-  await page.locator('a[aria-label="Notifications"]').click()
-  await expect(page).toHaveURL(/\/notifications$/)
+  await Promise.all([
+    page.waitForURL('**/notifications', { timeout: 20_000 }),
+    notifLink.click(),
+  ])
+  await page.waitForLoadState('networkidle')
   const item = page.getByTestId('notifications-list').locator('li').first()
   await expect(item).toContainText('You received an offer')
-  await item.getByRole('button', { name: /mark as read/i }).click()
-  await expect(page.locator('a[aria-label="Notifications"] span')).toHaveCount(0)
+  await Promise.all([
+    page.waitForLoadState('networkidle'),
+    item.getByRole('button', { name: /mark as read/i }).click(),
+  ])
+  await expect(notifLink.locator('span')).toHaveCount(0)
 
   await supa.from('notifications').insert({
     user_id: employerId,
@@ -65,6 +75,7 @@ test('notifications flow', async ({ page }) => {
 
   await stubSignIn(page, employerEmail)
   await page.goto(`${app}/notifications`)
+  await page.waitForLoadState('networkidle')
   await expect(page.getByTestId('notifications-list')).toContainText('Your offer was accepted')
   await expect(page.getByTestId('notifications-list')).toContainText('GCash top-up approved')
 })
