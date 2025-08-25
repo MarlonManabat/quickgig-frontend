@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/lib/db/types';
 
 function assertAuth(req: NextApiRequest) {
   const enabled = process.env.QA_TEST_MODE === 'true';
@@ -8,7 +10,7 @@ function assertAuth(req: NextApiRequest) {
   if (!okHeader) throw new Error('unauthorized');
 }
 
-async function deleteAllUsers(supabase: ReturnType<typeof createClient>) {
+async function deleteAllUsers(supabase: SupabaseClient<Database>) {
   let page = 1;
   while (true) {
     const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 1000 });
@@ -22,7 +24,7 @@ async function deleteAllUsers(supabase: ReturnType<typeof createClient>) {
 }
 
 async function createUser(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<Database>,
   email: string,
   profile: Record<string, any>
 ) {
@@ -52,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     if (req.method !== 'POST') return res.status(405).end();
     assertAuth(req);
-    const supabase = createClient(
+    const supabase = createClient<Database>(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       { auth: { persistSession: false } }
