@@ -14,17 +14,18 @@ export default function Start() {
       const target = intent === 'worker' ? '/find' : '/post';
 
       // who am i?
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      // not authed → go login, then back here (unless mock session)
-      if (!user && !hasMockSession()) {
-        const next = encodeURIComponent(`/start?intent=${intent}`);
-        router.replace(`/login?next=${next}`);
-        return;
-      }
-
-      if (hasMockSession()) {
-        router.replace(`/profile?next=${encodeURIComponent(target)}`);
+      const mock = hasMockSession();
+      if (!user) {
+        if (mock) {
+          router.replace(`/profile?next=${encodeURIComponent(target)}`);
+        } else {
+          const next = encodeURIComponent(`/start?intent=${intent}`);
+          router.replace(`/login?next=${next}`);
+        }
         return;
       }
 

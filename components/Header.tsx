@@ -106,6 +106,7 @@ export default function Header() {
                 Mag-login
               </LinkSafe>
               <LinkSafe
+                id="cta-app"
                 href="/start"
                 data-testid="app-signup"
                 app-nav="/start"
