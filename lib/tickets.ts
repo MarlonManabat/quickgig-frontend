@@ -1,7 +1,31 @@
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from './supabaseClient';
+
+export async function getBalance(userId: string): Promise<number> {
+  const { data, error } = await supabase
+    .from('tickets_balances')
+    .select('balance')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.balance ?? 0;
+}
+
+export async function addEntry(userId: string, delta: number, reason: string) {
+  const { error } = await supabase
+    .from('tickets_ledger')
+    .insert({ user_id: userId, delta, reason });
+  if (error) throw error;
+}
+
+export async function requireTicket(userId: string, reason: string) {
+  const balance = await getBalance(userId);
+  if (balance <= 0) throw new Error('Insufficient tickets');
+  await addEntry(userId, -1, reason);
+}
+
 export async function getMyTicketBalance() {
-  const supa = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-  const { data, error } = await supa.from('ticket_balances').select('balance').eq('user_id', (await supa.auth.getUser()).data.user?.id ?? '').maybeSingle()
-  if (error) return 0
-  return data?.balance ?? 0
+  const { data } = await supabase.auth.getUser();
+  const id = data.user?.id;
+  if (!id) return 0;
+  return getBalance(id);
 }
