@@ -31,7 +31,7 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       - name: Run smoke
-        run: npm run qa:smoke
+        run: npx playwright test -c playwright.ci.ts
         env:
           CI: 'true'
       - name: Upload artifacts (always)
@@ -67,7 +67,7 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       - name: Run full e2e
-        run: npm run qa:full
+        run: npx playwright test -c playwright.ci.ts
         env:
           CI: 'true'
       - name: Upload artifacts (always)
