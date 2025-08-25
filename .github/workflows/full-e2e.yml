@@ -1,0 +1,61 @@
+name: Full E2E
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm i -g npm@9
+          npm install --no-audit --no-fund
+
+      - name: Install Playwright (with system deps)
+        run: npx playwright install --with-deps
+
+      - name: Get Vercel Preview URL for this commit
+        id: preview
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          node scripts/get-vercel-preview-url.mjs > url.txt
+          echo "url=$(cat url.txt)" >> $GITHUB_OUTPUT
+
+      - name: Seed test data (optional)
+        env:
+          BASE_URL: ${{ steps.preview.outputs.url }}
+          TEST_ENABLE_SEED: ${{ secrets.TEST_ENABLE_SEED }}
+        run: |
+          curl -fsSL -X POST "$BASE_URL/api/test/seed/health" -H "x-test-token: $TEST_ENABLE_SEED" || true
+
+      - name: Run full E2E
+        env:
+          BASE_URL: ${{ steps.preview.outputs.url }}
+          TEST_ENABLE_SEED: ${{ secrets.TEST_ENABLE_SEED }}
+        run: |
+          npx playwright test tests/e2e \
+            --reporter=github,line \
+            --trace=on-first-retry --video=retain-on-failure --output=./test-artifacts
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts
+          path: test-artifacts

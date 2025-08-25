@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import { stubSignIn } from '../utils/session'
+import { seedApplication } from '../lib/seed'
 
-const app = process.env.PLAYWRIGHT_APP_URL!
+const app = process.env.BASE_URL!
 const employerEmail = 'demo-user@quickgig.test'
 const employerId = '00000000-0000-0000-0000-000000000001'
 const workerEmail = 'new-user@quickgig.test'
@@ -19,19 +20,15 @@ test('notifications flow', async ({ page }) => {
     .insert({ owner_id: employerId, title: 'Notif', description: 'n', budget: 1 })
     .select('id, title')
     .single()
-  const { data: appRow } = await supa
-    .from('applications')
-    .insert({ gig_id: gig!.id, applicant_id: workerId, status: 'pending' })
-    .select('id')
-    .single()
+  const appId = await seedApplication(process.env.BASE_URL!, process.env.TEST_ENABLE_SEED || '', { gigId: gig!.id, workerId })
 
   await supa.from('notifications').insert({
     user_id: workerId,
     type: 'offer_sent',
     title: 'You received an offer',
     body: `Good news! An employer sent you an offer on “${gig!.title}”.\nReview and accept if you’re interested.`,
-    link: `${app}/applications/${appRow!.id}`,
-    uniq_key: `offer_sent:${appRow!.id}`,
+    link: `${app}/applications/${appId}`,
+    uniq_key: `offer_sent:${appId}`,
   })
 
   await stubSignIn(page, workerEmail)
@@ -51,7 +48,7 @@ test('notifications flow', async ({ page }) => {
     title: 'Your offer was accepted',
     body: `Your offer for “${gig!.title}” was accepted. You’re now hired!`,
     link: `${app}/gigs/${gig!.id}`,
-    uniq_key: `offer_accepted:${appRow!.id}`,
+    uniq_key: `offer_accepted:${appId}`,
   })
 
   await supa.from('notifications').insert({

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { stubSignIn, getDemoEmail } from '../utils/session';
 
-const app = process.env.PLAYWRIGHT_APP_URL!;
+const app = process.env.BASE_URL!;
 const qa = process.env.QA_TEST_MODE === 'true';
 
 test('@full admin can post gig and view listing', async ({ page }) => {

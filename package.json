@@ -55,6 +55,8 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=18.17"
-  }
+    "node": ">=20 <21",
+    "npm": ">=9 <10"
+  },
+  "packageManager": "npm@9"
 }

@@ -17,7 +17,7 @@ test.describe('[full-e2e] tickets gate hire', () => {
 
     // Employer logs in and tries to hire
     await loginViaMagicLink(page, EMPLOYER)
-    await page.goto(`${process.env.APP_URL}/applications/${data.applicationId}`)
+    await page.goto(`${process.env.BASE_URL || process.env.APP_URL}/applications/${data.applicationId}`)
     await page.getByRole('button', { name: /hire|accept|confirm/i }).click()
 
     // Expect blocked: either redirect to /pay or see a "out of tickets" toast
@@ -31,7 +31,7 @@ test.describe('[full-e2e] tickets gate hire', () => {
     await ctx.post('/api/qa/credit-tickets', { data: { userId: data.employerId, tickets: 3 } })
 
     // Retry hire → should succeed (URL changes or status label shows)
-    await page.goto(`${process.env.APP_URL}/applications/${data.applicationId}`)
+    await page.goto(`${process.env.BASE_URL || process.env.APP_URL}/applications/${data.applicationId}`)
     await page.getByRole('button', { name: /hire|accept|confirm/i }).click()
 
     const success = await Promise.race([
