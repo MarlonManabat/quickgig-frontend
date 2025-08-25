@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { stubSignIn } from '../utils/session'
 import { createClient } from '@supabase/supabase-js'
+import { disableAnimations } from '../utils/test-login'
 
-const app = process.env.PLAYWRIGHT_APP_URL!
+const app = process.env.NEXT_PUBLIC_APP_URL!
 const qa = process.env.QA_TEST_MODE === 'true'
 
 const employerEmail = 'demo-user@quickgig.test'
@@ -10,6 +11,7 @@ const employerId = '00000000-0000-0000-0000-000000000001'
 const workerId = '00000000-0000-0000-0000-000000000002'
 
 test('@full hire requires tickets', async ({ page }) => {
+  await disableAnimations(page)
   if (qa) await stubSignIn(page, employerEmail)
 
   const supa = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
@@ -18,12 +20,22 @@ test('@full hire requires tickets', async ({ page }) => {
   const { data: appRow } = await supa.from('applications').insert({ gig_id: gig!.id, worker: workerId, status: 'applied' }).select('id').single()
 
   await page.goto(`${app}/gigs/${gig!.id}/applicants`)
+  await page.waitForLoadState('networkidle')
   page.on('dialog', d => d.accept())
-  await page.getByRole('button', { name: /accept/i }).click()
+  const accept = page.getByRole('button', { name: /accept/i })
+  await Promise.all([
+    page.waitForURL('**/pay', { timeout: 20_000 }),
+    accept.click(),
+  ])
+  await page.waitForLoadState('networkidle')
   await expect(page).toHaveURL(/\/pay$/)
 
   await supa.rpc('credit_tickets_admin', { p_user: employerId, p_tickets: 1, p_reason: 'test', p_ref: appRow!.id })
   await page.goto(`${app}/gigs/${gig!.id}/applicants`)
-  await page.getByRole('button', { name: /accept/i }).click()
+  await page.waitForLoadState('networkidle')
+  await Promise.all([
+    page.waitForLoadState('networkidle'),
+    page.getByRole('button', { name: /accept/i }).click(),
+  ])
   await expect(page.getByText(/status:\s*accepted/i)).toBeVisible()
 })

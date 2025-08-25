@@ -1,0 +1,46 @@
+name: full-e2e
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  full-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_APP_URL: https://app.quickgig.ph
+      NEXT_PUBLIC_LANDING_URL: https://quickgig.ph
+      NEXT_PUBLIC_DEFAULT_REDIRECT: /start
+      TEST_LOGIN_ENABLED: "true"
+      NEXT_PUBLIC_TEST_LOGIN_ENABLED: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 18 + npm@9
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.20.4'
+          cache: 'npm'
+      - name: Pin npm@9
+        run: |
+          npm i -g npm@9
+          npm -v
+
+      - name: Install dependencies (resilient)
+        run: bash .github/scripts/ci-install.sh
+
+      - name: Install Playwright (with system deps)
+        run: npx playwright install --with-deps
+
+      - name: Run full e2e
+        run: npx playwright test tests/full_e2e --reporter=github
+
+      - name: Upload artifacts (full-e2e)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-full-e2e
+          path: |
+            playwright-report/**
+            test-results/**
+          retention-days: 7
