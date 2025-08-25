@@ -12,12 +12,15 @@ const base = APP_URL.replace(/\/+$/, '');
 // Accept root with optional query/fragment
 const rootRe = new RegExp(`^${esc(base)}/?(?:[?#].*)?$`, 'i');
 
-// TEMP: accept legacy routes while caches/CDN propagate, remove soon.
-const findRe = new RegExp(`^${esc(base)}/find(?:[?#].*)?$`, 'i');
-const postRe = new RegExp(`^${esc(base)}/post(?:[?#].*)?$`, 'i');
-
-const acceptable = (href: string | null | undefined) =>
-  !!href && (rootRe.test(href) || findRe.test(href) || postRe.test(href)); // TODO: drop findRe & postRe
+const workerStartRe = new RegExp(
+  `^${esc(base)}/start\\?intent=worker(?:[?#].*)?$`,
+  'i',
+);
+const employerStartRe = new RegExp(
+  `^${esc(base)}/start\\?intent=employer(?:[?#].*)?$`,
+  'i',
+);
+const startRe = new RegExp(`^${esc(base)}/start(?:[?#].*)?$`, 'i');
 
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -26,21 +29,23 @@ test.beforeEach(async ({ page }) => {
 test('landing → app header visible', async ({ page }) => {
   await page.goto('https://quickgig.ph');
 
-  const checkCta = async (name: RegExp) => {
+  const checkCta = async (name: RegExp, target: RegExp) => {
     const cta = page.getByRole('link', { name }).first();
     await expect(cta).toBeVisible({ timeout: 10000 });
     const href = await cta.getAttribute('href');
     console.log('[smoke] CTA href:', href);
-    expect(acceptable(href)).toBeTruthy(); // TEMP relaxed
+    expect(href, 'href should exist').not.toBeNull();
+    expect(target.test(href!)).toBeTruthy();
     await Promise.all([
-      page.waitForURL(rootRe, { timeout: 10_000 }),
+      page.waitForURL(target, { timeout: 10_000 }),
       cta.click(),
     ]);
     await page.goBack({ waitUntil: 'load' }).catch(() => {});
   };
 
-  await checkCta(/find work|browse jobs|maghanap ng trabaho/i);
-  await checkCta(/post job/i);
+  await checkCta(/simulan na/i, workerStartRe);
+  await checkCta(/post job/i, employerStartRe);
+  await checkCta(/sign up/i, startRe);
 
   // ---- Header logo (prefer href, else click) ----
   const logoLink = page

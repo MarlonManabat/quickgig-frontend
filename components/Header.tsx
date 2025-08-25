@@ -106,9 +106,9 @@ export default function Header() {
                 Mag-login
               </LinkSafe>
               <LinkSafe
-                href="/signup"
+                href="/start"
                 data-testid="app-signup"
-                app-nav="/signup"
+                app-nav="/start"
                 className="hidden md:inline-flex qg-btn qg-btn--primary h-11 min-h-[44px]"
               >
                 Sign Up
@@ -151,9 +151,9 @@ export default function Header() {
                 </LinkSafe>
               )}
               <LinkSafe
-                href="/signup"
+                href="/start"
                 data-testid="app-signup"
-                app-nav="/signup"
+                app-nav="/start"
                 className="qg-btn qg-btn--primary w-full h-11 min-h-[44px] text-center flex items-center justify-center"
               >
                 Sign Up

@@ -25,6 +25,8 @@ module.exports = withBundleAnalyzer({
   },
   async redirects() {
     return [
+      { source: '/simulan', destination: '/start?intent=worker', permanent: true },
+      { source: '/signup', destination: '/start', permanent: true },
       { source: '/start-worker', destination: '/start?intent=worker', permanent: true },
       { source: '/start-employer', destination: '/start?intent=employer', permanent: true },
       { source: '/post-job', destination: '/post', permanent: true },
