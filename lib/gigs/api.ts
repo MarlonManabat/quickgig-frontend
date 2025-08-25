@@ -1,7 +1,10 @@
-import { getBrowserClient } from '@/lib/supabase/browser'
+import { getSupabaseBrowser } from '@/lib/supabase/browser'
 import type { Gig } from '@/lib/db/types'
 
-const supabase = getBrowserClient()
+const supabase = getSupabaseBrowser()
+if (!supabase) {
+  throw new Error('Supabase not initialized')
+}
 
 export function listGigs() {
   return supabase.from('gigs').select('*').order('created_at', { ascending: false })
