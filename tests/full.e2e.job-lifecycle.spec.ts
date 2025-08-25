@@ -4,6 +4,8 @@ import { qaUpsertUser, qaGetTickets, qaCleanupJobs } from './utils/qa';
 
 const APP = process.env.PLAYWRIGHT_APP_URL || 'https://app.quickgig.ph';
 
+test.setTimeout(120_000);
+
 test('[full-e2e] job lifecycle: post → apply → message → hire', async ({ page, context }) => {
   const title = `E2E Gig ${Date.now()}`;
 

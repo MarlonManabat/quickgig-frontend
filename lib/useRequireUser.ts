@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 import { useRouter } from "next/router";
+import { hasMockSession } from "./session";
 
 export function useRequireUser() {
   const router = useRouter();
@@ -18,12 +19,12 @@ export function useRequireUser() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!active) return;
-      if (!session?.user) {
+      if (!session?.user && !hasMockSession()) {
         router.replace(`/auth?next=${encodeURIComponent(router.asPath)}`);
         return;
       }
       clearTimeout(timer);
-      setUserId(session.user.id);
+      setUserId(session?.user?.id || 'mock-user');
       setReady(true);
     })();
     return () => {

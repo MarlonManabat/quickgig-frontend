@@ -10,13 +10,18 @@ import Container from "@/components/Container";
 import { useEffect } from "react";
 import { setupErrlog } from "@/lib/errlog";
 import { qgSans } from "@/lib/fonts";
+import { supabase } from "@/utils/supabaseClient";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isError = router.pathname === '/404' || router.pathname === '/500';
   useEffect(() => {
     setupErrlog();
-  }, []);
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session && router.pathname.startsWith('/profile')) router.replace('/start');
+    });
+    return () => { sub.subscription.unsubscribe(); };
+  }, [router]);
   return (
     <>
       <Head>

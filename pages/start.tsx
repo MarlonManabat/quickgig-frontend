@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { hasMockSession } from '@/lib/session';
 
 export default function Start() {
   const router = useRouter();
@@ -13,12 +14,18 @@ export default function Start() {
       const target = intent === 'worker' ? '/find' : '/post';
 
       // who am i?
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      // not authed → go login, then back here
+      const mock = hasMockSession();
       if (!user) {
-        const next = encodeURIComponent(`/start?intent=${intent}`);
-        router.replace(`/login?next=${next}`);
+        if (mock) {
+          router.replace(`/profile?next=${encodeURIComponent(target)}`);
+        } else {
+          const next = encodeURIComponent(`/start?intent=${intent}`);
+          router.replace(`/login?next=${next}`);
+        }
         return;
       }
 

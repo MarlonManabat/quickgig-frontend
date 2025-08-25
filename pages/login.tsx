@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '@/utils/supabaseClient';
+import { sendMagicLink } from '@/lib/auth';
 import FormShell from '@/components/forms/FormShell';
 import EmailField from '@/components/ui/EmailField';
 import FieldRow from '@/components/forms/FieldRow';
@@ -27,16 +28,7 @@ export default function AuthPage() {
     const next = router.query?.next as string | undefined;
     const role = router.query?.role as string | undefined;
     try {
-      const qp = new URLSearchParams();
-      if (next) qp.set('next', next);
-      if (role) qp.set('role', role);
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${location.origin}/auth/callback${qp.toString() ? `?${qp.toString()}` : ''}`,
-          shouldCreateUser: true,
-        },
-      });
+      const { error } = await sendMagicLink(email, { next, role });
       if (error) throw error;
       toast.success('Magic link sent! Please check your email.');
       setStatus(
