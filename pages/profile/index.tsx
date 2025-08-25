@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { hasMockSession } from '@/lib/session';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -14,12 +15,14 @@ export default function ProfilePage() {
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace(`/login?next=${encodeURIComponent('/profile')}`); return; }
-      const { data } = await supabase.from('profiles').select('first_name, city, avatar_url').eq('id', user.id).maybeSingle();
-      if (data) {
-        setFirstName(data.first_name || '');
-        setCity(data.city || '');
-        setAvatarUrl(data.avatar_url || null);
+      if (!user && !hasMockSession()) { router.replace(`/login?next=${encodeURIComponent('/profile')}`); return; }
+      if (user) {
+        const { data } = await supabase.from('profiles').select('first_name, city, avatar_url').eq('id', user.id).maybeSingle();
+        if (data) {
+          setFirstName(data.first_name || '');
+          setCity(data.city || '');
+          setAvatarUrl(data.avatar_url || null);
+        }
       }
       setLoading(false);
     })();
@@ -28,14 +31,16 @@ export default function ProfilePage() {
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    // Minimal completeness: first_name + city
-    await supabase.from('profiles').update({
-      first_name: firstName,
-      city,
-      avatar_url: avatarUrl
-    }).eq('id', user.id);
-    router.replace(nextTarget);
+    if (hasMockSession() || user) {
+      if (user) {
+        await supabase.from('profiles').update({
+          first_name: firstName,
+          city,
+          avatar_url: avatarUrl
+        }).eq('id', user.id);
+      }
+      router.replace(nextTarget);
+    }
   }
 
   if (loading) return <main className="p-6">Loading…</main>;

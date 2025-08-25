@@ -18,6 +18,9 @@ jobs:
       QA_TEST_MODE: "true"
       QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
       QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
+      TEST_LOGIN_SECRET: ${{ secrets.TEST_LOGIN_SECRET }}
+      TEST_LOGIN_ENABLED: "true"
+      NEXT_PUBLIC_TEST_LOGIN_ENABLED: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,7 +42,6 @@ jobs:
           if-no-files-found: ignore
 
   full-e2e:
-    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     env:
       APP_URL: https://app.quickgig.ph
@@ -49,6 +51,9 @@ jobs:
       QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
       QA_TEST_EMAIL_ADMIN: ${{ secrets.QA_TEST_EMAIL_ADMIN || secrets.QA_TEST_EMAIL }}
       QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
+      TEST_LOGIN_SECRET: ${{ secrets.TEST_LOGIN_SECRET }}
+      TEST_LOGIN_ENABLED: "true"
+      NEXT_PUBLIC_TEST_LOGIN_ENABLED: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
