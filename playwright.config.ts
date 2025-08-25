@@ -1,6 +1,13 @@
 import { defineConfig } from '@playwright/test'
 
+// make BASE_URL available for tests and legacy helpers
+if (process.env.BASE_URL) {
+  process.env.PLAYWRIGHT_APP_URL ??= process.env.BASE_URL;
+  process.env.APP_URL ??= process.env.BASE_URL;
+}
+
 const baseURL =
+  process.env.BASE_URL ||
   process.env.NEXT_PUBLIC_APP_URL ||
   process.env.NEXT_PUBLIC_SITE_URL ||
   process.env.NEXT_PUBLIC_LANDING_URL ||

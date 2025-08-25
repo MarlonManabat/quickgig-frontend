@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { stubSignIn } from '../utils/session';
 
-const app = process.env.PLAYWRIGHT_APP_URL!;
+const app = process.env.BASE_URL!;
 const qa = process.env.QA_TEST_MODE === 'true';
 
 // simple admin dashboard access check
