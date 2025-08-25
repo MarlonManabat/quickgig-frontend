@@ -75,3 +75,5 @@ export default function NotificationsPage() {
     </main>
   )
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

@@ -45,3 +45,5 @@ export default function OrdersAdmin() {
     </main>
   );
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

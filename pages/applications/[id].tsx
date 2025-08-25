@@ -95,3 +95,5 @@ export default function ApplicationPage() {
     </main>
   );
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

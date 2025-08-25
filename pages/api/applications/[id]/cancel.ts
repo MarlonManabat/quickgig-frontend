@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "@/lib/supabaseClient";
+import { requireSupabaseForApi } from "@/lib/supabase/server";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -7,6 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const supabase = requireSupabaseForApi(req, res);
     const matchId = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
 
     const { data, error } = await supabase.rpc("rpc_refund_match_tickets", {

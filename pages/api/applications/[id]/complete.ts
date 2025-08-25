@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createServerClient } from '@/utils/supabaseClient'
+import { requireSupabaseForApi } from '@/lib/supabase/server'
 import { emitNotification } from '@/lib/notifications'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') { res.status(405).json({ error: 'method not allowed' }); return; }
-  const supabase = createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) { res.status(401).json({ error: 'unauthorized' }); return; }
+  const supabase = requireSupabaseForApi(req, res)
+  const { data: { user }, error: userErr } = await supabase.auth.getUser()
+  if (userErr || !user) { res.status(401).json({ error: 'unauthorized' }); return; }
   const appId = req.query.id as string
   const { data: app } = await supabase
     .from('applications')
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const workerId = (app as any)?.applicant_id || (app as any)?.worker
   const employerId = gig?.owner_id
   const gigTitle = gig?.title
-  const gigId = (app as any)?.gig_id
+  const id = (app as any)?.gig_id
   for (const target of [employerId, workerId]) {
     if (target && gigTitle) {
       await emitNotification({
@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         type: 'job_completed',
         title: 'Gig marked completed',
         body: `“${gigTitle}” has been marked completed.`,
-        link: `${process.env.NEXT_PUBLIC_APP_URL}/gigs/${gigId}`,
+        link: `${process.env.NEXT_PUBLIC_APP_URL}/gigs/${id}`,
         uniq: `job_completed:${appId}:${target}`,
       })
     }

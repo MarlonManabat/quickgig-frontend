@@ -1,0 +1,41 @@
+name: Full E2E
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  full-e2e:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_ENABLE_SEED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node 18 + npm@9
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.20.4'
+          cache: 'npm'
+      - name: Pin npm@9
+        run: npm i -g npm@9 && npm -v
+      - name: Install deps
+        run: bash .github/scripts/ci-install.sh
+      - name: Force SSR on all pages (CI only)
+        run: npm run ci:force-ssr
+      - name: Build
+        run: npm run build
+      - name: Start app
+        run: |
+          npm run start > app.log 2>&1 &
+          npx wait-on --timeout=120000 ${{ env.BASE_URL }}/api/health || (echo "::error::Server failed to start"; tail -n +200 app.log; exit 1)
+      - name: Install Playwright (with system deps)
+        run: npx playwright install --with-deps
+      - name: Run full e2e
+        run: npx playwright test tests/e2e --reporter=github

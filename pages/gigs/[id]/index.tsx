@@ -11,7 +11,7 @@ export default function GigDetail() {
 
   useEffect(() => {
     if (!id) return
-    getGig(id).then(({ data }) => setGig(data))
+    getGig(id).then(setGig)
   }, [id])
 
   const saveToggle = async () => {
@@ -45,3 +45,5 @@ export default function GigDetail() {
     </main>
   )
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

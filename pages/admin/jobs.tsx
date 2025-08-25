@@ -65,3 +65,5 @@ export default function AdminJobs() {
     </main>
   );
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createServerClient } from '@/utils/supabaseClient'
+import { requireSupabaseForApi } from '@/lib/supabase/server'
 import { emitNotification } from '@/lib/notifications'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') { res.status(405).json({ error: 'method not allowed' }); return; }
-  const supabase = createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) { res.status(401).json({ error: 'unauthorized' }); return; }
+  const supabase = requireSupabaseForApi(req, res)
+  const { data: { user }, error: userErr } = await supabase.auth.getUser()
+  if (userErr || !user) { res.status(401).json({ error: 'unauthorized' }); return }
   const appId = req.query.id as string
   const { data: app } = await supabase
     .from('applications')

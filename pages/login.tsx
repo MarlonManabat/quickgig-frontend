@@ -74,3 +74,5 @@ export default function AuthPage() {
     </FormShell>
   );
 }
+
+export { forceSSR as getServerSideProps } from '@/lib/ssr'

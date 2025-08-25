@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createServerClient } from '@/utils/supabaseClient';
+import { requireSupabaseForApi } from '@/lib/supabase/server';
 import { TICKET_PRICE_PHP, makeRef } from '@/lib/payments';
 import { isAdmin } from '@/lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const supabase = createServerClient();
+  const supabase = requireSupabaseForApi(req, res);
   await supabase.rpc('set_config', { setting_name: 'app.admin_emails', new_value: process.env.ADMIN_EMAILS ?? '', is_local: true });
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) { res.status(401).json({ error: 'unauthorized' }); return; }
+  const { data: { user }, error: userErr } = await supabase.auth.getUser();
+  if (userErr || !user) { res.status(401).json({ error: 'unauthorized' }); return; }
 
   if (req.method === 'POST') {
     const { data, error } = await supabase.from('orders')

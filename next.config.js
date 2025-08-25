@@ -6,6 +6,10 @@ module.exports = withBundleAnalyzer({
   reactStrictMode: true,
   images: { formats: ['image/avif', 'image/webp'] },
   eslint: { ignoreDuringBuilds: true }, // prevent CI failing on eslint/parser fetch
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  },
   async headers() {
     return [
       {

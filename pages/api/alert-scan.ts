@@ -1,12 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { createClient } from "@supabase/supabase-js"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !service) return res.status(500).json({ error: 'Missing envs' })
+  const supabase = createClient(url, service)
   const { data: alerts } = await supabase.from("gig_alerts").select("*")
   const now = new Date().toISOString()
   for (const a of alerts ?? []) {

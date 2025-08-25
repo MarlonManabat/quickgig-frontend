@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { supabase } from '@/utils/supabaseClient';
+import { requireSupabaseForApi } from '@/lib/supabase/server';
 import { isAdminEmail } from '@/lib/authz';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') { res.status(405).end(); return; }
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!isAdminEmail(user?.email)) { res.status(403).json({ error: 'forbidden' }); return; }
+  const supabase = requireSupabaseForApi(req, res);
+  const { data: { user }, error: userErr } = await supabase.auth.getUser();
+  if (userErr || !isAdminEmail(user?.email)) { res.status(403).json({ error: 'forbidden' }); return; }
 
   const { action, kind, id } = req.body || {};
   if (!action || !kind || !id) { res.status(400).json({ error: 'missing fields' }); return; }

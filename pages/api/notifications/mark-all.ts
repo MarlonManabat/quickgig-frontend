@@ -1,15 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createServerClient } from '@/utils/supabaseClient'
+import { requireSupabaseForApi } from '@/lib/supabase/server'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') { res.status(405).end(); return }
-  const supabase = createServerClient()
+  const supabase = requireSupabaseForApi(req, res)
   let uid: string | null = null
   if (process.env.QA_TEST_MODE === 'true' && typeof req.headers['x-test-user'] === 'string') {
     uid = req.headers['x-test-user'] as string
   } else {
-    const { data: { user } } = await supabase.auth.getUser()
-    uid = user?.id || null
+    const { data: { user }, error: userErr } = await supabase.auth.getUser()
+    uid = userErr ? null : user?.id || null
   }
   if (!uid) { res.status(401).json({ error: 'unauthorized' }); return }
   const { error } = await supabase
