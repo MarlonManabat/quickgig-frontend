@@ -4,7 +4,7 @@ import { listMyApplications } from '@/lib/gigs/api'
 export default function MyApplications() {
   const [apps, setApps] = useState<any[]>([])
   useEffect(() => {
-    listMyApplications().then(({ data }) => setApps(data || []))
+    listMyApplications().then(setApps)
   }, [])
   return (
     <main className="p-4 space-y-4">

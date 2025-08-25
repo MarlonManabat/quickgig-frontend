@@ -5,7 +5,7 @@ import GigCard from '@/components/gigs/GigCard'
 export default function GigsIndex() {
   const [gigs, setGigs] = useState<any[]>([])
   useEffect(() => {
-    listGigs().then(({ data }) => setGigs(data || []))
+    listGigs().then(setGigs)
   }, [])
   return (
     <main className="p-4 space-y-4">

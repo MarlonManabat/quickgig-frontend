@@ -7,8 +7,8 @@ export default function NewGig() {
   return (
     <main className="p-4">
       <GigForm onSubmit={async (g) => {
-        const { data } = await createGig(g)
-        if (data) router.push(`/gigs/${data.id}`)
+        const gig = await createGig(g)
+        if (gig) router.push(`/gigs/${gig.id}`)
       }} />
     </main>
   )

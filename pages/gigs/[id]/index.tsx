@@ -11,7 +11,7 @@ export default function GigDetail() {
 
   useEffect(() => {
     if (!id) return
-    getGig(id).then(({ data }) => setGig(data))
+    getGig(id).then(setGig)
   }, [id])
 
   const saveToggle = async () => {

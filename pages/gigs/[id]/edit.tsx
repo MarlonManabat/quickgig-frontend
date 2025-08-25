@@ -9,7 +9,7 @@ export default function EditGig() {
   const [gig, setGig] = useState<any>(null)
   useEffect(() => {
     if (!id) return
-    getGig(id).then(({ data }) => setGig(data))
+    getGig(id).then(setGig)
   }, [id])
   if (!gig) return null
   return (
