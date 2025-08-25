@@ -1,10 +1,21 @@
-export default function NotFound(){
+export default function NotFound() {
   return (
-    <main className="min-h-[60vh] flex items-center justify-center text-center p-8">
-      <div>
-        <h1 className="text-3xl font-semibold mb-2">Page not found</h1>
-        <a href="/" className="px-4 py-2 rounded bg-black text-white">Go home</a>
+    <main className="mx-auto max-w-lg p-8 text-center space-y-4">
+      <h1 className="text-2xl font-semibold">Page not found</h1>
+      <p className="text-slate-600">
+        Sorry, hindi namin mahanap ang page na ito. Try one of these:
+      </p>
+      <div className="flex gap-3 justify-center">
+        <a href="/start?intent=worker" className="qg-btn qg-btn--primary px-4 py-2">
+          Find work
+        </a>
+        <a href="/start?intent=employer" className="qg-btn qg-btn--outline px-4 py-2">
+          Post a job
+        </a>
       </div>
+      <p className="text-sm text-slate-500">
+        Or go to <a className="qg-link" href="/">home</a>.
+      </p>
     </main>
-  )
+  );
 }

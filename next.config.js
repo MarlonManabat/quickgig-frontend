@@ -24,6 +24,13 @@ module.exports = withBundleAnalyzer({
     ];
   },
   async redirects() {
-    return [];
+    return [
+      { source: '/start-worker', destination: '/start?intent=worker', permanent: true },
+      { source: '/start-employer', destination: '/start?intent=employer', permanent: true },
+      { source: '/post-job', destination: '/post', permanent: true },
+      { source: '/gigs/new', destination: '/post', permanent: true },
+      { source: '/jobs', destination: '/find', permanent: true },
+      { source: '/jobs/:path*', destination: '/find', permanent: true },
+    ];
   },
 });

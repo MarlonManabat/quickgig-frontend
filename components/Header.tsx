@@ -7,11 +7,11 @@ import { copy } from '@/copy';
 import AppLogo from '@/components/AppLogo';
 
 const links = [
-  { href: '/gigs', label: copy.nav.findWork, id: 'app-nav-find-work' },
+  { href: '/find', label: copy.nav.findWork, id: 'app-nav-find-work' },
   { href: '/gigs?mine=1', label: copy.nav.myGigs, id: 'app-nav-my-gigs' },
   { href: '/applications', label: copy.nav.applications, id: 'app-nav-applications' },
   { href: '/saved', label: copy.nav.saved, id: 'app-nav-saved' },
-  { href: '/gigs/new', label: copy.nav.postJob, id: 'app-nav-post-job' },
+  { href: '/post', label: copy.nav.postJob, id: 'app-nav-post-job' },
 ];
 
 function IconMenu() {

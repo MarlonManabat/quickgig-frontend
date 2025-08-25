@@ -10,11 +10,11 @@ import { isAdmin } from '@/utils/admin';
 import Container from './Container';
 
 const links = [
-  { href: '/gigs', label: copy.nav.findWork, id: 'app-nav-find-work' },
+  { href: '/find', label: copy.nav.findWork, id: 'app-nav-find-work' },
   { href: '/gigs?mine=1', label: copy.nav.myGigs, id: 'app-nav-my-gigs' },
   { href: '/applications', label: copy.nav.applications, id: 'app-nav-applications' },
   { href: '/saved', label: copy.nav.saved, id: 'app-nav-saved' },
-  { href: '/gigs/new', label: copy.nav.postJob, id: 'app-nav-post-job' },
+  { href: '/post', label: copy.nav.postJob, id: 'app-nav-post-job' },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
