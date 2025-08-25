@@ -19,12 +19,23 @@ function isAssetOrApi(pathname: string) {
 }
 
 export async function middleware(req: NextRequest) {
-  const { pathname, searchParams } = req.nextUrl;
+  const { pathname } = req.nextUrl;
   if (isAssetOrApi(pathname)) return NextResponse.next();
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // If env vars are missing, skip auth handling to avoid crashes in Edge runtime
+  if (!url || !key) return NextResponse.next();
+
   const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
-  const { data: { user } } = await supabase.auth.getUser();
+  const supabase = createMiddlewareClient(
+    { req, res },
+    { supabaseUrl: url, supabaseKey: key }
+  );
+  const { data: { user } = { user: null } } = await supabase.auth
+    .getUser()
+    .catch(() => ({ data: { user: null } }));
 
   // 1) Logged-out → never force redirects (no loops)
   if (!user) return res;
@@ -79,5 +90,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!.*\\.).*)'], // all pages without file extension
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|api/).*)',
+  ],
 };

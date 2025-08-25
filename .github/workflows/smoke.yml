@@ -34,7 +34,7 @@ jobs:
       - name: Start app
         run: |
           npm run start > app.log 2>&1 &
-          npx wait-on --timeout=120000 ${{ env.BASE_URL }} || (echo "::error::Server failed to start"; tail -n +200 app.log; exit 1)
+          npx wait-on --timeout=120000 ${{ env.BASE_URL }}/api/health || (echo "::error::Server failed to start"; tail -n +200 app.log; exit 1)
       - name: Install Playwright (with system deps)
         run: npx playwright install --with-deps
       - name: Run smoke
