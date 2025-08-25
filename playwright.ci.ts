@@ -1,14 +1,19 @@
 import { defineConfig } from '@playwright/test';
-import baseConfig from './playwright.config';
+import base from './playwright.config';
 
-export default defineConfig({
-  // Inherit anything defined in the base config if present
-  ...(baseConfig as any),
-  reporter: [['github'], ...((baseConfig as any)?.reporter ?? [])],
+const config = defineConfig({
+  ...base,
+  // Only overrides specific to CI
   use: {
-    ...((baseConfig as any)?.use ?? {}),
+    ...base.use,
     video: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
+    trace: 'on-first-retry',
   },
+  // IMPORTANT: reporters must be tuples, not raw strings
+  reporter: [
+    ['github'],
+    ...(Array.isArray((base as any).reporter) ? (base as any).reporter : []),
+  ],
 });
+
+export default config;

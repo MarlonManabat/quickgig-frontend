@@ -1,11 +1,11 @@
-name: e2e
+name: smoke
 on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  e2e:
+  smoke:
     runs-on: ubuntu-latest
 
     permissions:
@@ -40,7 +40,7 @@ jobs:
         run: |
           curl -fsSL -X POST "$BASE_URL/api/test/seed" || echo "seed skipped"
 
-      - name: Run full E2E
+      - name: Run smoke tests
         env:
           BASE_URL: ${{ env.BASE_URL }}
-        run: npx playwright test tests/e2e --config=playwright.ci.ts --reporter=github
+        run: npx playwright test tests/smoke --config=playwright.ci.ts --reporter=github
