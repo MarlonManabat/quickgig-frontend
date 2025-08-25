@@ -1,20 +1,17 @@
-name: E2E
+name: Smoke
 
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
-  schedule:
-    - cron: '15 7 * * *'
 
 jobs:
-  e2e:
+  smoke:
     runs-on: ubuntu-latest
     env:
       QA_TEST_MODE: "true"
       QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
-      QA_TEST_EMAIL_ADMIN: ${{ secrets.QA_TEST_EMAIL_ADMIN || secrets.QA_TEST_EMAIL }}
       QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
       TEST_LOGIN_SECRET: ${{ secrets.TEST_LOGIN_SECRET }}
       TEST_LOGIN_ENABLED: "true"
@@ -43,13 +40,13 @@ jobs:
         run: |
           curl -fsS "$BASE_URL/api/test/seed?secret=${{ secrets.QA_TEST_SECRET }}&mode=preview" \
             || echo "::warning::Seed failed"
-      - name: Run e2e tests
-        run: npx playwright test tests/e2e --config=playwright.ci.ts --reporter=github
+      - name: Run smoke tests
+        run: npx playwright test tests/smoke --config=playwright.ci.ts --reporter=github
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-artifacts
+          name: smoke-artifacts
           path: |
             playwright-report
             test-results
