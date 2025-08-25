@@ -27,6 +27,8 @@ jobs:
         run: npm i -g npm@9 && npm -v
       - name: Install deps
         run: bash .github/scripts/ci-install.sh
+      - name: Force SSR on all pages (CI only)
+        run: npm run ci:force-ssr
       - name: Build
         run: npm run build
       - name: Start app
