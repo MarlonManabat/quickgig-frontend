@@ -1,7 +1,6 @@
 import { defineConfig } from "@playwright/test";
 
-const baseURL = process.env.E2E_BASE_URL || "http://localhost:3000";
-
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
 const isCI = !!process.env.CI;
 
 export default defineConfig({
@@ -12,8 +11,8 @@ export default defineConfig({
   retries: 1,
   use: {
     headless: true,
-    trace: "retain-on-failure",
-    screenshot: "only-on-failure",
+    trace: isCI ? "retain-on-failure" : "on",
+    screenshot: isCI ? "only-on-failure" : "on",
     video: "off",
     baseURL,
     actionTimeout: isCI ? 15_000 : 10_000,
@@ -28,9 +27,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run start:preview",
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    command: "npm run start",
+    port: 3000,
+    reuseExistingServer: !isCI,
     timeout: 120_000,
   },
 });

@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { qaContext } from "./helpers/qa";
 import { loginViaMagicLink } from "./helpers/auth"; // existing helper
 
 const EMPLOYER = process.env.QA_TEST_EMAIL!;
@@ -10,11 +9,11 @@ test.setTimeout(120_000);
 
 test.describe("[full-e2e] tickets gate hire", () => {
   test("hire blocked without tickets, succeeds after credit", async ({
+    request,
     page,
   }) => {
-    const ctx = await qaContext();
     // Seed scenario
-    const seed = await ctx.post("/api/qa/seed-hire-scenario", {
+    const seed = await request.post("/api/qa/seed-hire-scenario", {
       data: { employerEmail: EMPLOYER, workerEmail: WORKER },
     });
     const data = await seed.json();
@@ -42,7 +41,7 @@ test.describe("[full-e2e] tickets gate hire", () => {
     expect(blocked).toBeTruthy();
 
     // Credit tickets via QA endpoint
-    await ctx.post("/api/qa/credit-tickets", {
+    await request.post("/api/qa/credit-tickets", {
       data: { userId: data.employerId, tickets: 3 },
     });
 

@@ -11,6 +11,7 @@ env:
   DISABLE_STRIPE: '1'
   NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
   NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon
+  PLAYWRIGHT_BASE_URL: http://localhost:3000
 
 jobs:
   build:
@@ -105,7 +106,6 @@ jobs:
 
       - name: Run E2E tests (shard ${{ matrix.shard_label }})
         env:
-          E2E_BASE_URL: http://localhost:3000
           WORKER_EMAIL: ${{ secrets.WORKER_EMAIL }}
           WORKER_PASSWORD: ${{ secrets.WORKER_PASSWORD }}
           EMPLOYER_EMAIL: ${{ secrets.EMPLOYER_EMAIL }}
