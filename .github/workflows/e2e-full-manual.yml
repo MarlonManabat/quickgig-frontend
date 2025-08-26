@@ -1,0 +1,63 @@
+name: E2E Full (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      grep:
+        description: 'Optional Playwright grep (regex) to narrow tests'
+        required: false
+        default: ''
+
+concurrency:
+  group: full-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install deps (robust)
+        run: |
+          npm ci || (sleep 5 && npm ci) || (sleep 10 && npm ci)
+      - name: Build
+        run: npm run build
+
+  e2e_full:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard_n: [1, 2]
+        shard_d: [2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install deps
+        run: npm ci
+      - name: Install Playwright (system deps)
+        run: npx playwright install --with-deps
+      - name: Run E2E tests (full)
+        run: |
+          SHARD="${{ matrix.shard_n }}/${{ matrix.shard_d }}"
+          if [ -n "${{ github.event.inputs.grep }}" ]; then
+            npx playwright test --project=full-e2e --shard "$SHARD" --grep "${{ github.event.inputs.grep }}" --reporter=github,html
+          else
+            npx playwright test --project=full-e2e --shard "$SHARD" --reporter=github,html
+          fi
+        env:
+          DISABLE_STRIPE: '1'
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-full-e2e-${{ matrix.shard_n }}-of-${{ matrix.shard_d }}
+          path: playwright-report/
