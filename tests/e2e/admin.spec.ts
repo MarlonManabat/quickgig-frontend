@@ -9,5 +9,5 @@ const qa = process.env.QA_TEST_MODE === 'true';
 test('@full admin dashboard access control', async ({ page }) => {
   if (qa) await stubSignIn(page, process.env.SEED_ADMIN_EMAIL || 'demo-admin@quickgig.test');
   await page.goto(`${app}/admin`, { waitUntil: 'load' });
-  await expect(page.getByRole('heading', { name: /Admin/i })).toBeVisible();
+  await expect(page.getByTestId('admin-dashboard')).toBeVisible();
 });

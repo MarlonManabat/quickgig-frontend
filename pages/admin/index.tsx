@@ -13,7 +13,7 @@ export default function AdminHome() {
 
   return (
     <main className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Admin & Ops</h1>
+      <h1 className="text-2xl font-bold mb-4" data-testid="admin-dashboard">Admin & Ops</h1>
       <nav className="flex gap-4 mb-6">
         <Link href="/admin/users" className="underline">
           Users

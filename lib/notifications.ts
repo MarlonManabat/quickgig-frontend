@@ -1,6 +1,7 @@
 import 'server-only'
 import { Resend } from 'resend'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 
 const FROM = process.env.NOTIF_EMAIL_FROM || 'QuickGig <no-reply@quickgig.ph>'
 const RESEND_API_KEY = process.env.RESEND_API_KEY
@@ -52,7 +53,7 @@ export type NotifPayload = {
 export async function emitNotification(p: NotifPayload) {
   if (process.env.NOTIFICATIONS_ENABLED !== 'true') return
 
-  const supa = createClient(
+  const supa: SupabaseClient<Database> = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
