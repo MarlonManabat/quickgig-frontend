@@ -17,6 +17,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 - `npm run build` - build for production
 - `npm start` - run production build
 
+## CI
+
+All automated checks run through a single GitHub Actions workflow, [Release Check](.github/workflows/release-check.yml). It provisions a Vercel preview, seeds test data, runs Playwright smoke and full end-to-end suites, and always uploads the Playwright report artifacts.
+
 ## Testing
 
 ```bash
@@ -33,3 +37,4 @@ curl -X POST -H "Content-Type: application/json" -d '{"proof_url":"https://.../r
 curl -X POST -H "Content-Type: application/json" -d '{"decision":"paid"}' https://app.quickgig.ph/api/orders/<id>/decide
 curl https://app.quickgig.ph/api/users/me/eligibility
 ```
+

@@ -1,80 +1,81 @@
-name: Release check
+name: Release Check
 
 on:
-  workflow_dispatch:
   pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+  deployments: read
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Install deps
-        run: npm run ci:install
+      - name: Install deps (robust)
+        run: npm ci --no-audit --no-fund
 
-      - name: Verify lockfile
-        run: npm run ci:check-lock
-
-      - name: Install Playwright
+      - name: Install Playwright (with system deps)
         run: npx playwright install --with-deps
 
+      # Get Vercel preview URL (ORG optional)
       - name: Get Vercel preview URL
+        run: node scripts/get-preview-url.mjs
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        run: node scripts/get-vercel-preview-url.mjs > url.txt
 
-      - name: Export BASE_URL
-        run: echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
+      - name: Echo preview
+        run: |
+          echo "BASE_URL=${BASE_URL}"
+          echo "url.txt:"
+          cat url.txt
 
-      - name: Seed test data
+      # Seed preview (best-effort)
+      - name: Seed test data (Preview)
+        run: node scripts/seed-preview.mjs
         env:
-          QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
-          QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
+          BASE_URL: ${{ env.BASE_URL }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-        run: npm run ci:seed
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
 
+      # Smoke tests
       - name: Run smoke tests
-        run: npm run test:smoke:ci
+        run: npx playwright test tests/smoke --reporter=github
+        env:
+          BASE_URL: ${{ env.BASE_URL }}
 
-      - name: Run full e2e tests
-        run: npm run test:e2e:ci
+      # Full E2E
+      - name: Run full E2E
+        run: npx playwright test tests/e2e --reporter=github
+        env:
+          BASE_URL: ${{ env.BASE_URL }}
 
-      - name: Upload artifacts
+      # Always upload artifacts
+      - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-artifacts
+          name: playwright-report
           path: |
             test-results/**
             playwright-report/**
           if-no-files-found: ignore
-
-      - name: Create summary
-        if: always()
-        env:
-          BASE_URL: ${{ env.BASE_URL }}
-        run: node scripts/ci-summary.mjs > summary.md
-
-      - name: Post PR comment
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const body = fs.readFileSync('summary.md', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body,
-            });
 
