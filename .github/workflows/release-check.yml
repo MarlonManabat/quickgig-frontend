@@ -33,22 +33,28 @@ jobs:
       - name: Install Playwright (with system deps)
         run: npx playwright install --with-deps
 
-      # Get Vercel preview URL (ORG optional)
+      # Get Vercel preview URL (wait/retry, fall back to GitHub API)
       - name: Get Vercel preview URL
-        run: node scripts/get-preview-url.mjs
+        run: node scripts/get-vercel-preview-url.mjs
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
       - name: Echo preview
         run: |
-          echo "BASE_URL=${BASE_URL}"
-          echo "url.txt:"
-          cat url.txt
+          if [ -n "${BASE_URL}" ]; then
+            echo "BASE_URL=${BASE_URL}"
+            echo "url.txt:"
+            cat url.txt
+          else
+            echo "No preview URL resolved. Skipping preview-dependent steps."
+          fi
 
       # Seed preview (best-effort)
       - name: Seed test data (Preview)
+        if: env.BASE_URL != ''
         run: node scripts/seed-preview.mjs
         env:
           BASE_URL: ${{ env.BASE_URL }}
@@ -58,12 +64,14 @@ jobs:
 
       # Smoke tests
       - name: Run smoke tests
+        if: env.BASE_URL != ''
         run: npx playwright test tests/smoke --reporter=github
         env:
           BASE_URL: ${{ env.BASE_URL }}
 
       # Full E2E
       - name: Run full E2E
+        if: env.BASE_URL != ''
         run: npx playwright test tests/e2e --reporter=github
         env:
           BASE_URL: ${{ env.BASE_URL }}
