@@ -60,8 +60,10 @@ export default function Header() {
   return (
     <header
       data-app-header
+      data-testid="app-header"
+      role="banner"
       data-theme-brand="quickgig"
-      className="sticky top-0 z-40 qg-header border-b border-white/10"
+      className="sticky top-0 z-50 bg-white/90 supports-[backdrop-filter]:bg-white/70 backdrop-blur dark:bg-slate-900/80 shadow-sm qg-header"
     >
       <Container className="flex h-16 items-center justify-between">
         <LinkSafe

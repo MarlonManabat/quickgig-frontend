@@ -39,7 +39,12 @@ export default function AppHeader() {
   const highlight = balance === 0 && balance !== null;
 
   return (
-    <header className="qg-header h-14">
+    <header
+      data-app-header
+      data-testid="app-header"
+      role="banner"
+      className="sticky top-0 z-50 bg-white/90 supports-[backdrop-filter]:bg-white/70 backdrop-blur dark:bg-slate-900/80 shadow-sm qg-header h-14"
+    >
       <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
         <Link href="/" className="flex items-center">
           <AppLogo size={32} />
