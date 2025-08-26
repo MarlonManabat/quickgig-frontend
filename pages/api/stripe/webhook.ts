@@ -1,10 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import Stripe from "stripe";
 import getRawBody from "raw-body";
+
+const StripeLib =
+  process.env.CI === "true" || process.env.DISABLE_STRIPE === "1"
+    ? require("../../../stubs/stripe.js")
+    : require("stripe");
+const Stripe = StripeLib.default ?? StripeLib.Stripe ?? StripeLib;
 
 export const config = { api: { bodyParser: false } };
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2024-06-20",
 });
 

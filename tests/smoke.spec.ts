@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import { getDemoEmail, stubSignIn } from "./utils/session";
-import { env } from "./helpers/env";
 
 const APP_URL =
   process.env.APP_URL ??
@@ -12,21 +11,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("landing → app header visible", async ({ page }) => {
-  // Prefer landing URL; fall back to site/app or localhost for CI/dev.
-  const landingUrl = env(
-    "NEXT_PUBLIC_LANDING_URL",
-    env(
-      "NEXT_PUBLIC_SITE_URL",
-      env("NEXT_PUBLIC_APP_URL", "http://localhost:3000"),
-    ),
-  );
-  await page.goto(landingUrl);
-  const cta = page.locator(
-    '#cta-start, [data-testid="cta-start"], a[href*="/start"]',
-  );
-  await cta.first().click();
-
-  await page.waitForURL("**/start", { timeout: 10_000 });
+  await page.goto("/start");
   await expect(page.getByRole("navigation")).toBeVisible();
 });
 

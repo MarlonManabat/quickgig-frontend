@@ -1,45 +1,32 @@
-import { request } from "@playwright/test";
-import { APP_URL } from "../helpers/env";
+import type { APIRequestContext } from "@playwright/test";
+import { expect } from "@playwright/test";
 
-const QA_HEADER = process.env.QA_TEST_SECRET || "";
-
-async function ctx() {
-  return request.newContext({
-    baseURL: APP_URL,
-    extraHTTPHeaders: QA_HEADER ? { "x-qa-secret": QA_HEADER } : {},
-  });
-}
-
-export async function qaUpsertUser(
-  email: string,
-  role: "employer" | "worker",
-  opts: { tickets?: number } = {},
+export async function qaPost(
+  request: APIRequestContext,
+  path: string,
+  data?: unknown,
 ) {
-  const c = await ctx();
-  const r = await c.post("/api/qa/users/upsert", {
-    data: { email, role, ...opts },
-  });
-  const json = await r.json();
+  const resp = await request.post(path, { data });
+  const text = await resp.text();
+
+  let json: any = {};
+  if (text) {
+    try {
+      json = JSON.parse(text);
+    } catch {
+      throw new Error(
+        `QA POST ${path} -> ${resp.status()} ${resp.statusText()}\nBody: ${text.slice(
+          0,
+          300,
+        )}`,
+      );
+    }
+  }
+
+  expect(
+    resp.ok(),
+    `QA POST ${path} failed: ${resp.status()} ${text}`,
+  ).toBeTruthy();
   return json;
 }
 
-export async function qaGrantTickets(email: string, amount: number) {
-  const c = await ctx();
-  const r = await c.post("/api/qa/tickets/grant", { data: { email, amount } });
-  const json = await r.json();
-  return json.balance as number;
-}
-
-export async function qaGetTickets(email: string) {
-  const c = await ctx();
-  const r = await c.get(
-    `/api/qa/tickets/get?email=${encodeURIComponent(email)}`,
-  );
-  const json = await r.json();
-  return json.balance as number;
-}
-
-export async function qaCleanupJobs(opts: { titlePrefix: string }) {
-  const c = await ctx();
-  await c.post("/api/qa/cleanup/jobs", { data: opts });
-}

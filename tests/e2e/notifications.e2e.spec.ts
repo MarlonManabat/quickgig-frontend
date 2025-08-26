@@ -2,17 +2,18 @@ import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
 import { stubSignIn } from "../utils/session";
-import { requireEnvOrSkip } from "./_utils/ci";
 
 const app = process.env.PLAYWRIGHT_APP_URL!;
 const employerEmail = "demo-user@quickgig.test";
 const employerId = "00000000-0000-0000-0000-000000000001";
 const workerEmail = "new-user@quickgig.test";
 const workerId = "00000000-0000-0000-0000-000000000002";
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+test.skip(!serviceRoleKey, "missing service role");
 
 test("notifications flow", async ({ page }) => {
-  const key = requireEnvOrSkip('SUPABASE_SERVICE_ROLE_KEY');
-  const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key, {
+  const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, serviceRoleKey!, {
     auth: { persistSession: false },
   });
   const { data: gig } = await supa

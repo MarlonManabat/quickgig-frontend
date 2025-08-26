@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { loginAs } from "./utils/session";
-import { qaUpsertUser, qaGetTickets, qaCleanupJobs } from "./utils/qa";
+import { qaPost } from "./utils/qa";
 
 const APP = process.env.PLAYWRIGHT_APP_URL || "https://app.quickgig.ph";
 
@@ -9,15 +9,26 @@ test.setTimeout(120_000);
 test("[full-e2e] job lifecycle: post → apply → message → hire", async ({
   page,
   context,
+  request,
 }) => {
   const title = `E2E Gig ${Date.now()}`;
 
   const employer = { email: `employer+e2e${Date.now()}@example.com` };
   const worker = { email: `worker+e2e${Date.now()}@example.com` };
 
-  await qaUpsertUser(employer.email, "employer", { tickets: 2 });
-  await qaUpsertUser(worker.email, "worker");
-  const before = await qaGetTickets(employer.email);
+  await qaPost(request, "/api/qa/users/upsert", {
+    email: employer.email,
+    role: "employer",
+    tickets: 2,
+  });
+  await qaPost(request, "/api/qa/users/upsert", {
+    email: worker.email,
+    role: "worker",
+  });
+  const beforeRes = await qaPost(request, "/api/qa/tickets/get", {
+    email: employer.email,
+  });
+  const before = beforeRes.balance as number;
 
   // Employer posts job
   await loginAs(page, employer.email);
@@ -97,12 +108,15 @@ test("[full-e2e] job lifecycle: post → apply → message → hire", async ({
     timeout: 15000,
   });
 
-  const after = await qaGetTickets(employer.email);
+  const afterRes = await qaPost(request, "/api/qa/tickets/get", {
+    email: employer.email,
+  });
+  const after = afterRes.balance as number;
   expect(after).toBeLessThanOrEqual(before);
   if (after === before)
     console.warn(
       "[e2e] ticket did not change – consumption may occur earlier in flow",
     );
 
-  await qaCleanupJobs({ titlePrefix: "E2E Gig " });
+  await qaPost(request, "/api/qa/cleanup/jobs", { titlePrefix: "E2E Gig " });
 });
