@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const baseConfig = {
   reactStrictMode: true,
@@ -14,6 +16,13 @@ const baseConfig = {
       type: "asset/resource",
       generator: { filename: "static/fonts/[name][ext]" },
     });
+    if (process.env.CI === 'true' || process.env.DISABLE_STRIPE === '1') {
+      config.resolve = config.resolve || {};
+      config.resolve.alias = config.resolve.alias || {};
+      const stub = path.resolve(__dirname, 'stubs/stripe.ts');
+      config.resolve.alias['stripe'] = stub;
+      config.resolve.alias['stripe$'] = stub;
+    }
     return config;
   },
   async headers() {

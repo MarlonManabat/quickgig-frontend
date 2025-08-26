@@ -9,13 +9,13 @@ export default function NotFound() {
       </p>
       <div className="flex gap-3 justify-center">
         <Link
-          href="/start?intent=worker"
+          href="/search?intent=worker"
           className="qg-btn qg-btn--primary px-4 py-2"
         >
           Find work
         </Link>
         <Link
-          href="/start?intent=employer"
+          href="/post?intent=employer"
           className="qg-btn qg-btn--outline px-4 py-2"
         >
           Post a job

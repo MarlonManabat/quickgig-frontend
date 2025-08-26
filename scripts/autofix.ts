@@ -1,5 +1,4 @@
 import { execSync } from "child_process";
-import fs from "fs";
 
 try {
   execSync("npx eslint . --fix", { stdio: "inherit" });
@@ -7,5 +6,4 @@ try {
   // ignore lint errors
 }
 
-const diff = execSync("git diff", { encoding: "utf8" });
-fs.writeFileSync("autofix.patch", diff);
+execSync("git diff > autofix.patch");

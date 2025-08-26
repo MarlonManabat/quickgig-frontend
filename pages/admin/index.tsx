@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { withAdminGuard } from "@/components/guards/withAdminGuard";
 
-export default function AdminHome() {
+function AdminHome() {
   useEffect(() => {
     // optional client-side guard (server-side RLS still applies)
     (async () => {
@@ -41,3 +42,5 @@ export default function AdminHome() {
     </main>
   );
 }
+
+export default withAdminGuard(AdminHome);

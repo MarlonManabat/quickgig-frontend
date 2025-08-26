@@ -14,6 +14,10 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      DISABLE_STRIPE: '1'
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon
     permissions:
       contents: read
       deployments: read
@@ -22,30 +26,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Ensure Supabase env (CI-safe)
-        shell: bash
-        run: |
-          # If GitHub secrets are not provided, fall back to CI-safe defaults.
-          : "${NEXT_PUBLIC_SUPABASE_URL:=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}}"
-          : "${NEXT_PUBLIC_SUPABASE_ANON_KEY:=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}}"
-          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then
-            echo "Using CI-safe Supabase env defaults"
-            # Read from repo .env.example defaults (or hard-coded placeholders)
-            CI_URL=$(grep '^CI_SUPABASE_URL=' .env.example | cut -d= -f2-)
-            CI_KEY=$(grep '^CI_SUPABASE_ANON_KEY=' .env.example | cut -d= -f2-)
-            NEXT_PUBLIC_SUPABASE_URL="${CI_URL:-https://ci.example.supabase.co}"
-            NEXT_PUBLIC_SUPABASE_ANON_KEY="${CI_KEY:-ci_anon_key}"
-          fi
-          echo "NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL" >> "$GITHUB_ENV"
-          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY" >> "$GITHUB_ENV"
-
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install deps (robust)
-        run: npm ci --no-audit --no-fund
+        env:
+          NPM_CONFIG_FETCH_RETRIES: 6
+          NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: 20000
+          NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: 120000
+        run: |
+          npm config set audit false
+          npm config set fund false
+          npm config set progress false
+          npm config set prefer-offline true
+          npm config set cache ~/.npm
+          for i in 1 2 3 4; do
+            echo "npm ci attempt $i"
+            if npm ci --no-audit --no-fund; then
+              echo "npm ci succeeded"; break
+            fi
+            if [ "$i" -eq 4 ]; then
+              echo "npm ci failed after $i attempts"; exit 1
+            fi
+            sleep $((i*20))
+          done
 
       - name: Autofix (eslint/next/react/prettier)
         run: |
@@ -107,53 +116,16 @@ jobs:
 
       - name: Install Playwright (with system deps)
         run: npx playwright install --with-deps
-
-      # Get Vercel preview URL (wait/retry, fall back to GitHub API)
-      - name: Get Vercel preview URL
-        run: node scripts/get-vercel-preview-url.mjs
+      - name: Run E2E tests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-
-      - name: Echo preview
-        run: |
-          if [ -n "${BASE_URL}" ]; then
-            echo "BASE_URL=${BASE_URL}"
-            echo "url.txt:"
-            cat url.txt
-          else
-            echo "No preview URL resolved. Skipping preview-dependent steps."
-          fi
-
-      - name: Seed locations (best-effort)
-        if: env.BASE_URL != ''
-        run: |
-          curl -fsS "$BASE_URL/api/test/seed?only=locations" || true
-
-      # Seed preview (best-effort)
-      - name: Seed test data (Preview)
-        if: env.BASE_URL != ''
-        run: node scripts/seed-preview.mjs
-        env:
-          BASE_URL: ${{ env.BASE_URL }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
-
-      # Release tests
-      - name: Run release tests
-        if: env.BASE_URL != ''
-        run: npm run test:release
-        env:
-          BASE_URL: ${{ env.BASE_URL }}
+          E2E_BASE_URL: http://localhost:3000
           WORKER_EMAIL: ${{ secrets.WORKER_EMAIL }}
           WORKER_PASSWORD: ${{ secrets.WORKER_PASSWORD }}
           EMPLOYER_EMAIL: ${{ secrets.EMPLOYER_EMAIL }}
           EMPLOYER_PASSWORD: ${{ secrets.EMPLOYER_PASSWORD }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: npm run test:release
 
       # Always upload artifacts
       - name: Upload test artifacts
@@ -175,8 +147,7 @@ jobs:
           script: |
             core.summary.addHeading('Release check')
             core.summary.addList([
-              'Preview: seeded & ready',
-              'Smoke/E2E: executed',
+              'E2E: executed',
               'Autofix: applied if needed'
             ])
             await core.summary.write()

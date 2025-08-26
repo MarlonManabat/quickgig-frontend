@@ -39,7 +39,12 @@ export default function AppHeader() {
   const highlight = balance === 0 && balance !== null;
 
   return (
-    <header className="qg-header h-14">
+    <header
+      data-app-header
+      data-testid="app-header"
+      role="banner"
+      className="sticky top-0 z-50 bg-white/90 supports-[backdrop-filter]:bg-white/70 backdrop-blur dark:bg-slate-900/80 shadow-sm qg-header h-14"
+    >
       <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
         <Link href="/" className="flex items-center">
           <AppLogo size={32} />
@@ -47,15 +52,18 @@ export default function AppHeader() {
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
           {!user && (
             <>
-              <Link href="/start?intent=worker">Find work</Link>
-              <Link href="/start?intent=employer">Post job</Link>
+              <Link href="/search?intent=worker" data-testid="nav-find">Find work</Link>
+              <Link href="/post?intent=employer" data-testid="nav-post">Post job</Link>
+              <Link href="/login" data-testid="nav-login">Login</Link>
             </>
           )}
-          {user && role === "worker" && <Link href="/find">Find work</Link>}
+          {user && role === "worker" && (
+            <Link href="/find" data-testid="nav-find">Find work</Link>
+          )}
           {user && role === "employer" && (
             <>
-              <Link href="/post">Post job</Link>
-              <Link href="/find">Find work</Link>
+              <Link href="/post" data-testid="nav-post">Post job</Link>
+              <Link href="/find" data-testid="nav-find">Find work</Link>
             </>
           )}
           {balance !== null && (
@@ -77,31 +85,34 @@ export default function AppHeader() {
           <AppHeaderNotifications />
         </nav>
         <details className="md:hidden">
-          <summary aria-label="Open menu" className="cursor-pointer">
+          <summary aria-label="Open menu" className="cursor-pointer" data-testid="menu-toggle">
             Menu
           </summary>
           <div className="mt-2 flex flex-col">
             {!user && (
               <>
-                <Link href="/start?intent=worker" className="py-2">
+                <Link href="/search?intent=worker" className="py-2" data-testid="nav-find">
                   Find work
                 </Link>
-                <Link href="/start?intent=employer" className="py-2">
+                <Link href="/post?intent=employer" className="py-2" data-testid="nav-post">
                   Post job
+                </Link>
+                <Link href="/login" className="py-2" data-testid="nav-login">
+                  Login
                 </Link>
               </>
             )}
             {user && role === "worker" && (
-              <Link href="/find" className="py-2">
+              <Link href="/find" className="py-2" data-testid="nav-find">
                 Find work
               </Link>
             )}
             {user && role === "employer" && (
               <>
-                <Link href="/post" className="py-2">
+                <Link href="/post" className="py-2" data-testid="nav-post">
                   Post job
                 </Link>
-                <Link href="/find" className="py-2">
+                <Link href="/find" className="py-2" data-testid="nav-find">
                   Find work
                 </Link>
               </>

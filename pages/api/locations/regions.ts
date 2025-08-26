@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { env, requireServer } from "@/lib/env";
 
 export default async function handler(_: NextApiRequest, res: NextApiResponse) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  if (!key) return res.status(500).json([]);
+  const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
   const { data, error } = await supabase
     .from("regions")
     .select("id,name")

@@ -1,5 +1,4 @@
 import { Page, Locator, expect } from "@playwright/test";
-import fs from "fs/promises";
 
 const selector = [
   "button:not([disabled])",
@@ -37,9 +36,5 @@ export async function auditPage(page: Page, path: string) {
     }
     results.push({ name, ok });
   }
-  await fs.mkdir("button-audit", { recursive: true });
-  const slug =
-    path === "/" ? "home" : path.replace(/\//g, "_").replace(/^_/, "");
-  const file = `button-audit/${slug}.json`;
-  await fs.writeFile(file, JSON.stringify(results, null, 2));
+  console.log(`[button-audit] ${path}`, JSON.stringify(results));
 }

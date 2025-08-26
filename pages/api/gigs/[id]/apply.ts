@@ -17,11 +17,11 @@ export default async function handler(
     res.status(401).json({ error: "unauthorized" });
     return;
   }
-  const gigId = req.query.gigId;
+  const id = req.query.id;
   const { cover_letter } = req.body || {};
   const { error } = await supabase.from("applications").insert({
     applicant_id: user.id,
-    gig_id: gigId,
+    gig_id: id,
     message: cover_letter ?? null,
   });
   if (error) {

@@ -16,7 +16,7 @@
     <link rel="icon" href="/favicon.png" />
   </head>
   <body>
-    <header class="header" data-theme-brand="quickgig">
+    <header class="header" data-theme-brand="quickgig" data-app-header data-testid="app-header">
       <div class="container row">
         <a href="/" class="brand" data-testid="brand-link" data-app-root>
           <img
@@ -30,21 +30,21 @@
         <nav>
           <a href="#features">Features</a>
           <a
-            href="/start?intent=worker"
-            data-testid="cta-find-work"
+            href="/search?intent=worker"
+            data-testid="nav-find"
             aria-label="Maghanap ng trabaho sa QuickGig app"
             data-app-root
             >Maghanap ng Trabaho</a
           >
           <a
-            href="/start?intent=employer"
-            data-testid="nav-post-job"
+            href="/post?intent=employer"
+            data-testid="nav-post"
             aria-label="Post job on QuickGig app"
             data-app-root
             >Post Job</a
           >
           <a
-            href="/start"
+            href="/login"
             data-testid="nav-login"
             aria-label="Log in to QuickGig app"
             data-app-root
@@ -78,7 +78,7 @@
           <a
             id="cta-start"
             class="qg-btn qg-btn--primary"
-            href="/start?intent=worker"
+            href="/search?intent=worker"
             data-testid="cta-start-now"
             aria-label="Open QuickGig app"
             data-app-root
@@ -86,7 +86,7 @@
           >
           <a
             class="btn btn-ghost"
-            href="/start?intent=employer"
+            href="/post?intent=employer"
             data-testid="cta-post-job"
             aria-label="Post job on QuickGig app"
             data-app-root
@@ -136,7 +136,7 @@
             >Privacy</a
           >
           <a
-            href="/start?intent=worker"
+            href="/search?intent=worker"
             data-testid="footer-open-app"
             aria-label="Open the QuickGig app"
             data-app-root

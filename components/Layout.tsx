@@ -10,7 +10,7 @@ import { isAdmin } from "@/utils/admin";
 import Container from "./Container";
 
 const links = [
-  { href: "/find", label: copy.nav.findWork, id: "app-nav-find-work" },
+  { href: "/search?intent=worker", label: copy.nav.findWork, id: "nav-find" },
   { href: "/gigs?mine=1", label: copy.nav.myGigs, id: "app-nav-my-gigs" },
   {
     href: "/applications",
@@ -18,7 +18,7 @@ const links = [
     id: "app-nav-applications",
   },
   { href: "/saved", label: copy.nav.saved, id: "app-nav-saved" },
-  { href: "/post", label: copy.nav.postJob, id: "app-nav-post-job" },
+  { href: "/post?intent=employer", label: copy.nav.postJob, id: "nav-post" },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -66,7 +66,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-brand-bg text-brand">
       <header
-        className="sticky top-0 z-10 border-b border-brand-border bg-brand-surface"
+        data-app-header
+        data-testid="app-header"
+        role="banner"
+        className="sticky top-0 z-50 bg-white/90 supports-[backdrop-filter]:bg-white/70 backdrop-blur dark:bg-slate-900/80 shadow-sm"
         data-theme-brand="quickgig"
       >
         <div className="max-w-4xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
@@ -77,6 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             className="sm:hidden"
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle navigation"
+            data-testid="menu-toggle"
           >
             ☰
           </button>
@@ -119,7 +123,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 Profile
               </Link>
             ) : (
-              <Link href="/auth" data-testid="app-login" app-nav="/auth">
+              <Link href="/login" data-testid="nav-login" app-nav="/login">
                 {copy.nav.auth}
               </Link>
             )}

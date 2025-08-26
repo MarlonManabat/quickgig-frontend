@@ -4,11 +4,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prebuild": "node scripts/check-dynamic-route-conflicts.mjs",
     "start": "next start",
+    "start:preview": "next start -p 3000",
     "typecheck": "tsc --noEmit",
     "lint": "next lint || true",
-    "lint:href": "node scripts/href-lint.mjs",
-    "fix:href": "node scripts/href-codemod.mjs",
     "qa:seed": "tsx scripts/seed.ts",
     "qa:smoke": "playwright test --project=smoke",
     "qa:full": "playwright test --project=full-e2e",
@@ -59,7 +59,8 @@
     "tailwindcss": "^3.4.1",
     "ts-morph": "^24.0.0",
     "tsx": "^4.7.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "globby": "^11.1.0"
   },
   "engines": {
     "node": ">=18.17"

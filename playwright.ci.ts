@@ -19,7 +19,7 @@ export default defineConfig({
   timeout: 60_000,
   use: {
     ...((baseConfig as any).use ?? {}),
-    baseURL: process.env.BASE_URL,
+    baseURL: process.env.E2E_BASE_URL || (baseConfig as any).use?.baseURL,
     video: "retain-on-failure",
     trace: "retain-on-failure",
   },

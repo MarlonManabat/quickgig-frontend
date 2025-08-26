@@ -93,7 +93,7 @@ export default function ProfilePage() {
           />
         </label>
         <div className="flex gap-2">
-          <button type="submit" className="qg-btn qg-btn--primary px-4 py-2">
+          <button type="submit" data-testid="profile-save" className="qg-btn qg-btn--primary px-4 py-2">
             Save & continue
           </button>
           <button
