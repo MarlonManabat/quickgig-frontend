@@ -1,0 +1,51 @@
+name: Release Check (PR smoke)
+
+on:
+  pull_request:
+
+concurrency:
+  group: pr-smoke-${{ github.event.pull_request.head.sha || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install deps (robust)
+        run: |
+          npm ci || (sleep 5 && npm ci) || (sleep 10 && npm ci)
+      - name: Lint
+        run: npm run lint --if-present
+      - name: Build
+        run: npm run build
+
+  e2e_smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install deps
+        run: npm ci
+      - name: Install Playwright (system deps)
+        run: npx playwright install --with-deps
+      - name: Run E2E tests (smoke)
+        run: npx playwright test --project=smoke --reporter=github,html
+        env:
+          # keep your existing CI envs; these two are safe no-ops if already handled
+          CI_FAST: '1'
+          DISABLE_STRIPE: '1'
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-smoke
+          path: playwright-report/

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { loginViaMagicLink } from "./helpers/auth"; // existing helper
-import { qaPost } from "./utils/qa";
+import { loginViaMagicLink } from "../helpers/auth"; // existing helper
+import { qaPost } from "../utils/qa";
 
 const EMPLOYER = process.env.QA_TEST_EMAIL!;
 const WORKER =
