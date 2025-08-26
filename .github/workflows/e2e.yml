@@ -9,9 +9,26 @@ on:
     - cron: '15 7 * * *'   # daily 07:15 UTC
 
 jobs:
+  preview:
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.get-url.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: get-url
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          url=$(node scripts/get-vercel-preview-url.mjs)
+          echo "url=$url" >> $GITHUB_OUTPUT
+
   smoke:
+    needs: preview
     runs-on: ubuntu-latest
     env:
+      BASE_URL: ${{ needs.preview.outputs.url }}
       APP_URL: https://app.quickgig.ph
       QA_TEST_MODE: "true"
       QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
@@ -19,9 +36,9 @@ jobs:
       TEST_LOGIN_SECRET: ${{ secrets.TEST_LOGIN_SECRET }}
       TEST_LOGIN_ENABLED: "true"
       NEXT_PUBLIC_TEST_LOGIN_ENABLED: "true"
-      NEXT_PUBLIC_LANDING_URL: ${{ env.PREVIEW_URL || secrets.NEXT_PUBLIC_LANDING_URL || secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
-      NEXT_PUBLIC_SITE_URL:     ${{ secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
-      NEXT_PUBLIC_APP_URL:      ${{ secrets.NEXT_PUBLIC_APP_URL  || 'http://localhost:3000' }}
+      NEXT_PUBLIC_LANDING_URL: ${{ needs.preview.outputs.url || secrets.NEXT_PUBLIC_LANDING_URL || secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
+      NEXT_PUBLIC_SITE_URL:     ${{ secrets.NEXT_PUBLIC_SITE_URL || needs.preview.outputs.url || 'http://localhost:3000' }}
+      NEXT_PUBLIC_APP_URL:      ${{ secrets.NEXT_PUBLIC_APP_URL  || needs.preview.outputs.url || 'http://localhost:3000' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,13 +47,6 @@ jobs:
         run: npm run ci:install
       - name: Verify lockfile unchanged
         run: npm run ci:check-lock
-      - name: Get Vercel Preview URL
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        run: node scripts/get-vercel-preview-url.mjs > url.txt
-      - run: echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       - name: Run smoke
@@ -54,8 +64,10 @@ jobs:
           if-no-files-found: ignore
 
   full-e2e:
+    needs: preview
     runs-on: ubuntu-latest
     env:
+      BASE_URL: ${{ needs.preview.outputs.url }}
       APP_URL: https://app.quickgig.ph
       QA_TEST_MODE: "true"
       QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
@@ -64,9 +76,9 @@ jobs:
       TEST_LOGIN_SECRET: ${{ secrets.TEST_LOGIN_SECRET }}
       TEST_LOGIN_ENABLED: "true"
       NEXT_PUBLIC_TEST_LOGIN_ENABLED: "true"
-      NEXT_PUBLIC_LANDING_URL: ${{ env.PREVIEW_URL || secrets.NEXT_PUBLIC_LANDING_URL || secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
-      NEXT_PUBLIC_SITE_URL:     ${{ secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
-      NEXT_PUBLIC_APP_URL:      ${{ secrets.NEXT_PUBLIC_APP_URL  || 'http://localhost:3000' }}
+      NEXT_PUBLIC_LANDING_URL: ${{ needs.preview.outputs.url || secrets.NEXT_PUBLIC_LANDING_URL || secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
+      NEXT_PUBLIC_SITE_URL:     ${{ secrets.NEXT_PUBLIC_SITE_URL || needs.preview.outputs.url || 'http://localhost:3000' }}
+      NEXT_PUBLIC_APP_URL:      ${{ secrets.NEXT_PUBLIC_APP_URL  || needs.preview.outputs.url || 'http://localhost:3000' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -75,13 +87,6 @@ jobs:
         run: npm run ci:install
       - name: Verify lockfile unchanged
         run: npm run ci:check-lock
-      - name: Get Vercel Preview URL
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        run: node scripts/get-vercel-preview-url.mjs > url.txt
-      - run: echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       - name: Run full e2e
