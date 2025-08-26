@@ -20,7 +20,7 @@ export default defineConfig({
   use: {
     ...((baseConfig as any).use ?? {}),
     baseURL: process.env.E2E_BASE_URL || (baseConfig as any).use?.baseURL,
-    video: "retain-on-failure",
+    video: "off",
     trace: "retain-on-failure",
   },
 });

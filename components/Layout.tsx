@@ -69,7 +69,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         data-app-header
         data-testid="app-header"
         role="banner"
-        className="sticky top-0 z-50 bg-white/90 supports-[backdrop-filter]:bg-white/70 backdrop-blur dark:bg-slate-900/80 shadow-sm"
+        className="sticky top-0 z-50 bg-white dark:bg-slate-900 shadow-sm"
         data-theme-brand="quickgig"
       >
         <div className="max-w-4xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
@@ -77,15 +77,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             QuickGig.ph
           </Link>
           <button
+            type="button"
             className="sm:hidden"
             onClick={() => setOpen((o) => !o)}
-            aria-label="Toggle navigation"
+            aria-label="Open menu"
+            aria-expanded={open}
             data-testid="menu-toggle"
           >
             ☰
           </button>
           <nav
             className={`${open ? "block" : "hidden"} sm:flex sm:items-center sm:gap-4 text-sm`}
+            role="dialog"
+            aria-label="Main menu"
           >
             {links.map((l) => {
               const active = isActive(l.href);

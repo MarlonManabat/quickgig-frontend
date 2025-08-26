@@ -19,9 +19,7 @@ const baseConfig = {
     if (process.env.CI === 'true' || process.env.DISABLE_STRIPE === '1') {
       config.resolve = config.resolve || {};
       config.resolve.alias = config.resolve.alias || {};
-      const stub = path.resolve(__dirname, 'stubs/stripe.ts');
-      config.resolve.alias['stripe'] = stub;
-      config.resolve.alias['stripe$'] = stub;
+      config.resolve.alias['stripe'] = path.resolve(__dirname, 'stubs/stripe.js');
     }
     return config;
   },

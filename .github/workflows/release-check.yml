@@ -14,6 +14,10 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1/2, 2/2]
     env:
       DISABLE_STRIPE: '1'
       NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
@@ -125,7 +129,7 @@ jobs:
           EMPLOYER_PASSWORD: ${{ secrets.EMPLOYER_PASSWORD }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-        run: npm run test:release
+        run: npx playwright test --config=playwright.ci.ts --shard ${{ matrix.shard }} --reporter=github,html
 
       # Always upload artifacts
       - name: Upload test artifacts
