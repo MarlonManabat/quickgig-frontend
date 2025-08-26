@@ -50,6 +50,12 @@ test('create gig → save → upload proof → admin approves', async ({ page, b
     .first()
   await price.fill('123')
 
+  const regionSel = page.getByTestId('region-select')
+  if (await regionSel.isVisible().catch(() => false)) {
+    await regionSel.selectOption({ label: 'NCR' })
+    await page.getByTestId('city-select').selectOption({ label: 'Quezon City' })
+  }
+
   await page.getByRole('button', { name: /save|create|publish/i }).click()
   // consider success if either we navigate to a detail page OR see a success toast
   const navigated = await Promise.race([
