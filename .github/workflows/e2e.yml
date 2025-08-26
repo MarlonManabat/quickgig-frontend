@@ -22,6 +22,7 @@ jobs:
       NEXT_PUBLIC_LANDING_URL: ${{ env.PREVIEW_URL || secrets.NEXT_PUBLIC_LANDING_URL || secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
       NEXT_PUBLIC_SITE_URL:     ${{ secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
       NEXT_PUBLIC_APP_URL:      ${{ secrets.NEXT_PUBLIC_APP_URL  || 'http://localhost:3000' }}
+      VERCEL_ORG_ID:            ${{ secrets.VERCEL_ORG_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,7 +35,6 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: node scripts/get-vercel-preview-url.mjs > url.txt
       - run: echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
       - name: Install Playwright
@@ -67,6 +67,7 @@ jobs:
       NEXT_PUBLIC_LANDING_URL: ${{ env.PREVIEW_URL || secrets.NEXT_PUBLIC_LANDING_URL || secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
       NEXT_PUBLIC_SITE_URL:     ${{ secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
       NEXT_PUBLIC_APP_URL:      ${{ secrets.NEXT_PUBLIC_APP_URL  || 'http://localhost:3000' }}
+      VERCEL_ORG_ID:            ${{ secrets.VERCEL_ORG_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -79,7 +80,6 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: node scripts/get-vercel-preview-url.mjs > url.txt
       - run: echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
       - name: Install Playwright
