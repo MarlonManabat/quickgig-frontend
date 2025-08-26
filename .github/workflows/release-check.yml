@@ -2,9 +2,9 @@ name: Release Check
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -24,8 +24,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
+
+      - name: Check lockfile
+        run: npm ci --no-audit --no-fund --dry-run
 
       - name: Install deps (robust)
         run: npm ci --no-audit --no-fund
@@ -52,12 +55,43 @@ jobs:
             echo "No preview URL resolved. Skipping preview-dependent steps."
           fi
 
+      - name: Autofix (optional)
+        id: autofix
+        run: |
+          npm run ci:autofix || true
+          if [ -n "$(git status --porcelain)" ]; then
+            git diff > autofix.patch
+            echo "patch=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload autofix patch
+        if: steps.autofix.outputs.patch == '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: autofix.patch
+          path: autofix.patch
+
+      - name: Comment autofix patch
+        if: steps.autofix.outputs.patch == '1' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}#artifacts`;
+            const body = `Auto-format fixes available. Download patch from ${url} and apply with:\n\n\`\`\`bash\n git apply autofix.patch\n\`\`\``;
+            github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
       # Seed preview (best-effort)
       - name: Seed test data (Preview)
         if: env.BASE_URL != ''
-        run: node scripts/seed-preview.mjs
+        run: npm run ci:seed
         env:
-          BASE_URL: ${{ env.BASE_URL }}
+          QA_TEST_MODE: "1"
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
@@ -65,18 +99,22 @@ jobs:
       # Smoke tests
       - name: Run smoke tests
         if: env.BASE_URL != ''
-        run: npx playwright test tests/smoke --reporter=github
+        run: npm run ci:smoke
         env:
           BASE_URL: ${{ env.BASE_URL }}
 
       # Full E2E
       - name: Run full E2E
         if: env.BASE_URL != ''
-        run: npx playwright test tests/e2e --reporter=github
+        run: npm run ci:e2e
         env:
           BASE_URL: ${{ env.BASE_URL }}
 
       # Always upload artifacts
+      - name: Ensure artifacts
+        if: always()
+        run: mkdir -p test-results playwright-report || true
+
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -86,4 +124,3 @@ jobs:
             test-results/**
             playwright-report/**
           if-no-files-found: ignore
-
