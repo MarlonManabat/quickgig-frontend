@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { TICKET_PRICE_PHP, FREE_TICKETS_ON_SIGNUP } from "@/lib/payments";
+import { toNum } from "@/lib/normalize";
 
 export default function PayPage() {
   const supabase = createBrowserSupabaseClient();
@@ -13,11 +14,12 @@ export default function PayPage() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
+    type WalletRow = { balance: number | null } | null;
     const { data: balanceRow } = await supabase
       .from("ticket_balances")
       .select("balance")
-      .single();
-    setBalance(balanceRow?.balance ?? 0);
+      .maybeSingle<WalletRow>();
+    setBalance(toNum(balanceRow?.balance) ?? 0);
     const { data } = await supabase
       .from("payment_proofs")
       .select("*")

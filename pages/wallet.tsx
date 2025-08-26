@@ -1,5 +1,6 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
+import { toNum } from "@/lib/normalize";
 
 export default function Wallet() {
   const supabase = createClientComponentClient();
@@ -12,12 +13,13 @@ export default function Wallet() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
+      type WalletRow = { balance: number | null } | null;
       const { data: bal } = await supabase
         .from("tickets_balances")
         .select("balance")
         .eq("user_id", user.id)
-        .maybeSingle();
-      setBalance(bal?.balance ?? 0);
+        .maybeSingle<WalletRow>();
+      setBalance(toNum(bal?.balance) ?? 0);
       const { data: ledger } = await supabase
         .from("tickets_ledger")
         .select("*")

@@ -3,16 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import { uploadAvatar } from "@/lib/avatar";
-import { toNumber } from "@/lib/num";
-
-type UserRole = "employer" | "admin" | "seeker";
+import { toRole, toStr, toBool, toNum, type Role } from "@/lib/normalize";
 
 export default function HomeEmployer() {
-  const [role, setRole] = useState<UserRole>("seeker");
+  const [role, setRole] = useState<Role>("seeker");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [profileEmail, setProfileEmail] = useState<string | null>(null);
-  const [suspended, setSuspended] = useState(false);
-  const [deleted, setDeleted] = useState(false);
+  const [profileEmail, setProfileEmail] = useState<string>("");
+  const [suspended, setSuspended] = useState<boolean>(false);
+  const [deleted, setDeleted] = useState<boolean>(false);
   const [balance, setBalance] = useState<number>(0);
 
   // seeker
@@ -37,35 +35,19 @@ export default function HomeEmployer() {
         .eq("id", auth.user.id)
         .maybeSingle();
 
-      // Role: ensure union-safe string fallback
-      const roleStr: UserRole =
-        prof?.role === "employer" ||
-        prof?.role === "admin" ||
-        prof?.role === "seeker"
-          ? prof.role
-          : "seeker";
-      setRole(roleStr);
-
-      // Avatar URL: normalize to string | null for the state setter.
-      const avatarUrl =
-        typeof prof?.avatar_url === "string" ? prof.avatar_url : null;
-      setAvatarUrl(avatarUrl);
-
-      // Email already string | null from our types, keep explicit fallback
-      setProfileEmail((prof as any)?.email ?? null);
-
-      // Booleans: coerce based on timestamp presence
-      setSuspended(Boolean(prof?.suspended_at));
-      setDeleted(Boolean(prof?.deleted_at));
+      // Profile -> normalized state
+      setRole(toRole(prof?.role));
+      setAvatarUrl(toStr(prof?.avatar_url));
+      setProfileEmail(toStr(prof?.email) ?? "");
+      setSuspended(toBool(prof?.suspended_at));
+      setDeleted(toBool(prof?.deleted_at));
 
       const { data: bal } = await supabase
         .from("v_ticket_balances")
         .select("balance")
         .eq("user_id", auth.user.id)
-        .maybeSingle();
-      // Wallet balance: coerce unknown -> number with safe fallback
-      const balanceNum = toNumber(bal?.balance, 0);
-      setBalance(balanceNum);
+        .maybeSingle<{ balance: number | null }>();
+      setBalance(toNum(bal?.balance) ?? 0);
 
       // seeker widgets
       const { data: seekerApps } = await supabase
