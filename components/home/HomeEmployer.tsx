@@ -3,7 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import { uploadAvatar } from "@/lib/avatar";
-import { toRole, toStr, toBool, toNum, type Role } from "@/lib/normalize";
+import { asNumber, asRole, asString, toBool } from "@/lib/normalize";
+import type { Role, WalletRow } from "@/lib/types";
 
 export default function HomeEmployer() {
   const [role, setRole] = useState<Role>("seeker");
@@ -36,18 +37,18 @@ export default function HomeEmployer() {
         .maybeSingle();
 
       // Profile -> normalized state
-      setRole(toRole(prof?.role));
-      setAvatarUrl(toStr(prof?.avatar_url));
-      setProfileEmail(toStr(prof?.email) ?? "");
+      setRole(asRole(prof?.role) ?? "seeker");
+      setAvatarUrl(asString(prof?.avatar_url));
+      setProfileEmail(asString(prof?.email) ?? "");
       setSuspended(toBool(prof?.suspended_at));
       setDeleted(toBool(prof?.deleted_at));
 
-      const { data: bal } = await supabase
+      const { data: wallet } = await supabase
         .from("v_ticket_balances")
         .select("balance")
         .eq("user_id", auth.user.id)
-        .maybeSingle<{ balance: number | null }>();
-      setBalance(toNum(bal?.balance) ?? 0);
+        .maybeSingle<WalletRow>();
+      setBalance(asNumber(wallet?.balance) ?? 0);
 
       // seeker widgets
       const { data: seekerApps } = await supabase

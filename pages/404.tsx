@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function NotFound() {
   return (
     <main className="mx-auto max-w-lg p-8 text-center space-y-4">
@@ -6,24 +8,24 @@ export default function NotFound() {
         Sorry, hindi namin mahanap ang page na ito. Try one of these:
       </p>
       <div className="flex gap-3 justify-center">
-        <a
+        <Link
           href="/start?intent=worker"
           className="qg-btn qg-btn--primary px-4 py-2"
         >
           Find work
-        </a>
-        <a
+        </Link>
+        <Link
           href="/start?intent=employer"
           className="qg-btn qg-btn--outline px-4 py-2"
         >
           Post a job
-        </a>
+        </Link>
       </div>
       <p className="text-sm text-slate-500">
         Or go to{" "}
-        <a className="qg-link" href="/">
+        <Link className="qg-link" href="/">
           home
-        </a>
+        </Link>
         .
       </p>
     </main>

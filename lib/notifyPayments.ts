@@ -1,5 +1,6 @@
 import { sendTemplate } from "@/lib/email";
 import { supabase } from "@/lib/supabaseClient";
+import { asString } from "@/lib/normalize";
 
 async function getUserEmail(userId: string): Promise<string | null> {
   const { data, error } = await supabase
@@ -12,7 +13,7 @@ async function getUserEmail(userId: string): Promise<string | null> {
     console.warn("getUserEmail error:", error);
     return null;
   }
-  return data?.email ?? null;
+  return asString(data?.email);
 }
 
 export async function notifyPaymentApproved(paymentId: string) {
@@ -30,7 +31,7 @@ export async function notifyPaymentApproved(paymentId: string) {
     return;
   }
 
-  const to = await getUserEmail(p.user_id);
+  const to = await getUserEmail(asString((p as any).user_id) ?? "");
   if (!to) {
     console.warn("notifyPaymentApproved: email not found for user", p.user_id);
     return;
@@ -54,7 +55,7 @@ export async function notifyPaymentRejected(paymentId: string, reason: string) {
     return;
   }
 
-  const to = await getUserEmail(p.user_id);
+  const to = await getUserEmail(asString((p as any).user_id) ?? "");
   if (!to) {
     console.warn("notifyPaymentRejected: email not found for user", p.user_id);
     return;

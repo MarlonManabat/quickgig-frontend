@@ -1,14 +1,22 @@
-export type Role = 'employer' | 'admin' | 'seeker';
+import type { Role } from './types';
 
-export function toStr(v: unknown): string | null {
-  if (v == null) return null;
-  return typeof v === 'string' ? v : String(v);
+export function asString(v: unknown): string | null {
+  return typeof v === 'string' ? v : null;
 }
 
-export function toNum(v: unknown): number | null {
-  if (v == null) return null;
-  const n = typeof v === 'number' ? v : Number(v);
-  return Number.isFinite(n) ? n : null;
+export function asNumber(v: unknown): number | null {
+  return typeof v === 'number' && !Number.isNaN(v) ? v : null;
+}
+
+export function asRole(v: unknown): Role | null {
+  return v === 'employer' || v === 'seeker' || v === 'admin' ? v : null;
+}
+
+// Legacy aliases
+export const toStr = asString;
+export const toNum = asNumber;
+export function toRole(v: unknown): Role {
+  return asRole(v) ?? 'seeker';
 }
 
 export function toBool(v: unknown): boolean {
@@ -19,8 +27,3 @@ export function toBool(v: unknown): boolean {
   if (typeof v === 'string') return v.toLowerCase() === 'true';
   return Boolean(v);
 }
-
-export function toRole(v: unknown): Role {
-  return v === 'employer' || v === 'admin' || v === 'seeker' ? v : 'seeker';
-}
-

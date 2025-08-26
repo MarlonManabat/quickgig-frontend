@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerClient } from "@/utils/supabaseClient";
+import { asString } from "@/lib/normalize";
 
 function validProof(urlStr: string) {
   try {
@@ -45,10 +46,12 @@ export default async function handler(
     return;
   }
 
+  const id = asString(req.query.id);
+  if (!id) return res.status(400).json({ error: "id required" });
   const { error } = await supabase
     .from("orders")
     .update({ proof_url, status: "submitted" })
-    .eq("id", req.query.id)
+    .eq("id", id)
     .eq("user_id", user.id);
   if (error) {
     res.status(400).json({ error: error.message });

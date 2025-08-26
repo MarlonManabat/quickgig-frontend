@@ -5,6 +5,7 @@ import ApplicationThread from "@/components/ApplicationThread";
 import MessageComposer from "@/components/MessageComposer";
 import { supabase } from "@/utils/supabaseClient";
 import { getOrCreateThread } from "@/utils/application";
+import { asNumber } from "@/lib/normalize";
 import Card from "@/components/ui/Card";
 import { getString } from "@/utils/getString";
 
@@ -71,7 +72,7 @@ export default function ApplicationPage() {
 
   useEffect(() => {
     if (!app?.id) return;
-    getOrCreateThread(app.id).then((th) => setThreadId(th.id));
+    getOrCreateThread(app.id).then((th) => setThreadId(asNumber((th as any).id)));
   }, [app]);
 
   if (!appId) return <div data-testid="application-redirecting" />;

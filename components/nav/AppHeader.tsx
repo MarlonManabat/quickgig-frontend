@@ -4,7 +4,8 @@ import { supabase } from "@/utils/supabaseClient";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
 import AppHeaderTickets from "@/components/AppHeaderTickets";
 import AppLogo from "@/components/AppLogo";
-import { toNum } from "@/lib/normalize";
+import { asNumber } from "@/lib/normalize";
+import type { WalletRow } from "@/lib/types";
 
 export default function AppHeader() {
   const [balance, setBalance] = useState<number | null>(null);
@@ -23,12 +24,15 @@ export default function AppHeader() {
       setRole((prof?.role_pref as "worker" | "employer" | null) ?? null);
       const canPost = prof?.can_post_job ?? prof?.can_post;
       if (!canPost) return;
-      type WalletRow = { balance: number | null } | null;
-      const { data: bal } = await supabase
+      const { data: bal, error } = await supabase
         .from("ticket_balances")
         .select("balance")
-        .maybeSingle<WalletRow>();
-      setBalance(toNum(bal?.balance));
+        .single<WalletRow>();
+      if (error) {
+        setBalance(0);
+      } else {
+        setBalance(asNumber(bal?.balance) ?? 0);
+      }
     });
   }, []);
 

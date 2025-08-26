@@ -11,7 +11,7 @@ export default function ApplicationsList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !userId) return;
     (async () => {
       setLoading(true);
       const { data } = await supabase

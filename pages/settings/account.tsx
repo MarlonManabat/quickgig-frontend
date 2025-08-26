@@ -2,6 +2,7 @@ import { useState } from "react";
 import { requestAccountDeletion } from "@/lib/support";
 import { notifyDeletionRequested } from "@/lib/emailSupport";
 import { supabase } from "@/lib/supabaseClient";
+import { asString } from "@/lib/normalize";
 
 export default function AccountSettings() {
   const [busy, setBusy] = useState(false);
@@ -24,7 +25,8 @@ export default function AccountSettings() {
         .select("email")
         .limit(1)
         .maybeSingle();
-      if (data?.email) await notifyDeletionRequested(data.email);
+      const email = asString(data?.email);
+      if (email) await notifyDeletionRequested(email);
 
       // sign out locally
       await supabase.auth.signOut();

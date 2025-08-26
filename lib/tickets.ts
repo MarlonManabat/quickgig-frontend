@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { asNumber } from "./normalize";
 
 export async function getBalance(userId: string): Promise<number> {
   const { data, error } = await supabase
@@ -7,7 +8,7 @@ export async function getBalance(userId: string): Promise<number> {
     .eq("user_id", userId)
     .maybeSingle();
   if (error) throw error;
-  return data?.balance ?? 0;
+  return asNumber(data?.balance) ?? 0;
 }
 
 export async function addEntry(userId: string, delta: number, reason: string) {

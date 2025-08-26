@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerClient } from "@/utils/supabaseClient";
 import { isAdmin } from "@/lib/auth";
+import { asString } from "@/lib/normalize";
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,10 +31,12 @@ export default async function handler(
     return;
   }
 
+  const id = asString(req.query.id);
+  if (!id) return res.status(400).json({ error: "id required" });
   const { error } = await supabase
     .from("orders")
     .update({ status: decision })
-    .eq("id", req.query.id);
+    .eq("id", id);
   if (error) {
     res.status(400).json({ error: error.message });
     return;

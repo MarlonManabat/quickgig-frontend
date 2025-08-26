@@ -66,7 +66,7 @@ export default function TermsPage() {
             Limitation of Liability
           </h2>
           <p>
-            QuickGig is provided "as is" without indirect or consequential
+            QuickGig is provided &quot;as is&quot; without indirect or consequential
             damages.
           </p>
         </section>

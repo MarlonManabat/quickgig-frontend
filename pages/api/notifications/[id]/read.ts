@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerClient } from "@/utils/supabaseClient";
+import { asString } from "@/lib/normalize";
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,10 +27,12 @@ export default async function handler(
     res.status(401).json({ error: "unauthorized" });
     return;
   }
+  const id = asString(req.query.id);
+  if (!id) return res.status(400).json({ error: "id required" });
   const { error } = await supabase
     .from("notifications")
     .update({ read: true })
-    .eq("id", req.query.id)
+    .eq("id", id)
     .eq("user_id", uid);
   if (error) {
     res.status(400).json({ error: error.message });
