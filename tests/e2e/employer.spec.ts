@@ -1,10 +1,10 @@
-import { adminTest as test } from '../fixtures/roles';
+import { employerTest as test } from '../fixtures/roles';
 import { PAGES } from '../pages';
 import { auditPage } from '../utils/buttonAudit';
 
-const baseSet = PAGES.admin;
+const baseSet = PAGES.employer;
 
-test.describe('admin pages', () => {
+test.describe('employer pages', () => {
   for (const path of baseSet) {
     test(`audit ${path}`, async ({ page }) => {
       if (!process.env.BASE_URL) test.skip(true, 'BASE_URL not set');

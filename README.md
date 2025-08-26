@@ -19,7 +19,15 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 ## CI
 
-All automated checks run through a single GitHub Actions workflow, [Release Check](.github/workflows/release-check.yml). It provisions a Vercel preview, seeds test data, runs Playwright smoke and full end-to-end suites, and always uploads the Playwright report artifacts.
+All automated checks run through a single GitHub Actions workflow, [Release Check](.github/workflows/release-check.yml).
+It provisions a Vercel preview, seeds deterministic test data, then executes a multi-role Playwright suite.
+Each role (public, worker, employer, admin) audits visible buttons and performs basic happy path navigation.
+Artifacts from the run, including button audit JSON and Playwright reports, are always uploaded.
+If lint-based fixes are available an `autofix.patch` artifact is generated which can be applied locally:
+
+```
+git apply autofix.patch
+```
 
 ## Testing
 
@@ -37,4 +45,3 @@ curl -X POST -H "Content-Type: application/json" -d '{"proof_url":"https://.../r
 curl -X POST -H "Content-Type: application/json" -d '{"decision":"paid"}' https://app.quickgig.ph/api/orders/<id>/decide
 curl https://app.quickgig.ph/api/users/me/eligibility
 ```
-

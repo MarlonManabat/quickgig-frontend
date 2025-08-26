@@ -23,7 +23,9 @@
     "ci:check-lock": "node scripts/ci-check-lock.mjs",
     "ci:seed": "node scripts/ci-seed.mjs",
     "test:smoke:ci": "PLAYWRIGHT_HTML_REPORT=playwright-report/smoke playwright test tests/smoke --config=playwright.ci.ts --output=test-results/smoke",
-    "test:e2e:ci": "PLAYWRIGHT_HTML_REPORT=playwright-report/e2e playwright test tests/e2e --config=playwright.ci.ts --output=test-results/e2e"
+    "test:e2e:ci": "PLAYWRIGHT_HTML_REPORT=playwright-report/e2e playwright test tests/e2e --config=playwright.ci.ts --output=test-results/e2e",
+    "test:release": "playwright test -c playwright.ci.ts --reporter=github,html",
+    "autofix:ci": "tsx scripts/autofix.ts"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",
