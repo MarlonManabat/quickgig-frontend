@@ -65,7 +65,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1/2, 2/2]
+        include:
+          - shard: 1/2
+            shard_label: 1-of-2
+          - shard: 2/2
+            shard_label: 2-of-2
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -99,7 +103,7 @@ jobs:
       - name: Install Playwright (system deps)
         run: npx playwright install --with-deps
 
-      - name: Run E2E tests (shard ${{ matrix.shard }})
+      - name: Run E2E tests (shard ${{ matrix.shard_label }})
         env:
           E2E_BASE_URL: http://localhost:3000
           WORKER_EMAIL: ${{ secrets.WORKER_EMAIL }}
@@ -114,5 +118,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.shard }}
+          name: playwright-report-${{ matrix.shard_label }}
           path: playwright-report/**
