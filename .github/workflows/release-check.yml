@@ -13,8 +13,8 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: write
-  actions: read
+  pull-requests: read
+  deployments: read
 
 jobs:
   release:
@@ -35,17 +35,17 @@ jobs:
 
       # Get Vercel preview URL (ORG optional)
       - name: Get Vercel preview URL
-        id: preview
-        run: |
-          node scripts/get-vercel-preview-url.mjs > url.txt
-          echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
+        run: node scripts/get-preview-url.mjs
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
       - name: Echo preview
-        run: echo "Testing $BASE_URL"
+        run: |
+          echo "BASE_URL=${BASE_URL}"
+          echo "url.txt:"
+          cat url.txt
 
       # Seed preview (best-effort)
       - name: Seed test data (Preview)
