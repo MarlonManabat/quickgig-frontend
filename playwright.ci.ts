@@ -1,17 +1,19 @@
-import { defineConfig } from '@playwright/test';
-import baseConfig from './playwright.config';
+import type { PlaywrightTestConfig, ReporterDescription } from '@playwright/test';
+import base from './playwright.base';
 
-export default defineConfig({
-  ...(baseConfig as any),
+const config: PlaywrightTestConfig = {
+  ...base,
+  retries: 1,
+  timeout: 30_000,
   reporter: [
     ['github'],
-    ['html', { outputFolder: 'playwright-report' }],
+    ...((base.reporter as ReporterDescription[]) || []),
   ],
-  timeout: 60_000,
   use: {
-    ...((baseConfig as any)?.use ?? {}),
+    ...base.use,
     baseURL: process.env.BASE_URL,
     video: 'retain-on-failure',
   },
-});
+};
 
+export default config;

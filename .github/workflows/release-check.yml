@@ -1,80 +1,71 @@
-name: Release check
+name: Release Check
 
 on:
-  workflow_dispatch:
   pull_request:
+  push:
+    branches: [ main ]
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
+      QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
+      SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-
+        with:
+          node-version: 20.x
+          cache: npm
       - name: Install deps
         run: npm run ci:install
-
       - name: Verify lockfile
         run: npm run ci:check-lock
-
       - name: Install Playwright
         run: npx playwright install --with-deps
-
       - name: Get Vercel preview URL
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        run: node scripts/get-vercel-preview-url.mjs > url.txt
-
-      - name: Export BASE_URL
-        run: echo "BASE_URL=$(cat url.txt)" >> $GITHUB_ENV
-
+        run: echo "BASE_URL=$(node scripts/get-vercel-preview-url.mjs)" >> $GITHUB_ENV
       - name: Seed test data
-        env:
-          QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
-          QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-        run: npm run ci:seed
-
+        run: npm run ci:seed:preview
       - name: Run smoke tests
-        run: npm run test:smoke:ci
-
-      - name: Run full e2e tests
-        run: npm run test:e2e:ci
-
+        run: npm run test:smoke:ci -- --output=test-results/smoke
+        env:
+          PLAYWRIGHT_HTML_REPORT: playwright-report/smoke
+      - name: Run e2e tests
+        run: npm run test:e2e:ci -- --output=test-results/e2e
+        env:
+          PLAYWRIGHT_HTML_REPORT: playwright-report/e2e
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-artifacts
           path: |
-            test-results/**
             playwright-report/**
+            test-results/**
+            **/trace.zip
           if-no-files-found: ignore
-
-      - name: Create summary
+      - name: Generate summary
         if: always()
-        env:
-          BASE_URL: ${{ env.BASE_URL }}
         run: node scripts/ci-summary.mjs > summary.md
-
-      - name: Post PR comment
-        if: always()
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const body = fs.readFileSync('summary.md', 'utf8');
+            const body = fs.readFileSync('summary.md','utf8');
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body,
             });
-
+      - name: Write job summary
+        if: github.event_name != 'pull_request'
+        run: cat summary.md >> $GITHUB_STEP_SUMMARY

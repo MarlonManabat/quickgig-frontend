@@ -5,7 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "next lint || true",
     "lint:href": "node scripts/href-lint.mjs",
     "fix:href": "node scripts/href-codemod.mjs",
@@ -19,11 +19,11 @@
     "build:profile": "NODE_OPTIONS='--trace-deopt --trace_gc' next build",
     "seed": "node scripts/seed.mjs",
     "postinstall": "node -e \"process.env.NODE_ENV==='production'?process.exit(0):0\" || npx playwright install --with-deps || true",
-    "ci:install": "npm ci --no-audit --no-fund",
-    "ci:check-lock": "node scripts/ci-check-lock.mjs",
-    "ci:seed": "node scripts/ci-seed.mjs",
-    "test:smoke:ci": "PLAYWRIGHT_HTML_REPORT=playwright-report/smoke playwright test tests/smoke --config=playwright.ci.ts --output=test-results/smoke",
-    "test:e2e:ci": "PLAYWRIGHT_HTML_REPORT=playwright-report/e2e playwright test tests/e2e --config=playwright.ci.ts --output=test-results/e2e"
+    "ci:install": "npm ci --no-audit --no-fund || npm install --no-audit --no-fund",
+    "ci:check-lock": "node scripts/check-lock-consistency.mjs",
+    "ci:seed:preview": "node scripts/ci-seed-preview.mjs",
+    "test:smoke:ci": "playwright test tests/smoke --config=playwright.ci.ts",
+    "test:e2e:ci": "playwright test tests/e2e --config=playwright.ci.ts"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",
@@ -57,9 +57,10 @@
     "tailwindcss": "^3.4.1",
     "ts-morph": "^24.0.0",
     "tsx": "^4.7.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "playwright": "^1.48.0"
   },
   "engines": {
-    "node": ">=18.17"
+    "node": ">=20"
   }
 }
