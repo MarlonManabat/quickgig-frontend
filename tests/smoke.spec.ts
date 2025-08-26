@@ -12,7 +12,8 @@ test.beforeEach(async ({ page }) => {
 
 test("landing → app header visible", async ({ page }) => {
   await page.goto("/start");
-  await expect(page.getByRole("navigation")).toBeVisible();
+  const primaryNav = page.getByRole("navigation", { name: "Primary" });
+  await expect(primaryNav).toBeVisible();
 });
 
 test("app notifications bell visible after login (skips if no demo creds)", async ({

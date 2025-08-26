@@ -112,6 +112,7 @@ jobs:
           EMPLOYER_PASSWORD: ${{ secrets.EMPLOYER_PASSWORD }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          CI_FAST: '1'
         run: npx playwright test --shard ${{ matrix.shard }} --reporter=github,html
 
       - name: Upload test artifacts
