@@ -3,6 +3,19 @@ const baseConfig = {
   reactStrictMode: true,
   images: { formats: ["image/avif", "image/webp"] },
   eslint: { ignoreDuringBuilds: true }, // prevent CI failing on eslint/parser fetch
+  // Guard: don’t accidentally opt routes into Edge when using Supabase helpers.
+  experimental: {
+    forceSwcTransforms: true,
+  },
+  webpack: (config) => {
+    // Ensure woff/woff2 are always handled as assets when imported by css.
+    config.module.rules.push({
+      test: /\.(woff|woff2)$/i,
+      type: "asset/resource",
+      generator: { filename: "static/fonts/[name][ext]" },
+    });
+    return config;
+  },
   async headers() {
     return [
       {

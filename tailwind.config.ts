@@ -56,6 +56,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
+          "LegacySans",
           "Inter",
           "ui-sans-serif",
           "system-ui",
@@ -64,7 +65,7 @@ const config: Config = {
           "Apple Color Emoji",
           "Segoe UI Emoji",
         ],
-        heading: ["Inter", "ui-sans-serif", "system-ui"],
+        heading: ["LegacySans", "Inter", "ui-sans-serif", "system-ui"],
       },
       fontSize: {
         xs: ["clamp(0.75rem, 0.73rem + 0.10vw, 0.78rem)", "1.2"],
