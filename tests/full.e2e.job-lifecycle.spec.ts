@@ -22,6 +22,11 @@ test('[full-e2e] job lifecycle: post → apply → message → hire', async ({ p
   await page.getByRole('link', { name: /post job/i }).click();
   await page.getByLabel(/title/i).fill(title);
   await page.getByLabel(/description/i).fill('Automated E2E gig');
+  const regionSel = page.getByTestId('region-select');
+  if (await regionSel.isVisible().catch(() => false)) {
+    await regionSel.selectOption({ label: 'NCR' });
+    await page.getByTestId('city-select').selectOption({ label: 'Quezon City' });
+  }
   const price = page.getByLabel(/price/i);
   if (await price.isVisible().catch(() => false)) await price.fill('123');
   await page.getByRole('button', { name: /save|create|publish/i }).click();

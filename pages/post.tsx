@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { getRegions, getCities, RegionOption, CityOption } from '@/lib/locations';
 import { createJob } from '@/lib/jobs';
 import { requireTicket } from '@/lib/tickets';
 import { useRequireUser } from '@/lib/useRequireUser';
@@ -9,25 +8,47 @@ export default function PostJobPage() {
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');
   const [isOnline, setIsOnline] = useState(false);
-  const [regions, setRegions] = useState<RegionOption[]>([]);
-  const [cities, setCities] = useState<CityOption[]>([]);
-  const [region, setRegion] = useState('');
-  const [city, setCity] = useState('');
+  const [regions, setRegions] = useState<Array<{ id: string; name: string }>>([]);
+  const [cities, setCities] = useState<Array<{ id: string; name: string }>>([]);
+  const [regionId, setRegionId] = useState('');
+  const [cityId, setCityId] = useState('');
+  const [loadingRegions, setLoadingRegions] = useState(true);
+  const [loadingCities, setLoadingCities] = useState(false);
   const [address, setAddress] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    getRegions().then(setRegions);
+    (async () => {
+      try {
+        const r = await fetch('/api/locations/regions').then(r => r.json());
+        setRegions(r);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingRegions(false);
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    if (region) getCities(region).then(setCities);
-    else setCities([]);
-  }, [region]);
+    if (!regionId) {
+      setCities([]);
+      return;
+    }
+    setLoadingCities(true);
+    fetch(`/api/locations/cities?regionId=${regionId}`)
+      .then(r => r.json())
+      .then(setCities)
+      .catch(err => {
+        console.error(err);
+        setCities([]);
+      })
+      .finally(() => setLoadingCities(false));
+  }, [regionId]);
 
   const locationDisabled = isOnline;
-  const regionLabel = regions.find(r => r.value === region)?.label || '';
-  const cityLabel = cities.find(c => c.value === city)?.label || '';
+  const regionName = regions.find(r => r.id === regionId)?.name || '';
+  const cityName = cities.find(c => c.id === cityId)?.name || '';
 
   async function onSubmit(e: any) {
     e.preventDefault();
@@ -39,8 +60,8 @@ export default function PostJobPage() {
         title: title.trim(),
         company: company.trim() || undefined,
         is_online: isOnline,
-        region: locationDisabled ? null : regionLabel || null,
-        city: locationDisabled ? null : cityLabel || null,
+        region: locationDisabled ? null : regionName || null,
+        city: locationDisabled ? null : cityName || null,
         address: locationDisabled ? null : address.trim() || null,
       });
       window.location.href = '/find';
@@ -90,34 +111,50 @@ export default function PostJobPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <select
+            data-testid="region-select"
             className="border rounded p-2"
-            value={region}
+            value={regionId}
             onChange={e => {
-              setRegion(e.target.value);
-              setCity('');
+              setRegionId(e.target.value);
+              setCityId('');
             }}
             disabled={locationDisabled}
             required={!isOnline}
           >
-            <option value="">Select Region</option>
+            <option value="">
+              {loadingRegions
+                ? 'Loading regions…'
+                : regions.length
+                ? 'Select Region'
+                : 'No regions available'}
+            </option>
             {regions.map(r => (
-              <option key={r.value} value={r.value}>
-                {r.label}
+              <option key={r.id} value={r.id}>
+                {r.name}
               </option>
             ))}
           </select>
 
           <select
+            data-testid="city-select"
             className="border rounded p-2"
-            value={city}
-            onChange={e => setCity(e.target.value)}
-            disabled={locationDisabled || !region}
+            value={cityId}
+            onChange={e => setCityId(e.target.value)}
+            disabled={locationDisabled || !regionId}
             required={!isOnline}
           >
-            <option value="">{region ? 'Select City' : 'Select Region first'}</option>
+            <option value="">
+              {!regionId
+                ? 'Select Region first'
+                : loadingCities
+                ? 'Loading cities…'
+                : cities.length
+                ? 'Select City'
+                : 'No cities'}
+            </option>
             {cities.map(c => (
-              <option key={c.value} value={c.value}>
-                {c.label}
+              <option key={c.id} value={c.id}>
+                {c.name}
               </option>
             ))}
           </select>

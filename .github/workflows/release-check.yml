@@ -53,6 +53,11 @@ jobs:
             echo "No preview URL resolved. Skipping preview-dependent steps."
           fi
 
+      - name: Seed locations (best-effort)
+        if: env.BASE_URL != ''
+        run: |
+          curl -fsS "$BASE_URL/api/test/seed?only=locations" || true
+
       # Seed preview (best-effort)
       - name: Seed test data (Preview)
         if: env.BASE_URL != ''
