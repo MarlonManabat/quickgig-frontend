@@ -4,6 +4,8 @@ import { supabase } from "@/utils/supabaseClient";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
 import AppHeaderTickets from "@/components/AppHeaderTickets";
 import AppLogo from "@/components/AppLogo";
+import { asNumber } from "@/lib/normalize";
+import type { WalletRow } from "@/lib/types";
 
 export default function AppHeader() {
   const [balance, setBalance] = useState<number | null>(null);
@@ -25,8 +27,12 @@ export default function AppHeader() {
       const { data: bal, error } = await supabase
         .from("ticket_balances")
         .select("balance")
-        .single();
-      setBalance(error ? 0 : (bal?.balance ?? 0));
+        .single<WalletRow>();
+      if (error) {
+        setBalance(0);
+      } else {
+        setBalance(asNumber(bal?.balance) ?? 0);
+      }
     });
   }, []);
 

@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function RolePick() {
   const router = useRouter();
@@ -26,9 +27,9 @@ export default function RolePick() {
           I’m hiring
         </button>
       </div>
-      <a href="/home" className="qg-link text-sm">
+      <Link href="/home" className="qg-link text-sm">
         Skip for now
-      </a>
+      </Link>
     </main>
   );
 }

@@ -1,0 +1,15 @@
+/* Plain @font-face to avoid “Unknown font format” loader issues in CI */
+@font-face {
+  font-family: 'LegacySans';
+  src: url('/legacy/fonts/LegacySans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'LegacySans';
+  src: url('/legacy/fonts/LegacySans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

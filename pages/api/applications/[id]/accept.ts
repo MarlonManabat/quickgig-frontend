@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerClient } from "@/utils/supabaseClient";
 import { emitNotification } from "@/lib/notifications";
+import { asString } from "@/lib/normalize";
 
 export default async function handler(
   req: NextApiRequest,
@@ -36,12 +37,14 @@ export default async function handler(
     return;
   }
 
-  if (gig?.owner_id && gig.title) {
+  const ownerId = asString((gig as any)?.owner_id);
+  const title = asString((gig as any)?.title);
+  if (ownerId && title) {
     await emitNotification({
-      userId: gig.owner_id,
+      userId: ownerId,
       type: "offer_accepted",
       title: "Your offer was accepted",
-      body: `Your offer for “${gig.title}” was accepted. You’re now hired!`,
+      body: `Your offer for “${title}” was accepted. You’re now hired!`,
       link: `${process.env.NEXT_PUBLIC_APP_URL}/gigs/${(app as any)?.gig_id}`,
       uniq: `offer_accepted:${appId}`,
     });

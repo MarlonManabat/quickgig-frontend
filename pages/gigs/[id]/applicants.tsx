@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import toast from "@/utils/toast";
+import { toNum } from "@/lib/normalize";
 
 export default function Applicants() {
   const { ready, userId, timedOut } = useRequireUser();
@@ -47,12 +48,13 @@ export default function Applicants() {
   useEffect(() => {
     if (!ready || !userId) return;
     (async () => {
+      type WalletRow = { balance: number | null } | null;
       const { data } = await supabase
         .from("tickets_balances")
         .select("balance")
         .eq("user_id", userId)
-        .maybeSingle();
-      setBalance(data?.balance ?? 0);
+        .maybeSingle<WalletRow>();
+      setBalance(toNum(data?.balance) ?? 0);
     })();
   }, [ready, userId]);
 

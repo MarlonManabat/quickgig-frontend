@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import { uploadAvatar } from "@/lib/avatar";
+import { toStr } from "@/lib/normalize";
 
 export default function AvatarUploader() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export default function AvatarUploader() {
         .select("avatar_url")
         .eq("id", user.id)
         .maybeSingle();
-      setAvatarUrl(data?.avatar_url ?? null);
+      setAvatarUrl(toStr(data?.avatar_url));
     })();
   }, []);
 

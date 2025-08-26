@@ -3,15 +3,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import { uploadAvatar } from "@/lib/avatar";
-
-type TicketBalance = { balance: number };
+import { asNumber, asRole, asString, toBool } from "@/lib/normalize";
+import type { Role, WalletRow } from "@/lib/types";
 
 export default function HomeEmployer() {
-  const [role, setRole] = useState<"seeker" | "employer" | "admin">("seeker");
+  const [role, setRole] = useState<Role>("seeker");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [profileEmail, setProfileEmail] = useState<string | null>(null);
-  const [suspended, setSuspended] = useState(false);
-  const [deleted, setDeleted] = useState(false);
+  const [profileEmail, setProfileEmail] = useState<string>("");
+  const [suspended, setSuspended] = useState<boolean>(false);
+  const [deleted, setDeleted] = useState<boolean>(false);
   const [balance, setBalance] = useState<number>(0);
 
   // seeker
@@ -36,18 +36,19 @@ export default function HomeEmployer() {
         .eq("id", auth.user.id)
         .maybeSingle();
 
-      setRole((prof?.role as any) ?? "seeker");
-      setAvatarUrl(prof?.avatar_url ?? null);
-      setProfileEmail(prof?.email ?? null);
-      setSuspended(!!prof?.suspended_at);
-      setDeleted(!!prof?.deleted_at);
+      // Profile -> normalized state
+      setRole(asRole(prof?.role) ?? "seeker");
+      setAvatarUrl(asString(prof?.avatar_url));
+      setProfileEmail(asString(prof?.email) ?? "");
+      setSuspended(toBool(prof?.suspended_at));
+      setDeleted(toBool(prof?.deleted_at));
 
-      const { data: bal } = await supabase
+      const { data: wallet } = await supabase
         .from("v_ticket_balances")
         .select("balance")
         .eq("user_id", auth.user.id)
-        .maybeSingle();
-      setBalance(bal?.balance ?? 0);
+        .maybeSingle<WalletRow>();
+      setBalance(asNumber(wallet?.balance) ?? 0);
 
       // seeker widgets
       const { data: seekerApps } = await supabase

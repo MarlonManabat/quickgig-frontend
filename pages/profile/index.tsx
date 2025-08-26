@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { hasMockSession } from "@/lib/session";
+import { toStr } from "@/lib/normalize";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -28,9 +29,9 @@ export default function ProfilePage() {
           .eq("id", user.id)
           .maybeSingle();
         if (data) {
-          setFirstName(data.first_name || "");
-          setCity(data.city || "");
-          setAvatarUrl(data.avatar_url || null);
+          setFirstName(toStr(data.first_name) ?? "");
+          setCity(toStr(data.city) ?? "");
+          setAvatarUrl(toStr(data.avatar_url));
         }
       }
       setLoading(false);

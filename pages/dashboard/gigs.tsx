@@ -10,11 +10,11 @@ export default function MyGigs() {
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  async function load() {
+  async function load(uid: string) {
     const { data, error } = await supabase
       .from("gigs")
       .select("*")
-      .eq("owner", userId)
+      .eq("owner", uid)
       .order("created_at", { ascending: false });
     if (error) setError(error);
     else setData(data ?? []);
@@ -22,16 +22,16 @@ export default function MyGigs() {
   }
 
   useEffect(() => {
-    if (ready) {
+    if (ready && userId) {
       setLoading(true);
-      load();
+      load(userId);
     }
   }, [ready, userId]);
 
   async function del(id: number) {
     if (!confirm("Delete this gig?")) return;
     const { error } = await supabase.from("gigs").delete().eq("id", id);
-    if (!error) load();
+    if (!error && userId) load(userId);
   }
 
   if (!ready)

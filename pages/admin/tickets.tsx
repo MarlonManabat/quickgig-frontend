@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { addEntry } from "@/lib/tickets";
+import { asNumber, asString } from "@/lib/normalize";
 
 type Row = { user_id: string; balance: number; entries: any[] };
 
@@ -11,17 +12,19 @@ export default function AdminTickets() {
     const { data: balances } = await supabase
       .from("tickets_balances")
       .select("user_id,balance");
-    const list = await Promise.all(
+    const list: Row[] = await Promise.all(
       (balances ?? []).map(async (b) => {
+        const uid = asString((b as any).user_id) ?? "";
+        const bal = asNumber((b as any).balance) ?? 0;
         const { data: entries } = await supabase
           .from("tickets_ledger")
           .select("delta,reason,created_at")
-          .eq("user_id", b.user_id)
+          .eq("user_id", uid)
           .order("created_at", { ascending: false })
           .limit(10);
         return {
-          user_id: b.user_id,
-          balance: b.balance,
+          user_id: uid,
+          balance: bal,
           entries: entries ?? [],
         };
       }),

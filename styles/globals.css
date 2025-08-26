@@ -1,6 +1,7 @@
 html,
 body {
   background: var(--surface, #fff);
+  font-family: 'LegacySans', Inter, ui-sans-serif, system-ui, sans-serif;
 }
 @tailwind base;
 @tailwind components;

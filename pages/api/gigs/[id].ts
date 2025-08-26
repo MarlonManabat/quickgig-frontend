@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerClient } from "@/utils/supabaseClient";
+import { asString } from "@/lib/normalize";
 
 export default async function handler(
   req: NextApiRequest,
@@ -8,7 +9,8 @@ export default async function handler(
   if (req.method !== "GET")
     return res.status(405).json({ error: "method not allowed" });
   const supabase = createServerClient();
-  const id = req.query.id;
+  const id = asString(req.query.id);
+  if (!id) return res.status(400).json({ error: "id required" });
   const { data, error } = await supabase
     .from("gigs")
     .select("*")

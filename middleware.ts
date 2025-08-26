@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
+// Ensure middleware runs on Node runtime (not Edge) so anything that
+// indirectly touches Supabase helpers won’t crash during build or preview.
+export const runtime = "nodejs";
+
 const PUBLIC_ALLOW = new Set([
   "/",
   "/home",
