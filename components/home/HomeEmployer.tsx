@@ -36,11 +36,24 @@ export default function HomeEmployer() {
         .eq("id", auth.user.id)
         .maybeSingle();
 
-      setRole((prof?.role as any) ?? "seeker");
-      setAvatarUrl(prof?.avatar_url ?? null);
-      setProfileEmail(prof?.email ?? null);
-      setSuspended(!!prof?.suspended_at);
-      setDeleted(!!prof?.deleted_at);
+      // Role: ensure string fallback
+      setRole((prof?.role as string) ?? "seeker");
+
+      // Avatar URL: Supabase can return {} | string | null from JSON columns.
+      // Normalize to string | null for the state setter.
+      const rawAvatar = (prof as any)?.avatar_url;
+      const avatarUrlNormalized =
+        typeof rawAvatar === "string" && rawAvatar.trim().length > 0
+          ? rawAvatar
+          : null;
+      setAvatarUrl(avatarUrlNormalized);
+
+      // Email already string | null from our types, keep explicit fallback
+      setProfileEmail((prof as any)?.email ?? null);
+
+      // Booleans: coerce based on timestamp presence
+      setSuspended(Boolean(prof?.suspended_at));
+      setDeleted(Boolean(prof?.deleted_at));
 
       const { data: bal } = await supabase
         .from("v_ticket_balances")
