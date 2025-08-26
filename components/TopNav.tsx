@@ -14,7 +14,7 @@ export default function TopNav() {
       const user = data.user;
       setLoggedIn(!!user);
       if (user) {
-        const res = await fetch('/api/users/me/eligibility');
+        const res = await fetch("/api/users/me/eligibility");
         if (res.ok) {
           const d = await res.json();
           setEligible(d.canPost);
@@ -26,11 +26,15 @@ export default function TopNav() {
   return (
     <nav className="w-full sticky top-0 z-20 border-b border-brand-border bg-brand-bg backdrop-blur text-brand">
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
-        <Link href="/home" className="font-semibold">QuickGig.ph</Link>
+        <Link href="/home" className="font-semibold">
+          QuickGig.ph
+        </Link>
         <div className="ml-auto flex items-center gap-4 text-sm">
           <Link href="/find">{copy.nav.findWork}</Link>
           {loggedIn && <Link href="/dashboard/gigs">{copy.nav.myGigs}</Link>}
-          {loggedIn && <Link href="/applications">{copy.nav.applications}</Link>}
+          {loggedIn && (
+            <Link href="/applications">{copy.nav.applications}</Link>
+          )}
           {loggedIn && <Link href="/saved">{copy.nav.saved}</Link>}
           {loggedIn && <AppHeaderTickets />}
           {loggedIn && <AppHeaderNotifications />}
@@ -41,7 +45,7 @@ export default function TopNav() {
           )}
           <Link
             href="/post"
-            className={`btn-primary ${loggedIn && !eligible ? 'opacity-50 pointer-events-none' : ''}`}
+            className={`btn-primary ${loggedIn && !eligible ? "opacity-50 pointer-events-none" : ""}`}
             title={
               loggedIn && !eligible
                 ? `Please buy a ticket (₱${TICKET_PRICE_PHP})`

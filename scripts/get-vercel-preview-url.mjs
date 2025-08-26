@@ -2,7 +2,7 @@
 // Resolve Vercel preview URL with retry/backoff. Falls back to GitHub deployment API
 // and exits successfully even if no preview is found.
 
-import fs from 'node:fs/promises';
+import fs from "node:fs/promises";
 
 const {
   GITHUB_REPOSITORY,
@@ -14,10 +14,10 @@ const {
   GITHUB_ENV,
 } = process.env;
 
-const log = (...a) => console.log('[vercel-preview]', ...a);
-const warn = (...a) => console.warn('[vercel-preview][warn]', ...a);
+const log = (...a) => console.log("[vercel-preview]", ...a);
+const warn = (...a) => console.warn("[vercel-preview][warn]", ...a);
 
-const [OWNER, REPO] = GITHUB_REPOSITORY?.split('/') ?? [];
+const [OWNER, REPO] = GITHUB_REPOSITORY?.split("/") ?? [];
 
 async function fetchJson(url, init = {}) {
   const res = await fetch(url, init);
@@ -37,8 +37,8 @@ async function tryVercelApi() {
   const params = new URLSearchParams({
     projectId: VERCEL_PROJECT_ID,
     ...(VERCEL_ORG_ID ? { teamId: VERCEL_ORG_ID } : {}),
-    'meta-githubCommitSha': GITHUB_SHA ?? '',
-    limit: '1',
+    "meta-githubCommitSha": GITHUB_SHA ?? "",
+    limit: "1",
   });
   const url = `https://api.vercel.com/v6/deployments?${params}`;
   try {
@@ -47,11 +47,11 @@ async function tryVercelApi() {
     });
     const d = data?.deployments?.[0];
     if (!d?.url) return null;
-    const preview = d.url.startsWith('http') ? d.url : `https://${d.url}`;
-    log('Vercel API: found', preview);
-    return { url: preview, source: 'vercel' };
+    const preview = d.url.startsWith("http") ? d.url : `https://${d.url}`;
+    log("Vercel API: found", preview);
+    return { url: preview, source: "vercel" };
   } catch (e) {
-    warn('Vercel API failed:', e.message);
+    warn("Vercel API failed:", e.message);
     return null;
   }
 }
@@ -60,7 +60,7 @@ async function tryGithubDeployments() {
   if (!GITHUB_TOKEN || !OWNER || !REPO) return null;
   const headers = {
     Authorization: `Bearer ${GITHUB_TOKEN}`,
-    Accept: 'application/vnd.github+json',
+    Accept: "application/vnd.github+json",
   };
   const depUrl = `https://api.github.com/repos/${OWNER}/${REPO}/deployments?sha=${GITHUB_SHA}`;
   try {
@@ -70,14 +70,15 @@ async function tryGithubDeployments() {
     const statusesUrl = `https://api.github.com/repos/${OWNER}/${REPO}/deployments/${d.id}/statuses`;
     const statuses = await fetchJson(statusesUrl, { headers });
     const s = statuses?.find((x) => x.environment_url) || statuses?.[0];
-    const url = s?.environment_url || d?.original_environment_url || d?.environment_url;
+    const url =
+      s?.environment_url || d?.original_environment_url || d?.environment_url;
     if (url) {
-      log('GitHub API: found', url);
-      return { url, source: 'github' };
+      log("GitHub API: found", url);
+      return { url, source: "github" };
     }
     return null;
   } catch (e) {
-    warn('GitHub API failed:', e.message);
+    warn("GitHub API failed:", e.message);
     return null;
   }
 }
@@ -97,18 +98,18 @@ async function main() {
   }
 
   if (!result) {
-    log('No preview URL found. Skipping.');
+    log("No preview URL found. Skipping.");
     return;
   }
 
-  await fs.writeFile('url.txt', result.url.trim() + '\n');
+  await fs.writeFile("url.txt", result.url.trim() + "\n");
   log(`Preview URL resolved via ${result.source}: ${result.url}`);
   if (GITHUB_ENV) {
     await fs.appendFile(GITHUB_ENV, `BASE_URL=${result.url}\n`);
-    log('Exported BASE_URL for subsequent steps.');
+    log("Exported BASE_URL for subsequent steps.");
   }
 }
 
 main().catch((e) => {
-  warn('Unhandled error:', e.message);
+  warn("Unhandled error:", e.message);
 });

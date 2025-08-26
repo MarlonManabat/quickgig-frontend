@@ -1,30 +1,33 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { supabase } from './supabaseClient'
-import { useRouter } from 'next/router'
+"use client";
+import { useEffect, useState } from "react";
+import { supabase } from "./supabaseClient";
+import { useRouter } from "next/router";
 
-export function useRequireAuth(redirectTo: string = '/auth') {
-  const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<null | { id: string }>(null)
+export function useRequireAuth(redirectTo: string = "/auth") {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<null | { id: string }>(null);
 
   useEffect(() => {
-    let ignore = false
+    let ignore = false;
     supabase.auth.getUser().then(({ data }) => {
       if (!ignore) {
-        const u = data.user ? { id: data.user.id } : null
-        setUser(u)
-        if (!u) router.replace(redirectTo)
-        setLoading(false)
+        const u = data.user ? { id: data.user.id } : null;
+        setUser(u);
+        if (!u) router.replace(redirectTo);
+        setLoading(false);
       }
-    })
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      const u = session?.user ? { id: session.user.id } : null
-      setUser(u)
-      if (!u) router.replace(redirectTo)
-    })
-    return () => { ignore = true; sub.subscription.unsubscribe() }
-  }, [router, redirectTo])
+      const u = session?.user ? { id: session.user.id } : null;
+      setUser(u);
+      if (!u) router.replace(redirectTo);
+    });
+    return () => {
+      ignore = true;
+      sub.subscription.unsubscribe();
+    };
+  }, [router, redirectTo]);
 
-  return { user, loading }
+  return { user, loading };
 }

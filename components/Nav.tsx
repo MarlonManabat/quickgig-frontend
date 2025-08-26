@@ -1,23 +1,29 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { supabase } from '@/utils/supabaseClient'
-import type { Session } from '@supabase/supabase-js'
-import { copy } from '@/copy'
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { supabase } from "@/utils/supabaseClient";
+import type { Session } from "@supabase/supabase-js";
+import { copy } from "@/copy";
 
 export default function Nav() {
-  const [session, setSession] = useState<Session | null>(null)
-  const router = useRouter()
+  const [session, setSession] = useState<Session | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => setSession(session))
-    return () => { listener.subscription.unsubscribe() }
-  }, [])
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => setSession(session));
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => setSession(session),
+    );
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   async function logout() {
-    await supabase.auth.signOut()
-    router.push('/')
+    await supabase.auth.signOut();
+    router.push("/");
   }
 
   return (
@@ -31,5 +37,5 @@ export default function Nav() {
         <Link href="/auth">{copy.nav.auth}</Link>
       )}
     </nav>
-  )
+  );
 }

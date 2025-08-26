@@ -1,40 +1,43 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/utils/supabaseClient'
-import AppHeaderNotifications from '@/components/AppHeaderNotifications'
-import AppHeaderTickets from '@/components/AppHeaderTickets'
-import AppLogo from '@/components/AppLogo'
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "@/utils/supabaseClient";
+import AppHeaderNotifications from "@/components/AppHeaderNotifications";
+import AppHeaderTickets from "@/components/AppHeaderTickets";
+import AppLogo from "@/components/AppLogo";
 
-export default function AppHeader(){
-  const [balance, setBalance] = useState<number | null>(null)
-  const [user, setUser] = useState<any>(null)
-  const [role, setRole] = useState<'worker' | 'employer' | null>(null)
+export default function AppHeader() {
+  const [balance, setBalance] = useState<number | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [role, setRole] = useState<"worker" | "employer" | null>(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
-      const user = data.user
-      setUser(user)
-      if (!user) return
+      const user = data.user;
+      setUser(user);
+      if (!user) return;
       const { data: prof } = await supabase
-        .from('profiles')
-        .select('can_post_job, can_post, role_pref')
-        .single()
-      setRole((prof?.role_pref as 'worker' | 'employer' | null) ?? null)
-      const canPost = prof?.can_post_job ?? prof?.can_post
-      if (!canPost) return
-      const { data: bal, error } = await supabase.from('ticket_balances').select('balance').single()
-      setBalance(error ? 0 : bal?.balance ?? 0)
-    })
-  },[])
+        .from("profiles")
+        .select("can_post_job, can_post, role_pref")
+        .single();
+      setRole((prof?.role_pref as "worker" | "employer" | null) ?? null);
+      const canPost = prof?.can_post_job ?? prof?.can_post;
+      if (!canPost) return;
+      const { data: bal, error } = await supabase
+        .from("ticket_balances")
+        .select("balance")
+        .single();
+      setBalance(error ? 0 : (bal?.balance ?? 0));
+    });
+  }, []);
 
-  const highlight = balance === 0 && balance !== null
+  const highlight = balance === 0 && balance !== null;
 
-    return (
-      <header className="qg-header h-14">
-        <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <AppLogo size={32} />
-          </Link>
+  return (
+    <header className="qg-header h-14">
+      <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
+        <Link href="/" className="flex items-center">
+          <AppLogo size={32} />
+        </Link>
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
           {!user && (
             <>
@@ -42,8 +45,8 @@ export default function AppHeader(){
               <Link href="/start?intent=employer">Post job</Link>
             </>
           )}
-          {user && role === 'worker' && <Link href="/find">Find work</Link>}
-          {user && role === 'employer' && (
+          {user && role === "worker" && <Link href="/find">Find work</Link>}
+          {user && role === "employer" && (
             <>
               <Link href="/post">Post job</Link>
               <Link href="/find">Find work</Link>
@@ -54,36 +57,52 @@ export default function AppHeader(){
               href="/pay"
               className={`inline-flex items-center ${
                 highlight
-                  ? 'qg-btn qg-btn--primary px-3 py-1'
-                  : 'qg-btn qg-btn--white px-3 py-1'
+                  ? "qg-btn qg-btn--primary px-3 py-1"
+                  : "qg-btn qg-btn--white px-3 py-1"
               }`}
             >
               Add tickets
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-black text-white text-xs">{balance}</span>
+              <span className="ml-2 px-2 py-0.5 rounded-full bg-black text-white text-xs">
+                {balance}
+              </span>
             </Link>
           )}
           <AppHeaderTickets />
           <AppHeaderNotifications />
         </nav>
         <details className="md:hidden">
-          <summary aria-label="Open menu" className="cursor-pointer">Menu</summary>
+          <summary aria-label="Open menu" className="cursor-pointer">
+            Menu
+          </summary>
           <div className="mt-2 flex flex-col">
             {!user && (
               <>
-                <Link href="/start?intent=worker" className="py-2">Find work</Link>
-                <Link href="/start?intent=employer" className="py-2">Post job</Link>
+                <Link href="/start?intent=worker" className="py-2">
+                  Find work
+                </Link>
+                <Link href="/start?intent=employer" className="py-2">
+                  Post job
+                </Link>
               </>
             )}
-            {user && role === 'worker' && (
-              <Link href="/find" className="py-2">Find work</Link>
+            {user && role === "worker" && (
+              <Link href="/find" className="py-2">
+                Find work
+              </Link>
             )}
-            {user && role === 'employer' && (
+            {user && role === "employer" && (
               <>
-                <Link href="/post" className="py-2">Post job</Link>
-                <Link href="/find" className="py-2">Find work</Link>
+                <Link href="/post" className="py-2">
+                  Post job
+                </Link>
+                <Link href="/find" className="py-2">
+                  Find work
+                </Link>
               </>
             )}
-            <Link href="/notifications" className="py-2">Notifications</Link>
+            <Link href="/notifications" className="py-2">
+              Notifications
+            </Link>
             {balance !== null && (
               <Link href="/pay" className="py-2">
                 Add tickets ({balance})
@@ -93,5 +112,5 @@ export default function AppHeader(){
         </details>
       </div>
     </header>
-  )
+  );
 }

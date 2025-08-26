@@ -1,8 +1,16 @@
-import { useState } from 'react';
-import { supabase } from '@/utils/supabaseClient';
+import { useState } from "react";
+import { supabase } from "@/utils/supabaseClient";
 
-export default function MessageComposer({ threadId, userId, onSent }: { threadId: string; userId: string; onSent?: (msg: any) => void }) {
-  const [text, setText] = useState('');
+export default function MessageComposer({
+  threadId,
+  userId,
+  onSent,
+}: {
+  threadId: string;
+  userId: string;
+  onSent?: (msg: any) => void;
+}) {
+  const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   async function send() {
     if (!text.trim()) return;
@@ -15,11 +23,11 @@ export default function MessageComposer({ threadId, userId, onSent }: { threadId
       created_at: new Date().toISOString(),
     };
     onSent?.(optimistic);
-    setText('');
+    setText("");
     const { data, error } = await supabase
-      .from('messages')
+      .from("messages")
       .insert({ thread_id: threadId, sender_id: userId, body: optimistic.body })
-      .select('*')
+      .select("*")
       .single();
     setSending(false);
     if (error) console.error(error);
@@ -30,7 +38,7 @@ export default function MessageComposer({ threadId, userId, onSent }: { threadId
       <input
         data-testid="chat-input"
         value={text}
-        onChange={e => setText(e.target.value)}
+        onChange={(e) => setText(e.target.value)}
         className="flex-1 border rounded px-3 py-2"
         placeholder="Type a message…"
       />
@@ -45,4 +53,3 @@ export default function MessageComposer({ threadId, userId, onSent }: { threadId
     </div>
   );
 }
-

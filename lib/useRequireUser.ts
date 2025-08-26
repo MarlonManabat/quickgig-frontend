@@ -24,7 +24,7 @@ export function useRequireUser() {
         return;
       }
       clearTimeout(timer);
-      setUserId(session?.user?.id || 'mock-user');
+      setUserId(session?.user?.id || "mock-user");
       setReady(true);
     })();
     return () => {

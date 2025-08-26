@@ -1,4 +1,4 @@
-import { NextRouter } from 'next/router';
+import { NextRouter } from "next/router";
 
 export function hasDynamicParam(path: string) {
   // matches /[slug] or /[id] anywhere
@@ -10,21 +10,29 @@ export function isMissingParam(path: string) {
   return hasDynamicParam(path);
 }
 
-export function fillPath(path: string, params: Record<string,string|number|undefined|null>) {
+export function fillPath(
+  path: string,
+  params: Record<string, string | number | undefined | null>,
+) {
   return path.replace(/\[([^\]/]+)\]/g, (_, key) => {
     const v = params[key];
-    if (v === null || v === undefined || v === '') throw new Error(`Missing param ${key} for ${path}`);
+    if (v === null || v === undefined || v === "")
+      throw new Error(`Missing param ${key} for ${path}`);
     return String(v);
   });
 }
 
-export function safePush(router: NextRouter, path: string, params: Record<string,string|number|undefined|null> = {}) {
+export function safePush(
+  router: NextRouter,
+  path: string,
+  params: Record<string, string | number | undefined | null> = {},
+) {
   try {
     const finalPath = hasDynamicParam(path) ? fillPath(path, params) : path;
     return router.push(finalPath);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.error('safePush error', e);
+    console.error("safePush error", e);
     return Promise.resolve(false);
   }
 }

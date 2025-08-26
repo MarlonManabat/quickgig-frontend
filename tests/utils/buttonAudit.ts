@@ -1,11 +1,11 @@
-import { Page, Locator, expect } from '@playwright/test';
-import fs from 'fs/promises';
+import { Page, Locator, expect } from "@playwright/test";
+import fs from "fs/promises";
 
 const selector = [
-  'button:not([disabled])',
+  "button:not([disabled])",
   '[role="button"]:not([aria-disabled="true"])',
   '[data-testid*="btn"]',
-].join(',');
+].join(",");
 
 export async function collectButtons(page: Page): Promise<Locator[]> {
   const loc = page.locator(selector);
@@ -27,7 +27,7 @@ export async function auditPage(page: Page, path: string) {
   const buttons = await collectButtons(page);
   const results: ButtonResult[] = [];
   for (const btn of buttons) {
-    const name = (await btn.textContent())?.trim() || '<unnamed>';
+    const name = (await btn.textContent())?.trim() || "<unnamed>";
     let ok = true;
     try {
       await expect(btn).toBeEnabled();
@@ -37,8 +37,9 @@ export async function auditPage(page: Page, path: string) {
     }
     results.push({ name, ok });
   }
-  await fs.mkdir('button-audit', { recursive: true });
-  const slug = path === '/' ? 'home' : path.replace(/\//g, '_').replace(/^_/, '');
+  await fs.mkdir("button-audit", { recursive: true });
+  const slug =
+    path === "/" ? "home" : path.replace(/\//g, "_").replace(/^_/, "");
   const file = `button-audit/${slug}.json`;
   await fs.writeFile(file, JSON.stringify(results, null, 2));
 }

@@ -1,39 +1,44 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
 const CANON = new Set([
-  '/start?intent=worker',
-  '/start?intent=employer',
-  '/find',
-  '/post',
-  '/', '/home',
+  "/start?intent=worker",
+  "/start?intent=employer",
+  "/find",
+  "/post",
+  "/",
+  "/home",
 ]);
 
-test.describe('Landing CTAs are canonical', () => {
-  test('hero has exactly two CTAs with canonical hrefs', async ({ page }) => {
-    await page.goto('/');
+test.describe("Landing CTAs are canonical", () => {
+  test("hero has exactly two CTAs with canonical hrefs", async ({ page }) => {
+    await page.goto("/");
     const ctas = await page
-      .locator('a:has-text("Find work"), a:has-text("Simulan na"), a:has-text("Post job"), a:has-text("Post a job")')
+      .locator(
+        'a:has-text("Find work"), a:has-text("Simulan na"), a:has-text("Post job"), a:has-text("Post a job")',
+      )
       .all();
     // allow 1 or 2 depending on copy; enforce canonical hrefs
     expect(ctas.length).toBeGreaterThanOrEqual(1);
     for (const a of ctas) {
-      const href = await a.getAttribute('href');
+      const href = await a.getAttribute("href");
       expect(href).toBeTruthy();
       // allow canonical target or canonical start
-      const ok = [...CANON].some(c => href!.startsWith(c));
+      const ok = [...CANON].some((c) => href!.startsWith(c));
       expect(ok, `Bad CTA href: ${href}`).toBeTruthy();
     }
   });
 });
 
-test.describe('No dead links on landing', () => {
-  test('all <a> resolve to 200/3xx and not 404', async ({ page, request }) => {
-    await page.goto('/');
-    const links = await page.$$eval('a[href]', as =>
-      as.map(a => (a as HTMLAnchorElement).getAttribute('href') || '').filter(Boolean)
+test.describe("No dead links on landing", () => {
+  test("all <a> resolve to 200/3xx and not 404", async ({ page, request }) => {
+    await page.goto("/");
+    const links = await page.$$eval("a[href]", (as) =>
+      as
+        .map((a) => (a as HTMLAnchorElement).getAttribute("href") || "")
+        .filter(Boolean),
     );
-    const unique = Array.from(new Set(links)).filter(href =>
-      href.startsWith('/') && !href.startsWith('/api')
+    const unique = Array.from(new Set(links)).filter(
+      (href) => href.startsWith("/") && !href.startsWith("/api"),
     );
 
     for (const href of unique) {
@@ -43,17 +48,19 @@ test.describe('No dead links on landing', () => {
   });
 });
 
-test.describe('legacy routes redirect', () => {
-  test('old paths forward to start flow', async ({ request }) => {
+test.describe("legacy routes redirect", () => {
+  test("old paths forward to start flow", async ({ request }) => {
     const cases: Array<[string, string]> = [
-      ['/simulan', '/start?intent=worker'],
-      ['/signup', '/start'],
+      ["/simulan", "/start?intent=worker"],
+      ["/signup", "/start"],
     ];
     for (const [src, dest] of cases) {
       const res = await request.get(src, { maxRedirects: 0 });
-      expect(res.status(), `${src} should redirect`).toBeGreaterThanOrEqual(300);
+      expect(res.status(), `${src} should redirect`).toBeGreaterThanOrEqual(
+        300,
+      );
       expect(res.status()).toBeLessThan(400);
-      expect(res.headers()['location']).toBe(dest);
+      expect(res.headers()["location"]).toBe(dest);
     }
   });
 });

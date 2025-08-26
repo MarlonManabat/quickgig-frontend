@@ -17,7 +17,12 @@ export default function ApplyGig() {
 
   useEffect(() => {
     if (!ready || !id) return;
-    supabase.from("gigs").select("*").eq("id", id).single().then(({ data }) => setGig(data));
+    supabase
+      .from("gigs")
+      .select("*")
+      .eq("id", id)
+      .single()
+      .then(({ data }) => setGig(data));
   }, [ready, id]);
 
   async function submit(e: React.FormEvent) {
@@ -40,7 +45,7 @@ export default function ApplyGig() {
   if (!ready || !gig)
     return timedOut ? (
       <p>
-        Hindi ma-load ang auth.{' '}
+        Hindi ma-load ang auth.{" "}
         <Link className="underline" href="/auth">
           Go to Login
         </Link>
@@ -61,15 +66,16 @@ export default function ApplyGig() {
           onChange={(e) => setCover(e.target.value)}
           className="input"
         />
-        <button
-          className="btn-primary"
-          disabled={saving}
-        >
-          {saving ? <Spinner /> : 'Send Application'}
+        <button className="btn-primary" disabled={saving}>
+          {saving ? <Spinner /> : "Send Application"}
         </button>
       </form>
       {msg && <p className="mt-3">{msg}</p>}
-      <p className="mt-4 text-sm text-brand-subtle"><Link className="underline" href={`/gigs/${gig.id}`}>Back to gig</Link></p>
+      <p className="mt-4 text-sm text-brand-subtle">
+        <Link className="underline" href={`/gigs/${gig.id}`}>
+          Back to gig
+        </Link>
+      </p>
     </div>
   );
 }

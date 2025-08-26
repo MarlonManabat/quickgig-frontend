@@ -1,13 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/lib/supabaseClient";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const matchId = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id;
+    const matchId = Array.isArray(req.query.id)
+      ? req.query.id[0]
+      : req.query.id;
 
     const { data, error } = await supabase.rpc("rpc_refund_match_tickets", {
       p_match: matchId,

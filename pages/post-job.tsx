@@ -27,7 +27,8 @@ export default function PostJobPage() {
       setChecking(false);
       if (!ok)
         router.replace(
-          '/billing?message=' + encodeURIComponent('Complete payment to post jobs.')
+          "/billing?message=" +
+            encodeURIComponent("Complete payment to post jobs."),
         );
     })();
   }, [ready, userId, router]);
@@ -38,7 +39,14 @@ export default function PostJobPage() {
 
     const { data, error } = await supabase
       .from("gigs")
-      .insert({ owner: userId, title, description, budget: budget === "" ? null : Number(budget), city, image_url: imageUrl })
+      .insert({
+        owner: userId,
+        title,
+        description,
+        budget: budget === "" ? null : Number(budget),
+        city,
+        image_url: imageUrl,
+      })
       .select("id")
       .single();
 
@@ -65,7 +73,7 @@ export default function PostJobPage() {
       <Shell>
         {timedOut ? (
           <p>
-            Hindi ma-load ang auth.{' '}
+            Hindi ma-load ang auth.{" "}
             <Link className="underline" href="/auth">
               Go to Login
             </Link>
@@ -75,20 +83,43 @@ export default function PostJobPage() {
         )}
       </Shell>
     );
-  if (!allowed) return <Shell><p data-testid="paywall-redirect">Redirecting...</p></Shell>;
+  if (!allowed)
+    return (
+      <Shell>
+        <p data-testid="paywall-redirect">Redirecting...</p>
+      </Shell>
+    );
 
   return (
     <Shell>
       <h1 className="text-2xl font-bold mb-4">Post a Job</h1>
       <form onSubmit={submit} className="max-w-xl space-y-3">
-        <input className="input" required
-               placeholder="Title" value={title} onChange={(e)=>setTitle(e.target.value)} />
-        <textarea className="input" rows={5}
-               placeholder="Description" value={description} onChange={(e)=>setDesc(e.target.value)} />
-        <input className="input"
-               placeholder="Budget (optional)" value={budget} onChange={(e)=>setBudget(e.target.value as any)} />
-        <input className="input"
-               placeholder="City (optional)" value={city} onChange={(e)=>setCity(e.target.value)} />
+        <input
+          className="input"
+          required
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <textarea
+          className="input"
+          rows={5}
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDesc(e.target.value)}
+        />
+        <input
+          className="input"
+          placeholder="Budget (optional)"
+          value={budget}
+          onChange={(e) => setBudget(e.target.value as any)}
+        />
+        <input
+          className="input"
+          placeholder="City (optional)"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+        />
         <div className="space-y-2">
           {imageUrl && (
             <img

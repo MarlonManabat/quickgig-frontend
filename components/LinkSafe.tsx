@@ -1,6 +1,6 @@
-import Link, { LinkProps } from 'next/link';
-import * as React from 'react';
-import { hasDynamicParam, fillPath } from '@/utils/safeNav';
+import Link, { LinkProps } from "next/link";
+import * as React from "react";
+import { hasDynamicParam, fillPath } from "@/utils/safeNav";
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>;
 type Props = (LinkProps & AnchorProps) & {
@@ -9,10 +9,10 @@ type Props = (LinkProps & AnchorProps) & {
 
 const LinkSafe = React.forwardRef<HTMLAnchorElement, Props>(function LinkSafe(
   { href, params = {}, ...rest },
-  ref
+  ref,
 ) {
   const to =
-    typeof href === 'string'
+    typeof href === "string"
       ? hasDynamicParam(href)
         ? fillPath(href, params)
         : href

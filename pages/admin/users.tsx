@@ -1,11 +1,16 @@
-'use client';
-import { useEffect, useState } from 'react';
-import AdminTable from '@/components/AdminTable';
-import { listUsers, suspendUser, unsuspendUser, purgeUserContent } from '@/lib/admin';
+"use client";
+import { useEffect, useState } from "react";
+import AdminTable from "@/components/AdminTable";
+import {
+  listUsers,
+  suspendUser,
+  unsuspendUser,
+  purgeUserContent,
+} from "@/lib/admin";
 
 export default function AdminUsers() {
   const [rows, setRows] = useState<any[]>([]);
-  const [q, setQ] = useState('');
+  const [q, setQ] = useState("");
 
   const load = async () => {
     const { data } = await listUsers({ q });
@@ -57,9 +62,15 @@ export default function AdminUsers() {
             <tr key={u.id} className="border-t">
               <td>{u.email}</td>
               <td>{u.role}</td>
-              <td>{u.suspended_at ? 'yes' : 'no'}</td>
-              <td>{u.delete_requested_at ? new Date(u.delete_requested_at).toLocaleString() : ''}</td>
-              <td>{u.deleted_at ? new Date(u.deleted_at).toLocaleString() : ''}</td>
+              <td>{u.suspended_at ? "yes" : "no"}</td>
+              <td>
+                {u.delete_requested_at
+                  ? new Date(u.delete_requested_at).toLocaleString()
+                  : ""}
+              </td>
+              <td>
+                {u.deleted_at ? new Date(u.deleted_at).toLocaleString() : ""}
+              </td>
               <td>
                 {u.deleted_at && (
                   <button

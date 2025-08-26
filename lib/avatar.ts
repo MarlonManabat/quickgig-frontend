@@ -5,7 +5,9 @@ export async function uploadAvatar(file: File): Promise<string> {
   if (!auth?.user) throw new Error("Not authenticated");
 
   const path = `${auth.user.id}/${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
-  const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+  const { error: upErr } = await supabase.storage
+    .from("avatars")
+    .upload(path, file, { upsert: true });
   if (upErr) throw upErr;
 
   const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);

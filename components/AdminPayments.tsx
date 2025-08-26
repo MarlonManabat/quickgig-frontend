@@ -1,6 +1,9 @@
-import { useState } from 'react';
-import { approvePayment, rejectPayment } from '@/lib/actions/adminPayments';
-import { notifyPaymentApproved, notifyPaymentRejected } from '@/lib/notifyPayments';
+import { useState } from "react";
+import { approvePayment, rejectPayment } from "@/lib/actions/adminPayments";
+import {
+  notifyPaymentApproved,
+  notifyPaymentRejected,
+} from "@/lib/notifyPayments";
 
 export type PendingPayment = {
   id: string;
@@ -11,22 +14,26 @@ export type PendingPayment = {
   created_at: string;
 };
 
-export default function AdminPayments({ initial = [] }: { initial: PendingPayment[] }) {
+export default function AdminPayments({
+  initial = [],
+}: {
+  initial: PendingPayment[];
+}) {
   const [rows, setRows] = useState(initial);
 
   const handleApprove = async (id: string) => {
     await approvePayment(id);
     await notifyPaymentApproved(id);
     setRows((r) => r.filter((x) => x.id !== id));
-    alert('Tickets credited.');
+    alert("Tickets credited.");
   };
 
   const handleReject = async (id: string) => {
-    const reason = prompt('Reason for rejection?') || 'N/A';
+    const reason = prompt("Reason for rejection?") || "N/A";
     await rejectPayment(id, reason);
     await notifyPaymentRejected(id, reason);
     setRows((r) => r.filter((x) => x.id !== id));
-    alert('Payment rejected.');
+    alert("Payment rejected.");
   };
 
   return (

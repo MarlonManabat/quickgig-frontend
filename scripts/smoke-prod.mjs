@@ -1,7 +1,8 @@
 // scripts/smoke-prod.mjs
 import { execSync } from "node:child_process";
 
-const HEADER_FILTER = /^(HTTP\/|content-type:|content-length:|server:|location:)/i;
+const HEADER_FILTER =
+  /^(HTTP\/|content-type:|content-length:|server:|location:)/i;
 
 function head(url) {
   return execSync(`curl -sSI ${url}`, { encoding: "utf8" });
@@ -10,7 +11,9 @@ function get(url) {
   return execSync(`curl -sS ${url}`, { encoding: "utf8" });
 }
 function showHead(url, label = url) {
-  const lines = head(url).split("\n").filter(l => HEADER_FILTER.test(l));
+  const lines = head(url)
+    .split("\n")
+    .filter((l) => HEADER_FILTER.test(l));
   console.log(`\n# HEAD ${label}\n${lines.join("")}`);
 }
 

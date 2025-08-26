@@ -9,7 +9,10 @@ export function isAccessDenied(err: SupaErr): boolean {
   // Common PostgREST / PG codes for RLS / permission problems
   // PGRST116: No rows found or not authorized due to RLS (varies by op)
   // 42501: insufficient_privilege (Postgres)
-  if (code === 'PGRST116' || code === '42501') return true;
+  if (code === "PGRST116" || code === "42501") return true;
 
-  return !!msg && /row[- ]level security|rls|permission|not authorized|not allowed/i.test(msg);
+  return (
+    !!msg &&
+    /row[- ]level security|rls|permission|not authorized|not allowed/i.test(msg)
+  );
 }

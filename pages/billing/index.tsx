@@ -1,7 +1,7 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { supabase } from '@/utils/supabaseClient';
-import { uploadPaymentProof } from '@/utils/uploadProof';
+"use client";
+import { useEffect, useState } from "react";
+import { supabase } from "@/utils/supabaseClient";
+import { uploadPaymentProof } from "@/utils/uploadProof";
 
 export default function Billing() {
   const [user, setUser] = useState<any>(null);
@@ -9,10 +9,17 @@ export default function Billing() {
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => { supabase.auth.getUser().then(({ data }) => setUser(data.user)); }, []);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  }, []);
   useEffect(() => {
     if (!user) return;
-    supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data }) => setOrders(data || []));
+    supabase
+      .from("orders")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => setOrders(data || []));
   }, [user]);
 
   async function createOrUpdate() {
@@ -21,23 +28,29 @@ export default function Billing() {
     try {
       const result = await uploadPaymentProof(user.id, file);
       // create a new pending order with proof
-      const { error } = await supabase.from('orders').insert({
+      const { error } = await supabase.from("orders").insert({
         user_id: user.id,
         amount: 0,
-        currency: 'PHP',
-        status: 'pending',
+        currency: "PHP",
+        status: "pending",
         proof_url: result.publicUrl,
-        method: 'gcash'
+        method: "gcash",
       });
       if (error) throw error;
-      const { data } = await supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+      const { data } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
       setOrders(data || []);
       setFile(null);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
     setSubmitting(false);
   }
 
-  const requirePayment = process.env.NEXT_PUBLIC_REQUIRE_PAYMENT === 'true';
+  const requirePayment = process.env.NEXT_PUBLIC_REQUIRE_PAYMENT === "true";
 
   return (
     <main className="max-w-2xl mx-auto p-6" data-testid="billing-page">
@@ -45,27 +58,45 @@ export default function Billing() {
 
       {requirePayment ? (
         <>
-          <p className="mb-4">To post jobs, upload your GCash proof. An admin will review it.</p>
+          <p className="mb-4">
+            To post jobs, upload your GCash proof. An admin will review it.
+          </p>
           <div className="mb-6 flex items-center gap-3">
-            <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-            <button className="btn-primary px-4 py-2 rounded" disabled={!file || submitting} onClick={createOrUpdate} data-testid="upload-proof">
-              {submitting ? 'Submitting…' : 'Upload proof'}
+            <input
+              type="file"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+            />
+            <button
+              className="btn-primary px-4 py-2 rounded"
+              disabled={!file || submitting}
+              onClick={createOrUpdate}
+              data-testid="upload-proof"
+            >
+              {submitting ? "Submitting…" : "Upload proof"}
             </button>
           </div>
           <section>
             <h2 className="font-medium mb-2">Your submissions</h2>
             <ul data-testid="orders-list" className="space-y-2">
-              {orders.map(o => (
+              {orders.map((o) => (
                 <li key={o.id} className="border rounded p-3">
-                  <div>Status: <b data-testid="order-status">{o.status}</b></div>
-                  {o.proof_url && <a href={o.proof_url} target="_blank" rel="noreferrer">View proof</a>}
+                  <div>
+                    Status: <b data-testid="order-status">{o.status}</b>
+                  </div>
+                  {o.proof_url && (
+                    <a href={o.proof_url} target="_blank" rel="noreferrer">
+                      View proof
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
           </section>
         </>
       ) : (
-        <p className="text-green-700">Payment gating is disabled; you can post jobs.</p>
+        <p className="text-green-700">
+          Payment gating is disabled; you can post jobs.
+        </p>
       )}
     </main>
   );

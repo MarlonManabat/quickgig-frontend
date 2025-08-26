@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { hasMockSession } from '@/lib/session';
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { hasMockSession } from "@/lib/session";
 
 export default function Start() {
   const router = useRouter();
@@ -9,9 +9,9 @@ export default function Start() {
 
   useEffect(() => {
     (async () => {
-      const intentParam = (router.query.intent as string) || 'worker';
-      const intent = intentParam === 'employer' ? 'employer' : 'worker';
-      const target = intent === 'worker' ? '/find' : '/post';
+      const intentParam = (router.query.intent as string) || "worker";
+      const intent = intentParam === "employer" ? "employer" : "worker";
+      const target = intent === "worker" ? "/find" : "/post";
 
       // who am i?
       const {
@@ -31,14 +31,17 @@ export default function Start() {
 
       // fetch profile for role_pref + completeness
       const { data: profile } = await supabase
-        .from('profiles')
-        .select('role_pref, first_name, city')
-        .eq('id', user.id)
+        .from("profiles")
+        .select("role_pref, first_name, city")
+        .eq("id", user.id)
         .maybeSingle();
 
       // set role_pref if missing and intent is known (fire and forget)
       if (!profile?.role_pref) {
-        await supabase.from('profiles').update({ role_pref: intent }).eq('id', user.id);
+        await supabase
+          .from("profiles")
+          .update({ role_pref: intent })
+          .eq("id", user.id);
       }
 
       const incomplete = !profile || !profile.first_name || !profile.city;

@@ -21,7 +21,10 @@ export default function FindWorkPage() {
     let ignore = false;
     setLoading(true);
     (async () => {
-      let query = supabase.from("gigs").select("*", { count: "exact" }).neq('hidden', true);
+      let query = supabase
+        .from("gigs")
+        .select("*", { count: "exact" })
+        .neq("hidden", true);
 
       if (q.trim()) {
         query = query.ilike("title", `%${q}%`).or(`description.ilike.%${q}%`);
@@ -44,7 +47,9 @@ export default function FindWorkPage() {
       }
       setLoading(false);
     })();
-    return () => { ignore = true; };
+    return () => {
+      ignore = true;
+    };
   }, [q, city, minBudget, maxBudget, page]);
 
   const total = count;
@@ -55,14 +60,30 @@ export default function FindWorkPage() {
       <h1 className="text-2xl font-bold mb-4">Latest Gigs</h1>
 
       <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <input value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search title/description"
-               className="input" />
-        <input value={city} onChange={(e)=>setCity(e.target.value)} placeholder="City"
-               className="input" />
-        <input value={minBudget} onChange={(e)=>setMinBudget(e.target.value)} placeholder="Min budget"
-               className="input" />
-        <input value={maxBudget} onChange={(e)=>setMaxBudget(e.target.value)} placeholder="Max budget"
-               className="input" />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search title/description"
+          className="input"
+        />
+        <input
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="City"
+          className="input"
+        />
+        <input
+          value={minBudget}
+          onChange={(e) => setMinBudget(e.target.value)}
+          placeholder="Min budget"
+          className="input"
+        />
+        <input
+          value={maxBudget}
+          onChange={(e) => setMaxBudget(e.target.value)}
+          placeholder="Max budget"
+          className="input"
+        />
       </div>
 
       {loading && <p>Loading…</p>}
@@ -75,19 +96,37 @@ export default function FindWorkPage() {
               <h3 className="font-semibold text-lg">{g.title}</h3>
               <SaveButton gigId={g.id} />
             </div>
-            <p className="text-sm text-brand-subtle line-clamp-2">{g.description}</p>
+            <p className="text-sm text-brand-subtle line-clamp-2">
+              {g.description}
+            </p>
             <div className="mt-2 flex items-center justify-between text-sm">
               <span>{g.city ?? "—"}</span>
-              <Link className="underline" href={`/gigs/${g.id}`} prefetch>View</Link>
+              <Link className="underline" href={`/gigs/${g.id}`} prefetch>
+                View
+              </Link>
             </div>
           </li>
         ))}
       </ul>
 
       <div className="mt-6 flex items-center gap-3">
-        <button disabled={page<=1} onClick={()=>setPage(p=>Math.max(1,p-1))} className="px-3 py-1 rounded border border-brand-border disabled:opacity-50">Prev</button>
-        <span className="text-sm text-brand-subtle">Page {page} / {pages}</span>
-        <button disabled={page>=pages} onClick={()=>setPage(p=>Math.min(pages,p+1))} className="px-3 py-1 rounded border border-brand-border disabled:opacity-50">Next</button>
+        <button
+          disabled={page <= 1}
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          className="px-3 py-1 rounded border border-brand-border disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span className="text-sm text-brand-subtle">
+          Page {page} / {pages}
+        </span>
+        <button
+          disabled={page >= pages}
+          onClick={() => setPage((p) => Math.min(pages, p + 1))}
+          className="px-3 py-1 rounded border border-brand-border disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </Shell>
   );

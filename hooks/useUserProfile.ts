@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export function useUserProfile(userId?: string) {
   const [profile, setProfile] = useState<any>(null);
@@ -11,9 +11,9 @@ export function useUserProfile(userId?: string) {
     (async () => {
       setLoading(true);
       const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
         .maybeSingle();
       if (!cancelled) {
         setProfile(data ?? null);

@@ -1,13 +1,13 @@
-import { adminTest as test } from '../fixtures/roles';
-import { PAGES } from '../pages';
-import { auditPage } from '../utils/buttonAudit';
+import { adminTest as test } from "../fixtures/roles";
+import { PAGES } from "../pages";
+import { auditPage } from "../utils/buttonAudit";
 
 const baseSet = PAGES.admin;
 
-test.describe('admin pages', () => {
+test.describe("admin pages", () => {
   for (const path of baseSet) {
     test(`audit ${path}`, async ({ page }) => {
-      if (!process.env.BASE_URL) test.skip(true, 'BASE_URL not set');
+      if (!process.env.BASE_URL) test.skip(true, "BASE_URL not set");
       await page.goto(path);
       await auditPage(page, path);
     });

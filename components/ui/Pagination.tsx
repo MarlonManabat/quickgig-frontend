@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 interface PaginationProps {
   page: number;
@@ -6,7 +6,11 @@ interface PaginationProps {
   onPageChange?: (page: number) => void;
 }
 
-export default function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
+export default function Pagination({
+  page,
+  totalPages,
+  onPageChange,
+}: PaginationProps) {
   return (
     <div className="flex justify-center items-center gap-2 mt-4">
       <button

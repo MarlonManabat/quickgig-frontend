@@ -1,10 +1,10 @@
-import { supabase } from './supabaseClient';
+import { supabase } from "./supabaseClient";
 
 export async function getBalance(userId: string): Promise<number> {
   const { data, error } = await supabase
-    .from('tickets_balances')
-    .select('balance')
-    .eq('user_id', userId)
+    .from("tickets_balances")
+    .select("balance")
+    .eq("user_id", userId)
     .maybeSingle();
   if (error) throw error;
   return data?.balance ?? 0;
@@ -12,14 +12,14 @@ export async function getBalance(userId: string): Promise<number> {
 
 export async function addEntry(userId: string, delta: number, reason: string) {
   const { error } = await supabase
-    .from('tickets_ledger')
+    .from("tickets_ledger")
     .insert({ user_id: userId, delta, reason });
   if (error) throw error;
 }
 
 export async function requireTicket(userId: string, reason: string) {
   const balance = await getBalance(userId);
-  if (balance <= 0) throw new Error('Insufficient tickets');
+  if (balance <= 0) throw new Error("Insufficient tickets");
   await addEntry(userId, -1, reason);
 }
 

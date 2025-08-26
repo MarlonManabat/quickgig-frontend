@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { supabase } from '@/lib/supabaseClient';
-import { useRequireUser } from '@/lib/useRequireUser';
-import { uploadAvatar } from '@/lib/avatar';
-import { getBalance } from '@/lib/tickets';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
+import { useRequireUser } from "@/lib/useRequireUser";
+import { uploadAvatar } from "@/lib/avatar";
+import { getBalance } from "@/lib/tickets";
 
 export default function Home() {
   const { ready, userId, timedOut } = useRequireUser();
@@ -17,25 +17,25 @@ export default function Home() {
     if (!ready || !userId) return;
     (async () => {
       const { data: prof } = await supabase
-        .from('profiles')
-        .select('role_pref, avatar_url')
-        .eq('id', userId)
+        .from("profiles")
+        .select("role_pref, avatar_url")
+        .eq("id", userId)
         .single();
       setProfile(prof);
-      if (prof?.role_pref === 'employer') {
+      if (prof?.role_pref === "employer") {
         const { data: js } = await supabase
-          .from('jobs')
-          .select('id,title')
-          .eq('owner', userId)
-          .order('created_at', { ascending: false });
+          .from("jobs")
+          .select("id,title")
+          .eq("owner", userId)
+          .order("created_at", { ascending: false });
         setJobs(js ?? []);
         const bal = await getBalance(userId);
         setBalance(bal);
-      } else if (prof?.role_pref === 'worker') {
+      } else if (prof?.role_pref === "worker") {
         const { data: ap } = await supabase
-          .from('applications')
-          .select('id')
-          .eq('applicant_id', userId)
+          .from("applications")
+          .select("id")
+          .eq("applicant_id", userId)
           .limit(1);
         setHasApps((ap ?? []).length > 0);
       }
@@ -49,9 +49,9 @@ export default function Home() {
     try {
       await uploadAvatar(f);
       const { data: prof } = await supabase
-        .from('profiles')
-        .select('role_pref, avatar_url')
-        .eq('id', userId)
+        .from("profiles")
+        .select("role_pref, avatar_url")
+        .eq("id", userId)
         .single();
       setProfile(prof);
     } catch (err) {
@@ -62,13 +62,13 @@ export default function Home() {
   }
 
   if (!ready)
-    return <p className="p-6">{timedOut ? 'Auth timeout' : 'Loading...'}</p>;
+    return <p className="p-6">{timedOut ? "Auth timeout" : "Loading..."}</p>;
   if (!profile) return <p className="p-6">Loading...</p>;
 
   const avatar =
-    profile.avatar_url || 'https://via.placeholder.com/80?text=%3F';
+    profile.avatar_url || "https://via.placeholder.com/80?text=%3F";
 
-  if (profile.role_pref === 'worker') {
+  if (profile.role_pref === "worker") {
     return (
       <main className="mx-auto max-w-3xl p-6 space-y-4">
         <div className="flex items-center gap-4">
@@ -83,7 +83,10 @@ export default function Home() {
           <div className="border rounded p-4">
             <p className="mb-2">Wala ka pang applications.</p>
             <div className="flex gap-2">
-              <Link href="/profile" className="qg-btn qg-btn--primary px-4 py-2">
+              <Link
+                href="/profile"
+                className="qg-btn qg-btn--primary px-4 py-2"
+              >
                 Complete profile
               </Link>
               <Link href="/find" className="qg-btn qg-btn--outline px-4 py-2">
@@ -114,7 +117,7 @@ export default function Home() {
       </div>
       {jobs.length > 0 && (
         <ul className="space-y-2">
-          {jobs.map(j => (
+          {jobs.map((j) => (
             <li key={j.id} className="border rounded p-3">
               {j.title}
             </li>

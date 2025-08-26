@@ -39,7 +39,7 @@ export default function MyGigs() {
       <Shell>
         {timedOut ? (
           <p>
-            Hindi ma-load ang auth.{' '}
+            Hindi ma-load ang auth.{" "}
             <Link className="underline" href="/auth">
               Go to Login
             </Link>
@@ -61,12 +61,23 @@ export default function MyGigs() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-semibold">{g.title}</div>
-                <div className="text-sm text-brand-subtle">{g.city ?? '—'} • #{g.id}</div>
+                <div className="text-sm text-brand-subtle">
+                  {g.city ?? "—"} • #{g.id}
+                </div>
               </div>
               <div className="flex gap-3">
-                <Link className="underline" href={`/gigs/${g.id}`}>View</Link>
-                <Link className="underline" href={`/gigs/${g.id}/edit`}>Edit</Link>
-                <button onClick={() => del(g.id)} className="underline text-brand-danger">Delete</button>
+                <Link className="underline" href={`/gigs/${g.id}`}>
+                  View
+                </Link>
+                <Link className="underline" href={`/gigs/${g.id}/edit`}>
+                  Edit
+                </Link>
+                <button
+                  onClick={() => del(g.id)}
+                  className="underline text-brand-danger"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           </li>

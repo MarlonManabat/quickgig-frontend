@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 interface EmptyStateProps {
   title: string;
@@ -6,7 +6,11 @@ interface EmptyStateProps {
   action?: React.ReactNode;
 }
 
-export default function EmptyState({ title, message, action }: EmptyStateProps) {
+export default function EmptyState({
+  title,
+  message,
+  action,
+}: EmptyStateProps) {
   return (
     <div className="text-center py-10">
       <p className="text-lg font-medium mb-2">{title}</p>
