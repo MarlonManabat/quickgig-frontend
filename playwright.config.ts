@@ -1,28 +1,28 @@
-import { defineConfig } from '@playwright/test'
-
-const baseURL =
-  process.env.NEXT_PUBLIC_APP_URL ||
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  process.env.NEXT_PUBLIC_LANDING_URL ||
-  'http://localhost:3000';
-
-const isCI = !!process.env.CI;
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  timeout: isCI ? 180_000 : 60_000,
-  expect: { timeout: isCI ? 20_000 : 10_000 },
+  timeout: 120_000,
+  expect: { timeout: 10_000 },
+  fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
+  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
-    headless: true,
-    trace: 'on-first-retry',
-    baseURL,
-    actionTimeout: isCI ? 15_000 : 10_000,
-    navigationTimeout: isCI ? 30_000 : 15_000,
+    baseURL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    actionTimeout: 10_000,
+    navigationTimeout: 30_000,
+    viewport: { width: 1280, height: 800 },
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    ignoreHTTPSErrors: true,
+    testIdAttribute: 'data-test',
+    launchOptions: {
+      args: ['--disable-dev-shm-usage', '--no-sandbox'],
+      headless: true,
+    },
   },
-  reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],
   projects: [
-    { name: 'smoke', testMatch: /smoke\.spec\.ts$/ },
-    { name: 'full-e2e', testMatch: /(?:\.e2e\.spec\.ts|full\.e2e.*\.spec\.ts)$/ }
-  ]
-})
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
+});

@@ -48,7 +48,7 @@ export default function NotificationsPage() {
           </button>
         )}
       </div>
-      <ul className="space-y-4" data-testid="notifications-list">
+      <ul className="space-y-4" data-test="notifications-list">
         {items.map((n) => (
           <li key={n.id} className={`border p-3 rounded ${n.read ? 'opacity-50' : ''}`}>
             <div className="flex justify-between">

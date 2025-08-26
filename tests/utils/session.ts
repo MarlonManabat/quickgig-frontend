@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { loginViaMagicLink } from '../helpers/auth';
-import { testLogin } from '../helpers/testLogin';
+import { testLogin } from './test-login';
 
 type Kind = 'user' | 'admin';
 
@@ -38,7 +38,8 @@ export function getDemoEmail(kind: Kind = 'user'): string | null {
 
 /** Preview/dev auth: hit test login endpoint to set mock session */
 export async function stubSignIn(page: Page, email = getDemoEmail()) {
-  const role = email?.includes('employer') || email?.includes('admin') ? 'employer' : 'worker';
+  const role =
+    email?.includes('employer') || email?.includes('admin') ? 'employer' : 'seeker';
   await testLogin(page, role as any);
 }
 
