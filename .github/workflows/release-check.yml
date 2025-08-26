@@ -68,19 +68,18 @@ jobs:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
 
-      # Smoke tests
-      - name: Run smoke tests
+      # Release tests
+      - name: Run release tests
         if: env.BASE_URL != ''
-        run: npx playwright test tests/smoke --reporter=github
+        run: npm run test:release
         env:
           BASE_URL: ${{ env.BASE_URL }}
-
-      # Full E2E
-      - name: Run full E2E
-        if: env.BASE_URL != ''
-        run: npx playwright test tests/e2e --reporter=github
-        env:
-          BASE_URL: ${{ env.BASE_URL }}
+          WORKER_EMAIL: ${{ secrets.WORKER_EMAIL }}
+          WORKER_PASSWORD: ${{ secrets.WORKER_PASSWORD }}
+          EMPLOYER_EMAIL: ${{ secrets.EMPLOYER_EMAIL }}
+          EMPLOYER_PASSWORD: ${{ secrets.EMPLOYER_PASSWORD }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
       # Always upload artifacts
       - name: Upload test artifacts
@@ -91,13 +90,12 @@ jobs:
           path: |
             test-results/**
             playwright-report/**
+            button-audit/**
           if-no-files-found: ignore
 
-      - name: Check code format (autofix)
+      - name: Autofix suggestions
         continue-on-error: true
-        run: |
-          npx eslint . --fix
-          git diff > autofix.patch
+        run: npm run autofix:ci
 
       - name: Upload autofix patch
         uses: actions/upload-artifact@v4
@@ -129,4 +127,3 @@ jobs:
             });
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
