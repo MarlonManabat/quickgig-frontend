@@ -12,8 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
-  pull-requests: read
+  contents: write
+  pull-requests: write
+  issues: write
   deployments: read
 
 jobs:
@@ -86,4 +87,41 @@ jobs:
             test-results/**
             playwright-report/**
           if-no-files-found: ignore
+
+      - name: Check code format (autofix)
+        continue-on-error: true
+        run: |
+          npx eslint . --fix
+          git diff > autofix.patch
+
+      - name: Upload autofix patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: autofix.patch
+          path: autofix.patch
+
+      - name: Comment autofix patch (non-blocking)
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            const pr = context.payload.pull_request?.number;
+            if (!pr) { core.setOutput('skipped', 'no-pr'); return; }
+            const url = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}/artifacts`;
+            await github.rest.issues.createComment({
+              owner, repo, issue_number: pr,
+              body: [
+                `Auto-fix patch available.`,
+                ``,
+                `Download: ${url}`,
+                ``,
+                `Apply:`,
+                '```bash',
+                'git apply autofix.patch',
+                '```'
+              ].join('\n')
+            });
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
