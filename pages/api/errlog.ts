@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
-import { env } from "@/lib/env";
+import { env, requireServer } from "@/lib/env";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,7 +10,9 @@ export default async function handler(
     res.setHeader("Allow", "POST");
     return res.status(405).end();
   }
-  const supa = createClient(env.supabaseUrl, env.serviceRole);
+  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  if (!key) return res.status(500).end();
+  const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
   const { message, stack, path } = (req.body || {}) as {
     message?: string;
     stack?: string;

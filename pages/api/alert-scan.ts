@@ -1,15 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { env, requireServer } from "@/lib/env";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+const supabase = key
+  ? createClient(env.NEXT_PUBLIC_SUPABASE_URL, key)
+  : undefined;
 
 export default async function handler(
   _req: NextApiRequest,
   res: NextApiResponse,
 ) {
+  if (!supabase) return res.status(500).end();
   const { data: alerts } = await supabase.from("gig_alerts").select("*");
   const now = new Date().toISOString();
   for (const a of alerts ?? []) {

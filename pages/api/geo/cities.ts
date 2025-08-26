@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import { env, requireServer } from '@/lib/env';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const provinceId = String(req.query.provinceId || '');
   if (!provinceId) return res.status(400).json({ error: 'provinceId required' });
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
   if (!url || !key) return res.status(500).json([]);
   const supabase = createClient(url, key);
   const controller = new AbortController();

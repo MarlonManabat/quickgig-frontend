@@ -8,7 +8,10 @@ export default async function handler(
 ) {
   let supabaseStatus: "ok" | "error" = "ok";
   try {
-    const supa = createClient(env.supabaseUrl, env.supabaseAnon);
+    const supa = createClient(
+      env.NEXT_PUBLIC_SUPABASE_URL,
+      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    );
     const { error } = await supa.from("profiles").select("id").limit(1);
     if (error) supabaseStatus = "error";
   } catch {

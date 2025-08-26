@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { stubSignIn } from "../utils/session";
 import { createClient } from "@supabase/supabase-js";
+import { env, requireServer } from "@/lib/env";
 
 const app = process.env.PLAYWRIGHT_APP_URL!;
 const qa = process.env.QA_TEST_MODE === "true";
@@ -12,11 +13,11 @@ const workerId = "00000000-0000-0000-0000-000000000002";
 test("@full hire requires tickets", async ({ page }) => {
   if (qa) await stubSignIn(page, employerEmail);
 
-  const supa = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } },
-  );
+  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  if (!key) throw new Error('missing service role');
+  const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key, {
+    auth: { persistSession: false },
+  });
   await supa
     .from("ticket_balances")
     .upsert({ user_id: employerId, balance: 0 });

@@ -1,8 +1,9 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
+import { env, requireServer } from "../lib/env";
 
-const url = process.env.SUPABASE_URL!;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const url = env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceKey = requireServer('SUPABASE_SERVICE_ROLE_KEY')!;
 const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "demo-admin@quickgig.test";
 const userEmail = "demo-user@quickgig.test";
 const newUserEmail = "new-user@quickgig.test";

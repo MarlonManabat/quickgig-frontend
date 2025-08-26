@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { env, requireServer } from "@/lib/env";
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,10 +10,9 @@ export default async function handler(
   const doLocations = !only || only === "locations";
 
   if (doLocations) {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
+    const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+    if (!key) return res.status(500).end();
+    const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
     const regions = [
       { id: "11111111-1111-1111-1111-111111111111", name: "NCR" },
       { id: "22222222-2222-2222-2222-222222222222", name: "Region IV-A" },
