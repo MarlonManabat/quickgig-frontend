@@ -1,52 +1,59 @@
-import { writeFile } from 'node:fs/promises';
+import { setTimeout as sleep } from 'node:timers/promises';
 
 const {
   VERCEL_TOKEN,
   VERCEL_PROJECT_ID,
   VERCEL_ORG_ID,
   GITHUB_SHA,
-  GITHUB_REF,
+  GITHUB_EVENT_NAME,
+  NEXT_PUBLIC_SITE_URL,
 } = process.env;
 
 if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
-  throw new Error('Missing VERCEL_TOKEN or VERCEL_PROJECT_ID env vars.');
+  console.error('Missing VERCEL_TOKEN or VERCEL_PROJECT_ID env vars.');
+  process.exit(1);
 }
 
-const commitSha = GITHUB_SHA;
-const commitRef = GITHUB_REF?.split('/').pop();
+if (GITHUB_EVENT_NAME === 'push') {
+  if (NEXT_PUBLIC_SITE_URL) {
+    console.log(NEXT_PUBLIC_SITE_URL);
+    process.exit(0);
+  }
+  console.error('NEXT_PUBLIC_SITE_URL required for push events');
+  process.exit(1);
+}
 
-const query = new URLSearchParams({ projectId: VERCEL_PROJECT_ID, limit: '20' });
-if (VERCEL_ORG_ID) query.set('teamId', VERCEL_ORG_ID);
+const params = new URLSearchParams({ projectId: VERCEL_PROJECT_ID, limit: '20' });
+if (VERCEL_ORG_ID) params.set('teamId', VERCEL_ORG_ID);
+const apiUrl = `https://api.vercel.com/v13/deployments?${params}`;
 
-const apiUrl = `https://api.vercel.com/v13/deployments?${query}`;
-const maxAttempts = 60; // 10 minutes
+const end = Date.now() + 5 * 60 * 1000;
+let delay = 5000;
 
-for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+while (Date.now() < end) {
   const res = await fetch(apiUrl, {
     headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
   });
+  if (res.status === 400 || res.status === 404) {
+    await sleep(delay);
+    delay = Math.min(delay + 5000, 15000);
+    continue;
+  }
   if (!res.ok) {
     console.error(`Vercel API error: ${res.status} ${res.statusText}`);
     process.exit(1);
   }
   const data = await res.json();
-  const deployments = (data.deployments || [])
-    .filter(
-      (d) =>
-        d.meta?.githubCommitSha === commitSha ||
-        d.meta?.githubCommitRef === commitRef,
-    )
-    .sort((a, b) => (b.createdAt ?? b.created ?? 0) - (a.createdAt ?? a.created ?? 0));
-  const deployment = deployments.find((d) =>
-    ['READY', 'SUCCEEDED'].includes(d.readyState),
+  const deployments = (data.deployments || []).filter(
+    (d) => d.meta?.githubCommitSha === GITHUB_SHA,
   );
+  const deployment = deployments.find((d) => d.readyState === 'READY');
   if (deployment) {
-    const finalUrl = `https://${deployment.url}`;
-    await writeFile('url.txt', finalUrl);
-    console.log(finalUrl);
+    console.log(`https://${deployment.url}`);
     process.exit(0);
   }
-  await new Promise((r) => setTimeout(r, 10_000));
+  await sleep(delay);
+  delay = Math.min(delay + 5000, 15000);
 }
 
 console.error('Timed out waiting for Vercel deployment to be ready');

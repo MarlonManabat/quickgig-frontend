@@ -1,10 +1,10 @@
-name: E2E
+name: Smoke
 
 on:
   pull_request:
 
 jobs:
-  e2e:
+  smoke:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -29,15 +29,15 @@ jobs:
         run: echo "BASE_URL=$(node scripts/get-vercel-preview-url.mjs)" >> $GITHUB_ENV
       - name: Seed test data
         run: npm run ci:seed:preview
-      - name: Run e2e tests
-        run: npm run test:e2e:ci -- --output=test-results/e2e
+      - name: Run smoke tests
+        run: npm run test:smoke:ci -- --output=test-results/smoke
         env:
-          PLAYWRIGHT_HTML_REPORT: playwright-report/e2e
+          PLAYWRIGHT_HTML_REPORT: playwright-report/smoke
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-artifacts
+          name: smoke-artifacts
           path: |
             playwright-report/**
             test-results/**

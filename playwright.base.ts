@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test'
+import type { PlaywrightTestConfig, ReporterDescription } from '@playwright/test';
 
 const baseURL =
   process.env.NEXT_PUBLIC_APP_URL ||
@@ -8,11 +8,15 @@ const baseURL =
 
 const isCI = !!process.env.CI;
 
-export default defineConfig({
+const reporters: ReporterDescription[] = [
+  ['html', { outputFolder: 'playwright-report' }],
+];
+
+const config: PlaywrightTestConfig = {
   testDir: './tests',
-  timeout: isCI ? 180_000 : 60_000,
+  timeout: isCI ? 30_000 : 60_000,
   expect: { timeout: isCI ? 20_000 : 10_000 },
-  retries: process.env.CI ? 1 : 0,
+  retries: isCI ? 1 : 0,
   use: {
     headless: true,
     trace: 'on-first-retry',
@@ -20,9 +24,7 @@ export default defineConfig({
     actionTimeout: isCI ? 15_000 : 10_000,
     navigationTimeout: isCI ? 30_000 : 15_000,
   },
-  reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],
-  projects: [
-    { name: 'smoke', testMatch: /smoke\.spec\.ts$/ },
-    { name: 'full-e2e', testMatch: /(?:\.e2e\.spec\.ts|full\.e2e.*\.spec\.ts)$/ }
-  ]
-})
+  reporter: reporters,
+};
+
+export default config;
