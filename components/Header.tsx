@@ -1,17 +1,21 @@
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import LinkSafe from './LinkSafe';
-import Container from './Container';
-import { supabase } from '@/utils/supabaseClient';
-import { copy } from '@/copy';
-import AppLogo from '@/components/AppLogo';
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import LinkSafe from "./LinkSafe";
+import Container from "./Container";
+import { supabase } from "@/utils/supabaseClient";
+import { copy } from "@/copy";
+import AppLogo from "@/components/AppLogo";
 
 const links = [
-  { href: '/find', label: copy.nav.findWork, id: 'app-nav-find-work' },
-  { href: '/gigs?mine=1', label: copy.nav.myGigs, id: 'app-nav-my-gigs' },
-  { href: '/applications', label: copy.nav.applications, id: 'app-nav-applications' },
-  { href: '/saved', label: copy.nav.saved, id: 'app-nav-saved' },
-  { href: '/post', label: copy.nav.postJob, id: 'app-nav-post-job' },
+  { href: "/find", label: copy.nav.findWork, id: "app-nav-find-work" },
+  { href: "/gigs?mine=1", label: copy.nav.myGigs, id: "app-nav-my-gigs" },
+  {
+    href: "/applications",
+    label: copy.nav.applications,
+    id: "app-nav-applications",
+  },
+  { href: "/saved", label: copy.nav.saved, id: "app-nav-saved" },
+  { href: "/post", label: copy.nav.postJob, id: "app-nav-post-job" },
 ];
 
 function IconMenu() {
@@ -37,29 +41,35 @@ export default function Header() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      },
+    );
     return () => {
       listener.subscription.unsubscribe();
     };
   }, []);
 
   function isActive(href: string) {
-    if (href === '/gigs?mine=1') return router.pathname === '/gigs' && router.query.mine === '1';
+    if (href === "/gigs?mine=1")
+      return router.pathname === "/gigs" && router.query.mine === "1";
     return router.pathname === href;
   }
 
-    return (
-      <header
-        data-app-header
-        data-theme-brand="quickgig"
-        className="sticky top-0 z-40 qg-header border-b border-white/10"
-      >
+  return (
+    <header
+      data-app-header
+      data-theme-brand="quickgig"
+      className="sticky top-0 z-40 qg-header border-b border-white/10"
+    >
       <Container className="flex h-16 items-center justify-between">
-          <LinkSafe href="/" className="flex items-center h-11 min-h-[44px] gap-2">
-            <AppLogo />
-          </LinkSafe>
+        <LinkSafe
+          href="/"
+          className="flex items-center h-11 min-h-[44px] gap-2"
+        >
+          <AppLogo />
+        </LinkSafe>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {links.map((l) => {
             const active = isActive(l.href);
@@ -69,7 +79,7 @@ export default function Header() {
                 href={l.href}
                 data-testid={l.id}
                 app-nav={l.href}
-                className={`${active ? 'opacity-100 underline underline-offset-4' : 'opacity-90 hover:opacity-100'} h-11 min-h-[44px] inline-flex items-center`}
+                className={`${active ? "opacity-100 underline underline-offset-4" : "opacity-90 hover:opacity-100"} h-11 min-h-[44px] inline-flex items-center`}
               >
                 {l.label}
               </LinkSafe>
@@ -142,23 +152,23 @@ export default function Header() {
                 {copy.nav.auth}
               </LinkSafe>
             ) : (
-                <LinkSafe
-                  href="/auth"
-                  data-testid="app-login"
-                  app-nav="/auth"
-                  className="qg-btn qg-btn--outline w-full h-11 min-h-[44px] flex items-center justify-center"
-                >
-                  Mag-login
-                </LinkSafe>
-              )}
               <LinkSafe
-                href="/start"
-                data-testid="app-signup"
-                app-nav="/start"
-                className="qg-btn qg-btn--primary w-full h-11 min-h-[44px] text-center flex items-center justify-center"
+                href="/auth"
+                data-testid="app-login"
+                app-nav="/auth"
+                className="qg-btn qg-btn--outline w-full h-11 min-h-[44px] flex items-center justify-center"
               >
-                Sign Up
+                Mag-login
               </LinkSafe>
+            )}
+            <LinkSafe
+              href="/start"
+              data-testid="app-signup"
+              app-nav="/start"
+              className="qg-btn qg-btn--primary w-full h-11 min-h-[44px] text-center flex items-center justify-center"
+            >
+              Sign Up
+            </LinkSafe>
           </nav>
         </div>
       )}

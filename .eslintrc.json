@@ -8,5 +8,9 @@
     "sourceType": "module",
     "ecmaFeatures": { "jsx": true }
   },
-  "ignorePatterns": ["landing_public_html/**", "public_html/**", "node_modules/**"]
+  "ignorePatterns": [
+    "landing_public_html/**",
+    "public_html/**",
+    "node_modules/**"
+  ]
 }

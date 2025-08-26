@@ -103,5 +103,8 @@ export function getCitiesForRegion(regionKey?: RegionKey | null): CityOption[] {
 
 // Helpers to map DB values ↔ normalized values
 export function normalizeCityLabel(label: string) {
-  return label.toLowerCase().replace(/\s+/g, "_").replace(/[^\w_]/g, "");
+  return label
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^\w_]/g, "");
 }

@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import { supabase } from '@/lib/supabaseClient';
-import { uploadAvatar } from '@/lib/avatar';
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { supabase } from "@/lib/supabaseClient";
+import { uploadAvatar } from "@/lib/avatar";
 
 export default function AvatarUploader() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -9,12 +9,14 @@ export default function AvatarUploader() {
 
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
       const { data } = await supabase
-        .from('profiles')
-        .select('avatar_url')
-        .eq('id', user.id)
+        .from("profiles")
+        .select("avatar_url")
+        .eq("id", user.id)
         .maybeSingle();
       setAvatarUrl(data?.avatar_url ?? null);
     })();
@@ -28,9 +30,9 @@ export default function AvatarUploader() {
       setAvatarUrl(url);
     } catch (err) {
       console.error(err);
-      alert('Failed to upload avatar.');
+      alert("Failed to upload avatar.");
     } finally {
-      if (fileRef.current) fileRef.current.value = '';
+      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
@@ -39,7 +41,9 @@ export default function AvatarUploader() {
       {avatarUrl ? (
         <Image src={avatarUrl} alt="Profile photo" fill sizes="56px" />
       ) : (
-        <div className="h-full w-full grid place-items-center text-gray-400">Add photo</div>
+        <div className="h-full w-full grid place-items-center text-gray-400">
+          Add photo
+        </div>
       )}
       <input
         ref={fileRef}

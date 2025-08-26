@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import Card from '@/components/ui/Card';
-import { H1, P } from '@/components/ui/Text';
-import { getProfile } from '@/utils/session';
-import { copy } from '@/copy';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Card from "@/components/ui/Card";
+import { H1, P } from "@/components/ui/Text";
+import { getProfile } from "@/utils/session";
+import { copy } from "@/copy";
 
 export default function Home() {
   const [canPost, setCanPost] = useState(false);
@@ -11,7 +11,6 @@ export default function Home() {
   useEffect(() => {
     getProfile().then((p) => setCanPost(!!p?.can_post_job));
   }, []);
-
 
   return (
     <Card className="p-6 text-center space-y-4">

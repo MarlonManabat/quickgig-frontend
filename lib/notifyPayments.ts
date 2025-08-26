@@ -23,7 +23,10 @@ export async function notifyPaymentApproved(paymentId: string) {
     .maybeSingle();
 
   if (error || !p) {
-    console.warn("notifyPaymentApproved: payment not found", { paymentId, error });
+    console.warn("notifyPaymentApproved: payment not found", {
+      paymentId,
+      error,
+    });
     return;
   }
 
@@ -44,7 +47,10 @@ export async function notifyPaymentRejected(paymentId: string, reason: string) {
     .maybeSingle();
 
   if (error || !p) {
-    console.warn("notifyPaymentRejected: payment not found", { paymentId, error });
+    console.warn("notifyPaymentRejected: payment not found", {
+      paymentId,
+      error,
+    });
     return;
   }
 
@@ -56,4 +62,3 @@ export async function notifyPaymentRejected(paymentId: string, reason: string) {
 
   await sendTemplate(to, "payment-rejected", { reason });
 }
-

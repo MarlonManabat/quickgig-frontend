@@ -6,7 +6,13 @@ interface Message {
   profiles?: { full_name?: string | null; avatar_url?: string | null } | null;
 }
 
-export default function MessageItem({ msg, self }: { msg: Message; self: string }) {
+export default function MessageItem({
+  msg,
+  self,
+}: {
+  msg: Message;
+  self: string;
+}) {
   async function report() {
     const reason = prompt("Why are you reporting this message?") || "";
     try {
@@ -22,10 +28,13 @@ export default function MessageItem({ msg, self }: { msg: Message; self: string 
   return (
     <div className="mb-3">
       <div className="text-xs opacity-70">
-        {msg.profiles?.full_name ?? msg.sender} • {new Date(msg.created_at).toLocaleString()}
+        {msg.profiles?.full_name ?? msg.sender} •{" "}
+        {new Date(msg.created_at).toLocaleString()}
       </div>
       <div className="whitespace-pre-wrap">{msg.body}</div>
-      <button onClick={report} className="text-xs underline">Report</button>
+      <button onClick={report} className="text-xs underline">
+        Report
+      </button>
     </div>
   );
 }

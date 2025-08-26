@@ -86,15 +86,17 @@ async function tryGithubDeployments() {
   const depUrl = `https://api.github.com/repos/${OWNER}/${REPO}/deployments?sha=${GITHUB_SHA}`;
   try {
     const deployments = await fetchJson(depUrl, { headers });
-    const d = deployments?.find((x) =>
-      (x.environment || "").toLowerCase().includes("preview")
-    ) || deployments?.[0];
+    const d =
+      deployments?.find((x) =>
+        (x.environment || "").toLowerCase().includes("preview"),
+      ) || deployments?.[0];
     if (!d) return null;
 
     const statusesUrl = `https://api.github.com/repos/${OWNER}/${REPO}/deployments/${d.id}/statuses`;
     const statuses = await fetchJson(statusesUrl, { headers });
     const s = statuses?.find((x) => x.environment_url) || statuses?.[0];
-    const url = s?.environment_url || d?.original_environment_url || d?.environment_url;
+    const url =
+      s?.environment_url || d?.original_environment_url || d?.environment_url;
     if (url) {
       log("GitHub deployments: found", url);
       return url;
@@ -108,7 +110,12 @@ async function tryGithubDeployments() {
 
 async function tryVercelComment() {
   // For pull_request, scan comments for vercel[bot] and extract URL
-  if (!GITHUB_TOKEN || !OWNER || !REPO || GITHUB_EVENT_NAME !== "pull_request") {
+  if (
+    !GITHUB_TOKEN ||
+    !OWNER ||
+    !REPO ||
+    GITHUB_EVENT_NAME !== "pull_request"
+  ) {
     log("Vercel PR comment: not a PR or missing token, skipping.");
     return null;
   }
@@ -128,9 +135,9 @@ async function tryVercelComment() {
   const commentsUrl = `https://api.github.com/repos/${OWNER}/${REPO}/issues/${prNumber}/comments?per_page=50`;
   try {
     const comments = await fetchJson(commentsUrl, { headers });
-    const vercelComment = [...comments].reverse().find(
-      (c) => (c.user?.login || "").toLowerCase().includes("vercel")
-    );
+    const vercelComment = [...comments]
+      .reverse()
+      .find((c) => (c.user?.login || "").toLowerCase().includes("vercel"));
     if (!vercelComment?.body) return null;
 
     const m = vercelComment.body.match(/https?:\/\/[^\s)]+vercel\.app[^\s)]*/i);
@@ -159,7 +166,7 @@ async function tryVercelComment() {
         "Could not resolve Preview URL.\n" +
           "- Ensure the PR has a Vercel Preview deployment.\n" +
           "- Provide VERCEL_TOKEN + VERCEL_PROJECT_ID for the fastest lookup.\n" +
-          "- The GitHub token must have 'deployments:read' permission."
+          "- The GitHub token must have 'deployments:read' permission.",
       );
       process.exit(2);
     }

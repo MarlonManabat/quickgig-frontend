@@ -1,19 +1,19 @@
-'use client';
-import { useEffect, useState } from 'react';
-import AdminTable from '@/components/AdminTable';
-import { setFlag } from '@/lib/admin';
-import { supabase } from '@/lib/supabaseClient';
+"use client";
+import { useEffect, useState } from "react";
+import AdminTable from "@/components/AdminTable";
+import { setFlag } from "@/lib/admin";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminFlags() {
   const [rows, setRows] = useState<any[]>([]);
-  const [key, setKey] = useState('');
+  const [key, setKey] = useState("");
   const [enabled, setEnabled] = useState(false);
 
   const load = async () => {
     const { data } = await supabase
-      .from('feature_flags')
-      .select('key, enabled, updated_at')
-      .order('key');
+      .from("feature_flags")
+      .select("key, enabled, updated_at")
+      .order("key");
     setRows(data || []);
   };
 
@@ -29,7 +29,7 @@ export default function AdminFlags() {
   const handleAdd = async () => {
     if (key.trim()) {
       await setFlag(key.trim(), enabled);
-      setKey('');
+      setKey("");
       setEnabled(false);
       await load();
     }
@@ -74,7 +74,7 @@ export default function AdminFlags() {
           {rows.map((f) => (
             <tr key={f.key} className="border-t">
               <td>{f.key}</td>
-              <td>{f.enabled ? 'true' : 'false'}</td>
+              <td>{f.enabled ? "true" : "false"}</td>
               <td>{new Date(f.updated_at).toLocaleString()}</td>
               <td>
                 <button

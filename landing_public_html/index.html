@@ -17,9 +17,14 @@
   </head>
   <body>
     <header class="header" data-theme-brand="quickgig">
-        <div class="container row">
+      <div class="container row">
         <a href="/" class="brand" data-testid="brand-link" data-app-root>
-            <img src="/brand/quickgig-badge.png" alt="QuickGig.ph" width="28" height="28" />
+          <img
+            src="/brand/quickgig-badge.png"
+            alt="QuickGig.ph"
+            width="28"
+            height="28"
+          />
           <strong>QuickGig.ph</strong>
         </a>
         <nav>
@@ -46,13 +51,13 @@
             >Login</a
           >
           <a
-              class="btn btn-primary"
-              href="/start"
-              data-testid="cta-signup"
-              aria-label="Sign up on QuickGig app"
-              data-app-root
-              >Sign Up</a
-            >
+            class="btn btn-primary"
+            href="/start"
+            data-testid="cta-signup"
+            aria-label="Sign up on QuickGig app"
+            data-app-root
+            >Sign Up</a
+          >
         </nav>
       </div>
     </header>
@@ -70,24 +75,24 @@
           skilled professionals. Dito sa QuickGig.ph, madali lang!
         </p>
         <div class="actions">
-            <a
-              id="cta-start"
-              class="qg-btn qg-btn--primary"
-              href="/start?intent=worker"
-              data-testid="cta-start-now"
-              aria-label="Open QuickGig app"
-              data-app-root
-              >Simulan Na!</a
-            >
-            <a
-              class="btn btn-ghost"
-              href="/start?intent=employer"
-              data-testid="cta-post-job"
-              aria-label="Post job on QuickGig app"
-              data-app-root
-              >Post a Job</a
-            >
-          </div>
+          <a
+            id="cta-start"
+            class="qg-btn qg-btn--primary"
+            href="/start?intent=worker"
+            data-testid="cta-start-now"
+            aria-label="Open QuickGig app"
+            data-app-root
+            >Simulan Na!</a
+          >
+          <a
+            class="btn btn-ghost"
+            href="/start?intent=employer"
+            data-testid="cta-post-job"
+            aria-label="Post job on QuickGig app"
+            data-app-root
+            >Post a Job</a
+          >
+        </div>
       </div>
     </section>
 
@@ -118,9 +123,25 @@
       <div class="container footer-row">
         <small>© <span id="year"></span> QuickGig.ph</small>
         <nav class="footer-nav">
-          <a href="/terms" data-testid="footer-terms" aria-label="QuickGig terms">Terms</a>
-          <a href="/privacy" data-testid="footer-privacy" aria-label="QuickGig privacy">Privacy</a>
-          <a href="/start?intent=worker" data-testid="footer-open-app" aria-label="Open the QuickGig app" data-app-root>Open the App</a>
+          <a
+            href="/terms"
+            data-testid="footer-terms"
+            aria-label="QuickGig terms"
+            >Terms</a
+          >
+          <a
+            href="/privacy"
+            data-testid="footer-privacy"
+            aria-label="QuickGig privacy"
+            >Privacy</a
+          >
+          <a
+            href="/start?intent=worker"
+            data-testid="footer-open-app"
+            aria-label="Open the QuickGig app"
+            data-app-root
+            >Open the App</a
+          >
         </nav>
       </div>
     </footer>
@@ -128,14 +149,14 @@
       const APP_URL =
         window.NEXT_PUBLIC_APP_URL ||
         window.APP_URL ||
-        'https://app.quickgig.ph';
-      const appRoot = APP_URL.replace(/\/+$/, '');
-      document.querySelectorAll('[data-app-root]').forEach((el) => {
-        const path = el.getAttribute('href') || '/';
-        const normalized = path.startsWith('/') ? path : `/${path}`;
-        el.setAttribute('href', `${appRoot}${normalized}`);
+        "https://app.quickgig.ph";
+      const appRoot = APP_URL.replace(/\/+$/, "");
+      document.querySelectorAll("[data-app-root]").forEach((el) => {
+        const path = el.getAttribute("href") || "/";
+        const normalized = path.startsWith("/") ? path : `/${path}`;
+        el.setAttribute("href", `${appRoot}${normalized}`);
       });
-      document.getElementById('year').textContent = new Date().getFullYear();
+      document.getElementById("year").textContent = new Date().getFullYear();
     </script>
   </body>
 </html>

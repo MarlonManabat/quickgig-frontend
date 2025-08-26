@@ -4,9 +4,14 @@ import getRawBody from "raw-body";
 
 export const config = { api: { bodyParser: false } };
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2024-06-20" });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2024-06-20",
+});
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     res.status(405).end("Method Not Allowed");
@@ -23,7 +28,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   let event: any;
   try {
-    event = stripe.webhooks.constructEvent(buf, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = stripe.webhooks.constructEvent(
+      buf,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET!,
+    );
   } catch (err: any) {
     res.status(400).send(`Webhook Error: ${err.message}`);
     return;

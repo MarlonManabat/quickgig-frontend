@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { supabase } from "./supabaseClient";
 
 export async function getUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
@@ -10,9 +10,9 @@ export async function getProfile() {
   const id = data.user?.id;
   if (!id) return null;
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, can_post_job, avatar_url')
-    .eq('id', id)
+    .from("profiles")
+    .select("full_name, can_post_job, avatar_url")
+    .eq("id", id)
     .maybeSingle();
   return profile;
 }

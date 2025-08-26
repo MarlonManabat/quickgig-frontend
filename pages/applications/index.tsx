@@ -24,7 +24,7 @@ export default function ApplicationsList() {
         apps.map(async (a: any) => {
           const unread = await getUnreadCount(a.id, userId!);
           return { ...a, unread };
-        })
+        }),
       );
       setRows(withUnread);
       setLoading(false);
@@ -36,7 +36,7 @@ export default function ApplicationsList() {
       <Shell>
         {timedOut ? (
           <p>
-            Hindi ma-load ang auth.{' '}
+            Hindi ma-load ang auth.{" "}
             <Link className="underline" href="/auth">
               Go to Login
             </Link>
@@ -60,10 +60,14 @@ export default function ApplicationsList() {
               data-testid="application-row"
             >
               <div>
-                <div className="font-semibold">{r.gigs?.title ?? 'Gig'}</div>
-                <div className="text-sm text-brand-subtle">{r.gigs?.city ?? '—'} • status: {r.status}</div>
+                <div className="font-semibold">{r.gigs?.title ?? "Gig"}</div>
+                <div className="text-sm text-brand-subtle">
+                  {r.gigs?.city ?? "—"} • status: {r.status}
+                </div>
               </div>
-              {r.unread > 0 && <span className="w-2 h-2 rounded-full bg-brand-warning self-center" />}
+              {r.unread > 0 && (
+                <span className="w-2 h-2 rounded-full bg-brand-warning self-center" />
+              )}
             </Link>
           </li>
         ))}

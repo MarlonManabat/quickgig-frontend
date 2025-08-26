@@ -1,7 +1,7 @@
-'use client';
-import { useEffect, useState } from 'react';
-import AdminTable from '@/components/AdminTable';
-import { listReviews, hideReview, unhideReview } from '@/lib/admin';
+"use client";
+import { useEffect, useState } from "react";
+import AdminTable from "@/components/AdminTable";
+import { listReviews, hideReview, unhideReview } from "@/lib/admin";
 
 export default function AdminReviews() {
   const [rows, setRows] = useState<any[]>([]);
@@ -17,13 +17,13 @@ export default function AdminReviews() {
   }, [hidden]);
 
   const handleHide = async (id: string) => {
-    const reason = prompt('Reason for hiding?') || 'N/A';
+    const reason = prompt("Reason for hiding?") || "N/A";
     await hideReview(id, reason);
     await load();
   };
 
   const handleUnhide = async (id: string) => {
-    if (confirm('Unhide review?')) {
+    if (confirm("Unhide review?")) {
       await unhideReview(id);
       await load();
     }
@@ -34,10 +34,10 @@ export default function AdminReviews() {
       <h1 className="text-2xl font-semibold mb-4">Reviews</h1>
       <div className="mb-4">
         <select
-          value={hidden === undefined ? '' : hidden ? 'hidden' : 'visible'}
+          value={hidden === undefined ? "" : hidden ? "hidden" : "visible"}
           onChange={(e) => {
             const v = e.target.value;
-            setHidden(v === '' ? undefined : v === 'hidden');
+            setHidden(v === "" ? undefined : v === "hidden");
           }}
           className="border p-2"
         >
@@ -60,7 +60,7 @@ export default function AdminReviews() {
             <tr key={r.id} className="border-t">
               <td>{r.rating}</td>
               <td className="max-w-xs truncate">{r.comment}</td>
-              <td>{r.hidden ? 'yes' : 'no'}</td>
+              <td>{r.hidden ? "yes" : "no"}</td>
               <td>
                 {r.hidden ? (
                   <button

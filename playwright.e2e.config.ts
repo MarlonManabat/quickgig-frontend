@@ -1,21 +1,21 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './tests',
-  testMatch: 'e2e/**/*.spec.ts',
+  testDir: "./tests",
+  testMatch: "e2e/**/*.spec.ts",
   timeout: 120_000,
   retries: 2,
   workers: 4,
-  reporter: [['html', { outputFolder: 'playwright-report', open: 'never' }]],
+  reporter: [["html", { outputFolder: "playwright-report", open: "never" }]],
   use: {
     baseURL: process.env.PLAYWRIGHT_APP_URL,
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
   },
   projects: [
-    { name: 'chromium-desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'chromium-mobile', use: { ...devices['iPhone 12'] } },
+    { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] } },
+    { name: "chromium-mobile", use: { ...devices["iPhone 12"] } },
   ],
-  outputDir: 'test-results',
+  outputDir: "test-results",
 });

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { addEntry } from '@/lib/tickets';
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { addEntry } from "@/lib/tickets";
 
 type Row = { user_id: string; balance: number; entries: any[] };
 
@@ -9,18 +9,22 @@ export default function AdminTickets() {
 
   async function load() {
     const { data: balances } = await supabase
-      .from('tickets_balances')
-      .select('user_id,balance');
+      .from("tickets_balances")
+      .select("user_id,balance");
     const list = await Promise.all(
-      (balances ?? []).map(async b => {
+      (balances ?? []).map(async (b) => {
         const { data: entries } = await supabase
-          .from('tickets_ledger')
-          .select('delta,reason,created_at')
-          .eq('user_id', b.user_id)
-          .order('created_at', { ascending: false })
+          .from("tickets_ledger")
+          .select("delta,reason,created_at")
+          .eq("user_id", b.user_id)
+          .order("created_at", { ascending: false })
           .limit(10);
-        return { user_id: b.user_id, balance: b.balance, entries: entries ?? [] };
-      })
+        return {
+          user_id: b.user_id,
+          balance: b.balance,
+          entries: entries ?? [],
+        };
+      }),
     );
     setRows(list);
   }
@@ -30,7 +34,7 @@ export default function AdminTickets() {
   }, []);
 
   async function credit(userId: string) {
-    await addEntry(userId, 3, 'admin_adjust');
+    await addEntry(userId, 3, "admin_adjust");
     load();
   }
 
@@ -46,7 +50,7 @@ export default function AdminTickets() {
           </tr>
         </thead>
         <tbody>
-          {rows.map(r => (
+          {rows.map((r) => (
             <tr key={r.user_id} className="border-t">
               <td className="p-2">{r.user_id}</td>
               <td className="p-2">{r.balance}</td>
@@ -59,7 +63,7 @@ export default function AdminTickets() {
           ))}
         </tbody>
       </table>
-      {rows.map(r => (
+      {rows.map((r) => (
         <div key={r.user_id} className="mb-6">
           <h2 className="font-semibold">{r.user_id} history</h2>
           <ul className="text-sm">

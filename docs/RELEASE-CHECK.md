@@ -17,4 +17,3 @@ This workflow seeds deterministic QA data and runs smoke and full end‑to‑end
 1. Push your changes and open a Pull Request.
 2. In GitHub select **Actions → Release check → Run workflow** and target the PR.
 3. The job waits for the preview, seeds the database, runs smoke and e2e tests, and posts a summary comment with links to the preview and test artifacts.
-

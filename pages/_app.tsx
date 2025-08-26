@@ -14,13 +14,16 @@ import { supabase } from "@/utils/supabaseClient";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const isError = router.pathname === '/404' || router.pathname === '/500';
+  const isError = router.pathname === "/404" || router.pathname === "/500";
   useEffect(() => {
     setupErrlog();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session && router.pathname.startsWith('/profile')) router.replace('/start');
+      if (!session && router.pathname.startsWith("/profile"))
+        router.replace("/start");
     });
-    return () => { sub.subscription.unsubscribe(); };
+    return () => {
+      sub.subscription.unsubscribe();
+    };
   }, [router]);
   return (
     <>
@@ -36,7 +39,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           content="Find work or hire quickly with simple, ticket-based matches."
         />
       </Head>
-      <div className={`${qgSans.className} min-h-screen bg-surface text-text flex flex-col`}>
+      <div
+        className={`${qgSans.className} min-h-screen bg-surface text-text flex flex-col`}
+      >
         {!isError && <AppHeader />}
         <main className="flex-1 py-6 bg-surface">
           <Container>

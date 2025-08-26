@@ -19,7 +19,9 @@ export default function HomeEmployer() {
   const [activeMatches, setActiveMatches] = useState<any[]>([]);
   // employer
   const [myJobs, setMyJobs] = useState<any[]>([]);
-  const [pendingCounts, setPendingCounts] = useState<Record<string, number>>({});
+  const [pendingCounts, setPendingCounts] = useState<Record<string, number>>(
+    {},
+  );
 
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -66,7 +68,9 @@ export default function HomeEmployer() {
       // employer widgets
       const { data: jobs } = await supabase
         .from("jobs")
-        .select("id, title, created_at, is_online, location_city, location_region")
+        .select(
+          "id, title, created_at, is_online, location_city, location_region",
+        )
         .order("created_at", { ascending: false })
         .limit(5);
       setMyJobs(jobs ?? []);
@@ -83,7 +87,11 @@ export default function HomeEmployer() {
     })();
   }, []);
 
-  const roleLabel = useMemo(() => (role === "employer" ? "Employer" : role === "admin" ? "Admin" : "Seeker"), [role]);
+  const roleLabel = useMemo(
+    () =>
+      role === "employer" ? "Employer" : role === "admin" ? "Admin" : "Seeker",
+    [role],
+  );
 
   async function onPickAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -108,28 +116,50 @@ export default function HomeEmployer() {
             {avatarUrl ? (
               <Image src={avatarUrl} alt="Profile photo" fill sizes="56px" />
             ) : (
-              <div className="h-full w-full grid place-items-center text-gray-400">Add photo</div>
+              <div className="h-full w-full grid place-items-center text-gray-400">
+                Add photo
+              </div>
             )}
           </div>
           <div>
             <h1 className="text-2xl font-bold">Home</h1>
-            <div className="text-sm text-gray-600">Signed in as <b>{roleLabel}</b>{profileEmail ? ` • ${profileEmail}` : ""}</div>
+            <div className="text-sm text-gray-600">
+              Signed in as <b>{roleLabel}</b>
+              {profileEmail ? ` • ${profileEmail}` : ""}
+            </div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPickAvatar} />
-          <button className="qg-btn qg-btn--white px-3 py-2" onClick={() => fileRef.current?.click()}>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={onPickAvatar}
+          />
+          <button
+            className="qg-btn qg-btn--white px-3 py-2"
+            onClick={() => fileRef.current?.click()}
+          >
             Change photo
           </button>
-          <Link href="/profile" className="qg-btn qg-btn--outline px-3 py-2">Edit Profile</Link>
+          <Link href="/profile" className="qg-btn qg-btn--outline px-3 py-2">
+            Edit Profile
+          </Link>
         </div>
       </div>
 
       {(suspended || deleted) && (
         <div className="rounded bg-yellow-50 p-3 text-yellow-800">
-          {deleted ? "Your account is scheduled for deletion." : "Your account is currently suspended."} Need help?{" "}
-          <Link href="/support" className="underline">Contact support</Link>.
+          {deleted
+            ? "Your account is scheduled for deletion."
+            : "Your account is currently suspended."}{" "}
+          Need help?{" "}
+          <Link href="/support" className="underline">
+            Contact support
+          </Link>
+          .
         </div>
       )}
 
@@ -138,51 +168,110 @@ export default function HomeEmployer() {
         <Card title="Tickets">
           <div className="text-3xl font-semibold mb-3">{balance}</div>
           <div className="flex gap-2">
-            <Link href="/wallet" className="qg-btn qg-btn--primary px-3 py-2">Buy Tickets</Link>
-            <Link href="/wallet" className="qg-btn qg-btn--outline px-3 py-2">View History</Link>
+            <Link href="/wallet" className="qg-btn qg-btn--primary px-3 py-2">
+              Buy Tickets
+            </Link>
+            <Link href="/wallet" className="qg-btn qg-btn--outline px-3 py-2">
+              View History
+            </Link>
           </div>
         </Card>
 
         <Card title="Quick Actions">
           {role === "employer" || role === "admin" ? (
             <div className="flex flex-wrap gap-2">
-              <Link href="/post" className="qg-btn qg-btn--primary px-3 py-2">Post Job</Link>
-              <Link href="/admin/payments" className="qg-btn qg-btn--outline px-3 py-2">Review Payments</Link>
-              <Link href="/admin/reviews" className="qg-btn qg-btn--outline px-3 py-2">Moderate Reviews</Link>
+              <Link href="/post" className="qg-btn qg-btn--primary px-3 py-2">
+                Post Job
+              </Link>
+              <Link
+                href="/admin/payments"
+                className="qg-btn qg-btn--outline px-3 py-2"
+              >
+                Review Payments
+              </Link>
+              <Link
+                href="/admin/reviews"
+                className="qg-btn qg-btn--outline px-3 py-2"
+              >
+                Moderate Reviews
+              </Link>
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              <Link href="/find" className="qg-btn qg-btn--primary px-3 py-2">Browse Jobs</Link>
-              <Link href="/messages" className="qg-btn qg-btn--outline px-3 py-2">Messages</Link>
-              <Link href="/profile" className="qg-btn qg-btn--outline px-3 py-2">Edit Profile</Link>
+              <Link href="/find" className="qg-btn qg-btn--primary px-3 py-2">
+                Browse Jobs
+              </Link>
+              <Link
+                href="/messages"
+                className="qg-btn qg-btn--outline px-3 py-2"
+              >
+                Messages
+              </Link>
+              <Link
+                href="/profile"
+                className="qg-btn qg-btn--outline px-3 py-2"
+              >
+                Edit Profile
+              </Link>
             </div>
           )}
         </Card>
 
         <Card title="Recent messages">
-          <div className="text-sm text-gray-500">Open your inbox to continue chatting.</div>
-          <Link href="/messages" className="mt-3 inline-block qg-btn qg-btn--white px-3 py-2">Open Messages</Link>
+          <div className="text-sm text-gray-500">
+            Open your inbox to continue chatting.
+          </div>
+          <Link
+            href="/messages"
+            className="mt-3 inline-block qg-btn qg-btn--white px-3 py-2"
+          >
+            Open Messages
+          </Link>
         </Card>
       </section>
 
       {/* Role sections */}
       {role === "employer" || role === "admin" ? (
         <>
-          <Section title="Your job posts" actionHref="/post" actionLabel="Post new" />
+          <Section
+            title="Your job posts"
+            actionHref="/post"
+            actionLabel="Post new"
+          />
           <Grid>
             {myJobs.length === 0 ? (
               <Empty text="No job posts yet. Create one to receive applications." />
             ) : (
               myJobs.map((j) => (
-                <ListCard key={j.id}
+                <ListCard
+                  key={j.id}
                   title={j.title}
-                  subtitle={j.is_online ? "Online Job" : [j.location_city, j.location_region].filter(Boolean).join(", ") || "—"}
-                  meta={new Date(j.created_at).toLocaleString()}>
+                  subtitle={
+                    j.is_online
+                      ? "Online Job"
+                      : [j.location_city, j.location_region]
+                          .filter(Boolean)
+                          .join(", ") || "—"
+                  }
+                  meta={new Date(j.created_at).toLocaleString()}
+                >
                   <div className="flex gap-2">
-                    <Link className="qg-btn qg-btn--outline px-3 py-1.5" href={`/jobs/${j.id}`}>View</Link>
-                    <Link className="qg-btn qg-btn--white px-3 py-1.5" href={`/jobs/${j.id}/edit`}>Edit</Link>
+                    <Link
+                      className="qg-btn qg-btn--outline px-3 py-1.5"
+                      href={`/jobs/${j.id}`}
+                    >
+                      View
+                    </Link>
+                    <Link
+                      className="qg-btn qg-btn--white px-3 py-1.5"
+                      href={`/jobs/${j.id}/edit`}
+                    >
+                      Edit
+                    </Link>
                     <span className="ml-auto text-xs text-gray-600">
-                      {pendingCounts[j.id] ? `${pendingCounts[j.id]} pending apps` : "No pending apps"}
+                      {pendingCounts[j.id]
+                        ? `${pendingCounts[j.id]} pending apps`
+                        : "No pending apps"}
                     </span>
                   </div>
                 </ListCard>
@@ -192,17 +281,28 @@ export default function HomeEmployer() {
         </>
       ) : (
         <>
-          <Section title="Your applications" actionHref="/find" actionLabel="Find jobs" />
+          <Section
+            title="Your applications"
+            actionHref="/find"
+            actionLabel="Find jobs"
+          />
           <Grid>
             {apps.length === 0 ? (
               <Empty text="You haven't applied to any jobs yet." />
             ) : (
               apps.map((a) => (
-                <ListCard key={a.id}
+                <ListCard
+                  key={a.id}
                   title={a.job?.title ?? "Job"}
                   subtitle={`Status: ${a.status}`}
-                  meta={new Date(a.updated_at).toLocaleString()}>
-                  <Link className="qg-btn qg-btn--outline px-3 py-1.5" href={`/jobs/${a.job_id}`}>View job</Link>
+                  meta={new Date(a.updated_at).toLocaleString()}
+                >
+                  <Link
+                    className="qg-btn qg-btn--outline px-3 py-1.5"
+                    href={`/jobs/${a.job_id}`}
+                  >
+                    View job
+                  </Link>
                 </ListCard>
               ))
             )}
@@ -214,11 +314,18 @@ export default function HomeEmployer() {
               <Empty text="When both parties agree, your active matches appear here." />
             ) : (
               activeMatches.map((m) => (
-                <ListCard key={m.id}
+                <ListCard
+                  key={m.id}
                   title={m.job?.title ?? "Job"}
                   subtitle={`Status: ${m.status}`}
-                  meta={new Date(m.updated_at).toLocaleString()}>
-                  <Link className="qg-btn qg-btn--outline px-3 py-1.5" href={`/jobs/${m.job_id}`}>Open chat</Link>
+                  meta={new Date(m.updated_at).toLocaleString()}
+                >
+                  <Link
+                    className="qg-btn qg-btn--outline px-3 py-1.5"
+                    href={`/jobs/${m.job_id}`}
+                  >
+                    Open chat
+                  </Link>
                 </ListCard>
               ))
             )}
@@ -237,18 +344,42 @@ function Card({ title, children }: { title: string; children: any }) {
     </div>
   );
 }
-function Section({ title, actionHref, actionLabel }: { title: string; actionHref?: string; actionLabel?: string }) {
+function Section({
+  title,
+  actionHref,
+  actionLabel,
+}: {
+  title: string;
+  actionHref?: string;
+  actionLabel?: string;
+}) {
   return (
     <div className="flex items-center justify-between mt-4 mb-2">
       <h2 className="text-lg font-semibold">{title}</h2>
-      {actionHref && actionLabel && <Link href={actionHref} className="qg-btn qg-btn--white px-3 py-1.5">{actionLabel}</Link>}
+      {actionHref && actionLabel && (
+        <Link href={actionHref} className="qg-btn qg-btn--white px-3 py-1.5">
+          {actionLabel}
+        </Link>
+      )}
     </div>
   );
 }
 function Grid({ children }: { children: any }) {
-  return <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{children}</div>;
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{children}</div>
+  );
 }
-function ListCard({ title, subtitle, meta, children }: { title: string; subtitle?: string; meta?: string; children?: any }) {
+function ListCard({
+  title,
+  subtitle,
+  meta,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  meta?: string;
+  children?: any;
+}) {
   return (
     <div className="border rounded p-4">
       <div className="font-semibold">{title}</div>

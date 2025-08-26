@@ -1,9 +1,9 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { getUserId } from "../utils/session";
-import Input from '@/components/ui/Input';
-import Textarea from '@/components/ui/Textarea';
-import Button from '@/components/ui/Button';
-import Banner from '@/components/ui/Banner';
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
+import Button from "@/components/ui/Button";
+import Banner from "@/components/ui/Banner";
 
 interface GigFormValues {
   title?: string;
@@ -21,13 +21,20 @@ interface GigFormProps {
   submitLabel?: string;
 }
 
-export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabel = "Save" }: GigFormProps) {
+export default function GigForm({
+  initialGig,
+  onSubmit,
+  onFileUpload,
+  submitLabel = "Save",
+}: GigFormProps) {
   const [gig, setGig] = useState<GigFormValues>(initialGig ?? {});
   const [message, setMessage] = useState<string | null>(null);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setGig(prev => ({
+    setGig((prev) => ({
       ...prev,
       [name]: name === "budget" ? (value === "" ? null : Number(value)) : value,
     }));
@@ -39,7 +46,7 @@ export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabe
     if (!f) return;
     try {
       const url = await onFileUpload(f);
-      setGig(prev => ({ ...prev, image_url: url ?? null }));
+      setGig((prev) => ({ ...prev, image_url: url ?? null }));
     } catch (err: any) {
       setMessage(err.message ?? "File upload failed");
     }
@@ -66,7 +73,11 @@ export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabe
 
   return (
     <form onSubmit={handleSubmit} className="md:grid md:grid-cols-2 md:gap-6">
-      {message && <Banner kind="error" className="md:col-span-2">{message}</Banner>}
+      {message && (
+        <Banner kind="error" className="md:col-span-2">
+          {message}
+        </Banner>
+      )}
       <div className="space-y-3 md:col-span-1">
         <Input
           id="title"
@@ -101,7 +112,7 @@ export default function GigForm({ initialGig, onSubmit, onFileUpload, submitLabe
             <input type="file" accept="image/*" onChange={handleFileChange} />
             {gig.image_url && (
               <img
-                src={gig.image_url ?? ''}
+                src={gig.image_url ?? ""}
                 alt="Gig"
                 loading="lazy"
                 className="mt-2 max-w-xs"

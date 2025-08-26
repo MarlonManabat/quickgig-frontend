@@ -1,13 +1,13 @@
-'use client';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import AdminTable from '@/components/AdminTable';
-import { listJobs } from '@/lib/admin';
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import AdminTable from "@/components/AdminTable";
+import { listJobs } from "@/lib/admin";
 
 export default function AdminJobs() {
   const [rows, setRows] = useState<any[]>([]);
-  const [q, setQ] = useState('');
-  const [status, setStatus] = useState('');
+  const [q, setQ] = useState("");
+  const [status, setStatus] = useState("");
 
   const load = async () => {
     const { data } = await listJobs({ q, status });

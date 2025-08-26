@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 type Application = {
   id: string;
@@ -20,9 +20,39 @@ export function useSeekerApplications(userId?: string) {
     (async () => {
       setLoading(true);
       const candidates = [
-        { table: 'applications', userCol: 'user_id', jobCol: 'job_id', titleJoin: { table: 'jobs', titleCol: 'title', idCol: 'id', mapTo: 'job_title' } },
-        { table: 'applications', userCol: 'user_id', jobCol: 'gig_id', titleJoin: { table: 'gigs', titleCol: 'title', idCol: 'id', mapTo: 'gig_title' } },
-        { table: 'applicants',   userCol: 'user_id', jobCol: 'gig_id', titleJoin: { table: 'gigs', titleCol: 'title', idCol: 'id', mapTo: 'gig_title' } },
+        {
+          table: "applications",
+          userCol: "user_id",
+          jobCol: "job_id",
+          titleJoin: {
+            table: "jobs",
+            titleCol: "title",
+            idCol: "id",
+            mapTo: "job_title",
+          },
+        },
+        {
+          table: "applications",
+          userCol: "user_id",
+          jobCol: "gig_id",
+          titleJoin: {
+            table: "gigs",
+            titleCol: "title",
+            idCol: "id",
+            mapTo: "gig_title",
+          },
+        },
+        {
+          table: "applicants",
+          userCol: "user_id",
+          jobCol: "gig_id",
+          titleJoin: {
+            table: "gigs",
+            titleCol: "title",
+            idCol: "id",
+            mapTo: "gig_title",
+          },
+        },
       ];
 
       for (const c of candidates) {
@@ -36,7 +66,11 @@ export function useSeekerApplications(userId?: string) {
           const rows: Application[] = [];
           for (const r of data as any[]) {
             // Build with 'any' to avoid recursive/union explosion in TS
-            const app: any = { id: r.id, status: r.status, [c.jobCol]: r[c.jobCol] };
+            const app: any = {
+              id: r.id,
+              status: r.status,
+              [c.jobCol]: r[c.jobCol],
+            };
 
             if (r[c.jobCol] && c.titleJoin) {
               try {

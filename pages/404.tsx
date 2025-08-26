@@ -6,15 +6,25 @@ export default function NotFound() {
         Sorry, hindi namin mahanap ang page na ito. Try one of these:
       </p>
       <div className="flex gap-3 justify-center">
-        <a href="/start?intent=worker" className="qg-btn qg-btn--primary px-4 py-2">
+        <a
+          href="/start?intent=worker"
+          className="qg-btn qg-btn--primary px-4 py-2"
+        >
           Find work
         </a>
-        <a href="/start?intent=employer" className="qg-btn qg-btn--outline px-4 py-2">
+        <a
+          href="/start?intent=employer"
+          className="qg-btn qg-btn--outline px-4 py-2"
+        >
           Post a job
         </a>
       </div>
       <p className="text-sm text-slate-500">
-        Or go to <a className="qg-link" href="/">home</a>.
+        Or go to{" "}
+        <a className="qg-link" href="/">
+          home
+        </a>
+        .
       </p>
     </main>
   );

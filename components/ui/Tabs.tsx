@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 export interface Tab {
   id: string;
@@ -17,8 +17,8 @@ export default function Tabs({ tabs }: { tabs: Tab[] }) {
             key={t.id}
             className={`px-4 py-2 -mb-px border-b-2 text-sm font-medium ${
               active === t.id
-                ? 'border-brand-primary text-brand-foreground'
-                : 'border-transparent text-brand-muted'
+                ? "border-brand-primary text-brand-foreground"
+                : "border-transparent text-brand-muted"
             }`}
             onClick={() => setActive(t.id)}
           >

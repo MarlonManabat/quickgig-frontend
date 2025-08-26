@@ -1,23 +1,23 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { supabase } from '@/utils/supabaseClient';
-import { sendMagicLink } from '@/lib/auth';
-import FormShell from '@/components/forms/FormShell';
-import EmailField from '@/components/ui/EmailField';
-import FieldRow from '@/components/forms/FieldRow';
-import { focusFromQuery } from '@/utils/focusTarget';
-import { toast } from '@/utils/toast';
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { supabase } from "@/utils/supabaseClient";
+import { sendMagicLink } from "@/lib/auth";
+import FormShell from "@/components/forms/FormShell";
+import EmailField from "@/components/ui/EmailField";
+import FieldRow from "@/components/forms/FieldRow";
+import { focusFromQuery } from "@/utils/focusTarget";
+import { toast } from "@/utils/toast";
 
 export default function AuthPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    focusFromQuery('focus', { email: '#email' });
+    focusFromQuery("focus", { email: "#email" });
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
@@ -30,13 +30,14 @@ export default function AuthPage() {
     try {
       const { error } = await sendMagicLink(email, { next, role });
       if (error) throw error;
-      toast.success('Magic link sent! Please check your email.');
+      toast.success("Magic link sent! Please check your email.");
       setStatus(
-        `Nagpadala kami ng Magic Link sa ${email}. I-open mo ang email mo at i-tap ang link para makapasok.`
+        `Nagpadala kami ng Magic Link sa ${email}. I-open mo ang email mo at i-tap ang link para makapasok.`,
       );
       setTimeout(() => setStatus(null), 30000);
     } catch (err: any) {
-      const msg = err.message || 'Hindi valid ang login—paki-check ang email mo.';
+      const msg =
+        err.message || "Hindi valid ang login—paki-check ang email mo.";
       setError(msg);
       toast.error(msg);
     }
@@ -68,7 +69,7 @@ export default function AuthPage() {
           aria-busy={loading}
           className="btn-primary w-full sm:w-auto h-11 rounded-xl"
         >
-          {loading ? '...' : 'Send Magic Link'}
+          {loading ? "..." : "Send Magic Link"}
         </button>
       </form>
     </FormShell>

@@ -1,30 +1,32 @@
-import { useEffect, useState } from "react"
-import Shell from "@/components/Shell"
-import { listAlerts, createAlert, deleteAlert } from "@/lib/alerts"
+import { useEffect, useState } from "react";
+import Shell from "@/components/Shell";
+import { listAlerts, createAlert, deleteAlert } from "@/lib/alerts";
 
 export default function AlertsPage() {
-  const [items, setItems] = useState<any[]>([])
-  const [keyword, setKeyword] = useState("")
-  const [city, setCity] = useState("")
+  const [items, setItems] = useState<any[]>([]);
+  const [keyword, setKeyword] = useState("");
+  const [city, setCity] = useState("");
 
   const load = async () => {
-    const { data } = await listAlerts()
-    setItems(data ?? [])
-  }
-  useEffect(() => { load() }, [])
+    const { data } = await listAlerts();
+    setItems(data ?? []);
+  };
+  useEffect(() => {
+    load();
+  }, []);
 
   const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    await createAlert(keyword, city || undefined)
-    setKeyword("")
-    setCity("")
-    load()
-  }
+    e.preventDefault();
+    await createAlert(keyword, city || undefined);
+    setKeyword("");
+    setCity("");
+    load();
+  };
 
   const onDelete = async (id: number) => {
-    await deleteAlert(id)
-    load()
-  }
+    await deleteAlert(id);
+    load();
+  };
 
   return (
     <Shell>
@@ -49,12 +51,18 @@ export default function AlertsPage() {
       </form>
       <ul>
         {items.map((a) => (
-          <li key={a.id} className="flex items-center justify-between border-b border-brand-border py-2">
+          <li
+            key={a.id}
+            className="flex items-center justify-between border-b border-brand-border py-2"
+          >
             <span>
               {a.keyword}
               {a.city ? ` - ${a.city}` : ""}
             </span>
-            <button onClick={() => onDelete(a.id)} className="underline text-sm">
+            <button
+              onClick={() => onDelete(a.id)}
+              className="underline text-sm"
+            >
               Delete
             </button>
           </li>
@@ -64,5 +72,5 @@ export default function AlertsPage() {
         )}
       </ul>
     </Shell>
-  )
+  );
 }

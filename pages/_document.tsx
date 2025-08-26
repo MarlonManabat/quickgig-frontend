@@ -1,9 +1,11 @@
-import { Html, Head, Main, NextScript } from 'next/document'
+import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-  let preconnectHref: string | null = null
-  try { if (supabaseUrl) preconnectHref = new URL(supabaseUrl).origin } catch {}
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  let preconnectHref: string | null = null;
+  try {
+    if (supabaseUrl) preconnectHref = new URL(supabaseUrl).origin;
+  } catch {}
   return (
     <Html lang="en">
       <Head>
@@ -21,5 +23,5 @@ export default function Document() {
         <NextScript />
       </body>
     </Html>
-  )
+  );
 }
