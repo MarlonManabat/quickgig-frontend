@@ -6,8 +6,15 @@ import { uploadAvatar } from "@/lib/avatar";
 
 type TicketBalance = { balance: number };
 
+type UserRole = "employer" | "admin" | "seeker";
+
+function normalizeRole(role: string | null | undefined): UserRole {
+  if (role === "employer" || role === "admin" || role === "seeker") return role;
+  return "seeker";
+}
+
 export default function HomeEmployer() {
-  const [role, setRole] = useState<"seeker" | "employer" | "admin">("seeker");
+  const [role, setRole] = useState<UserRole>("seeker");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [profileEmail, setProfileEmail] = useState<string | null>(null);
   const [suspended, setSuspended] = useState(false);
@@ -36,8 +43,8 @@ export default function HomeEmployer() {
         .eq("id", auth.user.id)
         .maybeSingle();
 
-      // Role: ensure string fallback
-      setRole((prof?.role as string) ?? "seeker");
+      // Role: coerce to our known union
+      setRole(normalizeRole((prof as any)?.role));
 
       // Avatar URL: Supabase can return {} | string | null from JSON columns.
       // Normalize to string | null for the state setter.
