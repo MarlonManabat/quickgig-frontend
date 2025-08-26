@@ -16,7 +16,7 @@ test('notifications flow', async ({ page }) => {
   )
   const { data: gig } = await supa
     .from('gigs')
-    .insert({ owner_id: employerId, title: 'Notif', description: 'n', budget: 1 })
+    .insert({ owner_id: employerId, title: 'Notif', description: 'n', price: 1 })
     .select('id, title')
     .single()
   const { data: appRow } = await supa
@@ -36,14 +36,14 @@ test('notifications flow', async ({ page }) => {
 
   await stubSignIn(page, workerEmail)
   await page.goto(`${app}/`)
-  await expect(page.locator('a[aria-label="Notifications"] span')).toHaveText('1')
+  await expect(page.getByTestId('notifications-count')).toHaveText('1')
 
-  await page.locator('a[aria-label="Notifications"]').click()
+  await page.getByTestId('app-nav-notifications').click()
   await expect(page).toHaveURL(/\/notifications$/)
   const item = page.getByTestId('notifications-list').locator('li').first()
   await expect(item).toContainText('You received an offer')
   await item.getByRole('button', { name: /mark as read/i }).click()
-  await expect(page.locator('a[aria-label="Notifications"] span')).toHaveCount(0)
+  await expect(page.getByTestId('notifications-count')).toHaveCount(0)
 
   await supa.from('notifications').insert({
     user_id: employerId,

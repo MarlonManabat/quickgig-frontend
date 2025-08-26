@@ -1,11 +1,11 @@
-name: E2E
+name: Smoke
 
 on:
   pull_request:
   workflow_dispatch:
 
 jobs:
-  e2e:
+  smoke:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,15 +38,15 @@ jobs:
       - name: Seed
         run: |
           curl -fsSL -X POST "$BASE_URL/api/test/seed" -H "x-test-secret: ${{ secrets.QA_TEST_SECRET }}" || true
-      - name: Run e2e
-        run: npx playwright test -c playwright.ci.ts tests/e2e
+      - name: Run smoke
+        run: npx playwright test -c playwright.ci.ts tests/smoke
         env:
           CI: 'true'
       - name: Upload artifacts (always)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-results
+          name: smoke-results
           path: |
             test-results/**
             playwright-report/**

@@ -51,7 +51,13 @@ export default function ProfilePage() {
       <form onSubmit={onSave} className="space-y-3">
         <label className="block">
           <span className="text-sm">First name (required)</span>
-          <input value={firstName} onChange={e => setFirstName(e.target.value)} required className="w-full border rounded px-3 py-2" />
+          <input
+            value={firstName}
+            onChange={e => setFirstName(e.target.value)}
+            required
+            className="w-full border rounded px-3 py-2"
+            data-testid="profile-first-name"
+          />
         </label>
         <label className="block">
           <span className="text-sm">City (required)</span>
@@ -62,7 +68,13 @@ export default function ProfilePage() {
           <input type="url" value={avatarUrl ?? ''} onChange={e => setAvatarUrl(e.target.value || null)} placeholder="https://…" className="w-full border rounded px-3 py-2" />
         </label>
         <div className="flex gap-2">
-          <button type="submit" className="qg-btn qg-btn--primary px-4 py-2">Save & continue</button>
+          <button
+            type="submit"
+            className="qg-btn qg-btn--primary px-4 py-2"
+            data-testid="profile-save"
+          >
+            Save & continue
+          </button>
           <button type="button" onClick={() => router.replace(nextTarget)} className="qg-btn qg-btn--white px-4 py-2">Skip for now</button>
         </div>
       </form>

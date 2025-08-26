@@ -8,10 +8,11 @@ test('@full admin can post gig and view listing', async ({ page }) => {
   const admin = getDemoEmail('admin');
   if (qa) await stubSignIn(page, admin);
   const title = `QA Gig ${Date.now()}`;
-  await page.goto(`${app}/post`, { waitUntil: 'load' });
-  await page.getByLabel(/Title|Pamagat/i).fill(title);
-  await page.getByLabel(/Description|Paglalarawan/i).fill('End-to-end tested gig.');
-  await page.getByRole('button', { name: /publish|post/i }).click();
+  await page.goto(`${app}/gigs/new`, { waitUntil: 'load' });
+  await page.getByTestId('gig-title').fill(title);
+  await page.getByTestId('gig-description').fill('End-to-end tested gig.');
+  await page.getByTestId('gig-price').fill('123');
+  await page.getByTestId('gig-submit').click();
   await expect(page.getByText(/posted|na-post/i)).toBeVisible();
   await page.goto(`${app}/find`, { waitUntil: 'load' });
   await expect(page.getByText(title)).toBeVisible();

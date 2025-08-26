@@ -6,7 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const supabase = createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) { res.status(401).json({ error: 'unauthorized' }); return; }
-  const gigId = req.query.gigId
+  const gigId = req.query.id
   const { cover_letter } = req.body || {}
   const { error } = await supabase.from('applications').insert({
     applicant_id: user.id,

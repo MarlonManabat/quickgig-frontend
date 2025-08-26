@@ -34,9 +34,9 @@ const baseConfig = {
   },
 };
 
-const withAnalyzer =
-  process.env.ANALYZE === 'true'
+const withBundleAnalyzer =
+  process.env.ANALYZE
     ? require('@next/bundle-analyzer')({ enabled: true })
     : (cfg) => cfg;
 
-module.exports = withAnalyzer(baseConfig);
+module.exports = withBundleAnalyzer(baseConfig);

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 
 function assertQA(req: NextApiRequest) {
   if (process.env.QA_TEST_MODE !== 'true') throw new Error('QA disabled')
@@ -14,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { employerEmail, workerEmail } = req.body || {}
     if (!employerEmail || !workerEmail) return res.status(400).json({ error: 'emails required' })
 
-    const supa = createClient(
+    const supa: SupabaseClient<Database> = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY! // server-side only
     )

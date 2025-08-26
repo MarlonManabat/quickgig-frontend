@@ -20,7 +20,9 @@
     "seed": "node scripts/seed.mjs",
     "postinstall": "node -e \"process.env.NODE_ENV==='production'?process.exit(0):0\" || npx playwright install --with-deps || true",
     "ci:install": "npm ci --no-audit --no-fund",
-    "ci:check-lock": "git diff --exit-code -- package-lock.json"
+    "ci:check-lock": "node scripts/ci-check-lock.mjs",
+    "test:smoke": "playwright test tests/smoke",
+    "test:e2e": "playwright test tests/e2e"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",

@@ -100,12 +100,19 @@ export default function Applicants() {
                       disabled={balance <= 0}
                       title={balance <= 0 ? 'Kulang ang tickets — bumili muna.' : undefined}
                       className={`btn bg-brand-success text-white${balance <= 0 ? ' opacity-50 cursor-not-allowed' : ''}`}
+                      data-testid="hire-accept"
                     >
                       Accept
                     </button>
                   )}
                   {a.status !== 'rejected' && (
-                    <button onClick={() => setStatus(a.id, 'rejected')} className="btn-danger">Reject</button>
+                    <button
+                      onClick={() => setStatus(a.id, 'rejected')}
+                      className="btn-danger"
+                      data-testid="hire-reject"
+                    >
+                      Reject
+                    </button>
                   )}
                 </div>
               </div>

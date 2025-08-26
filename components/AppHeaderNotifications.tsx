@@ -37,10 +37,18 @@ export default function AppHeaderNotifications() {
   }, [])
 
   return (
-    <Link href="/notifications" aria-label="Notifications" className="relative">
+    <Link
+      href="/notifications"
+      aria-label="Notifications"
+      className="relative"
+      data-testid="app-nav-notifications"
+    >
       <span className="i-bell" />
       {unread > 0 && (
-        <span className="absolute -top-1 -right-1 text-xs rounded-full bg-red-500 text-white px-1">
+        <span
+          className="absolute -top-1 -right-1 text-xs rounded-full bg-red-500 text-white px-1"
+          data-testid="notifications-count"
+        >
           {unread}
         </span>
       )}
