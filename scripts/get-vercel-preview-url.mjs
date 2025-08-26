@@ -8,22 +8,17 @@ const {
   GITHUB_REF,
 } = process.env;
 
-if (!VERCEL_TOKEN) {
-  console.error('Missing VERCEL_TOKEN');
-  process.exit(1);
-}
-if (!VERCEL_PROJECT_ID) {
-  console.error('Missing VERCEL_PROJECT_ID');
-  process.exit(1);
+if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
+  throw new Error('Missing VERCEL_TOKEN or VERCEL_PROJECT_ID env vars.');
 }
 
 const commitSha = GITHUB_SHA;
 const commitRef = GITHUB_REF?.split('/').pop();
 
-const params = new URLSearchParams({ projectId: VERCEL_PROJECT_ID, limit: '20' });
-if (VERCEL_ORG_ID) params.set('teamId', VERCEL_ORG_ID);
+const query = new URLSearchParams({ projectId: VERCEL_PROJECT_ID, limit: '20' });
+if (VERCEL_ORG_ID) query.set('teamId', VERCEL_ORG_ID);
 
-const apiUrl = `https://api.vercel.com/v13/deployments?${params}`;
+const apiUrl = `https://api.vercel.com/v13/deployments?${query}`;
 const maxAttempts = 60; // 10 minutes
 
 for (let attempt = 1; attempt <= maxAttempts; attempt++) {
