@@ -1,0 +1,5 @@
+[
+  {"id":"MM","name":"Metro Manila","regionCode":"NCR"},
+  {"id":"PAM","name":"Pampanga","regionCode":"REG-III"},
+  {"id":"LAG","name":"Laguna","regionCode":"REG-IVA"}
+]
