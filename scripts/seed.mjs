@@ -51,13 +51,11 @@ async function first(table) {
 
   // demo gig
   if (!(await first("gigs"))) {
-    await supabase
-      .from("gigs")
-      .insert({
-        title: "Demo Gig",
-        description: "Seeded",
-        owner: "seed-owner",
-      });
+    await supabase.from("gigs").insert({
+      title: "Demo Gig",
+      description: "Seeded",
+      owner: "seed-owner",
+    });
   }
   // demo application
   if (!(await first("applications"))) {
@@ -69,13 +67,11 @@ async function first(table) {
   }
   // demo thread+message
   if (!(await first("messages"))) {
-    await supabase
-      .from("messages")
-      .insert({
-        thread_id: "00000000-0000-0000-0000-000000000000",
-        sender_id: "seed",
-        body: "hello",
-      });
+    await supabase.from("messages").insert({
+      thread_id: "00000000-0000-0000-0000-000000000000",
+      sender_id: "seed",
+      body: "hello",
+    });
   }
   // mark admin
   const adminEmail =

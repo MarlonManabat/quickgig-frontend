@@ -1,16 +1,14 @@
 import { supabase } from "@/utils/supabaseClient";
 
 export async function markThreadRead(appId: string, userId: string) {
-  const { error } = await supabase
-    .from("message_reads")
-    .upsert(
-      {
-        app_id: appId,
-        user_id: userId,
-        last_read_at: new Date().toISOString(),
-      },
-      { onConflict: "app_id,user_id" },
-    );
+  const { error } = await supabase.from("message_reads").upsert(
+    {
+      app_id: appId,
+      user_id: userId,
+      last_read_at: new Date().toISOString(),
+    },
+    { onConflict: "app_id,user_id" },
+  );
   if (error) throw error;
 }
 
