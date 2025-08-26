@@ -13,14 +13,19 @@ function warnOnce(source: string, err: unknown) {
 }
 
 export async function withTimeout<T>(p: Promise<T>, ms = 2500, label = ''): Promise<T> {
-  let t: NodeJS.Timeout;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
   const timeout = new Promise<never>((_, reject) => {
-    t = setTimeout(() => reject(new Error(label ? `${label} timed out` : 'Timed out')), ms);
+    timeoutId = setTimeout(() => {
+      reject(new Error(`Timeout after ${ms}ms${label ? ` [${label}]` : ''}`));
+    }, ms);
   });
+
   try {
+    // race the real promise against the timeout
     return await Promise.race([p, timeout]);
   } finally {
-    clearTimeout(t);
+    if (timeoutId) clearTimeout(timeoutId);
   }
 }
 

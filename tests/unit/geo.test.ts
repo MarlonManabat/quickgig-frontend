@@ -13,6 +13,21 @@ test('withTimeout rejects on timeout', async () => {
   await assert.rejects(() => withTimeout(new Promise(() => {}), 100));
 });
 
+test('withTimeout clears timer', async () => {
+  let cleared = false;
+  const realClear = global.clearTimeout;
+  global.clearTimeout = ((id: any) => {
+    cleared = true;
+    return realClear(id);
+  }) as any;
+  try {
+    await withTimeout(Promise.resolve('ok'), 50);
+    assert.ok(cleared);
+  } finally {
+    global.clearTimeout = realClear;
+  }
+});
+
 test('fetchRegions supabase success', async () => {
   process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://sb';
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'k';
