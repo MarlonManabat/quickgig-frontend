@@ -2,13 +2,16 @@ import { defineConfig } from '@playwright/test';
 import baseConfig from './playwright.config';
 
 export default defineConfig({
-  // Inherit anything defined in the base config if present
   ...(baseConfig as any),
-  reporter: [['github'], ...((baseConfig as any)?.reporter ?? [])],
+  reporter: [
+    ['github'],
+    ['html', { outputFolder: 'playwright-report' }],
+  ],
+  timeout: 60_000,
   use: {
     ...((baseConfig as any)?.use ?? {}),
+    baseURL: process.env.BASE_URL,
     video: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
   },
 });
+
