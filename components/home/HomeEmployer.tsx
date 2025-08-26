@@ -3,15 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import { uploadAvatar } from "@/lib/avatar";
-
-type TicketBalance = { balance: number };
+import { toNumber } from "@/lib/num";
 
 type UserRole = "employer" | "admin" | "seeker";
-
-function normalizeRole(role: string | null | undefined): UserRole {
-  if (role === "employer" || role === "admin" || role === "seeker") return role;
-  return "seeker";
-}
 
 export default function HomeEmployer() {
   const [role, setRole] = useState<UserRole>("seeker");
@@ -43,17 +37,19 @@ export default function HomeEmployer() {
         .eq("id", auth.user.id)
         .maybeSingle();
 
-      // Role: coerce to our known union
-      setRole(normalizeRole((prof as any)?.role));
+      // Role: ensure union-safe string fallback
+      const roleStr: UserRole =
+        prof?.role === "employer" ||
+        prof?.role === "admin" ||
+        prof?.role === "seeker"
+          ? prof.role
+          : "seeker";
+      setRole(roleStr);
 
-      // Avatar URL: Supabase can return {} | string | null from JSON columns.
-      // Normalize to string | null for the state setter.
-      const rawAvatar = (prof as any)?.avatar_url;
-      const avatarUrlNormalized =
-        typeof rawAvatar === "string" && rawAvatar.trim().length > 0
-          ? rawAvatar
-          : null;
-      setAvatarUrl(avatarUrlNormalized);
+      // Avatar URL: normalize to string | null for the state setter.
+      const avatarUrl =
+        typeof prof?.avatar_url === "string" ? prof.avatar_url : null;
+      setAvatarUrl(avatarUrl);
 
       // Email already string | null from our types, keep explicit fallback
       setProfileEmail((prof as any)?.email ?? null);
@@ -67,7 +63,9 @@ export default function HomeEmployer() {
         .select("balance")
         .eq("user_id", auth.user.id)
         .maybeSingle();
-      setBalance(bal?.balance ?? 0);
+      // Wallet balance: coerce unknown -> number with safe fallback
+      const balanceNum = toNumber(bal?.balance, 0);
+      setBalance(balanceNum);
 
       // seeker widgets
       const { data: seekerApps } = await supabase
