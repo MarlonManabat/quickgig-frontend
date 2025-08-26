@@ -29,12 +29,18 @@ export default function Nav() {
   return (
     <nav className="p-4 border-b mb-4 flex gap-4">
       <Link href="/home">Home</Link>
-      <Link href="/find">{copy.nav.findWork}</Link>
-      <Link href="/post">{copy.nav.postJob}</Link>
+      <Link href="/search?intent=worker" data-testid="nav-find">
+        {copy.nav.findWork}
+      </Link>
+      <Link href="/post?intent=employer" data-testid="nav-post">
+        {copy.nav.postJob}
+      </Link>
       {session ? (
         <button onClick={logout}>Logout</button>
       ) : (
-        <Link href="/auth">{copy.nav.auth}</Link>
+        <Link href="/login" data-testid="nav-login">
+          {copy.nav.auth}
+        </Link>
       )}
     </nav>
   );

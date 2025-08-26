@@ -7,7 +7,7 @@ import { copy } from "@/copy";
 import AppLogo from "@/components/AppLogo";
 
 const links = [
-  { href: "/find", label: copy.nav.findWork, id: "app-nav-find-work" },
+  { href: "/search?intent=worker", label: copy.nav.findWork, id: "nav-find" },
   { href: "/gigs?mine=1", label: copy.nav.myGigs, id: "app-nav-my-gigs" },
   {
     href: "/applications",
@@ -15,7 +15,7 @@ const links = [
     id: "app-nav-applications",
   },
   { href: "/saved", label: copy.nav.saved, id: "app-nav-saved" },
-  { href: "/post", label: copy.nav.postJob, id: "app-nav-post-job" },
+  { href: "/post?intent=employer", label: copy.nav.postJob, id: "nav-post" },
 ];
 
 function IconMenu() {
@@ -110,9 +110,9 @@ export default function Header() {
           ) : (
             <>
               <LinkSafe
-                href="/auth"
-                data-testid="app-login"
-                app-nav="/auth"
+                href="/login"
+                data-testid="nav-login"
+                app-nav="/login"
                 className="hidden md:inline-flex qg-btn qg-btn--outline h-11 min-h-[44px]"
               >
                 Mag-login
@@ -155,9 +155,9 @@ export default function Header() {
               </LinkSafe>
             ) : (
               <LinkSafe
-                href="/auth"
-                data-testid="app-login"
-                app-nav="/auth"
+                href="/login"
+                data-testid="nav-login"
+                app-nav="/login"
                 className="qg-btn qg-btn--outline w-full h-11 min-h-[44px] flex items-center justify-center"
               >
                 Mag-login
