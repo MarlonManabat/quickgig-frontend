@@ -51,15 +51,23 @@ test('fetchRegions falls back to api then static', async () => {
   process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://sb';
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'k';
   let call = 0;
-  global.fetch = (async (_url: any) => {
+  global.fetch = (async (url: any) => {
     call++;
     if (call === 1) throw new Error('sb fail');
     if (call === 2) throw new Error('api fail');
+    if (String(url).includes('/geo/ph/regions.json')) {
+      return new Response(
+        JSON.stringify([
+          { id: 'NCR', code: 'NCR', name: 'National Capital Region' },
+        ]),
+        { status: 200 },
+      );
+    }
     return new Response('[]', { status: 200 });
   }) as any;
   const regions = await fetchRegions();
   assert.equal(regions[0].id, 'NCR');
-  assert.equal(call, 2);
+  assert.equal(call, 3);
 });
 
 test.after(() => {

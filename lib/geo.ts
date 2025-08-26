@@ -1,5 +1,3 @@
-import { readFile } from 'fs/promises';
-
 export type Region = { id: string; code: string; name: string };
 export type Province = { id: string; name: string; regionCode: string };
 export type City = { id: string; name: string; provinceId: string };
@@ -48,21 +46,10 @@ async function fetchSupabase(path: string, signal?: AbortSignal) {
   return res.json();
 }
 
-function staticPath(name: string) {
-  if (typeof window === 'undefined') {
-    return new URL(`../public/geo/ph/${name}.json`, import.meta.url);
-  }
-  return `/geo/ph/${name}.json`;
-}
-
-async function loadStatic(name: string) {
-  if (typeof window === 'undefined') {
-    const data = await readFile(staticPath(name), 'utf-8');
-    return JSON.parse(data);
-  }
-  const res = await fetch(staticPath(name));
-  if (!res.ok) throw new Error(`static ${name}`);
-  return res.json();
+async function loadStaticJSON<T>(path: string): Promise<T> {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
+  return res.json() as Promise<T>;
 }
 
 function validateRegions(data: any): Region[] {
@@ -112,7 +99,11 @@ export async function fetchRegions(opts?: { signal?: AbortSignal }): Promise<Reg
     warnOnce('api regions', err);
   }
   // Static
-  const data = await withTimeout(loadStatic('regions'), 2500, 'regions static');
+  const data = await withTimeout(
+    loadStaticJSON<Region[]>('/geo/ph/regions.json'),
+    2500,
+    'regions static',
+  );
   return validateRegions(data);
 }
 
@@ -146,7 +137,11 @@ export async function fetchProvinces(regionCode: string, opts?: { signal?: Abort
     warnOnce('api provinces', err);
   }
   // Static
-  const data = await withTimeout(loadStatic('provinces'), 2500, 'provinces static');
+  const data = await withTimeout(
+    loadStaticJSON<Province[]>(`/geo/ph/provinces.json`),
+    2500,
+    'provinces static',
+  );
   return validateProvinces(data, regionCode);
 }
 
@@ -180,7 +175,11 @@ export async function fetchCities(provinceId: string, opts?: { signal?: AbortSig
     warnOnce('api cities', err);
   }
   // Static
-  const data = await withTimeout(loadStatic('cities'), 2500, 'cities static');
+  const data = await withTimeout(
+    loadStaticJSON<City[]>(`/geo/ph/cities.json`),
+    2500,
+    'cities static',
+  );
   return validateCities(data, provinceId);
 }
 
