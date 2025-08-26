@@ -21,9 +21,10 @@
     "postinstall": "node -e \"process.env.NODE_ENV==='production'?process.exit(0):0\" || npx playwright install --with-deps || true",
     "ci:install": "npm ci --no-audit --no-fund",
     "ci:check-lock": "node scripts/ci-check-lock.mjs",
-    "ci:seed": "node scripts/ci-seed.mjs",
-    "test:smoke:ci": "PLAYWRIGHT_HTML_REPORT=playwright-report/smoke playwright test tests/smoke --config=playwright.ci.ts --output=test-results/smoke",
-    "test:e2e:ci": "PLAYWRIGHT_HTML_REPORT=playwright-report/e2e playwright test tests/e2e --config=playwright.ci.ts --output=test-results/e2e"
+    "ci:seed": "tsx scripts/seed-preview.mts",
+    "ci:smoke": "playwright test tests/smoke --reporter=github",
+    "ci:e2e": "playwright test tests/e2e --reporter=github",
+    "ci:autofix": "prettier -w . && eslint . --fix"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",
