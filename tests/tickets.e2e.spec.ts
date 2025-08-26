@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { qaContext } from "./helpers/qa";
 import { loginViaMagicLink } from "./helpers/auth"; // existing helper
+import { qaPost } from "./utils/qa";
 
 const EMPLOYER = process.env.QA_TEST_EMAIL!;
 const WORKER =
@@ -10,20 +10,20 @@ test.setTimeout(120_000);
 
 test.describe("[full-e2e] tickets gate hire", () => {
   test("hire blocked without tickets, succeeds after credit", async ({
+    request,
     page,
   }) => {
-    const ctx = await qaContext();
     // Seed scenario
-    const seed = await ctx.post("/api/qa/seed-hire-scenario", {
-      data: { employerEmail: EMPLOYER, workerEmail: WORKER },
+    const seed = await qaPost(request, "/api/qa/seed-hire-scenario", {
+      employerEmail: EMPLOYER,
+      workerEmail: WORKER,
     });
-    const data = await seed.json();
-    expect(data.ok).toBeTruthy();
+    expect(seed.ok).toBeTruthy();
 
     // Employer logs in and tries to hire
     await loginViaMagicLink(page, EMPLOYER);
     await page.goto(
-      `${process.env.APP_URL}/applications/${data.applicationId}`,
+      `${process.env.APP_URL}/applications/${seed.applicationId}`,
     );
     await page.getByRole("button", { name: /hire|accept|confirm/i }).click();
 
@@ -42,13 +42,14 @@ test.describe("[full-e2e] tickets gate hire", () => {
     expect(blocked).toBeTruthy();
 
     // Credit tickets via QA endpoint
-    await ctx.post("/api/qa/credit-tickets", {
-      data: { userId: data.employerId, tickets: 3 },
+    await qaPost(request, "/api/qa/credit-tickets", {
+      userId: seed.employerId,
+      tickets: 3,
     });
 
     // Retry hire → should succeed (URL changes or status label shows)
     await page.goto(
-      `${process.env.APP_URL}/applications/${data.applicationId}`,
+      `${process.env.APP_URL}/applications/${seed.applicationId}`,
     );
     await page.getByRole("button", { name: /hire|accept|confirm/i }).click();
 
@@ -59,7 +60,7 @@ test.describe("[full-e2e] tickets gate hire", () => {
         .then(() => true)
         .catch(() => false),
       page
-        .waitForURL(new RegExp(`/applications/${data.applicationId}(?!$)`), {
+        .waitForURL(new RegExp(`/applications/${seed.applicationId}(?!$)`), {
           timeout: 8000,
         })
         .then(() => true)

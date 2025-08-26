@@ -63,7 +63,7 @@ export default function Header() {
       data-testid="app-header"
       role="banner"
       data-theme-brand="quickgig"
-      className="sticky top-0 z-50 bg-white/90 supports-[backdrop-filter]:bg-white/70 backdrop-blur dark:bg-slate-900/80 shadow-sm qg-header"
+      className="sticky top-0 z-50 bg-white dark:bg-slate-900 shadow-sm qg-header"
     >
       <Container className="flex h-16 items-center justify-between">
         <LinkSafe
@@ -90,6 +90,7 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-4">
           <button
+            type="button"
             data-testid="menu-toggle"
             className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg text-white"
             aria-label="Open menu"
@@ -131,7 +132,11 @@ export default function Header() {
         </div>
       </Container>
       {open && (
-        <div className="md:hidden fixed inset-0 z-30 bg-header-bg text-white pt-16">
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-header-bg text-white pt-16"
+          role="dialog"
+          aria-label="Main menu"
+        >
           <nav className="grid gap-1 p-6">
             {links.map((l) => (
               <LinkSafe

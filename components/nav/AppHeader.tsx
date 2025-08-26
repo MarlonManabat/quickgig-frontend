@@ -11,6 +11,7 @@ export default function AppHeader() {
   const [balance, setBalance] = useState<number | null>(null);
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<"worker" | "employer" | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -43,7 +44,7 @@ export default function AppHeader() {
       data-app-header
       data-testid="app-header"
       role="banner"
-      className="sticky top-0 z-50 bg-white/90 supports-[backdrop-filter]:bg-white/70 backdrop-blur dark:bg-slate-900/80 shadow-sm qg-header h-14"
+      className="sticky top-0 z-50 bg-white dark:bg-slate-900 shadow-sm"
     >
       <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
         <Link href="/" className="flex items-center">
@@ -84,17 +85,36 @@ export default function AppHeader() {
           <AppHeaderTickets />
           <AppHeaderNotifications />
         </nav>
-        <details className="md:hidden">
-          <summary aria-label="Open menu" className="cursor-pointer" data-testid="menu-toggle">
-            Menu
-          </summary>
-          <div className="mt-2 flex flex-col">
+        <button
+          type="button"
+          aria-label="Open menu"
+          data-testid="menu-toggle"
+          className="md:hidden cursor-pointer"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          Menu
+        </button>
+        {open && (
+          <div
+            role="dialog"
+            aria-label="Main menu"
+            className="mt-2 flex flex-col md:hidden"
+          >
             {!user && (
               <>
-                <Link href="/search?intent=worker" className="py-2" data-testid="nav-find">
+                <Link
+                  href="/search?intent=worker"
+                  className="py-2"
+                  data-testid="nav-find"
+                >
                   Find work
                 </Link>
-                <Link href="/post?intent=employer" className="py-2" data-testid="nav-post">
+                <Link
+                  href="/post?intent=employer"
+                  className="py-2"
+                  data-testid="nav-post"
+                >
                   Post job
                 </Link>
                 <Link href="/login" className="py-2" data-testid="nav-login">
@@ -126,7 +146,7 @@ export default function AppHeader() {
               </Link>
             )}
           </div>
-        </details>
+        )}
       </div>
     </header>
   );

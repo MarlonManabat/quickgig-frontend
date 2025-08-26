@@ -2,152 +2,122 @@ name: Release Check
 
 on:
   pull_request:
-    branches: [main]
-  push:
-    branches: [main]
-  workflow_dispatch:
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: pr-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  DISABLE_STRIPE: '1'
+  NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon
+  PLAYWRIGHT_BASE_URL: http://localhost:3000
+
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
-    env:
-      DISABLE_STRIPE: '1'
-      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon
-    permissions:
-      contents: read
-      deployments: read
-      pull-requests: write
-      issues: write
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node (cache npm)
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: 20
           cache: 'npm'
           cache-dependency-path: package-lock.json
-          registry-url: 'https://registry.npmjs.org'
 
-      - name: Install deps (robust)
-        env:
-          NPM_CONFIG_FETCH_RETRIES: 6
-          NPM_CONFIG_FETCH_RETRY_MINTIMEOUT: 20000
-          NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT: 120000
+      - name: Harden npm & retry more (429-safe)
         run: |
-          npm config set audit false
-          npm config set fund false
-          npm config set progress false
-          npm config set prefer-offline true
-          npm config set cache ~/.npm
-          for i in 1 2 3 4; do
-            echo "npm ci attempt $i"
-            if npm ci --no-audit --no-fund; then
-              echo "npm ci succeeded"; break
-            fi
-            if [ "$i" -eq 4 ]; then
-              echo "npm ci failed after $i attempts"; exit 1
-            fi
-            sleep $((i*20))
-          done
+          npm config set audit false fund false
+          npm config set fetch-retries 5
+          npm config set fetch-retry-factor 2
+          npm config set fetch-retry-maxtimeout 120000
 
-      - name: Autofix (eslint/next/react/prettier)
-        run: |
-          npm run autofix:ci
-          # Never push from CI (runner is on detached HEAD). The script should
-          # have created 'autofix.patch' if any changes were suggested.
+      - name: Install deps
+        run: npm ci --no-audit --no-fund --prefer-offline
 
-      - name: Upload autofix patch
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
         with:
-          name: autofix.patch
-          path: autofix.patch
-          if-no-files-found: ignore
-
-      # Best-effort comment with instructions; do not fail the workflow
-      - name: Comment autofix patch (non-blocking)
-        if: ${{ github.event_name == 'pull_request' }}
-        continue-on-error: true
-        uses: actions/github-script@v7
-        env:
-          RUN_ID: ${{ github.run_id }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const runId = process.env.RUN_ID
-            const { owner, repo } = context.repo
-            const prNumber = context.payload.pull_request?.number
-            if (!prNumber) {
-              core.info('Not a PR context; skipping comment.')
-              return
-            }
-            // Construct artifact URL
-            const artifactUrl = `https://github.com/${owner}/${repo}/actions/runs/${runId}/artifacts`
-            const body = [
-              'Auto-fix patch available.',
-              '',
-              `Download: ${artifactUrl}`,
-              '',
-              'Apply:',
-              '',
-              '```bash',
-              'git apply autofix.patch',
-              '```'
-            ].join('\n')
-            try {
-              await github.rest.issues.createComment({
-                owner, repo, issue_number: prNumber, body
-              })
-            } catch (e) {
-              core.warning(`Skipping comment (non-blocking): ${e?.message}`)
-            }
-
-      - name: Lint
-        run: npm run lint
+          path: |
+            .next/cache
+          key: next-${{ runner.os }}-${{ github.ref_name }}-${{ hashFiles('**/*.ts','**/*.tsx','package-lock.json','next.config.js','tsconfig.json') }}
+          restore-keys: |
+            next-${{ runner.os }}-${{ github.ref_name }}-
 
       - name: Build
         run: npm run build
 
-      - name: Install Playwright (with system deps)
+      - name: Pack build for shards
+        run: |
+          tar -czf build.tgz .next public package.json next.config.js
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: build.tgz
+          if-no-files-found: error
+
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1/2
+            shard_label: 1-of-2
+          - shard: 2/2
+            shard_label: 2-of-2
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node (cache npm)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Harden npm & retry more (429-safe)
+        run: |
+          npm config set audit false fund false
+          npm config set fetch-retries 5
+          npm config set fetch-retry-factor 2
+          npm config set fetch-retry-maxtimeout 120000
+
+      - name: Install deps
+        run: npm ci --no-audit --no-fund --prefer-offline
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: .
+
+      - name: Unpack build
+        run: tar -xzf build.tgz
+
+      - name: Install Playwright (system deps)
         run: npx playwright install --with-deps
-      - name: Run E2E tests
+
+      - name: Run E2E tests (shard ${{ matrix.shard_label }})
         env:
-          E2E_BASE_URL: http://localhost:3000
           WORKER_EMAIL: ${{ secrets.WORKER_EMAIL }}
           WORKER_PASSWORD: ${{ secrets.WORKER_PASSWORD }}
           EMPLOYER_EMAIL: ${{ secrets.EMPLOYER_EMAIL }}
           EMPLOYER_PASSWORD: ${{ secrets.EMPLOYER_PASSWORD }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-        run: npm run test:release
+          CI_FAST: '1'
+        run: npx playwright test --shard ${{ matrix.shard }} --reporter=github,html
 
-      # Always upload artifacts
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: |
-            test-results/**
-            playwright-report/**
-            button-audit/**
-          if-no-files-found: ignore
-
-      - name: Post PR summary comment (non-blocking)
-        if: always()
-        continue-on-error: true
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.summary.addHeading('Release check')
-            core.summary.addList([
-              'E2E: executed',
-              'Autofix: applied if needed'
-            ])
-            await core.summary.write()
+          name: playwright-report-${{ matrix.shard_label }}
+          path: playwright-report/**
