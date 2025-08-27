@@ -26,7 +26,7 @@ export default function Home() {
         </Link>
         {canPost && (
           <Link
-            href="/post?intent=employer"
+            href="/jobs/new"
             className="btn-secondary"
             data-testid="cta-postjob"
           >
