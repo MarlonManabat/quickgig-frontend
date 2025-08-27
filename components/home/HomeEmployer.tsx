@@ -199,7 +199,7 @@ export default function HomeEmployer() {
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              <Link href="/find" className="qg-btn qg-btn--primary px-3 py-2">
+              <Link href="/find?focus=search" className="qg-btn qg-btn--primary px-3 py-2">
                 Browse Jobs
               </Link>
               <Link

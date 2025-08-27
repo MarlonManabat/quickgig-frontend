@@ -41,7 +41,7 @@ export default function AppHeader() {
 
   return (
     <header
-      data-app-header
+      data-app-header="true"
       data-testid="app-header"
       role="banner"
       className="sticky top-0 z-50 bg-white dark:bg-slate-900 shadow-sm"
@@ -53,18 +53,18 @@ export default function AppHeader() {
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
           {!user && (
             <>
-              <Link href="/search?intent=worker" data-testid="nav-find">Find work</Link>
+              <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
               <Link href="/post?intent=employer" data-testid="nav-post">Post job</Link>
               <Link href="/login" data-testid="nav-login">Login</Link>
             </>
           )}
           {user && role === "worker" && (
-            <Link href="/find" data-testid="nav-find">Find work</Link>
+            <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
           )}
           {user && role === "employer" && (
             <>
               <Link href="/post" data-testid="nav-post">Post job</Link>
-              <Link href="/find" data-testid="nav-find">Find work</Link>
+              <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
             </>
           )}
           {balance !== null && (
@@ -104,7 +104,7 @@ export default function AppHeader() {
             {!user && (
               <>
                 <Link
-                  href="/search?intent=worker"
+                  href="/find?focus=search"
                   className="py-2"
                   data-testid="nav-find"
                 >
@@ -123,7 +123,7 @@ export default function AppHeader() {
               </>
             )}
             {user && role === "worker" && (
-              <Link href="/find" className="py-2" data-testid="nav-find">
+              <Link href="/find?focus=search" className="py-2" data-testid="nav-find">
                 Find work
               </Link>
             )}
@@ -132,7 +132,7 @@ export default function AppHeader() {
                 <Link href="/post" className="py-2" data-testid="nav-post">
                   Post job
                 </Link>
-                <Link href="/find" className="py-2" data-testid="nav-find">
+                <Link href="/find?focus=search" className="py-2" data-testid="nav-find">
                   Find work
                 </Link>
               </>

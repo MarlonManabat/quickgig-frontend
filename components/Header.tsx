@@ -7,7 +7,7 @@ import { copy } from "@/copy";
 import AppLogo from "@/components/AppLogo";
 
 const links = [
-  { href: "/search?intent=worker", label: copy.nav.findWork, id: "nav-find" },
+  { href: "/find?focus=search", label: copy.nav.findWork, id: "nav-find" },
   { href: "/gigs?mine=1", label: copy.nav.myGigs, id: "app-nav-my-gigs" },
   {
     href: "/applications",
@@ -59,7 +59,7 @@ export default function Header() {
 
   return (
     <header
-      data-app-header
+      data-app-header="true"
       data-testid="app-header"
       role="banner"
       data-theme-brand="quickgig"
