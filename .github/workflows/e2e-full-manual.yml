@@ -35,7 +35,7 @@ jobs:
       - name: Install Playwright (system deps)
         run: npx playwright install --with-deps
       - name: Run Playwright (full shard ${{ matrix.shard }})
-        run: npx playwright test --reporter=github,html --project=full-e2e --shard ${{ matrix.shard }}
+        run: npx playwright test --reporter=github,html --project=e2e --shard ${{ matrix.shard }}
         env:
           DISABLE_STRIPE: '1'
           NEXT_PUBLIC_SUPABASE_URL: http://localhost:3000

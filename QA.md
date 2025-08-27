@@ -5,7 +5,7 @@
 Run smoke tests against deployed app:
 
 ```
-PLAYWRIGHT_BASE_URL=https://app.quickgig.ph npx playwright test --project=smoke
+PLAYWRIGHT_BASE_URL=https://app.quickgig.ph npm run test:smoke
 ```
 
 ## Full suite

@@ -25,9 +25,8 @@ test.describe("Mobile header & forms", () => {
     await page.goto("/signup");
     const email = page.getByLabel(/email/i);
     await expect(email).toBeVisible();
-    const box = await email.boundingBox();
-    expect((box?.width ?? 0)).toBeGreaterThanOrEqual(280);
-    expect((box?.height ?? 0)).toBeGreaterThanOrEqual(40);
+    await expect(email).toHaveCSS("width", /[3-9]\d{2}px|^100%$/);
+    await expect(email).toHaveCSS("height", /44|45|46/);
   });
 
   test("no horizontal scroll on key pages", async ({ page }) => {
