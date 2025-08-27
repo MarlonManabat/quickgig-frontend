@@ -26,7 +26,7 @@ export default function TopNav() {
   return (
     <nav
       className="w-full sticky top-0 z-20 border-b border-brand-border bg-brand-bg backdrop-blur text-brand"
-      data-app-header
+      data-app-header="true"
       data-testid="app-header"
     >
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
@@ -34,7 +34,7 @@ export default function TopNav() {
           QuickGig.ph
         </Link>
         <div className="ml-auto flex items-center gap-4 text-sm">
-          <Link href="/search?intent=worker" data-testid="nav-find">
+          <Link href="/find?focus=search" data-testid="nav-find">
             {copy.nav.findWork}
           </Link>
           {loggedIn && <Link href="/dashboard/gigs">{copy.nav.myGigs}</Link>}

@@ -68,6 +68,7 @@ export default function AuthPage() {
           disabled={loading}
           aria-busy={loading}
           className="btn-primary w-full sm:w-auto h-11 rounded-xl"
+          data-testid="magic-link"
         >
           {loading ? "..." : "Send Magic Link"}
         </button>

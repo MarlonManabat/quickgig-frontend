@@ -18,7 +18,7 @@ export default function Home() {
       <P>Connect with opportunities — find work or hire talent quickly.</P>
       <div className="flex justify-center gap-4">
         <Link
-          href="/search?intent=worker"
+          href="/find?focus=search"
           className="btn-primary"
           data-testid="cta-findwork"
         >

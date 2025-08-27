@@ -18,7 +18,7 @@ export function withAdminGuard<P>(Component: React.ComponentType<P>) {
 
     useEffect(() => {
       // Redirect non-admins away from /admin
-      if (role && role !== 'admin') {
+      if (role !== 'admin') {
         router.replace('/');
       }
     }, [role, router]);
