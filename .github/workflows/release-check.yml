@@ -1,7 +1,9 @@
 name: Release Check
 
 on:
-  pull_request:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
 concurrency:
   group: pr-${{ github.event.pull_request.number || github.ref }}
@@ -60,7 +62,8 @@ jobs:
           path: build.tgz
           if-no-files-found: error
 
-  e2e:
+  e2e_full:
+    if: ${{ github.event_name != 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
     strategy:
