@@ -1,18 +1,20 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { supabase } from "@/utils/supabaseClient";
 import { getStubRole } from "@/lib/testAuth";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
-import AppHeaderTickets from "@/components/AppHeaderTickets";
 import AppLogo from "@/components/AppLogo";
-import { asNumber } from "@/lib/normalize";
-import type { WalletRow } from "@/lib/types";
+import { getCredits } from "@/lib/credits";
 
 export default function AppHeader() {
-  const [balance, setBalance] = useState<number | null>(null);
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<"worker" | "employer" | null>(null);
   const [open, setOpen] = useState(false);
+  const { data: credits } = useSWR(
+    user && role === "employer" ? "credits" : null,
+    getCredits,
+  );
 
   useEffect(() => {
     const stub = getStubRole();
@@ -27,24 +29,11 @@ export default function AppHeader() {
       if (!user) return;
       const { data: prof } = await supabase
         .from("profiles")
-        .select("can_post_job, can_post, role_pref")
+        .select("role_pref")
         .single();
       setRole((prof?.role_pref as "worker" | "employer" | null) ?? null);
-      const canPost = prof?.can_post_job ?? prof?.can_post;
-      if (!canPost) return;
-      const { data: bal, error } = await supabase
-        .from("ticket_balances")
-        .select("balance")
-        .single<WalletRow>();
-      if (error) {
-        setBalance(0);
-      } else {
-        setBalance(asNumber(bal?.balance) ?? 0);
-      }
     });
   }, []);
-
-  const highlight = balance === 0 && balance !== null;
 
   return (
     <header
@@ -61,7 +50,7 @@ export default function AppHeader() {
           {!user && (
             <>
               <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
-              <Link href="/post?intent=employer" data-testid="nav-post">Post job</Link>
+              <Link href="/jobs/new" data-testid="nav-post">Post job</Link>
               <Link href="/login" data-testid="nav-login">Login</Link>
             </>
           )}
@@ -70,26 +59,18 @@ export default function AppHeader() {
           )}
           {user && role === "employer" && (
             <>
-              <Link href="/post" data-testid="nav-post">Post job</Link>
+              <Link href="/jobs/new" data-testid="nav-post">Post job</Link>
               <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
             </>
           )}
-          {balance !== null && (
-            <Link
-              href="/pay"
-              className={`inline-flex items-center ${
-                highlight
-                  ? "qg-btn qg-btn--primary px-3 py-1"
-                  : "qg-btn qg-btn--white px-3 py-1"
-              }`}
+          {user && role === "employer" && credits !== undefined && (
+            <span
+              data-testid="credits-pill"
+              className="text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800"
             >
-              Add tickets
-              <span className="ml-2 px-2 py-0.5 rounded-full bg-black text-white text-xs">
-                {balance}
-              </span>
-            </Link>
+              Credits: {credits}
+            </span>
           )}
-          <AppHeaderTickets />
           <AppHeaderNotifications />
         </nav>
         <button
@@ -118,7 +99,7 @@ export default function AppHeader() {
                   Find work
                 </Link>
                 <Link
-                  href="/post?intent=employer"
+                  href="/jobs/new"
                   className="py-2"
                   data-testid="nav-post"
                 >
@@ -136,7 +117,7 @@ export default function AppHeader() {
             )}
             {user && role === "employer" && (
               <>
-                <Link href="/post" className="py-2" data-testid="nav-post">
+                <Link href="/jobs/new" className="py-2" data-testid="nav-post">
                   Post job
                 </Link>
                 <Link href="/find?focus=search" className="py-2" data-testid="nav-find">
@@ -147,11 +128,6 @@ export default function AppHeader() {
             <Link href="/notifications" className="py-2">
               Notifications
             </Link>
-            {balance !== null && (
-              <Link href="/pay" className="py-2">
-                Add tickets ({balance})
-              </Link>
-            )}
           </div>
         )}
       </div>

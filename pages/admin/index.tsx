@@ -28,6 +28,9 @@ function AdminHome() {
         <Link href="/admin/tickets" className="underline">
           Tickets
         </Link>
+        <Link href="/admin/credits" className="underline">
+          Credits
+        </Link>
         <Link href="/admin/reviews" className="underline">
           Reviews
         </Link>
