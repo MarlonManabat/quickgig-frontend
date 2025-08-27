@@ -3,8 +3,8 @@ import { stubAuth } from "./utils/stubAuth";
 import { failOnConsoleErrors } from "./utils/consoleFail";
 
 test.describe("@smoke auth guards", () => {
-  test.beforeEach(async ({ page }, testInfo) => {
-    failOnConsoleErrors(page, testInfo);
+  test.beforeEach(async ({ page }) => {
+    failOnConsoleErrors(page);
   });
 
   test("redirects to auth when signed out", async ({ page }) => {

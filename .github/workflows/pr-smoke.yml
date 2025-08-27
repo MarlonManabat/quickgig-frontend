@@ -20,8 +20,9 @@ jobs:
       - name: Build
         env:
           DISABLE_STRIPE: '1'
-          NEXT_PUBLIC_SUPABASE_URL: http://localhost:3000
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: public-anon-key
         run: npm run build
 
   e2e_smoke:
@@ -34,8 +35,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 20
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - name: Install deps
         run: npm ci
       - name: Build Next.js (production)
@@ -48,6 +50,11 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Run Playwright (smoke)
+        env:
+          DISABLE_STRIPE: '1'
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: public-anon-key
         run: npx playwright test --reporter=github,html --project=smoke
       - name: Upload smoke report
         if: always()
