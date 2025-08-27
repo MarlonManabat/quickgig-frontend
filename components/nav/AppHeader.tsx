@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import { getStubRole } from "@/lib/testAuth";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
 import AppHeaderTickets from "@/components/AppHeaderTickets";
 import AppLogo from "@/components/AppLogo";
@@ -14,6 +15,12 @@ export default function AppHeader() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    const stub = getStubRole();
+    if (stub) {
+      setUser({});
+      setRole(stub === "admin" ? "employer" : stub);
+      return;
+    }
     supabase.auth.getUser().then(async ({ data }) => {
       const user = data.user;
       setUser(user);

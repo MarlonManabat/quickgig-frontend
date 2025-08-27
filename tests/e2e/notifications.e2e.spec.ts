@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import { stubSignIn } from "../utils/session";
+import { loginAs } from "./_helpers/session";
 
 const app = process.env.PLAYWRIGHT_APP_URL!;
 const employerEmail = "demo-user@quickgig.test";
@@ -41,7 +41,7 @@ test("notifications flow", async ({ page }) => {
     uniq_key: `offer_sent:${appRow!.id}`,
   });
 
-  await stubSignIn(page, workerEmail);
+  await loginAs(page, 'worker');
   await page.goto(`${app}/`);
   await expect(page.locator('a[aria-label="Notifications"] span')).toHaveText(
     "1",
@@ -74,7 +74,7 @@ test("notifications flow", async ({ page }) => {
     uniq_key: `gcash_approved:test`,
   });
 
-  await stubSignIn(page, employerEmail);
+  await loginAs(page, 'employer');
   await page.goto(`${app}/notifications`);
   await expect(page.getByTestId("notifications-list")).toContainText(
     "Your offer was accepted",

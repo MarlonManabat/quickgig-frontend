@@ -8,6 +8,7 @@ import { supabase } from "@/utils/supabaseClient";
 import { copy } from "@/copy";
 import { isAdmin } from "@/utils/admin";
 import Container from "./Container";
+import { getStubRole } from "@/lib/testAuth";
 
 const links = [
   { href: "/find?focus=search", label: copy.nav.findWork, id: "nav-find" },
@@ -30,6 +31,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [admin, setAdmin] = useState(false);
 
   useEffect(() => {
+    const stub = getStubRole();
+    if (stub) {
+      setUser({});
+      setAdmin(stub === "admin");
+      return;
+    }
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -42,6 +49,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const stub = getStubRole();
+    if (stub === "admin") {
+      setAdmin(true);
+      return;
+    }
     isAdmin()
       .then(setAdmin)
       .catch(() => setAdmin(false));

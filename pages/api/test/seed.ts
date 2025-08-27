@@ -1,46 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { createClient } from "@supabase/supabase-js";
-import { env, requireServer } from "@/lib/env";
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const only = String(req.query.only ?? "");
-  const doLocations = !only || only === "locations";
-
-  if (doLocations) {
-    const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
-    if (!key) return res.status(500).end();
-    const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
-    const regions = [
-      { id: "11111111-1111-1111-1111-111111111111", name: "NCR" },
-      { id: "22222222-2222-2222-2222-222222222222", name: "Region IV-A" },
-    ];
-    for (const r of regions) {
-      await supabase.from("regions").upsert(r, { onConflict: "id" });
-    }
-    const cities = [
-      {
-        id: "aaaaaaa1-0000-0000-0000-000000000001",
-        region_id: regions[0].id,
-        name: "Quezon City",
-      },
-      {
-        id: "aaaaaaa2-0000-0000-0000-000000000002",
-        region_id: regions[0].id,
-        name: "Manila",
-      },
-      {
-        id: "bbbbbbb1-0000-0000-0000-000000000001",
-        region_id: regions[1].id,
-        name: "Cabuyao",
-      },
-    ];
-    for (const c of cities) {
-      await supabase.from("cities").upsert(c, { onConflict: "id" });
-    }
-  }
-
-  return res.status(200).json({ ok: true });
+import type { NextApiRequest, NextApiResponse } from 'next';
+let seeded = false;
+export default function handler(_req: NextApiRequest, res: NextApiResponse) {
+  if (process.env.E2E_STUB !== '1') return res.status(404).end();
+  seeded = true; res.json({ ok: true, seeded });
 }

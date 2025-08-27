@@ -1,9 +1,11 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+import { getStubRole } from '@/lib/testAuth';
 
 // Replace this with your real auth hook if available
 function useRole(): 'admin' | 'user' | undefined {
-  // Prefer app auth state; fall back to localStorage for E2E stubs
+  const stub = getStubRole();
+  if (stub === 'admin') return 'admin';
   if (typeof window !== 'undefined') {
     const r = window.localStorage.getItem('role');
     if (r === 'admin' || r === 'user') return r;

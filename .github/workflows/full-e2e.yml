@@ -1,0 +1,39 @@
+name: Full E2E (manual)
+on:
+  workflow_dispatch: {}
+
+env:
+  E2E_STUB: '1'
+  NEXT_TELEMETRY_DISABLED: '1'
+  DISABLE_STRIPE: '1'
+  NEXT_PUBLIC_SUPABASE_URL: http://localhost:3000
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Build
+        run: npm run build
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Start server
+        run: npx next start -p 3000 & npx wait-on http://localhost:3000
+      - name: Run full E2E
+        run: npx playwright test --project=e2e --reporter=github,html
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-e2e
+          path: |
+            playwright-report
+            test-results/**
+          if-no-files-found: ignore
