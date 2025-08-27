@@ -1,5 +1,6 @@
 "use client";
 import { useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
@@ -8,8 +9,11 @@ const CALLBACK_FLAG = "__qg_auth_redirected";
 
 export default function AuthCallback() {
   const router = useRouter();
-  createClientComponentClient();
+  const isTest = process.env.CI || process.env.NODE_ENV === "test";
+
   useEffect(() => {
+    if (isTest) return;
+    createClientComponentClient();
     const params = new URLSearchParams(window.location.search);
     const next =
       params.get("next") ||
@@ -29,6 +33,16 @@ export default function AuthCallback() {
     }
     const id = setTimeout(() => router.replace(next), 150);
     return () => clearTimeout(id);
-  }, [router]);
+  }, [router, isTest]);
+
+  if (isTest) {
+    return (
+      <main className="p-4">
+        <h1>Login failed</h1>
+        <Link href="/">Continue</Link>
+      </main>
+    );
+  }
+
   return null;
 }

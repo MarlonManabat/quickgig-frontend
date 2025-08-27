@@ -1,39 +1,32 @@
-import { defineConfig } from "@playwright/test";
-
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
-const isCI = !!process.env.CI;
-const CI_FAST = !!process.env.CI_FAST;
+import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  testDir: "./tests",
-  testIgnore: CI_FAST
-    ? ["tests/**/full_e2e.*", "tests/**/tickets.e2e.*"]
-    : [],
-  timeout: isCI ? 180_000 : 60_000,
-  expect: { timeout: isCI ? 20_000 : 10_000 },
-  fullyParallel: true,
-  retries: 1,
   use: {
-    headless: true,
-    trace: isCI ? "retain-on-failure" : "on",
-    screenshot: isCI ? "only-on-failure" : "on",
-    video: "off",
-    baseURL,
-    actionTimeout: isCI ? 15_000 : 10_000,
-    navigationTimeout: isCI ? 30_000 : 15_000,
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'off',
   },
-  reporter: [["list"], ["html", { outputFolder: "playwright-report" }]],
+  webServer: {
+    command: 'npx next start -p 3000',
+    url: 'http://localhost:3000',
+    timeout: 120_000,
+    reuseExistingServer: !process.env.CI,
+    env: {
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321',
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key',
+    },
+  },
   projects: [
-    { name: "smoke", testMatch: /smoke\.spec\.ts$/ },
     {
-      name: "full-e2e",
-      testMatch: /(?:\.e2e\.spec\.ts|full\.e2e.*\.spec\.ts)$/,
+      name: 'smoke',
+      testMatch: ['tests/smoke/**/*.spec.ts', '**/*.smoke.ts'],
+      timeout: 45_000,
+      expect: { timeout: 7_000 },
+      use: { baseURL: 'http://localhost:3000' },
+    },
+    {
+      name: 'e2e',
+      testMatch: ['tests/**/*.spec.ts'],
     },
   ],
-  webServer: {
-    command: "npm run start",
-    port: 3000,
-    reuseExistingServer: !isCI,
-    timeout: 120_000,
-  },
 });

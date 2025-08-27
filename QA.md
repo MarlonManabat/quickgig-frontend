@@ -5,7 +5,7 @@
 Run smoke tests against deployed app:
 
 ```
-PLAYWRIGHT_APP_URL=https://app.quickgig.ph npx playwright test -c playwright.smoke.config.ts
+PLAYWRIGHT_BASE_URL=https://app.quickgig.ph npm run test:smoke
 ```
 
 ## Full suite
@@ -13,5 +13,5 @@ PLAYWRIGHT_APP_URL=https://app.quickgig.ph npx playwright test -c playwright.smo
 Trigger full E2E workflow manually:
 
 ```
-gh workflow run e2e.yml -f run_full=true
+gh workflow run e2e-full-manual.yml
 ```

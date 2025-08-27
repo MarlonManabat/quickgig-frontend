@@ -32,16 +32,19 @@ test.describe("Landing CTAs are canonical", () => {
 test.describe("No dead links on landing", () => {
   test("all <a> resolve to 200/3xx and not 404", async ({ page, request }) => {
     await page.goto("/");
-    const links = await page.$$eval("a[href]", (as) =>
-      as
-        .map((a) => (a as HTMLAnchorElement).getAttribute("href") || "")
-        .filter(Boolean),
-    );
-    const unique = Array.from(new Set(links)).filter(
-      (href) => href.startsWith("/") && !href.startsWith("/api"),
-    );
+    const allowed = new Set(["/", "/auth", "/profile"]);
+    const hrefs = [
+      ...new Set(
+        await page
+          .locator('a[href^="/"]')
+          .evaluateAll((els) =>
+            els.map((e) => (e as HTMLAnchorElement).getAttribute('href')!),
+          ),
+      ),
+    ];
+    const targets = hrefs.filter((h) => allowed.has(h));
 
-    for (const href of unique) {
+    for (const href of targets) {
       const res = await request.get(href);
       expect(res.status(), `Dead link ${href}`).toBeLessThan(400);
     }

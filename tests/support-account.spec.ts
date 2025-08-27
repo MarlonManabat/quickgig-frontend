@@ -3,8 +3,8 @@ import { stubAuth } from "./utils/stubAuth";
 import { failOnConsoleErrors } from "./utils/consoleFail";
 
 test.describe("support and account deletion", () => {
-  test.beforeEach(async ({ page }, testInfo) => {
-    failOnConsoleErrors(page, testInfo);
+  test.beforeEach(async ({ page }) => {
+    failOnConsoleErrors(page);
     await stubAuth(page);
   });
 
