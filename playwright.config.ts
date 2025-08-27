@@ -26,7 +26,13 @@ export default defineConfig({
     },
     {
       name: 'e2e',
-      testMatch: ['tests/**/*.spec.ts'],
+      testMatch: ['tests/e2e/**/*.spec.ts'],
+      use: {
+        baseURL: 'http://localhost:3000',
+        video: 'retain-on-failure',
+        trace: 'retain-on-failure',
+        screenshot: 'only-on-failure',
+      },
     },
   ],
 });

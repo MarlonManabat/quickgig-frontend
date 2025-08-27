@@ -1,17 +1,16 @@
 import { test, expect } from "@playwright/test";
-import { stubSignIn } from "../utils/session";
+import { loginAs } from "./_helpers/session";
 import { createClient } from "@supabase/supabase-js";
 import { env, requireServer } from "@/lib/env";
 
 const app = process.env.PLAYWRIGHT_APP_URL!;
-const qa = process.env.QA_TEST_MODE === "true";
 
 const employerEmail = "demo-user@quickgig.test";
 const employerId = "00000000-0000-0000-0000-000000000001";
 const workerId = "00000000-0000-0000-0000-000000000002";
 
 test("@full hire requires tickets", async ({ page }) => {
-  if (qa) await stubSignIn(page, employerEmail);
+  await loginAs(page, 'employer');
 
   const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
   if (!key) throw new Error('missing service role');

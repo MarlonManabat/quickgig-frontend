@@ -1,13 +1,12 @@
 import { test, expect } from "@playwright/test";
-import { stubSignIn, getDemoEmail } from "../utils/session";
+import { loginAs } from "./_helpers/session";
 import { createClient } from "@supabase/supabase-js";
 
 const app = process.env.PLAYWRIGHT_APP_URL!;
-const qa = process.env.QA_TEST_MODE === "true";
 
 test("@full user onboarding creates/updates profile", async ({ page }) => {
-  const email = getDemoEmail();
-  if (qa) await stubSignIn(page, email);
+  const email = "demo-user@quickgig.test";
+  await loginAs(page, 'worker');
   const display = `QA User ${Date.now()}`;
   await page.goto(`${app}/profile`, { waitUntil: "load" });
   await page.getByLabel(/Buong pangalan|Full name/i).fill(display);

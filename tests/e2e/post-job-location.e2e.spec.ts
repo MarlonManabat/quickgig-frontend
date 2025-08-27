@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { loginAs } from './_helpers/session';
 
 test.describe('post job location', () => {
-  test.beforeEach(async ({}, testInfo) => {
-    if (testInfo.project.name !== 'employer') test.skip();
+  test.beforeEach(async ({ page }) => {
+    await loginAs(page, 'employer');
   });
 
   test('loads geo selects and toggles online job', async ({ page }) => {

@@ -5,6 +5,7 @@ import Container from "./Container";
 import { supabase } from "@/utils/supabaseClient";
 import { copy } from "@/copy";
 import AppLogo from "@/components/AppLogo";
+import { getStubRole } from "@/lib/testAuth";
 
 const links = [
   { href: "/find?focus=search", label: copy.nav.findWork, id: "nav-find" },
@@ -40,6 +41,11 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    const stub = getStubRole();
+    if (stub) {
+      setUser({});
+      return;
+    }
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
