@@ -2,25 +2,28 @@ import { useState } from "react";
 import { createJob } from "@/lib/jobs";
 import { requireTicket } from "@/lib/tickets";
 import { useRequireUser } from "@/lib/useRequireUser";
-import GeoSelect, { GeoValue } from "@/components/location/GeoSelect";
+import LocationSelect, { LocationValue } from "@/components/location/LocationSelect";
+import { staticPhData } from "@/lib/ph-data";
 
 export default function PostJobPage() {
   const { ready, userId, timedOut } = useRequireUser();
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [isOnline, setIsOnline] = useState(false);
-  const [location, setLocation] = useState<GeoValue>({
-    region: null,
-    province: null,
-    city: null,
+  const [location, setLocation] = useState<LocationValue>({
+    regionCode: null,
+    provinceCode: null,
+    cityCode: null,
   });
-  const [locationLoading, setLocationLoading] = useState(false);
   const [address, setAddress] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const regionName = location.region?.name || "";
-  const provinceName = location.province?.name || "";
-  const cityName = location.city?.name || "";
+  const regionName =
+    staticPhData.regions.find((r) => r.region_code === location.regionCode)?.region_name || "";
+  const provinceName =
+    staticPhData.provinces.find((p) => p.province_code === location.provinceCode)?.province_name || "";
+  const cityName =
+    staticPhData.cities.find((c) => c.city_code === location.cityCode)?.city_name || "";
 
   async function onSubmit(e: any) {
     e.preventDefault();
@@ -88,12 +91,7 @@ export default function PostJobPage() {
           </span>
         </label>
 
-        <GeoSelect
-          value={location}
-          onChange={setLocation}
-          isOnline={isOnline}
-          onLoadingChange={setLocationLoading}
-        />
+        <LocationSelect value={location} onChange={setLocation} disabled={isOnline} />
 
         <input
           className="border rounded p-2"
@@ -105,7 +103,7 @@ export default function PostJobPage() {
 
         <button
           className="qg-btn qg-btn--primary px-4 py-2"
-          disabled={busy || locationLoading}
+          disabled={busy}
         >
           {busy ? "Posting..." : "Post Job"}
         </button>

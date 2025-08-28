@@ -1,10 +1,14 @@
 'use client';
 import { useState } from 'react';
 import { mutate } from 'swr';
-import PHCascade from '@/components/location/PHCascade';
+import LocationSelect, { LocationValue } from '@/components/location/LocationSelect';
 import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 
-interface Loc { region?: string; province?: string; city?: string }
+interface Loc {
+  regionCode?: string | null;
+  provinceCode?: string | null;
+  cityCode?: string | null;
+}
 
 function validate(form: { title: string; description: string; loc: Loc }) {
   const errors: Record<string, string> = {};
@@ -15,17 +19,17 @@ function validate(form: { title: string; description: string; loc: Loc }) {
     errors.description = 'Description too short';
   }
   const NCR = '130000000';
-  if (!form.loc.region) errors.region = 'Region required';
-  if (form.loc.region && form.loc.region !== NCR && !form.loc.province)
+  if (!form.loc.regionCode) errors.region = 'Region required';
+  if (form.loc.regionCode && form.loc.regionCode !== NCR && !form.loc.provinceCode)
     errors.province = 'Province required';
-  if (!form.loc.city) errors.city = 'City required';
+  if (!form.loc.cityCode) errors.city = 'City required';
   return errors;
 }
 
 export default function NewJobForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [loc, setLoc] = useState<Loc>({});
+  const [loc, setLoc] = useState<Loc>({ regionCode: null, provinceCode: null, cityCode: null });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -48,9 +52,9 @@ export default function NewJobForm() {
         body: JSON.stringify({
           title,
           description,
-          region_code: loc.region,
-          province_code: loc.province ?? null,
-          city_code: loc.city,
+          region_code: loc.regionCode,
+          province_code: loc.provinceCode ?? null,
+          city_code: loc.cityCode,
         }),
       });
       if (res.ok) {
@@ -114,13 +118,7 @@ export default function NewJobForm() {
           </p>
         )}
       </div>
-      <PHCascade
-        value={loc}
-        onChange={(v) => {
-          setLoc(v);
-        }}
-        required
-      />
+      <LocationSelect value={loc as LocationValue} onChange={(v) => setLoc(v)} />
       {errors.region && (
         <p className="text-sm text-red-600" aria-live="polite">
           {errors.region}
