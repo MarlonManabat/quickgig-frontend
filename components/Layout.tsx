@@ -76,7 +76,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-brand-bg text-brand">
+    <div data-testid="page-root" className="min-h-screen flex flex-col bg-brand-bg text-brand">
       <header
         data-app-header="true"
         data-testid="app-header"

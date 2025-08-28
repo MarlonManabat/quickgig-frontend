@@ -118,8 +118,8 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, requ
   // ---- employer posts job ----
   await test.step('open new job form', async () => {
     await page.goto(`${app}/jobs/new`);
-    await page.waitForURL('**/jobs/new');
     await waitForAppReady(page);
+    await page.waitForURL('**/jobs/new');
     await page.waitForSelector('[data-testid="job-form"]', { timeout: 20_000 });
   });
 
