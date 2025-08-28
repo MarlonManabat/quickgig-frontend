@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   staticPhData,
-  loadStaticPhData,
   Region,
   Province,
   City,
@@ -22,20 +21,35 @@ interface Props {
 
 const NCR_REGION_CODE = '130000000';
 const NCR_PROVINCE_CODE = 'NCR';
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const FALLBACK = {
+  regions: staticPhData.regions.filter((r) => r.region_code === NCR_REGION_CODE),
+  provinces: staticPhData.provinces.filter((p) => p.province_code === NCR_PROVINCE_CODE),
+  cities: staticPhData.cities.filter((c) => c.region_code === NCR_REGION_CODE),
+};
 
 export default function LocationSelect({ value, onChange, disabled, compact }: Props) {
-  const [regions, setRegions] = useState<Region[]>(staticPhData.regions);
-  const [provinces, setProvinces] = useState<Province[]>(staticPhData.provinces);
-  const [cities, setCities] = useState<City[]>(staticPhData.cities);
+  const [regions, setRegions] = useState<Region[]>(FALLBACK.regions);
+  const [provinces, setProvinces] = useState<Province[]>(FALLBACK.provinces);
+  const [cities, setCities] = useState<City[]>(FALLBACK.cities);
 
   useEffect(() => {
-    loadStaticPhData()
-      .then((d) => {
-        setRegions(d.regions);
-        setProvinces(d.provinces);
-        setCities(d.cities);
-      })
-      .catch(() => {});
+    (async () => {
+      try {
+        const [regions, provinces, cities] = await Promise.all([
+          fetch(`${BASE}/data/ph/regions.json`).then((r) => r.json()),
+          fetch(`${BASE}/data/ph/provinces.json`).then((r) => r.json()),
+          fetch(`${BASE}/data/ph/cities.json`).then((r) => r.json()),
+        ]);
+        setRegions(regions);
+        setProvinces(provinces);
+        setCities(cities);
+      } catch {
+        setRegions(FALLBACK.regions);
+        setProvinces(FALLBACK.provinces);
+        setCities(FALLBACK.cities);
+      }
+    })();
   }, []);
 
   // hydrate from API when available
