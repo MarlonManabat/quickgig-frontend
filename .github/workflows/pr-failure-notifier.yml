@@ -40,6 +40,7 @@ jobs:
 
             // Attempt to fetch first failing job logs and extract a short snippet
             let snippet = '';
+            let buildHint = false;
             if (failing.length) {
               try {
                 const firstFail = failing[0];
@@ -61,6 +62,12 @@ jobs:
                 if (idx >= 0) {
                   snippet = lines.slice(Math.max(0, idx - 2), idx + 3).join('\n').slice(0, 800);
                 }
+                const patterns = [
+                  /Cannot find module '.*\.json'/,
+                  /fs\.readFileSync is not a function/,
+                  /Module not found: Can't resolve 'fs'/
+                ];
+                buildHint = patterns.some(p => p.test(snippet));
               } catch (e) {
                 core.info(`Snippet extraction failed: ${e.message}`);
               }
@@ -72,6 +79,9 @@ jobs:
             }
             if (snippet) {
               body += `\n\n**First error snippet:**\n\`\`\`\n${snippet}\n\`\`\``;
+            }
+            if (buildHint) {
+              body += `\n\nPossible fix: move JSON to public/, enable resolveJsonModule in tsconfig, and replace fs usage with fetch.`;
             }
             body += `\n\n[View run logs](${run.html_url})`;
 

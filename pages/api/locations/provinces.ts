@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import provincesJson from '../../../public/data/ph/provinces.json';
 
 const NCR_REGION_CODE = '130000000';
 
@@ -16,20 +17,31 @@ export default async function handler(
     );
     return res.json([]);
   }
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-  const { data, error } = await supabase
-    .from('ph_provinces')
-    .select('code,name')
-    .eq('region_code', regionId)
-    .order('name');
-  if (error) return res.status(500).json({ error: error.message });
+
+  let rows: { id: string; name: string }[] | null = null;
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    );
+    const { data } = await supabase
+      .from('ph_provinces')
+      .select('code,name')
+      .eq('region_code', regionId)
+      .order('name');
+    if (data && data.length) rows = data.map((p) => ({ id: p.code, name: p.name }));
+  }
+
+  if (!rows || !rows.length) {
+    rows = (provincesJson as any[])
+      .filter((p: any) => p.region_code === regionId)
+      .map((p: any) => ({ id: p.province_code, name: p.province_name }));
+  }
+
   res.setHeader(
     'Cache-Control',
     'public, s-maxage=3600, stale-while-revalidate=21600'
   );
-  const provinces = (data ?? []).map((p) => ({ id: p.code, name: p.name }));
-  res.json(provinces);
+  res.json(rows);
 }

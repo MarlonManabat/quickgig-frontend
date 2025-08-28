@@ -3,9 +3,7 @@ import { createJob } from "@/lib/jobs";
 import { requireTicket } from "@/lib/tickets";
 import { useRequireUser } from "@/lib/useRequireUser";
 import LocationSelect, { LocationValue } from "@/components/location/LocationSelect";
-import regions from "../data/ph/regions.json";
-import provinces from "../data/ph/provinces.json";
-import cities from "../data/ph/cities.json";
+import { staticPhData } from "@/lib/ph-data";
 
 export default function PostJobPage() {
   const { ready, userId, timedOut } = useRequireUser();
@@ -21,11 +19,11 @@ export default function PostJobPage() {
   const [busy, setBusy] = useState(false);
 
   const regionName =
-    regions.find((r: any) => r.region_code === location.regionCode)?.region_name || "";
+    staticPhData.regions.find((r) => r.region_code === location.regionCode)?.region_name || "";
   const provinceName =
-    provinces.find((p: any) => p.province_code === location.provinceCode)?.province_name || "";
+    staticPhData.provinces.find((p) => p.province_code === location.provinceCode)?.province_name || "";
   const cityName =
-    cities.find((c: any) => c.city_code === location.cityCode)?.city_name || "";
+    staticPhData.cities.find((c) => c.city_code === location.cityCode)?.city_name || "";
 
   async function onSubmit(e: any) {
     e.preventDefault();

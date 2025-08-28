@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import regionsData from '../../data/ph/regions.json';
-import provincesData from '../../data/ph/provinces.json';
-import citiesData from '../../data/ph/cities.json';
+import {
+  staticPhData,
+  loadStaticPhData,
+  Region,
+  Province,
+  City,
+} from '@/lib/ph-data';
 
 export interface LocationValue {
   regionCode: string | null;
@@ -16,24 +20,23 @@ interface Props {
   compact?: boolean;
 }
 
-interface Region { region_code: string; region_name: string }
-interface Province { region_code: string; province_code: string; province_name: string }
-interface City {
-  region_code: string;
-  province_code: string;
-  city_code: string;
-  city_name: string;
-  is_city: boolean;
-  is_municipality: boolean;
-}
-
 const NCR_REGION_CODE = '130000000';
 const NCR_PROVINCE_CODE = 'NCR';
 
 export default function LocationSelect({ value, onChange, disabled, compact }: Props) {
-  const [regions, setRegions] = useState<Region[]>(regionsData as Region[]);
-  const [provinces, setProvinces] = useState<Province[]>(provincesData as Province[]);
-  const [cities, setCities] = useState<City[]>(citiesData as City[]);
+  const [regions, setRegions] = useState<Region[]>(staticPhData.regions);
+  const [provinces, setProvinces] = useState<Province[]>(staticPhData.provinces);
+  const [cities, setCities] = useState<City[]>(staticPhData.cities);
+
+  useEffect(() => {
+    loadStaticPhData()
+      .then((d) => {
+        setRegions(d.regions);
+        setProvinces(d.provinces);
+        setCities(d.cities);
+      })
+      .catch(() => {});
+  }, []);
 
   // hydrate from API when available
   useEffect(() => {
@@ -54,7 +57,7 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
       .then((rows) => {
         if (Array.isArray(rows) && rows.length) {
           const mapped = rows.map((p: any) => ({
-            region_code: value.regionCode,
+            region_code: value.regionCode!,
             province_code: p.id || p.code,
             province_name: p.name,
           }));
@@ -72,7 +75,7 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
         .then((rows) => {
           if (Array.isArray(rows) && rows.length) {
             const mapped = rows.map((c: any) => ({
-              region_code: value.regionCode,
+              region_code: value.regionCode!,
               province_code: NCR_PROVINCE_CODE,
               city_code: c.id || c.code,
               city_name: c.name,
@@ -91,7 +94,7 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
       .then((rows) => {
         if (Array.isArray(rows) && rows.length) {
           const mapped = rows.map((c: any) => ({
-            region_code: value.regionCode,
+            region_code: value.regionCode!,
             province_code: value.provinceCode!,
             city_code: c.id || c.code,
             city_name: c.name,

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import regions from '../data/ph/regions.json';
-import provinces from '../data/ph/provinces.json';
-import cities from '../data/ph/cities.json';
+import regions from '../public/data/ph/regions.json';
+import provinces from '../public/data/ph/provinces.json';
+import cities from '../public/data/ph/cities.json';
 
 async function run() {
   if (process.env.SEED !== 'true') {
