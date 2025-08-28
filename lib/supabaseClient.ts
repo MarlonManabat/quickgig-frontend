@@ -24,15 +24,3 @@ export function getSupabase(): ReturnType<typeof createClient> {
 }
 
 export const supabase = getSupabase();
-
-export function createServerClient(): ReturnType<typeof createClient> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-  if (!url || !key) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[supabase] env missing in CI/build — returning no-op client");
-    }
-    return {} as any;
-  }
-  return createClient(url, key, { auth: { persistSession: false } });
-}

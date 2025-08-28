@@ -1,21 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createClient } from "@supabase/supabase-js";
-import { env, requireServer } from "@/lib/env";
+import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const regionId = String(req.query.regionId ?? "");
-  if (!regionId) return res.status(400).json({ error: "regionId required" });
-  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
-  if (!key) return res.status(500).json([]);
-  const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
+  const province = String(req.query.province ?? '');
+  if (!province) return res.status(400).json({ error: 'province required' });
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const { data, error } = await supabase
-    .from("cities")
-    .select("id,name")
-    .eq("region_id", regionId)
-    .order("name");
+    .from('ph_cities')
+    .select('code,name')
+    .eq('province_code', province)
+    .order('name');
   if (error) return res.status(500).json({ error: error.message });
-  res.json(data ?? []);
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=86400, stale-while-revalidate=604800'
+  );
+  res.json({ cities: data ?? [] });
 }
