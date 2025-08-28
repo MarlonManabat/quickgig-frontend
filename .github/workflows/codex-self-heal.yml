@@ -1,0 +1,66 @@
+name: Codex Auto-Fix
+
+on:
+  workflow_run:
+    workflows: ["Release Check (PR smoke) / e2e_smoke (pull_request)"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  self-heal:
+    if: >
+      github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR metadata
+        id: pr
+        uses: potiuk/get-workflow-origin@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Exit if PR lacks codex label
+        run: |
+          echo "Checking labels…"
+          gh pr view ${{ steps.pr.outputs.pull_request_number }} --json labels -q '.labels[].name' | grep -q '^codex$' || {
+            echo "No codex label; skipping."; exit 78;
+          }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download failing run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          path: ./artifacts
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          fetch-depth: 0
+
+      - name: Discover Vercel preview URL
+        id: preview
+        run: |
+          url=$(gh pr view ${{ steps.pr.outputs.pull_request_number }} --json comments -q '.comments[].body' | grep -Eo '(https?://[^ ]+vercel\.app[^ ]*)' | head -n1 || true)
+          echo "url=${url}" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Invoke Codex Self-Heal
+        uses: openai/codex-self-heal@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          connector-id: ${{ secrets.CODEX_CONNECTOR_ID }}
+          mode: pr-self-heal
+          pr-number: ${{ steps.pr.outputs.pull_request_number }}
+          fail-job-name: "e2e_smoke"
+          artifacts-path: "./artifacts"
+          preview-url: ${{ steps.preview.outputs.url }}
+          commit-message-prefix: "codex: auto-fix"
+          max-edits: 5
