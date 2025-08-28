@@ -12,4 +12,4 @@ After a run the Playwright HTML report and media artifacts (screenshots, videos,
 
 ## Self-heal loop
 
-The `final-qa.yml` workflow triggers the Codex self-heal workflow whenever the QA run fails. The loop waits for a patch commit from **ChatGPT Codex Connector** and re-runs up to `MAX_HEAL_ROUNDS` (default `2`). Override by setting the `MAX_HEAL_ROUNDS` environment variable when dispatching the workflow.
+The `qa.yml` workflow triggers the Codex self-heal workflow whenever the QA run fails. The loop waits for a patch commit from **ChatGPT Codex Connector** and re-runs up to `MAX_HEAL_ROUNDS` (default `2`). Override by setting the `MAX_HEAL_ROUNDS` environment variable when dispatching the workflow.

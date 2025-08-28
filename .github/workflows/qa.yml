@@ -1,7 +1,8 @@
-name: Final QA
+name: Final QA (full)
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
     inputs:
       pr:
@@ -15,8 +16,9 @@ on:
         required: false
 
 permissions:
+  contents: write
   actions: write
-  contents: read
+  pull-requests: write
 
 jobs:
   qa:
@@ -58,16 +60,15 @@ jobs:
         run: echo "BASE_URL=${{ steps.preview.outputs.url }}" >> $GITHUB_ENV
 
       - name: Seed test data
+        shell: bash
         run: |
-          node - <<'NODE'
-          (async () => {
-            const res = await fetch(process.env.BASE_URL + '/api/test/seed', { method: 'POST' });
-            if (!res.ok) {
-              console.error('Seed failed', res.status);
-              process.exit(1);
-            }
-          })();
-          NODE
+          echo "Seeding test data at: ${BASE_URL}/api/test/seed"
+          code=$(curl -sS -o /tmp/seed.out -w "%{http_code}" \
+            -X POST "${BASE_URL}/api/test/seed" \
+            -H "Content-Type: application/json" \
+            --data '{}')
+          echo "Seed HTTP ${code}"
+          test "$code" -ge 200 -a "$code" -lt 300 || { echo "Seed failed:"; cat /tmp/seed.out; exit 1; }
 
       - name: Run smoke tests
         run: npx playwright test --project=smoke
@@ -99,29 +100,26 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Trigger self-heal
+      - name: Trigger self-heal (only if smoke failed)
         if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          FAILED_JOB_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          jq -n \
-            --arg previewUrl "${{ env.BASE_URL }}" \
-            --arg failedJobUrl "$FAILED_JOB_URL" \
-            --arg artifactsUrl "$FAILED_JOB_URL#artifacts" \
-            --arg branch "${{ github.head_ref || github.ref_name }}" \
-            --arg prNumber "${{ env.PR_NUMBER }}" \
-            '{previewUrl:$previewUrl,failedJobUrl:$failedJobUrl,artifactsUrl:$artifactsUrl,branch:$branch,prNumber:$prNumber, reason:"final-qa failed"}' > payload.json
-          if command -v gh >/dev/null 2>&1; then
-            gh workflow run codex-self-heal.yml -f payload=@payload.json
-          else
-            echo "gh not found"
-          fi
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: self_heal.yml
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          inputs: |
+            {
+              "failed_job_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "preview_url": "${{ steps.preview.outputs.url }}",
+              "base_url": "${{ env.BASE_URL }}",
+              "pr_number": "${{ github.event.pull_request.number }}"
+            }
 
       - name: Self-heal loop controller
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
           max=${MAX_HEAL_ROUNDS:-2}
           attempt=${ATTEMPT:-1}
@@ -130,16 +128,15 @@ jobs:
             echo "Self-heal rounds exhausted ($attempt/$max)"
             exit 1
           fi
-          head=$(gh pr view "$pr" --json commits --jq '.commits[-1].oid')
-          echo "Waiting for Codex commit on PR #$pr (head $head)"
+          head_sha="${{ github.event.pull_request.head.sha }}"
+          echo "Waiting for Codex commit on PR #${{ github.event.pull_request.number }} (head $head_sha)"
           for i in $(seq 1 30); do
-            sleep 10
-            latest=$(gh pr view "$pr" --json commits --jq '.commits[-1].oid')
-            author=$(gh pr view "$pr" --json commits --jq '.commits[-1].commit.author.name')
-            if [ "$latest" != "$head" ] && [ "$author" = "ChatGPT Codex Connector" ]; then
-              branch=$(gh pr view "$pr" --json headRefName --jq .headRefName)
-              echo "Detected new Codex commit $latest, re-running QA (attempt $((attempt+1)))"
-              gh workflow run final-qa.yml --ref "$branch" -f pr=$pr -f attempt=$((attempt+1))
+            sleep 60
+            new="$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r .head.sha)"
+            if [ "$new" != "$head_sha" ]; then
+              echo "Detected new commit from Codex: $new"
+              branch=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} | jq -r .head.ref)
+              gh workflow run qa.yml --ref "$branch" -f pr=$pr -f attempt=$((attempt+1))
               exit 0
             fi
           done
