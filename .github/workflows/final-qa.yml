@@ -2,20 +2,31 @@ name: Final QA
 
 on:
   pull_request:
-    branches: [ main ]
   workflow_dispatch:
+    inputs:
+      pr:
+        description: PR number
+        required: false
+      attempt:
+        description: Heal attempt
+        required: false
+      max_heal_rounds:
+        description: Max heal rounds override
+        required: false
 
 permissions:
   actions: write
   contents: read
 
 jobs:
-  e2e_smoke:
+  qa:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 60
     env:
       NODE_ENV: test
-
+      ATTEMPT: ${{ inputs.attempt || 1 }}
+      MAX_HEAL_ROUNDS: ${{ inputs.max_heal_rounds || 2 }}
+      PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +35,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
       - name: Install
         run: npm ci
@@ -34,7 +45,6 @@ jobs:
 
       - name: Resolve Vercel Preview URL
         id: preview
-        shell: bash
         run: |
           if [ -n "${PREVIEW_URL}" ]; then
             echo "url=${PREVIEW_URL}" >> "$GITHUB_OUTPUT"
@@ -44,56 +54,94 @@ jobs:
             echo "url=" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Show BASE_URL
-        run: echo "BASE_URL=${{ steps.preview.outputs.url }}"
+      - name: Export BASE_URL
+        run: echo "BASE_URL=${{ steps.preview.outputs.url }}" >> $GITHUB_ENV
+
+      - name: Seed test data
+        run: |
+          node - <<'NODE'
+          (async () => {
+            const res = await fetch(process.env.BASE_URL + '/api/test/seed', { method: 'POST' });
+            if (!res.ok) {
+              console.error('Seed failed', res.status);
+              process.exit(1);
+            }
+          })();
+          NODE
 
       - name: Run smoke tests
-        id: smoke
-        env:
-          BASE_URL: ${{ steps.preview.outputs.url }}
-        run: npm run test:smoke
+        run: npx playwright test --project=smoke
         continue-on-error: true
 
-      - name: Always collect smoke artifacts
+      - name: Move smoke report
         if: always()
-        id: upload_smoke_artifacts
+        run: mv playwright-report playwright-report-smoke || true
+
+      - name: Run QA tests
+        id: qa
+        run: npx playwright test --project=qa --retries=2 --timeout=60000
+        continue-on-error: true
+
+      - name: Move QA report
+        if: always()
+        run: mv playwright-report playwright-report-qa || true
+
+      - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: smoke-artifacts
+          name: qa-artifacts
           path: |
+            playwright-report-smoke/**
+            playwright-report-qa/**
             test-results/**
-            playwright-report/**
-            smoke-artifacts.zip
+            tests/qa/coverage.json
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Take QA screenshots (still try even if smoke failed)
-        if: always()
-        env:
-          BASE_URL: ${{ steps.preview.outputs.url }}
-        run: npm run qa:screens || true
-
-      - name: Upload QA screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: qa-screens
-          path: test-results/screens/**
-          if-no-files-found: ignore
-          retention-days: 7
-
-      - name: Trigger self-heal (only if smoke failed)
+      - name: Trigger self-heal
         if: failure()
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: codex-self-heal.yml
-          ref: ${{ github.head_ref || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          inputs: >-
-            ${{ toJSON({
-              previewUrl: steps.preview.outputs.url || env.BASE_URL,
-              artifactUrl: steps.upload_smoke_artifacts.outputs['artifact-url'] || steps.upload_smoke_artifacts.outputs.artifact_url,
-              prNumber: github.event.pull_request.number,
-              runId: github.run_id,
-              repo: github.repository
-            }) }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FAILED_JOB_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          jq -n \
+            --arg previewUrl "${{ env.BASE_URL }}" \
+            --arg failedJobUrl "$FAILED_JOB_URL" \
+            --arg artifactsUrl "$FAILED_JOB_URL#artifacts" \
+            --arg branch "${{ github.head_ref || github.ref_name }}" \
+            --arg prNumber "${{ env.PR_NUMBER }}" \
+            '{previewUrl:$previewUrl,failedJobUrl:$failedJobUrl,artifactsUrl:$artifactsUrl,branch:$branch,prNumber:$prNumber, reason:"final-qa failed"}' > payload.json
+          if command -v gh >/dev/null 2>&1; then
+            gh workflow run codex-self-heal.yml -f payload=@payload.json
+          else
+            echo "gh not found"
+          fi
+
+      - name: Self-heal loop controller
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          max=${MAX_HEAL_ROUNDS:-2}
+          attempt=${ATTEMPT:-1}
+          pr=${PR_NUMBER}
+          if [ "$attempt" -ge "$max" ]; then
+            echo "Self-heal rounds exhausted ($attempt/$max)"
+            exit 1
+          fi
+          head=$(gh pr view "$pr" --json commits --jq '.commits[-1].oid')
+          echo "Waiting for Codex commit on PR #$pr (head $head)"
+          for i in $(seq 1 30); do
+            sleep 10
+            latest=$(gh pr view "$pr" --json commits --jq '.commits[-1].oid')
+            author=$(gh pr view "$pr" --json commits --jq '.commits[-1].commit.author.name')
+            if [ "$latest" != "$head" ] && [ "$author" = "ChatGPT Codex Connector" ]; then
+              branch=$(gh pr view "$pr" --json headRefName --jq .headRefName)
+              echo "Detected new Codex commit $latest, re-running QA (attempt $((attempt+1)))"
+              gh workflow run final-qa.yml --ref "$branch" -f pr=$pr -f attempt=$((attempt+1))
+              exit 0
+            fi
+          done
+          echo "No new Codex commit found."
+          exit 1
