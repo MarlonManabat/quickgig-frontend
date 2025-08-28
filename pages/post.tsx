@@ -58,7 +58,7 @@ export default function PostJobPage() {
   return (
     <main className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Post a Job</h1>
-      <form onSubmit={onSubmit} className="space-y-3">
+      <form onSubmit={onSubmit} className="space-y-3" data-testid="job-form">
         <input
           className="w-full border rounded p-2"
           placeholder="Job title"

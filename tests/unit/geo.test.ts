@@ -36,11 +36,11 @@ test('fetchRegions supabase success', async () => {
       called++;
       if (String(url).startsWith('https://sb')) {
         return new Response(
-          JSON.stringify([{ id: 'A', code: 'A', name: 'Region A' }]),
+          JSON.stringify([{ code: 'A', name: 'Region A' }]),
           { status: 200 }
         );
       }
-      return new Response('[]', { status: 200 });
+      return new Response(JSON.stringify({ regions: [] }), { status: 200 });
     }) as any;
   const regions = await fetchRegions();
   assert.equal(regions[0].name, 'Region A');
@@ -58,12 +58,12 @@ test('fetchRegions falls back to api then static', async () => {
     if (String(url).includes('/geo/ph/regions.json')) {
       return new Response(
         JSON.stringify([
-          { id: 'NCR', code: 'NCR', name: 'National Capital Region' },
+          { code: 'NCR', name: 'National Capital Region' },
         ]),
         { status: 200 },
       );
     }
-    return new Response('[]', { status: 200 });
+    return new Response(JSON.stringify({ regions: [] }), { status: 200 });
   }) as any;
   const regions = await fetchRegions();
   assert.equal(regions[0].id, 'NCR');

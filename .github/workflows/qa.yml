@@ -76,6 +76,33 @@ jobs:
         if: always()
         run: mv playwright-report playwright-report-smoke || true
 
+      - name: Check PH locations health
+        id: lochealth
+        run: |
+          resp=$(curl -fsSL "$BASE_URL/api/locations/health")
+          echo "$resp"
+          ok=$(echo "$resp" | jq -r '.ok')
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch location self-heal
+        if: steps.lochealth.outputs.ok != 'true'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: self_heal
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          inputs: |
+            {
+              "previewUrl": "${{ steps.preview.outputs.url }}",
+              "failureCategory": "locations",
+              "prNumber": "${{ github.event.pull_request.number }}",
+              "headSha": "${{ github.event.pull_request.head.sha }}"
+            }
+
+      - name: Fail for bad location health
+        if: steps.lochealth.outputs.ok != 'true'
+        run: exit 1
+
       - name: Run QA tests
         id: qa
         run: npx playwright test --project=qa --retries=2 --timeout=60000
@@ -99,22 +126,22 @@ jobs:
           retention-days: 7
 
       - name: Trigger self-heal (only if smoke failed)
-        if: failure()
+        if: failure() && steps.lochealth.outputs.ok == 'true'
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: self_heal  # must match file name in .github/workflows (without .yml)
+          workflow: self_heal
           ref: ${{ github.head_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
           inputs: |
             {
-              "failed_job_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-              "preview_url": "${{ steps.preview.outputs.url }}",
-              "base_url": "${{ env.BASE_URL }}",
-              "pr_number": "${{ github.event.pull_request.number }}"
+              "previewUrl": "${{ steps.preview.outputs.url }}",
+              "failureCategory": "qa",
+              "prNumber": "${{ github.event.pull_request.number }}",
+              "headSha": "${{ github.event.pull_request.head.sha }}"
             }
 
       - name: Self-heal loop controller
-        if: failure()
+        if: failure() && steps.lochealth.outputs.ok == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash

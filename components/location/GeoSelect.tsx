@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   fetchRegions,
   fetchProvinces,
@@ -31,6 +31,8 @@ export default function GeoSelect({
   const [loadingRegions, setLoadingRegions] = useState(true);
   const [loadingProvinces, setLoadingProvinces] = useState(false);
   const [loadingCities, setLoadingCities] = useState(false);
+  const [cityWarning, setCityWarning] = useState(false);
+  const cityRetry = useRef(false);
 
   const regionId = value.region?.id || '';
   const provinceId = value.province?.id || '';
@@ -76,21 +78,42 @@ export default function GeoSelect({
     if (!provinceId) {
       setCities([]);
       if (value.city) onChange({ ...value, city: null });
+      setCityWarning(false);
+      cityRetry.current = false;
       return;
     }
-    setLoadingCities(true);
-    onLoadingChange?.(true);
-    fetchCities(provinceId)
-      .then((data) => {
+    let cancelled = false;
+    async function load() {
+      setLoadingCities(true);
+      onLoadingChange?.(true);
+      try {
+        const data = await fetchCities(provinceId);
+        if (cancelled) return;
         setCities(data);
         if (!data.find((c) => c.id === cityId))
           onChange({ region: value.region, province: value.province, city: null });
-      })
-      .catch(() => setCities([]))
-      .finally(() => {
-        setLoadingCities(false);
-      });
-  }, [provinceId]);
+        const isNCR =
+          value.region?.name === 'National Capital Region' &&
+          value.province?.name === 'Metro Manila';
+        if (isNCR && data.length < 5 && !cityRetry.current) {
+          setCityWarning(true);
+          cityRetry.current = true;
+          setTimeout(load, 500);
+          return;
+        }
+        if (isNCR && data.length < 5) setCityWarning(true);
+        else setCityWarning(false);
+      } catch {
+        if (!cancelled) setCities([]);
+      } finally {
+        if (!cancelled) setLoadingCities(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [provinceId, value.region, value.province]);
 
   useEffect(() => {
     const loading = loadingRegions || loadingProvinces || loadingCities;
@@ -98,7 +121,8 @@ export default function GeoSelect({
   }, [loadingRegions, loadingProvinces, loadingCities, onLoadingChange]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
       <select
         data-testid="region-select"
         className="border rounded p-2"
@@ -170,6 +194,12 @@ export default function GeoSelect({
           </option>
         ))}
       </select>
-    </div>
+      </div>
+      {cityWarning && (
+        <p className="text-xs text-orange-600" aria-live="polite">
+          City list incomplete. Retrying…
+        </p>
+      )}
+    </>
   );
 }

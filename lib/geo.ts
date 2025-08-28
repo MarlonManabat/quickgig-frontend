@@ -54,22 +54,30 @@ async function loadStaticJSON<T>(path: string): Promise<T> {
 
 function validateRegions(data: any): Region[] {
   return Array.isArray(data)
-    ? data.filter((r: any) => r && typeof r.id === 'string' && typeof r.code === 'string' && typeof r.name === 'string')
+    ? data
+        .filter(
+          (r: any) => r && typeof r.code === 'string' && typeof r.name === 'string',
+        )
+        .map((r: any) => ({ id: r.code, code: r.code, name: r.name }))
     : [];
 }
 
 function validateProvinces(data: any, regionCode: string): Province[] {
   const rows = Array.isArray(data)
-    ? data.filter((p: any) => p && typeof p.id === 'string' && typeof p.name === 'string' && typeof p.regionCode === 'string')
+    ? data.filter(
+        (p: any) => p && typeof p.code === 'string' && typeof p.name === 'string',
+      )
     : [];
-  return rows.filter((p) => p.regionCode === regionCode);
+  return rows.map((p: any) => ({ id: p.code, name: p.name, regionCode }));
 }
 
 function validateCities(data: any, provinceId: string): City[] {
   const rows = Array.isArray(data)
-    ? data.filter((c: any) => c && typeof c.id === 'string' && typeof c.name === 'string' && typeof c.provinceId === 'string')
+    ? data.filter(
+        (c: any) => c && typeof c.code === 'string' && typeof c.name === 'string',
+      )
     : [];
-  return rows.filter((c) => c.provinceId === provinceId);
+  return rows.map((c: any) => ({ id: c.code, name: c.name, provinceId }));
 }
 
 export async function fetchRegions(opts?: { signal?: AbortSignal }): Promise<Region[]> {
@@ -77,7 +85,7 @@ export async function fetchRegions(opts?: { signal?: AbortSignal }): Promise<Reg
   // Supabase
   try {
     const data = await withTimeout(
-      fetchSupabase('regions?select=id,code,name&order=name', signal),
+      fetchSupabase('ph_regions?select=code,name&order=name', signal),
       2500,
       'regions supabase',
     );
@@ -89,11 +97,11 @@ export async function fetchRegions(opts?: { signal?: AbortSignal }): Promise<Reg
   // API
   try {
     const res = await withTimeout(
-      fetch('/api/geo/regions', { signal }).then((r) => r.json()),
+      fetch('/api/locations/regions', { signal }).then((r) => r.json()),
       2500,
       'regions api',
     );
-    const rows = validateRegions(res);
+    const rows = validateRegions(res.regions);
     if (rows.length) return rows;
   } catch (err) {
     warnOnce('api regions', err);
@@ -107,13 +115,18 @@ export async function fetchRegions(opts?: { signal?: AbortSignal }): Promise<Reg
   return validateRegions(data);
 }
 
-export async function fetchProvinces(regionCode: string, opts?: { signal?: AbortSignal }): Promise<Province[]> {
+export async function fetchProvinces(
+  regionCode: string,
+  opts?: { signal?: AbortSignal },
+): Promise<Province[]> {
   const signal = opts?.signal;
   // Supabase
   try {
     const data = await withTimeout(
       fetchSupabase(
-        `provinces?select=id,name,regionCode&regionCode=eq.${encodeURIComponent(regionCode)}&order=name`,
+        `ph_provinces?select=code,name,region_code&region_code=eq.${encodeURIComponent(
+          regionCode,
+        )}&order=name`,
         signal,
       ),
       2500,
@@ -127,11 +140,13 @@ export async function fetchProvinces(regionCode: string, opts?: { signal?: Abort
   // API
   try {
     const res = await withTimeout(
-      fetch(`/api/geo/provinces?regionCode=${regionCode}`, { signal }).then((r) => r.json()),
+      fetch(`/api/locations/provinces?region=${regionCode}`, { signal }).then((r) =>
+        r.json(),
+      ),
       2500,
       'provinces api',
     );
-    const rows = validateProvinces(res, regionCode);
+    const rows = validateProvinces(res.provinces, regionCode);
     if (rows.length) return rows;
   } catch (err) {
     warnOnce('api provinces', err);
@@ -145,13 +160,18 @@ export async function fetchProvinces(regionCode: string, opts?: { signal?: Abort
   return validateProvinces(data, regionCode);
 }
 
-export async function fetchCities(provinceId: string, opts?: { signal?: AbortSignal }): Promise<City[]> {
+export async function fetchCities(
+  provinceId: string,
+  opts?: { signal?: AbortSignal },
+): Promise<City[]> {
   const signal = opts?.signal;
   // Supabase
   try {
     const data = await withTimeout(
       fetchSupabase(
-        `cities?select=id,name,provinceId&provinceId=eq.${encodeURIComponent(provinceId)}&order=name`,
+        `ph_cities?select=code,name,province_code&province_code=eq.${encodeURIComponent(
+          provinceId,
+        )}&order=name`,
         signal,
       ),
       2500,
@@ -165,11 +185,13 @@ export async function fetchCities(provinceId: string, opts?: { signal?: AbortSig
   // API
   try {
     const res = await withTimeout(
-      fetch(`/api/geo/cities?provinceId=${provinceId}`, { signal }).then((r) => r.json()),
+      fetch(`/api/locations/cities?province=${provinceId}`, { signal }).then((r) =>
+        r.json(),
+      ),
       2500,
       'cities api',
     );
-    const rows = validateCities(res, provinceId);
+    const rows = validateCities(res.cities, provinceId);
     if (rows.length) return rows;
   } catch (err) {
     warnOnce('api cities', err);
