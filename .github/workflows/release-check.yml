@@ -26,6 +26,14 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm run build
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            .next/**/*.html
+            **/playwright-report/**
 
   e2e_smoke:
     needs: build
@@ -47,9 +55,11 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps
       - run: npm run test:smoke
-      - name: Upload smoke report
+      - name: Upload smoke artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-smoke
-          path: playwright-report/**
+          name: smoke-artifacts
+          path: |
+            test-results/**
+            playwright-report/**
