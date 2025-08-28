@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-let seeded = false;
+
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
-  if (process.env.NODE_ENV === 'production') return res.status(404).end();
-  seeded = true;
-  res.json({ ok: true, seeded });
+  if (process.env.VERCEL_ENV !== 'preview' && process.env.CI !== 'true') {
+    return res.status(403).json({ ok: false, error: 'disabled' });
+  }
+  return res.status(200).json({ ok: true });
 }
