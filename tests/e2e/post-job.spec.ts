@@ -70,7 +70,7 @@ test('@full post job flow', async ({ page }) => {
   await loginAs(page, 'employer');
 
   // Happy path
-  await page.goto(`${app}/jobs/new`);
+  await page.goto(`${app}/post`);
   await page.fill('[data-testid=txt-title]', 'Test Job');
   await page.fill(
     '[data-testid=txt-description]',
@@ -84,12 +84,12 @@ test('@full post job flow', async ({ page }) => {
   await expect(page.getByTestId('credits-pill')).toHaveText('Credits: 0');
 
   // No credits gate
-  await page.goto(`${app}/jobs/new`);
+  await page.goto(`${app}/post`);
   await expect(page.getByText('You have 0 credits')).toBeVisible();
 
   // Validation: short title / missing city
   credits = 1;
-  await page.goto(`${app}/jobs/new`);
+  await page.goto(`${app}/post`);
   await page.fill('[data-testid=txt-title]', 'no');
   await page.fill(
     '[data-testid=txt-description]',
@@ -101,7 +101,7 @@ test('@full post job flow', async ({ page }) => {
   await expect(page.getByTestId('btn-submit')).toBeDisabled();
 
   // NCR flow
-  await page.goto(`${app}/jobs/new`);
+  await page.goto(`${app}/post`);
   await page.fill('[data-testid=txt-title]', 'Another Job');
   await page.fill(
     '[data-testid=txt-description]',

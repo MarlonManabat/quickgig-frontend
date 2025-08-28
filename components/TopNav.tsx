@@ -34,7 +34,7 @@ export default function TopNav() {
           QuickGig.ph
         </Link>
         <div className="ml-auto flex items-center gap-4 text-sm">
-          <Link href="/find?focus=search" data-testid="nav-find">
+          <Link href="/search" data-testid="nav-find">
             {copy.nav.findWork}
           </Link>
           {loggedIn && <Link href="/dashboard/gigs">{copy.nav.myGigs}</Link>}
@@ -50,7 +50,7 @@ export default function TopNav() {
             </Link>
           )}
           <Link
-            href="/post?intent=employer"
+            href="/post"
             data-testid="nav-post"
             className={`btn-primary ${loggedIn && !eligible ? "opacity-50 pointer-events-none" : ""}`}
             title={

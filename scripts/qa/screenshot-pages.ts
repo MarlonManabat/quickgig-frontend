@@ -6,7 +6,7 @@ const BASE = (process.env.BASE_URL ?? "http://localhost:3000").replace(/\/$/, ""
 type PageSpec = { path: string; waitFor: string; file: string };
 const pages: PageSpec[] = [
   { path: "/", waitFor: "[data-testid=app-header]", file: "home.png" },
-  { path: "/jobs/new", waitFor: "[data-testid=job-form]", file: "jobs-new.png" },
+  { path: "/post", waitFor: "[data-testid=job-form]", file: "jobs-new.png" },
   { path: "/jobs", waitFor: "[data-testid=jobs-list]", file: "jobs-list.png" },
   {
     path: "/applications",

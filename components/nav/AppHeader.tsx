@@ -49,18 +49,18 @@ export default function AppHeader() {
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
           {!user && (
             <>
-              <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
-              <Link href="/jobs/new" data-testid="nav-post">Post job</Link>
+              <Link href="/search" data-testid="nav-find">Find work</Link>
+              <Link href="/post" data-testid="nav-post">Post job</Link>
               <Link href="/login" data-testid="nav-login">Login</Link>
             </>
           )}
           {user && role === "worker" && (
-            <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
+            <Link href="/search" data-testid="nav-find">Find work</Link>
           )}
           {user && role === "employer" && (
             <>
-              <Link href="/jobs/new" data-testid="nav-post">Post job</Link>
-              <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
+              <Link href="/post" data-testid="nav-post">Post job</Link>
+              <Link href="/search" data-testid="nav-find">Find work</Link>
             </>
           )}
           {user && role === "employer" && credits !== undefined && (
@@ -92,14 +92,14 @@ export default function AppHeader() {
             {!user && (
               <>
                 <Link
-                  href="/find?focus=search"
+                  href="/search"
                   className="py-2"
                   data-testid="nav-find"
                 >
                   Find work
                 </Link>
                 <Link
-                  href="/jobs/new"
+                  href="/post"
                   className="py-2"
                   data-testid="nav-post"
                 >
@@ -111,16 +111,16 @@ export default function AppHeader() {
               </>
             )}
             {user && role === "worker" && (
-              <Link href="/find?focus=search" className="py-2" data-testid="nav-find">
+              <Link href="/search" className="py-2" data-testid="nav-find">
                 Find work
               </Link>
             )}
             {user && role === "employer" && (
               <>
-                <Link href="/jobs/new" className="py-2" data-testid="nav-post">
+                <Link href="/post" className="py-2" data-testid="nav-post">
                   Post job
                 </Link>
-                <Link href="/find?focus=search" className="py-2" data-testid="nav-find">
+                <Link href="/search" className="py-2" data-testid="nav-find">
                   Find work
                 </Link>
               </>
