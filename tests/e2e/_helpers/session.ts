@@ -11,6 +11,30 @@ export async function seedBasic(request: APIRequestContext) {
 }
 
 export async function waitForAppReady(page: Page) {
-  await page.waitForSelector('[data-testid="app-header"]', { state: 'visible' });
-  await page.waitForSelector('main', { state: 'attached' });
+  const headerSel = '[data-testid="app-header"]';
+  const mainSel = 'main';
+  const deadline = Date.now() + 30_000;
+  let attempt = 0;
+  let reloaded = false;
+
+  while (Date.now() < deadline) {
+    try {
+      const remaining = deadline - Date.now();
+      const timeout = Math.min(20_000, remaining);
+      await page.waitForSelector(headerSel, { state: 'visible', timeout });
+      await page.waitForSelector(mainSel, { state: 'attached', timeout });
+      return;
+    } catch (err) {
+      attempt += 1;
+      console.warn(`waitForAppReady retry ${attempt}`, err);
+      if (!reloaded) {
+        reloaded = true;
+        console.warn('waitForAppReady: reload page');
+        await page.reload();
+      }
+      const delay = Math.min(500 * 2 ** (attempt - 1), 5_000);
+      await page.waitForTimeout(delay);
+    }
+  }
+  throw new Error('waitForAppReady: timed out after 30s');
 }

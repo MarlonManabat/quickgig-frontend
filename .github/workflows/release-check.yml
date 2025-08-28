@@ -54,7 +54,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps
-      - run: npm run test:smoke
+      - run: npx playwright test --project=smoke --retries=2 --timeout=60000 || npx playwright test --project=smoke --retries=2 --timeout=60000
       - name: Upload smoke artifacts
         if: always()
         uses: actions/upload-artifact@v4

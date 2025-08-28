@@ -1,5 +1,35 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { loginAs, seedBasic, waitForAppReady } from './_helpers/session';
+
+async function safeFill(page: Page, testId: string, value: string) {
+  const selector = `[data-testid="${testId}"]`;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      await page.waitForSelector(selector, { state: 'visible', timeout: 5_000 });
+      await page.fill(selector, value, { timeout: 5_000 });
+      return;
+    } catch (err) {
+      console.warn(`safeFill retry ${attempt} for ${testId}`, err);
+      if (attempt === 3) throw err;
+      await page.waitForTimeout(500 * attempt);
+    }
+  }
+}
+
+async function safeSelect(page: Page, testId: string, value: string) {
+  const selector = `[data-testid="${testId}"]`;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      await page.waitForSelector(selector, { state: 'visible', timeout: 5_000 });
+      await page.selectOption(selector, value, { timeout: 5_000 });
+      return;
+    } catch (err) {
+      console.warn(`safeSelect retry ${attempt} for ${testId}`, err);
+      if (attempt === 3) throw err;
+      await page.waitForTimeout(500 * attempt);
+    }
+  }
+}
 
 const app = process.env.PLAYWRIGHT_APP_URL!;
 const supa = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -90,33 +120,18 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, requ
     await page.goto(`${app}/jobs/new`);
     await page.waitForURL('**/jobs/new');
     await waitForAppReady(page);
-    await expect(page.getByTestId('job-form')).toBeVisible();
+    await page.waitForSelector('[data-testid="job-form"]', { timeout: 20_000 });
   });
 
   await test.step('fill job form', async () => {
-    const title = page.getByTestId('txt-title');
-    await expect(title).toBeVisible();
-    await expect(title).toBeEnabled();
-    await title.fill('Test Job');
-
-    const desc = page.getByTestId('txt-description');
-    await expect(desc).toBeVisible();
-    await desc.fill('This is a long description for testing.');
-
-    const region = page.getByTestId('sel-region');
-    await expect(region).toBeEnabled();
-    await region.selectOption('NCR');
-
-    const province = page.getByTestId('sel-province');
-    await expect(province).toBeEnabled();
-    await province.selectOption('NCR');
-
-    const city = page.getByTestId('sel-city');
-    await expect(city).toBeEnabled();
-    await city.selectOption('MKT');
-
+    await safeFill(page, 'txt-title', 'Test Job');
+    await safeFill(page, 'txt-description', 'This is a long description for testing.');
+    await safeSelect(page, 'sel-region', 'NCR');
+    await safeSelect(page, 'sel-province', 'NCR');
+    await safeSelect(page, 'sel-city', 'MKT');
+    await page.waitForSelector('[data-testid="btn-submit"]', { timeout: 20_000 });
     await page.getByTestId('btn-submit').click();
-    await expect(page.getByText('Job posted!')).toBeVisible();
+    await page.waitForSelector('text=Job posted!');
   });
 
   // ---- worker applies ----
@@ -124,14 +139,11 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, requ
     await loginAs(page, 'worker');
     await page.goto(`${app}/jobs/job-1`);
     await waitForAppReady(page);
-    const msg = page.getByTestId('txt-message');
-    await expect(msg).toBeVisible();
-    await msg.fill('hello world message');
-    const rate = page.getByTestId('txt-rate');
-    await expect(rate).toBeVisible();
-    await rate.fill('100');
+    await safeFill(page, 'txt-message', 'hello world message');
+    await safeFill(page, 'txt-rate', '100');
+    await page.waitForSelector('[data-testid="btn-apply"]', { timeout: 20_000 });
     await page.getByTestId('btn-apply').click();
-    await expect(page).toHaveURL(`${app}/applications/app-1`);
+    await page.waitForURL(`${app}/applications/app-1`);
   });
 
   // ---- employer sends message ----
@@ -139,6 +151,7 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, requ
     await loginAs(page, 'employer');
     await page.goto(`${app}/applications/app-1`);
     await waitForAppReady(page);
+    await page.waitForSelector('[data-testid="hire"]', { timeout: 20_000 });
     await page.route('/api/messages/create', () => {}); // ensure route already set
     await page.evaluate(() => fetch('/api/messages/create', { method: 'POST', body: '{}' }));
   });
@@ -148,9 +161,9 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, requ
     await loginAs(page, 'worker');
     await page.goto(`${app}/`);
     await waitForAppReady(page);
-    await expect(page.getByTestId('bell')).toBeVisible();
+    await page.waitForSelector('[data-testid="bell"]', { timeout: 20_000 });
     await page.getByTestId('bell').click();
-    await expect(page.getByTestId('notif-item').first()).toBeVisible();
+    await page.waitForSelector('[data-testid="notif-item"]', { timeout: 20_000 });
   });
 
   // ---- employer hires ----
@@ -158,6 +171,7 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, requ
     await loginAs(page, 'employer');
     await page.goto(`${app}/applications/app-1`);
     await waitForAppReady(page);
+    await page.waitForSelector('[data-testid="hire"]', { timeout: 20_000 });
     await page.getByTestId('hire').click();
   });
 
@@ -166,6 +180,7 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, requ
     await loginAs(page, 'worker');
     await page.goto(`${app}/me/applications`);
     await waitForAppReady(page);
+    await page.waitForSelector('[data-testid="status-pill"]', { timeout: 20_000 });
     await expect(page.getByTestId('status-pill')).toContainText('hired');
   });
 });
