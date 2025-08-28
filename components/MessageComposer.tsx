@@ -12,6 +12,7 @@ export default function MessageComposer({
 }) {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const disabled = sending || text.trim().length === 0 || text.length > 4000;
   async function send() {
     if (!text.trim()) return;
     setSending(true);
@@ -45,7 +46,7 @@ export default function MessageComposer({
       <button
         data-testid="chat-send"
         onClick={send}
-        disabled={sending}
+        disabled={disabled}
         className="btn-primary px-4 py-2 rounded"
       >
         Send
