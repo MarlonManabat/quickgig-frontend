@@ -15,7 +15,8 @@ export default async function handler(
       'Cache-Control',
       'public, s-maxage=3600, stale-while-revalidate=21600'
     );
-    return res.json([]);
+    // NCR is treated as a single province "Metro Manila"
+    return res.json([{ id: 'NCR', name: 'Metro Manila' }]);
   }
 
   let rows: { id: string; name: string }[] | null = null;
