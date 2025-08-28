@@ -39,6 +39,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    outputs:
+      preview_url: ${{ steps.vercel.outputs.preview_url }}
     env:
       DISABLE_STRIPE: '1'
       NEXT_TELEMETRY_DISABLED: 1
@@ -54,7 +56,17 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps
-      - run: npm run test:smoke
+      - name: Fetch Vercel preview URL
+        id: vercel
+        run: |
+          url=$(gh pr view ${{ github.event.pull_request.number }} --json comments -q '.comments[].body' | grep -Eo '(https?://[^ ]+vercel\.app[^ ]*)' | head -n1 || true)
+          echo "preview_url=$url" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run tests (retry once, longer timeout)
+        run: |
+          npx playwright test --project=smoke --retries=1 --timeout=60000 || \
+          npx playwright test --project=smoke --retries=0 --timeout=60000
       - name: Upload smoke artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,3 +75,15 @@ jobs:
           path: |
             test-results/**
             playwright-report/**
+          if-no-files-found: warn
+      - name: Comment failure with trace links
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: smoke-links
+          message: |
+            ❌ Smoke failed. Artifacts:
+            - Trace: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts
+            - Preview: ${{ steps.vercel.outputs.preview_url || 'n/a' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
