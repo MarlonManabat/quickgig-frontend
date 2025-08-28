@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { loginAs, seedBasic, waitForAppReady } from './_helpers/session';
+import { loginAs, seedBasic, waitForAppReady, ensureOnJobsNew } from './_helpers/session';
 
 async function safeFill(page: Page, testId: string, value: string) {
   const selector = `[data-testid="${testId}"]`;
@@ -117,17 +117,32 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, requ
 
   // ---- employer posts job ----
   await test.step('open new job form', async () => {
-    await page.goto(`${app}/jobs/new`);
-    await waitForAppReady(page);
-    await page.waitForURL('**/jobs/new');
-    await page.waitForSelector('[data-testid="job-form"]', { timeout: 20_000 });
+    await ensureOnJobsNew(page);
+
+    const haveRegion = page.locator('[data-testid=sel-region]');
+    const haveProvince = page.locator('[data-testid=sel-province]');
+    await haveRegion.waitFor({ state: 'visible', timeout: 15_000 });
+    await haveProvince.waitFor({ state: 'visible', timeout: 15_000 });
   });
 
   await test.step('fill job form', async () => {
     await safeFill(page, 'txt-title', 'Test Job');
     await safeFill(page, 'txt-description', 'This is a long description for testing.');
+
+    await page.waitForFunction(
+      (sel) => !!document.querySelector(sel)?.querySelector('option'),
+      '[data-testid=sel-region]',
+      { timeout: 15_000 },
+    );
     await safeSelect(page, 'sel-region', 'NCR');
+
+    await page.waitForFunction(
+      (sel) => !!document.querySelector(sel)?.querySelector('option'),
+      '[data-testid=sel-province]',
+      { timeout: 15_000 },
+    );
     await safeSelect(page, 'sel-province', 'NCR');
+
     await safeSelect(page, 'sel-city', 'MKT');
     await page.waitForSelector('[data-testid="btn-submit"]', { timeout: 20_000 });
     await page.getByTestId('btn-submit').click();
