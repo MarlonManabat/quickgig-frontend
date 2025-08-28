@@ -37,6 +37,26 @@ Workers can apply to open jobs once.
 - Workers can read their own applications.
 - Employers can read applications for their jobs.
 
-## Closing a job
+## Application lifecycle
 
-Set `is_closed` to `true` in the `jobs` table to prevent new applications.
+`submitted` → `accepted` / `declined` → (future `withdrawn`).
+
+## Employer actions
+
+From the job detail page, employers can review each application and set it to
+**accepted** or **declined**. They may also close the job, which sets
+`is_closed=true` and prevents new applications.
+
+## Notifications
+
+When an employer updates an application status, a notification is created for
+the worker:
+
+```json
+{
+  "type": "application_status",
+  "title": "Application status updated",
+  "body": "Your application was accepted.",
+  "link": "/applications/<id>"
+}
+```
