@@ -34,6 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
 export default function ApplicationDetail({ app }: { app: AppDetail }) {
   const [status, setStatus] = useState(app.status);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const ch = supabase
       .channel('app-status')
@@ -52,11 +53,25 @@ export default function ApplicationDetail({ app }: { app: AppDetail }) {
   }, [app.id]);
 
   const statusCls =
-    status === 'accepted'
+    status === 'hired'
       ? 'bg-green-100 text-green-800'
-      : status === 'declined'
+      : status === 'rejected'
       ? 'bg-red-100 text-red-800'
       : 'bg-gray-200';
+
+  const updateStatus = async (next: 'hired' | 'rejected') => {
+    setLoading(true);
+    try {
+      await fetch('/api/applications/updateStatus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: app.id, status: next }),
+      });
+      setStatus(next);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="max-w-2xl mx-auto p-4 space-y-4">
@@ -75,6 +90,24 @@ export default function ApplicationDetail({ app }: { app: AppDetail }) {
       <div>
         <h2 className="font-semibold">Expected rate</h2>
         <p>{app.expected_rate}</p>
+      </div>
+      <div className="space-x-2">
+        <button
+          className="px-3 py-1 rounded bg-green-600 text-white disabled:opacity-50"
+          data-testid="hire"
+          disabled={loading || status !== 'submitted'}
+          onClick={() => updateStatus('hired')}
+        >
+          Hire
+        </button>
+        <button
+          className="px-3 py-1 rounded bg-red-600 text-white disabled:opacity-50"
+          data-testid="reject"
+          disabled={loading || status !== 'submitted'}
+          onClick={() => updateStatus('rejected')}
+        >
+          Reject
+        </button>
       </div>
     </main>
   );

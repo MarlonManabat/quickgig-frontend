@@ -19,7 +19,7 @@ export default defineConfig({
   projects: [
     {
       name: 'smoke',
-      testMatch: ['tests/smoke/**/*.spec.ts', '**/*.smoke.ts'],
+      testMatch: ['tests/smoke/**/*.spec.ts', '**/*.smoke.ts', '**/*.smoke.spec.ts'],
       timeout: 45_000,
       expect: { timeout: 7_000 },
       use: { baseURL: 'http://localhost:3000' },
