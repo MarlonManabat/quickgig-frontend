@@ -27,7 +27,12 @@
     "test:release": "playwright test -c playwright.ci.ts --reporter=github,html",
     "autofix:ci": "tsx scripts/autofix.ts",
     "test:smoke": "playwright test --project=smoke",
-    "test:e2e": "playwright test --project=e2e"
+    "test:e2e": "playwright test --project=e2e",
+    "codex:pr": "codex run -p ./codex/tasks/credits_gate.md",
+    "codex:e2e": "codex run -p ./codex/tasks/e2e_reliability.md",
+    "codex:billing": "codex run -p ./codex/tasks/manual_gcash.md",
+    "codex:locations": "codex run -p ./codex/tasks/locations_cascade.md",
+    "codex:review": "codex review --config ./codex/config.json"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",
