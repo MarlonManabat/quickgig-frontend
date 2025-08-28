@@ -13,6 +13,8 @@
     "qa:smoke": "playwright test --project=smoke",
     "qa:full": "playwright test --project=full-e2e",
     "qa:report": "playwright show-report",
+    "qa:screens": "tsx scripts/qa/screenshot-pages.ts",
+    "qa:final": "npm run test:smoke && npm run qa:screens",
     "build:prod": "next build",
     "start:prod": "next start -p 3000",
     "analyze": "ANALYZE=true next build",
