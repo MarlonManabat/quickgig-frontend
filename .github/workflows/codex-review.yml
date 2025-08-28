@@ -1,0 +1,17 @@
+name: Codex Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  codex-review:
+    if: ${{ secrets.CODEX_API_KEY != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm i -g @openai/codex
+      - name: Run Codex review
+        env:
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+        run: codex review --config ./codex/config.json --github-annotate
