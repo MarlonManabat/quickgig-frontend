@@ -1,25 +1,35 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from '@supabase/supabase-js';
 
+const NCR_REGION_CODE = '130000000';
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const province = String(req.query.province ?? '');
-  if (!province) return res.status(400).json({ error: 'province required' });
+  const regionId = String(req.query.region_id ?? '');
+  const provinceId = String(req.query.province_id ?? '');
+  if (!regionId) return res.status(400).json({ error: 'region_id required' });
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
-  const { data, error } = await supabase
+  let query = supabase
     .from('ph_cities')
     .select('code,name')
-    .eq('province_code', province)
     .order('name');
+  if (regionId === NCR_REGION_CODE) {
+    query = query.eq('region_code', regionId);
+  } else {
+    if (!provinceId) return res.status(400).json({ error: 'province_id required' });
+    query = query.eq('province_code', provinceId);
+  }
+  const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
   res.setHeader(
     'Cache-Control',
-    'public, s-maxage=86400, stale-while-revalidate=604800'
+    'public, s-maxage=3600, stale-while-revalidate=21600'
   );
-  res.json({ cities: data ?? [] });
+  const cities = (data ?? []).map((c) => ({ id: c.code, name: c.name }));
+  res.json(cities);
 }

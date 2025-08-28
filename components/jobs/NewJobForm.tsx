@@ -14,8 +14,10 @@ function validate(form: { title: string; description: string; loc: Loc }) {
   if (form.description.trim().length < 20) {
     errors.description = 'Description too short';
   }
+  const NCR = '130000000';
   if (!form.loc.region) errors.region = 'Region required';
-  if (!form.loc.province) errors.province = 'Province required';
+  if (form.loc.region && form.loc.region !== NCR && !form.loc.province)
+    errors.province = 'Province required';
   if (!form.loc.city) errors.city = 'City required';
   return errors;
 }
@@ -47,7 +49,7 @@ export default function NewJobForm() {
           title,
           description,
           region_code: loc.region,
-          province_code: loc.province,
+          province_code: loc.province ?? null,
           city_code: loc.city,
         }),
       });
