@@ -1,30 +1,39 @@
-import { useRouter } from 'next/router';
-import GigForm from '@/components/gigs/GigForm';
-import { createGig } from '@/lib/gigs/api';
-import CreditsGate from '@/components/credits/Gate';
-import { consumeOneCredit } from '@/lib/credits';
-import { mutate } from 'swr';
+import type { GetServerSideProps } from 'next';
+import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import CreditsGate from '@/components/credits/CreditsGate';
+import NewJobForm from '@/components/jobs/NewJobForm';
 
-export default function NewJob() {
-  const router = useRouter();
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const supabase = createPagesServerClient(ctx, {
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { redirect: { destination: '/auth', permanent: false } };
+  }
+  const { data } = await supabase
+    .from('user_credits')
+    .select('credits')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  const credits = data?.credits ?? 0;
+  return { props: { credits } };
+};
+
+export default function NewJobPage({ credits }: { credits: number }) {
+  if (credits <= 0) {
+    return (
+      <main className="max-w-2xl mx-auto p-6">
+        <CreditsGate />
+      </main>
+    );
+  }
   return (
-    <main className="p-4">
-      <CreditsGate>
-        <GigForm
-          onSubmit={async (g) => {
-            const { data } = await createGig(g);
-            if (data) {
-              try {
-                await consumeOneCredit();
-                mutate('credits');
-              } catch {
-                // non-blocking
-              }
-              router.push(`/gigs/${data.id}`);
-            }
-          }}
-        />
-      </CreditsGate>
+    <main className="max-w-2xl mx-auto p-6">
+      <NewJobForm />
     </main>
   );
 }

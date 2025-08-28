@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createServerClient } from "@/utils/supabaseClient";
+import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
 import { asString } from "@/lib/normalize";
 
 export default async function handler(
@@ -10,7 +10,10 @@ export default async function handler(
     res.status(405).end();
     return;
   }
-  const supabase = createServerClient();
+  const supabase = createPagesServerClient({ req, res }, {
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  });
   let uid: string | null = null;
   if (
     process.env.QA_TEST_MODE === "true" &&

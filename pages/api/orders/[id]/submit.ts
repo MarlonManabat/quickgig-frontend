@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createServerClient } from "@/utils/supabaseClient";
+import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
 import { asString } from "@/lib/normalize";
 
 function validProof(urlStr: string) {
@@ -26,7 +26,10 @@ export default async function handler(
     res.status(405).json({ error: "method not allowed" });
     return;
   }
-  const supabase = createServerClient();
+  const supabase = createPagesServerClient({ req, res }, {
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  });
   await supabase.rpc("set_config", {
     setting_name: "app.admin_emails",
     new_value: process.env.ADMIN_EMAILS ?? "",
