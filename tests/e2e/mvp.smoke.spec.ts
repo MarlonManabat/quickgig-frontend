@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loginAs } from './_helpers/session';
+import { loginAs, seedBasic, waitForAppReady } from './_helpers/session';
 
 const app = process.env.PLAYWRIGHT_APP_URL!;
 const supa = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -10,7 +10,15 @@ let applications: any[] = [];
 let notifications: any[] = [];
 let credits = 1;
 
-test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page }) => {
+test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page, request }) => {
+  test.slow();
+  test.setTimeout(60_000);
+
+  await test.step('seed + login', async () => {
+    await seedBasic(request);
+    await loginAs(page, 'employer');
+  });
+
   // ---- routes ----
   await page.route(`${supa}/rest/v1/user_credits*`, (route) => {
     if (route.request().method() === 'GET') {
@@ -78,44 +86,86 @@ test('@smoke golden e2e: post job -> apply -> chat -> hire', async ({ page }) =>
   });
 
   // ---- employer posts job ----
-  await loginAs(page, 'employer');
-  await page.goto(`${app}/jobs/new`);
-  await page.fill('[data-testid=txt-title]', 'Test Job');
-  await page.fill('[data-testid=txt-description]', 'This is a long description for testing.');
-  await page.selectOption('[data-testid=sel-region]', 'NCR');
-  await page.selectOption('[data-testid=sel-province]', 'NCR');
-  await page.selectOption('[data-testid=sel-city]', 'MKT');
-  await page.click('[data-testid=btn-submit]');
-  await expect(page.getByText('Job posted!')).toBeVisible();
+  await test.step('open new job form', async () => {
+    await page.goto(`${app}/jobs/new`);
+    await page.waitForURL('**/jobs/new');
+    await waitForAppReady(page);
+    await expect(page.getByTestId('job-form')).toBeVisible();
+  });
+
+  await test.step('fill job form', async () => {
+    const title = page.getByTestId('txt-title');
+    await expect(title).toBeVisible();
+    await expect(title).toBeEnabled();
+    await title.fill('Test Job');
+
+    const desc = page.getByTestId('txt-description');
+    await expect(desc).toBeVisible();
+    await desc.fill('This is a long description for testing.');
+
+    const region = page.getByTestId('sel-region');
+    await expect(region).toBeEnabled();
+    await region.selectOption('NCR');
+
+    const province = page.getByTestId('sel-province');
+    await expect(province).toBeEnabled();
+    await province.selectOption('NCR');
+
+    const city = page.getByTestId('sel-city');
+    await expect(city).toBeEnabled();
+    await city.selectOption('MKT');
+
+    await page.getByTestId('btn-submit').click();
+    await expect(page.getByText('Job posted!')).toBeVisible();
+  });
 
   // ---- worker applies ----
-  await loginAs(page, 'worker');
-  await page.goto(`${app}/jobs/job-1`);
-  await page.fill('[data-testid=txt-message]', 'hello world message');
-  await page.fill('[data-testid=txt-rate]', '100');
-  await page.getByTestId('btn-apply').click();
-  await expect(page).toHaveURL(`${app}/applications/app-1`);
+  await test.step('worker applies', async () => {
+    await loginAs(page, 'worker');
+    await page.goto(`${app}/jobs/job-1`);
+    await waitForAppReady(page);
+    const msg = page.getByTestId('txt-message');
+    await expect(msg).toBeVisible();
+    await msg.fill('hello world message');
+    const rate = page.getByTestId('txt-rate');
+    await expect(rate).toBeVisible();
+    await rate.fill('100');
+    await page.getByTestId('btn-apply').click();
+    await expect(page).toHaveURL(`${app}/applications/app-1`);
+  });
 
   // ---- employer sends message ----
-  await loginAs(page, 'employer');
-  await page.goto(`${app}/applications/app-1`);
-  await page.route('/api/messages/create', () => {}); // ensure route already set
-  await page.evaluate(() => fetch('/api/messages/create', { method: 'POST', body: '{}' }));
+  await test.step('employer sends message', async () => {
+    await loginAs(page, 'employer');
+    await page.goto(`${app}/applications/app-1`);
+    await waitForAppReady(page);
+    await page.route('/api/messages/create', () => {}); // ensure route already set
+    await page.evaluate(() => fetch('/api/messages/create', { method: 'POST', body: '{}' }));
+  });
 
   // ---- worker sees notification ----
-  await loginAs(page, 'worker');
-  await page.goto(`${app}/`);
-  await expect(page.getByTestId('bell')).toBeVisible();
-  await page.getByTestId('bell').click();
-  await expect(page.getByTestId('notif-item').first()).toBeVisible();
+  await test.step('worker sees notification', async () => {
+    await loginAs(page, 'worker');
+    await page.goto(`${app}/`);
+    await waitForAppReady(page);
+    await expect(page.getByTestId('bell')).toBeVisible();
+    await page.getByTestId('bell').click();
+    await expect(page.getByTestId('notif-item').first()).toBeVisible();
+  });
 
   // ---- employer hires ----
-  await loginAs(page, 'employer');
-  await page.goto(`${app}/applications/app-1`);
-  await page.getByTestId('hire').click();
+  await test.step('employer hires', async () => {
+    await loginAs(page, 'employer');
+    await page.goto(`${app}/applications/app-1`);
+    await waitForAppReady(page);
+    await page.getByTestId('hire').click();
+  });
 
   // ---- worker sees hired status ----
-  await loginAs(page, 'worker');
-  await page.goto(`${app}/me/applications`);
-  await expect(page.getByTestId('status-pill')).toContainText('hired');
+  await test.step('worker sees hired status', async () => {
+    await loginAs(page, 'worker');
+    await page.goto(`${app}/me/applications`);
+    await waitForAppReady(page);
+    await expect(page.getByTestId('status-pill')).toContainText('hired');
+  });
 });

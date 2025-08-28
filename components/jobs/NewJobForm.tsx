@@ -68,7 +68,7 @@ export default function NewJobForm() {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-3">
+    <form onSubmit={submit} className="space-y-3" data-testid="job-form">
       {serverError && (
         <p className="text-red-600 text-sm" aria-live="polite">
           {serverError}
