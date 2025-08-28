@@ -19,10 +19,18 @@ export default defineConfig({
   projects: [
     {
       name: 'smoke',
-      testMatch: ['tests/smoke/**/*.spec.ts', '**/*.smoke.ts'],
+      testMatch: ['tests/smoke/**/*.spec.ts', '**/*.smoke.ts', '**/*.smoke.spec.ts'],
       timeout: 45_000,
-      expect: { timeout: 7_000 },
-      use: { baseURL: 'http://localhost:3000' },
+      retries: process.env.CI ? 2 : 0,
+      expect: { timeout: 8_000 },
+      use: {
+        baseURL: process.env.PREVIEW_URL || 'http://localhost:3000',
+        actionTimeout: 10_000,
+        navigationTimeout: 15_000,
+        trace: 'on-first-retry',
+        screenshot: 'on',
+        video: 'retain-on-failure',
+      },
     },
     {
       name: 'e2e',

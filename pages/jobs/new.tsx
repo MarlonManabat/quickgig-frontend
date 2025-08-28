@@ -32,7 +32,7 @@ export default function NewJobPage({ credits }: { credits: number }) {
     );
   }
   return (
-    <main className="max-w-2xl mx-auto p-6">
+    <main className="max-w-2xl mx-auto p-6" data-testid="job-form">
       <NewJobForm />
     </main>
   );

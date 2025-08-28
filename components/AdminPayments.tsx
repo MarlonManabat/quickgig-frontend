@@ -61,7 +61,7 @@ export default function AdminPayments({
               <td className="space-x-2">
                 <button
                   onClick={() => handleApprove(p.id)}
-                  data-testid="approve-payment"
+                  data-testid="admin-approve"
                   aria-label="Approve payment"
                   className="px-2 py-1 bg-green-600 text-white rounded"
                 >
@@ -69,7 +69,7 @@ export default function AdminPayments({
                 </button>
                 <button
                   onClick={() => handleReject(p.id)}
-                  data-testid="reject-payment"
+                  data-testid="admin-reject"
                   aria-label="Reject payment"
                   className="px-2 py-1 bg-red-600 text-white rounded"
                 >

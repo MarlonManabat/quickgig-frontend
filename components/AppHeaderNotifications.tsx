@@ -59,6 +59,7 @@ export default function AppHeaderNotifications() {
       <button
         aria-label="Notifications"
         className="relative"
+        data-testid="bell"
         onClick={() => setOpen((v) => !v)}
       >
         <span className="i-bell" />
@@ -72,7 +73,11 @@ export default function AppHeaderNotifications() {
         <div className="absolute right-0 mt-2 w-72 bg-white border rounded shadow-md z-50">
           <ul className="max-h-80 overflow-auto">
             {items.map((n) => (
-              <li key={n.id} className="p-2 border-b last:border-0">
+              <li
+                key={n.id}
+                className="p-2 border-b last:border-0"
+                data-testid="notif-item"
+              >
                 {n.link ? (
                   <Link href={n.link} className="block text-sm">
                     {n.title}

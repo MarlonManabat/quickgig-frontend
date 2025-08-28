@@ -10,14 +10,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
-  const { role } = (req.body ?? {}) as { role?: string };
-  if (!role || !['worker', 'employer', 'admin'].includes(role)) {
-    return res.status(400).json({ ok: false, error: 'role required' });
-  }
-  const uid = role === 'admin' ? 'test-admin' : role === 'employer' ? 'test-employer' : 'test-worker';
   res.setHeader('Set-Cookie', [
-    `${TEST_COOKIE_ROLE}=${role}; Path=/; HttpOnly; SameSite=Lax`,
-    `${TEST_COOKIE_UID}=${uid}; Path=/; HttpOnly; SameSite=Lax`,
+    `${TEST_COOKIE_ROLE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`,
+    `${TEST_COOKIE_UID}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`,
   ]);
   return res.status(200).json({ ok: true });
 }
