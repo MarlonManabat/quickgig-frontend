@@ -1,16 +1,34 @@
 name: Self Heal
+
 on:
   workflow_run:
-    workflows: ["Release Check (PR smoke)"]
+    workflows: ["Release Check (PR smoke)", "Final QA (full)"]
     types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
 jobs:
   heal:
+    # Run on failures, cancellations, or timeouts
     if: ${{ contains(fromJson('["failure","cancelled","timed_out"]'), github.event.workflow_run.conclusion) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
+
+      # Primary healer – opens a patch PR when heuristics match
       - name: Run healer
         run: node scripts/self-heal/run.js
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Fallback note so you see it's active even if no script action was taken
+      - name: Post note if no automated fix applied
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.info('Self-heal workflow executed. If no fix PR was created, check clickmap/artifacts for details.')
