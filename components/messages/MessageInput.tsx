@@ -24,6 +24,8 @@ export default function MessageInput({ applicationId }: { applicationId: string 
     }
   };
 
+  const disabled = sending || text.trim().length === 0 || text.length > 4000;
+
   return (
     <div className="mt-2 flex gap-2">
       <textarea
@@ -37,9 +39,9 @@ export default function MessageInput({ applicationId }: { applicationId: string 
       />
       <button
         onClick={send}
-        disabled={sending}
+        disabled={disabled}
         className="px-3 py-2 bg-brand-accent text-white rounded"
-        data-testid="btn-send"
+        data-testid="msg-send"
       >
         Send
       </button>

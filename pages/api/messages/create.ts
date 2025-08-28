@@ -1,29 +1,38 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getServerSupabase } from '@/lib/supabase-server';
+import { z } from 'zod';
+import { getServerSupabase } from '@/lib/credits-server';
+
+const BodySchema = z.object({
+  applicationId: z.string().min(1),
+  body: z.string().min(1).max(4000),
+});
 
 const WINDOW_MS = 60 * 1000;
 const LIMIT = 15;
 const hits: Record<string, number[]> = {};
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') return res.status(405).end();
-  const supabase = getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return res.status(401).json({ error: { code: 'UNAUTHORIZED' } });
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'POST')
+    return res.status(405).json({ error: { code: 'METHOD_NOT_ALLOWED' } });
 
-  const { applicationId, body } = req.body || {};
-  const fieldErrors: Record<string, string> = {};
-  if (!applicationId || typeof applicationId !== 'string')
-    fieldErrors.applicationId = 'applicationId required';
-  const text = typeof body === 'string' ? body.trim() : '';
-  if (text.length < 1 || text.length > 4000)
-    fieldErrors.body = 'Message length 1-4000';
-  if (Object.keys(fieldErrors).length)
+  const parse = BodySchema.safeParse(req.body ?? {});
+  if (!parse.success)
     return res
       .status(400)
-      .json({ error: { code: 'VALIDATION_FAILED', fields: fieldErrors } });
+      .json({ error: { code: 'BAD_REQUEST', issues: parse.error.issues } });
+
+  const { applicationId, body } = parse.data;
+
+  const supabase = await getServerSupabase();
+  const {
+    data: { user },
+    error: authErr,
+  } = await supabase.auth.getUser();
+  if (authErr || !user)
+    return res.status(401).json({ error: { code: 'UNAUTHENTICATED' } });
 
   const now = Date.now();
   const arr = hits[user.id] || (hits[user.id] = []);
@@ -32,35 +41,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(429).json({ error: { code: 'RATE_LIMITED' } });
   arr.push(now);
 
-  const { data, error } = await supabase
+  type AppRow = { id: string; job_id: string; worker_id: string };
+  const { data: app, error: appErr } = await supabase
+    .from('applications')
+    .select('id, job_id, worker_id')
+    .eq('id', applicationId)
+    .single<AppRow>();
+  if (appErr || !app)
+    return res.status(404).json({ error: { code: 'APPLICATION_NOT_FOUND' } });
+
+  type JobRow = { id: string; employer_id: string };
+  const { data: job, error: jobErr } = await supabase
+    .from('jobs')
+    .select('id, employer_id')
+    .eq('id', app.job_id)
+    .single<JobRow>();
+  if (jobErr || !job)
+    return res.status(404).json({ error: { code: 'JOB_NOT_FOUND' } });
+
+  const me = user.id;
+  const other = app.worker_id === me ? job.employer_id : app.worker_id;
+
+  const { data: msg, error: msgErr } = await supabase
     .from('messages')
     .insert({
-      application_id: applicationId,
-      sender_id: user.id,
-      body: text,
+      application_id: app.id,
+      sender_id: me,
+      body,
     })
     .select('id')
     .single();
-  if (error)
-    return res.status(400).json({ error: { code: 'DB_ERROR', message: error.message } });
-  const msgId = data.id;
+  if (msgErr || !msg)
+    return res
+      .status(500)
+      .json({ error: { code: 'MESSAGE_CREATE_FAILED' } });
 
-  const { data: app } = await supabase
-    .from('applications')
-    .select('worker_id, job:jobs(title,employer_id)')
-    .eq('id', applicationId)
-    .maybeSingle();
-  const other =
-    app?.worker_id === user.id ? app?.job?.employer_id : app?.worker_id;
-  if (other) {
-    await supabase.from('notifications').insert({
-      user_id: other,
-      type: 'message_new',
-      title: `New message about ${app?.job?.title || 'a job'}`,
-      body: text.slice(0, 80),
-      link: `/applications/${applicationId}`,
-    });
-  }
+  await supabase.from('notifications').insert({
+    user_id: other,
+    type: 'message_new',
+    data: { applicationId: app.id, messageId: msg.id },
+  });
 
-  res.status(201).json({ id: msgId });
+  return res.status(201).json({ id: msg.id });
 }
+
