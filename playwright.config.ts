@@ -41,6 +41,12 @@ export default defineConfig({
       },
     },
     {
+      name: 'clickmap',
+      testDir: 'e2e',
+      testMatch: /.*\.spec\.ts/,
+      timeout: 60_000,
+    },
+    {
       name: 'qa',
       testDir: 'tests/qa',
       testIgnore: ['ui.*'],
