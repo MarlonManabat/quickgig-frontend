@@ -1,0 +1,27 @@
+name: Release Check (PR smoke)
+on: [pull_request]
+concurrency:
+  group: pr-smoke-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps
+      - name: Click-map
+        env:
+          PREVIEW_URL: ${{ vars.PREVIEW_URL || env.PREVIEW_URL }}
+          LANDING_URL: ${{ vars.LANDING_URL || env.LANDING_URL }}
+        run: npm run test:clickmap
+      - name: Upload click artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clickmap-artifacts
+          path: artifacts/**
