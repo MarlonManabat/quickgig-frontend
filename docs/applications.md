@@ -1,14 +1,42 @@
-# Applications
+# Applications API
 
-Applications link a gig to an applicant. Row level security ensures only:
+Workers can apply to open jobs once.
 
-- the applicant
-- the gig owner
-- admins
+## Endpoint
 
-can view a given application and its thread.
+`POST /api/applications/create`
 
-Each application has a single messaging thread. When a message is sent, a row is
-inserted into `notifications` for the other participant with `type = 'message'`
-and a JSON payload containing the `application_id`, `thread_id` and a short
-`preview` of the body. A dedicated notifications UI will come later.
+### Request body
+
+```json
+{
+  "jobId": "<job uuid>",
+  "message": "<at least 20 characters>",
+  "expectedRate": 1000
+}
+```
+
+### Success response
+
+`201 Created`
+
+```json
+{ "id": "<application uuid>" }
+```
+
+### Error responses
+
+- `400 { "error": { "code": "VALIDATION_FAILED", "fields": { ... } } }`
+- `400 { "error": { "code": "JOB_CLOSED" } }`
+- `400 { "error": { "code": "DUPLICATE_APPLICATION" } }`
+- `401 { "error": { "code": "UNAUTHORIZED" } }`
+
+## Row Level Security
+
+- Workers may insert their own application if the job is open.
+- Workers can read their own applications.
+- Employers can read applications for their jobs.
+
+## Closing a job
+
+Set `is_closed` to `true` in the `jobs` table to prevent new applications.
