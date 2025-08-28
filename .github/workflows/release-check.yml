@@ -55,11 +55,12 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps
       - run: npm run test:smoke
-      - name: Upload smoke artifacts
+      - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: smoke-artifacts
+          name: playwright-report-smoke
           path: |
-            test-results/**
             playwright-report/**
+            test-results/**
+          if-no-files-found: ignore
