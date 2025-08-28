@@ -6,15 +6,18 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   );
-  const { data, error } = await supabase
-    .from('ph_regions')
-    .select('code,name')
-    .order('name');
-  if (error) return res.status(500).json({ error: error.message });
+  const [regions, provinces, cities] = await Promise.all([
+    supabase.from('ph_regions').select('*', { count: 'exact', head: true }),
+    supabase.from('ph_provinces').select('*', { count: 'exact', head: true }),
+    supabase.from('ph_cities').select('*', { count: 'exact', head: true }),
+  ]);
   res.setHeader(
     'Cache-Control',
     'public, s-maxage=3600, stale-while-revalidate=21600'
   );
-  const regions = (data ?? []).map((r) => ({ id: r.code, name: r.name }));
-  res.json(regions);
+  res.json({
+    regions: regions.count ?? 0,
+    provinces: provinces.count ?? 0,
+    cities: cities.count ?? 0,
+  });
 }

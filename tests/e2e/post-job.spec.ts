@@ -39,33 +39,31 @@ test('@full post job flow', async ({ page }) => {
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({
-        regions: [
-          { code: '040000000', name: 'CALABARZON' },
-          { code: 'NCR', name: 'NCR' },
-        ],
-      }),
+      body: JSON.stringify([
+        { id: '040000000', name: 'CALABARZON' },
+        { id: '130000000', name: 'NCR' },
+      ]),
     });
   });
-  await page.route('/api/locations/provinces?region=040000000', (route) => {
+  await page.route('/api/locations/provinces?region_id=040000000', (route) => {
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ provinces: [{ code: '042100000', name: 'Cavite' }] }),
+      body: JSON.stringify([{ id: '042100000', name: 'Cavite' }]),
     });
   });
-  await page.route('/api/locations/cities?province=042100000', (route) => {
+  await page.route('/api/locations/cities?region_id=040000000&province_id=042100000', (route) => {
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ cities: [{ code: '042108000', name: 'Bacoor' }] }),
+      body: JSON.stringify([{ id: '042108000', name: 'Bacoor' }]),
     });
   });
-  await page.route('/api/locations/cities?province=NCR', (route) => {
+  await page.route('/api/locations/cities?region_id=130000000', (route) => {
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ cities: [{ code: 'MKT', name: 'Makati' }] }),
+      body: JSON.stringify([{ id: 'MKT', name: 'Makati' }]),
     });
   });
 
@@ -109,8 +107,8 @@ test('@full post job flow', async ({ page }) => {
     '[data-testid=txt-description]',
     'This is a long description for NCR flow.',
   );
-  await page.selectOption('[data-testid=sel-region]', 'NCR');
-  await expect(page.locator('[data-testid=sel-province]')).toHaveValue('NCR');
+  await page.selectOption('[data-testid=sel-region]', '130000000');
+  await expect(page.locator('[data-testid=sel-province]')).toHaveCount(0);
   await page.selectOption('[data-testid=sel-city]', 'MKT');
   await page.click('[data-testid=btn-submit]');
   await expect(page.getByText('Job posted!')).toBeVisible();
