@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
-test('home renders', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByRole('banner')).toBeVisible();
+test.setTimeout(10 * 60 * 1000);
+
+test('clickmap', async () => {
+  await import('../qa/clickmap.mjs');
 });

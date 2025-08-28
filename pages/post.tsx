@@ -1,12 +1,19 @@
 import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 import { createJob } from "@/lib/jobs";
 import { requireTicket } from "@/lib/tickets";
 import { useRequireUser } from "@/lib/useRequireUser";
-import LocationSelect, { LocationValue } from "@/components/location/LocationSelect";
+import type { LocationValue } from "@/components/location/LocationSelect";
+const LocationSelect = dynamic(
+  () => import("@/components/location/LocationSelect"),
+  { ssr: false }
+);
 import { staticPhData } from "@/lib/ph-data";
 
 export default function PostJobPage() {
   const { ready, userId, timedOut } = useRequireUser();
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [isOnline, setIsOnline] = useState(false);
@@ -40,7 +47,7 @@ export default function PostJobPage() {
         city: isOnline ? null : cityName || null,
         address: isOnline ? null : address.trim() || null,
       });
-      window.location.href = "/find";
+      router.push("/find");
     } catch (err: any) {
       if (err.message?.includes("Insufficient tickets")) {
         alert(
