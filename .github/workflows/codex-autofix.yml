@@ -1,88 +1,87 @@
-name: Codex Auto-Fix (PR failures)
+name: Codex Auto-Fix
 
 on:
   workflow_run:
     workflows:
-      - Release Check (PR smoke)
+      - "Release Check (PR smoke)"
+      - "Full E2E"
     types: [completed]
 
 permissions:
+  contents: write
   pull-requests: write
-  contents: read
   actions: read
-  issues: write
+  checks: read
 
 jobs:
-  nudge-codex:
+  trigger:
     if: >
-      github.event.workflow_run.event == 'pull_request'
-      && github.event.workflow_run.conclusion == 'failure'
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'failure'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Derive PR number
-        id: pr
+      - name: Find PR + failing jobs
+        id: info
         uses: actions/github-script@v7
         with:
           script: |
+            const { owner, repo } = context.repo;
             const run = context.payload.workflow_run;
-            const { data: prs } = await github.request('GET /repos/{owner}/{repo}/pulls', {
-              owner: context.repo.owner, repo: context.repo.repo, state: 'open', per_page: 100
-            });
-            const pr = prs.find(p => p.head && p.head.sha === run.head_sha);
-            if (!pr) { core.setFailed('PR not found for this run'); return; }
-            core.setOutput('number', pr.number);
-            core.setOutput('sha', run.head_sha);
+            const runId = run.id;
 
-      - name: Avoid duplicate comments
-        id: dup
+            // map failing job names
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner, repo, run_id: runId
+            });
+            const failing = jobs.data.jobs
+              .filter(j => j.conclusion === 'failure')
+              .map(j => j.name);
+
+            // find PR by head_branch
+            const prs = await github.rest.pulls.list({
+              owner, repo, state: 'open', head: `${owner}:${run.head_branch}`
+            });
+            const pr = prs.data[0];
+
+            core.setOutput('pr', pr ? String(pr.number) : '');
+            core.setOutput('failing', failing.join(', '));
+            core.setOutput('runUrl', run.html_url);
+            core.setOutput('workflow', run.name);
+
+      - name: Exit if no PR found
+        if: steps.info.outputs.pr == ''
+        run: echo "No open PR for this run." && exit 0
+
+      - name: Check labels (codex + autofix)
+        id: labels
         uses: actions/github-script@v7
         with:
           script: |
-            const number = core.getInput('number', { required: true });
-            const { data: comments } = await github.issues.listComments({
-              owner: context.repo.owner, repo: context.repo.repo, issue_number: Number(number), per_page: 100
-            });
-            const exists = comments.some(c =>
-              c.user.type === 'Bot' &&
-              (c.body || '').includes('<!-- codex-auto-fix -->') &&
-              (c.body || '').includes(context.payload.workflow_run.id.toString())
-            );
-            core.setOutput('exists', exists ? 'true' : 'false');
-          result-encoding: string
-          number: ${{ steps.pr.outputs.number }}
+            const { owner, repo } = context.repo;
+            const prNumber = Number(core.getOutput('pr'));
+            const labels = await github.rest.issues.listLabelsOnIssue({ owner, repo, issue_number: prNumber });
+            const names = labels.data.map(l => l.name);
+            core.setOutput('ok', (names.includes('codex') && names.includes('autofix')) ? 'true' : 'false');
 
-      - name: Ensure `codex` label on PR
-        if: steps.dup.outputs.exists != 'true'
-        uses: actions-ecosystem/action-add-labels@v1
+      - name: Post Codex task comment
+        if: steps.labels.outputs.ok == 'true'
+        uses: actions/github-script@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          labels: codex
-          number: ${{ steps.pr.outputs.number }}
-
-      - name: Post Codex fix request comment
-        if: steps.dup.outputs.exists != 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
-          PR_NUM="${{ steps.pr.outputs.number }}"
-          SHA="${{ steps.pr.outputs.sha }}"
-          cat > body.txt <<EOF
-          <!-- codex-auto-fix -->
-          @codex please fix failing checks for this PR.
-
-          **Context**
-          - Workflow: Release Check (PR smoke)
-          - Failed run: ${RUN_URL}
-          - Head SHA: ${SHA}
-
-          **What to fix**
-          - Make failing jobs pass (build / smoke) without disabling tests.
-          - Keep PR scope minimal; prefer type-safe fixes.
-          - If TypeScript error includes `Property 'employer_id' does not exist` in `/pages/api/messages/create.ts`,
-            switch `.maybeSingle()` to `.single()` or split the query (applications → job) to avoid array typing.
-
-          When done, push a patch to this same PR and re-run checks.
-          EOF
-          gh pr comment "$PR_NUM" --body-file body.txt
+          script: |
+            const { owner, repo } = context.repo;
+            const prNumber = Number(core.getOutput('pr'));
+            const failing = core.getOutput('failing') || '(unknown)';
+            const runUrl = core.getOutput('runUrl');
+            const wname = core.getOutput('workflow');
+            const prUrl = `https://github.com/${owner}/${repo}/pull/${prNumber}`;
+            const body = [
+              "codex:self-heal",
+              `Workflow: ${wname}`,
+              `Failing jobs: ${failing}`,
+              `Run: ${runUrl}`,
+              `PR: ${prUrl}`,
+              "Artifacts: ensure Playwright zip(s) uploaded under 'playwright-report/**' or 'playwright-report-*.zip'.",
+              "Task: diagnose failure from logs & traces and push a fix to this PR branch."
+            ].join("\n");
+            await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
