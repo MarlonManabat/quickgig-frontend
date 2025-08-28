@@ -3,20 +3,20 @@ name: Codex self-heal
 on:
   workflow_dispatch:
     inputs:
-      failed_job_url:
-        description: "URL of the failed QA job"
-        required: true
-        type: string
-      preview_url:
+      previewUrl:
         description: "Deployed preview URL"
         required: true
         type: string
-      base_url:
-        description: "BASE_URL to use for seeding / API calls"
+      failureCategory:
+        description: "Failure category to heal"
         required: true
         type: string
-      pr_number:
-        description: "Pull Request number to push fixes to"
+      prNumber:
+        description: "Pull Request number"
+        required: true
+        type: string
+      headSha:
+        description: "Commit SHA to rerun QA on"
         required: true
         type: string
 
@@ -26,18 +26,37 @@ permissions:
   pull-requests: write
 
 jobs:
-  codex-self-heal:
+  self-heal:
     runs-on: ubuntu-latest
     env:
-      FAILED_JOB_URL: ${{ github.event.inputs.failed_job_url }}
-      BASE_URL: ${{ github.event.inputs.base_url }}
-      PREVIEW_URL: ${{ github.event.inputs.preview_url }}
-      PR_NUMBER: ${{ github.event.inputs.pr_number }}
+      PREVIEW_URL: ${{ inputs.previewUrl }}
+      FAILURE_CATEGORY: ${{ inputs.failureCategory }}
+      PR_NUMBER: ${{ inputs.prNumber }}
+      HEAD_SHA: ${{ inputs.headSha }}
     steps:
-      - name: Echo context for debugging
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Repair PH locations
+        if: env.FAILURE_CATEGORY == 'locations'
         run: |
-          echo "FAILED_JOB_URL=${FAILED_JOB_URL}"
-          echo "PREVIEW_URL=${PREVIEW_URL}"
-          echo "BASE_URL=${BASE_URL}"
-          echo "PR_NUMBER=${PR_NUMBER}"
-      # … your Codex task/patch steps follow …
+          curl -fsSL -X POST "$PREVIEW_URL/api/locations/repair" \
+            -H "x-self-heal: ${{ secrets.SELF_HEAL_TOKEN }}"
+
+      - name: Verify PH locations
+        if: env.FAILURE_CATEGORY == 'locations'
+        run: |
+          resp=$(curl -fsSL "$PREVIEW_URL/api/locations/health")
+          echo "$resp"
+          ok=$(echo "$resp" | jq -r '.ok')
+          if [ "$ok" != "true" ]; then
+            echo "Location repair failed"
+            exit 1
+          fi
+
+      - name: Re-run QA
+        if: env.FAILURE_CATEGORY == 'locations'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run qa.yml --ref "$HEAD_SHA" -f pr="$PR_NUMBER" -f attempt=2
