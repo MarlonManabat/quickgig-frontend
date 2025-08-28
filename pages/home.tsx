@@ -89,7 +89,7 @@ export default function Home() {
               >
                 Complete profile
               </Link>
-              <Link href="/find?focus=search" className="qg-btn qg-btn--outline px-4 py-2">
+              <Link href="/search" className="qg-btn qg-btn--outline px-4 py-2">
                 Find jobs near you
               </Link>
             </div>

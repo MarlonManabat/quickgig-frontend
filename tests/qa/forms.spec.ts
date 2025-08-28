@@ -11,7 +11,7 @@ test.describe('forms and flows', () => {
 
   test('employer can create job', async ({ page }) => {
     await loginAs(page, 'employer');
-    await page.goto('/jobs/new');
+    await page.goto('/post');
     await waitForAppReady(page);
     await smartFill(page);
     await page.getByRole('button', { name: /submit|post|create/i }).click().catch(()=>{});
@@ -19,7 +19,7 @@ test.describe('forms and flows', () => {
       page.waitForURL(/\/jobs/),
       page.getByText(/success/i).waitFor({ timeout: 5_000 }).catch(() => {}),
     ]);
-    recordVisit('/jobs/new');
+    recordVisit('/post');
   });
 
   test('worker can apply to a job', async ({ page }) => {

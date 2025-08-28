@@ -30,17 +30,19 @@
         <nav>
           <a href="#features">Features</a>
           <a
-            href="/find?focus=search"
+            href="/search"
             data-testid="nav-find"
-            aria-label="Maghanap ng trabaho sa QuickGig app"
+            aria-label="Find work on QuickGig app"
             data-app-root
-            >Maghanap ng Trabaho</a
+            rel="noopener"
+            >Find Work</a
           >
           <a
-            href="/post?intent=employer"
+            href="/post"
             data-testid="nav-post"
             aria-label="Post job on QuickGig app"
             data-app-root
+            rel="noopener"
             >Post Job</a
           >
           <a
@@ -48,14 +50,16 @@
             data-testid="nav-login"
             aria-label="Log in to QuickGig app"
             data-app-root
+            rel="noopener"
             >Login</a
           >
           <a
             class="btn btn-primary"
-            href="/start"
+            href="/signup"
             data-testid="cta-signup"
             aria-label="Sign up on QuickGig app"
             data-app-root
+            rel="noopener"
             >Sign Up</a
           >
         </nav>
@@ -78,19 +82,21 @@
           <a
             id="cta-start"
             class="qg-btn qg-btn--primary"
-            href="/search?intent=worker"
+            href="/post"
             data-testid="cta-start-now"
-            aria-label="Open QuickGig app"
+            aria-label="Post job on QuickGig app"
             data-app-root
+            rel="noopener"
             >Simulan Na!</a
           >
           <a
             class="btn btn-ghost"
-            href="/post?intent=employer"
-            data-testid="cta-post-job"
-            aria-label="Post job on QuickGig app"
+            href="/search"
+            data-testid="cta-browse-jobs"
+            aria-label="Browse jobs on QuickGig app"
             data-app-root
-            >Post a Job</a
+            rel="noopener"
+            >Browse Jobs</a
           >
         </div>
       </div>
@@ -136,25 +142,32 @@
             >Privacy</a
           >
           <a
-            href="/search?intent=worker"
+            href="/search"
             data-testid="footer-open-app"
             aria-label="Open the QuickGig app"
             data-app-root
+            rel="noopener"
             >Open the App</a
           >
         </nav>
       </div>
     </footer>
     <script>
-      const APP_URL =
-        window.NEXT_PUBLIC_APP_URL ||
-        window.APP_URL ||
-        "https://app.quickgig.ph";
-      const appRoot = APP_URL.replace(/\/+$/, "");
+      function resolveAppOrigin() {
+        if (window.NEXT_PUBLIC_APP_ORIGIN)
+          return window.NEXT_PUBLIC_APP_ORIGIN;
+        const { protocol, hostname, port } = window.location;
+        const guess = hostname.startsWith("app.")
+          ? `${protocol}//${hostname}${port ? ":" + port : ""}`
+          : `${protocol}//app.${hostname}${port ? ":" + port : ""}`;
+        return guess;
+      }
+      const appRoot = resolveAppOrigin().replace(/\/+$/, "");
       document.querySelectorAll("[data-app-root]").forEach((el) => {
         const path = el.getAttribute("href") || "/";
         const normalized = path.startsWith("/") ? path : `/${path}`;
         el.setAttribute("href", `${appRoot}${normalized}`);
+        if (!el.getAttribute("rel")) el.setAttribute("rel", "noopener");
       });
       document.getElementById("year").textContent = new Date().getFullYear();
     </script>

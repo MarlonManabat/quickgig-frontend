@@ -4,7 +4,7 @@ import { waitForAppReady } from './helpers/waits';
 export const routes = [
   '/',
   '/jobs',
-  '/jobs/new',
+  '/post',
   '/applications',
   '/messages',
   '/offers',

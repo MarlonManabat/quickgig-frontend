@@ -18,7 +18,7 @@ export default function Home() {
       <P>Connect with opportunities — find work or hire talent quickly.</P>
       <div className="flex justify-center gap-4">
         <Link
-          href="/find?focus=search"
+          href="/search"
           className="btn-primary"
           data-testid="cta-findwork"
         >
@@ -26,7 +26,7 @@ export default function Home() {
         </Link>
         {canPost && (
           <Link
-            href="/jobs/new"
+            href="/post"
             className="btn-secondary"
             data-testid="cta-postjob"
           >

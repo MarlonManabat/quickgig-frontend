@@ -48,7 +48,7 @@ test('@full credits flow', async ({ page }) => {
   await page.goto(app);
   await expect(page.getByTestId('credits-pill')).toHaveText('Credits: 3');
 
-  await page.goto(`${app}/jobs/new`);
+  await page.goto(`${app}/post`);
   await page.fill('input[name=title]', 'Test');
   await page.fill('textarea[name=description]', 'Desc');
   await page.fill('input[name=price]', '5');
@@ -56,7 +56,7 @@ test('@full credits flow', async ({ page }) => {
   await expect(page.getByTestId('credits-pill')).toHaveText('Credits: 2');
 
   credits = 0;
-  await page.goto(`${app}/jobs/new`);
+  await page.goto(`${app}/post`);
   await expect(page.getByText('You have 0 credits')).toBeVisible();
 
   await loginAs(page, 'admin');

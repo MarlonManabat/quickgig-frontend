@@ -1,9 +1,17 @@
+"use client";
+
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { createJob } from "@/lib/jobs";
 import { requireTicket } from "@/lib/tickets";
 import { useRequireUser } from "@/lib/useRequireUser";
-import LocationSelect, { LocationValue } from "@/components/location/LocationSelect";
+import type { LocationValue } from "@/components/location/LocationSelect";
 import { staticPhData } from "@/lib/ph-data";
+
+const LocationSelect = dynamic(() => import("@/components/location/LocationSelect"), {
+  ssr: false,
+  loading: () => <div className="opacity-60">Loading locations…</div>,
+});
 
 export default function PostJobPage() {
   const { ready, userId, timedOut } = useRequireUser();
