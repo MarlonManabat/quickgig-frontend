@@ -2,15 +2,15 @@ import type { GetServerSideProps } from 'next';
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabaseClient';
+import Thread from '@/components/messages/Thread';
+import MessageInput from '@/components/messages/MessageInput';
 
 interface AppDetail {
   id: string;
   job_id: string;
   worker_id: string;
-  message: string;
-  expected_rate: number;
   status: string;
-  job?: { title?: string } | null;
+  job?: { title?: string; employer_id?: string } | null;
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -25,14 +25,27 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id as string;
   const { data } = await supabase
     .from('applications')
-    .select('id,job_id,worker_id,message,expected_rate,status,job:jobs(title)')
+    .select('id,job_id,worker_id,status,job:jobs(title,employer_id)')
     .eq('id', id)
     .maybeSingle();
   if (!data) return { notFound: true };
-  return { props: { app: data } };
+  if (user.id !== data.worker_id && user.id !== data.job?.employer_id)
+    return { redirect: { destination: '/', permanent: false } };
+  const otherId =
+    user.id === data.worker_id ? data.job?.employer_id : data.worker_id;
+  let counterpartyName = '';
+  if (otherId) {
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', otherId)
+      .maybeSingle();
+    counterpartyName = prof?.full_name || '';
+  }
+  return { props: { app: data, counterpartyName } };
 };
 
-export default function ApplicationDetail({ app }: { app: AppDetail }) {
+export default function ApplicationDetail({ app, counterpartyName }: { app: AppDetail; counterpartyName: string }) {
   const [status, setStatus] = useState(app.status);
   useEffect(() => {
     const ch = supabase
@@ -60,22 +73,21 @@ export default function ApplicationDetail({ app }: { app: AppDetail }) {
 
   return (
     <main className="max-w-2xl mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-semibold">Application</h1>
-      <p className="text-sm">Job: {app.job?.title || app.job_id}</p>
-      <p>
-        Status:{' '}
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">
+            {app.job?.title || app.job_id}
+          </h1>
+          {counterpartyName && (
+            <p className="text-sm text-brand-subtle">{counterpartyName}</p>
+          )}
+        </div>
         <span className={`inline-block rounded px-2 py-1 text-sm ${statusCls}`}>
           {status}
         </span>
-      </p>
-      <div>
-        <h2 className="font-semibold">Message</h2>
-        <p>{app.message}</p>
-      </div>
-      <div>
-        <h2 className="font-semibold">Expected rate</h2>
-        <p>{app.expected_rate}</p>
-      </div>
+      </header>
+      <Thread applicationId={app.id} />
+      <MessageInput applicationId={app.id} />
     </main>
   );
 }
