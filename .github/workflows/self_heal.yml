@@ -1,43 +1,16 @@
-name: Codex self-heal
-
+name: Self Heal
 on:
-  workflow_dispatch:
-    inputs:
-      failed_job_url:
-        description: "URL of the failed QA job"
-        required: true
-        type: string
-      preview_url:
-        description: "Deployed preview URL"
-        required: true
-        type: string
-      base_url:
-        description: "BASE_URL to use for seeding / API calls"
-        required: true
-        type: string
-      pr_number:
-        description: "Pull Request number to push fixes to"
-        required: true
-        type: string
-
-permissions:
-  contents: write
-  actions: write
-  pull-requests: write
-
+  workflow_run:
+    workflows: ["Release Check (PR smoke)"]
+    types: [completed]
 jobs:
-  codex-self-heal:
+  heal:
+    if: ${{ contains(fromJson('["failure","cancelled","timed_out"]'), github.event.workflow_run.conclusion) }}
     runs-on: ubuntu-latest
-    env:
-      FAILED_JOB_URL: ${{ github.event.inputs.failed_job_url }}
-      BASE_URL: ${{ github.event.inputs.base_url }}
-      PREVIEW_URL: ${{ github.event.inputs.preview_url }}
-      PR_NUMBER: ${{ github.event.inputs.pr_number }}
     steps:
-      - name: Echo context for debugging
-        run: |
-          echo "FAILED_JOB_URL=${FAILED_JOB_URL}"
-          echo "PREVIEW_URL=${PREVIEW_URL}"
-          echo "BASE_URL=${BASE_URL}"
-          echo "PR_NUMBER=${PR_NUMBER}"
-      # … your Codex task/patch steps follow …
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Run healer
+        run: node scripts/self-heal/run.js
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
