@@ -1,0 +1,42 @@
+name: Codex Self-Heal
+
+on:
+  workflow_dispatch:
+    inputs:
+      previewUrl:
+        description: "Vercel preview URL"
+        required: false
+        default: ""
+      artifactUrl:
+        description: "Smoke artifacts zip (optional)"
+        required: false
+        default: ""
+      prNumber:
+        description: "PR number to comment/patch"
+        required: true
+      runId:
+        description: "Failed run id"
+        required: true
+      repo:
+        description: "owner/repo"
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  codex-self-heal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show inputs (debug)
+        run: |
+          echo "previewUrl=${{ github.event.inputs.previewUrl }}"
+          echo "artifactUrl=${{ github.event.inputs.artifactUrl }}"
+          echo "prNumber=${{ github.event.inputs.prNumber }}"
+          echo "runId=${{ github.event.inputs.runId }}"
+          echo "repo=${{ github.event.inputs.repo }}"
