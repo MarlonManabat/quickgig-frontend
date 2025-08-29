@@ -14,9 +14,21 @@ import { setupErrlog } from "@/lib/errlog";
 import { supabase } from "@/utils/supabaseClient";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
 
+const CLEAR_KEYS = [
+  "LEGACY_UI",
+  "LEGACY_STRICT_SHELL",
+  "NEXT_PUBLIC_LEGACY_UI",
+  "NEXT_PUBLIC_LEGACY_STRICT_SHELL",
+];
+
 export default function MyApp({ Component, pageProps }: AppProps) {
     const router = useRouter();
     const isError = router.pathname === "/404" || router.pathname === "/500";
+  useEffect(() => {
+    try {
+      CLEAR_KEYS.forEach((k) => localStorage.removeItem(k));
+    } catch {}
+  }, []);
   useEffect(() => {
     setupErrlog();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {

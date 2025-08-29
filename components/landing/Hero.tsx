@@ -1,12 +1,22 @@
-import { appHref } from '@/lib/appOrigin';
+import { appHref } from '@/lib/appLinks';
 
 export default function LandingHero() {
   return (
     <section className="...">
-      <a href={appHref('/')} className="btn btn-primary">Simulan na</a>
-      <a href={appHref('/find')} className="btn btn-secondary">Browse jobs</a>
-      {/* If you show a “Mag-post ng Gig” button here, link it too */}
-      {/* <a href={appHref('/post')} className="btn">Mag-post ng Gig</a> */}
+      <a
+        href={appHref('/')}
+        className="btn-primary"
+        data-e2e="cta-start"
+      >
+        Simulan na
+      </a>
+      <a
+        href={appHref('/find')}
+        className="btn-secondary"
+        data-e2e="cta-browse"
+      >
+        Browse jobs
+      </a>
     </section>
   );
 }

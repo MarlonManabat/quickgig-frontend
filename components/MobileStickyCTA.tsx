@@ -1,5 +1,5 @@
 'use client';
-import { appHref } from '@/lib/appOrigin';
+import { appHref } from '@/lib/appLinks';
 
 export default function MobileStickyCTA() {
   // Visible only on small screens; avoid overlapping with iOS home bar.
