@@ -7,6 +7,12 @@ import {
   City,
 } from '@/lib/ph-data';
 
+if (typeof window === 'undefined') {
+  // Never execute logic server-side (extra guard even though we use ssr:false)
+  // eslint-disable-next-line no-throw-literal
+  throw 'LocationSelect must run client-side';
+}
+
 export interface LocationValue {
   regionCode: string | null;
   provinceCode: string | null;
@@ -29,13 +35,17 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
   const [cities, setCities] = useState<City[]>(staticPhData.cities);
 
   useEffect(() => {
-    loadStaticPhData()
-      .then((d) => {
+    (async () => {
+      try {
+        const d = await loadStaticPhData();
         setRegions(d.regions);
         setProvinces(d.provinces);
         setCities(d.cities);
-      })
-      .catch(() => {});
+      } catch (e) {
+        console.error('LocationSelect failed to initialize:', e);
+        // Do not throw — leave selects empty; the page will fall back if needed
+      }
+    })();
   }, []);
 
   // hydrate from API when available
