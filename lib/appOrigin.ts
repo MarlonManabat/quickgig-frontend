@@ -1,15 +1,8 @@
-export function appOrigin() {
-  const explicit = process.env.NEXT_PUBLIC_APP_ORIGIN; // e.g., https://app.quickgig.ph
-  if (explicit) return explicit.replace(/\/$/, '');
+const rawOrigin = process.env.NEXT_PUBLIC_APP_ORIGIN || 'https://app.quickgig.ph';
+let origin = rawOrigin;
+while (origin.endsWith('/')) origin = origin.slice(0, -1);
+export const APP_ORIGIN = origin;
 
-  const env = process.env.NEXT_PUBLIC_VERCEL_ENV; // production | preview | development
-  if (env === 'production') return 'https://app.quickgig.ph';
-  if (env === 'development') return 'http://localhost:3000';
-  // preview: relative so Vercel previews keep working
-  return '';
-}
+export const appHref = (path = '/') =>
+  `${APP_ORIGIN}${path.startsWith('/') ? path : `/${path}`}`;
 
-export function appHref(path: string) {
-  const base = appOrigin();
-  return base ? `${base}${path}` : path;
-}

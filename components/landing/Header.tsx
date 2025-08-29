@@ -1,28 +1,25 @@
 import Link from 'next/link';
-
-const APP_ORIGIN =
-  process.env.NEXT_PUBLIC_APP_ORIGIN ||
-  'https://app.quickgig.ph';
+import { appHref } from '@/lib/appOrigin';
 
 export default function LandingHeader() {
   return (
     <nav className="...">
       <Link
-        href={`${APP_ORIGIN}/find`}
+        href={appHref('/find')}
         prefetch={false}
         className="..."
       >
         Find work
       </Link>
       <Link
-        href={`${APP_ORIGIN}/post`}
+        href={appHref('/post')}
         prefetch={false}
         className="..."
       >
         Post job
       </Link>
       <Link
-        href={`${APP_ORIGIN}/login`}
+        href={appHref('/login')}
         prefetch={false}
         className="..."
       >

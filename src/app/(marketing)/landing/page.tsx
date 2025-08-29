@@ -1,9 +1,6 @@
 import Link from 'next/link';
 import LandingHeader from '@/components/landing/Header';
-
-const APP_ORIGIN =
-  process.env.NEXT_PUBLIC_APP_ORIGIN ||
-  'https://app.quickgig.ph';
+import { appHref } from '@/lib/appOrigin';
 
 export default function LandingPage() {
   return (
@@ -17,10 +14,10 @@ export default function LandingPage() {
           Ang pinakamabilis na paraan para makahanap ng trabaho o mag-hire ng skilled professionals. Dito sa QuickGig.ph, madali lang!
         </p>
         <div className="actions">
-          <Link href={`${APP_ORIGIN}/`} prefetch={false} className="btn btn-primary">
+          <Link href={appHref('/')} prefetch={false} className="btn btn-primary">
             Simulan na
           </Link>
-          <Link href={`${APP_ORIGIN}/find`} prefetch={false} className="btn btn-secondary">
+          <Link href={appHref('/find')} prefetch={false} className="btn btn-secondary">
             Browse jobs
           </Link>
         </div>
