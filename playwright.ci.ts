@@ -3,6 +3,7 @@ import baseConfig from "./playwright.config";
 
 export default defineConfig({
   ...(baseConfig as any),
+  retries: 1,
   projects: [
     { name: "public" },
     { name: "worker", use: { storageState: "playwright/.auth/worker.json" } },

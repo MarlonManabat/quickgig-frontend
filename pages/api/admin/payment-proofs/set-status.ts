@@ -6,21 +6,31 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method !== "POST") {
+    res.status(405).end();
+    return;
+  }
   const supabase = createServerSupabaseClient({ req, res });
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return res.status(401).end();
+  if (!user) {
+    res.status(401).end();
+    return;
+  }
   const allowed = (process.env.ADMIN_EMAILS || "")
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
-  if (!allowed.includes((user.email || "").toLowerCase()))
-    return res.status(404).end("Not Found");
+  if (!allowed.includes((user.email || "").toLowerCase())) {
+    res.status(404).end("Not Found");
+    return;
+  }
   const { id, status, reason } = req.body || {};
-  if (!["approved", "flagged"].includes(status))
-    return res.status(400).json({ error: "invalid status" });
+  if (!["approved", "flagged"].includes(status)) {
+    res.status(400).json({ error: "invalid status" });
+    return;
+  }
 
   const { data: proof } = await supabase
     .from("payment_proofs")
@@ -32,7 +42,10 @@ export default async function handler(
     proof_id: id,
     new_status: status,
   });
-  if (error) return res.status(400).json({ error: error.message });
+  if (error) {
+    res.status(400).json({ error: error.message });
+    return;
+  }
 
   const employerId = (proof as any)?.user_id;
   const qty = Number(process.env.NEXT_PUBLIC_TICKETS_PER_PROOF || "0");
@@ -56,4 +69,5 @@ export default async function handler(
   }
 
   res.status(200).json({ ok: true });
+  return;
 }
