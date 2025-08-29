@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { safeSelect } from "@/lib/safeSelect";
 import { hasMockSession } from "@/lib/session";
 
 export default function Start() {
@@ -30,11 +31,13 @@ export default function Start() {
       }
 
       // fetch profile for role_pref + completeness
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role_pref, first_name, city")
-        .eq("id", user.id)
-        .maybeSingle();
+      const profile = await safeSelect<any>(
+        supabase
+          .from("profiles")
+          .select("role_pref, first_name, city")
+          .eq("id", user.id)
+          .maybeSingle(),
+      );
 
       // set role_pref if missing and intent is known (fire and forget)
       if (!profile?.role_pref) {

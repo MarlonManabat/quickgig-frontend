@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import { safeSelect } from "@/lib/safeSelect";
 import { timeAgo } from "@/utils/time";
 
 type Row = {
@@ -17,13 +18,18 @@ export default function NotificationsPage() {
   const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id || null));
-    supabase
-      .from("notifications")
-      .select("id, title, body, link, read, created_at")
-      .order("created_at", { ascending: false })
-      .limit(50)
-      .then(({ data }) => setItems((data as any) || []));
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      setUid(data.user?.id || null);
+      const rows = await safeSelect<Row[]>(
+        supabase
+          .from("notifications")
+          .select("id, title, body, link, read, created_at")
+          .order("created_at", { ascending: false })
+          .limit(50),
+      );
+      setItems(rows);
+    })();
   }, []);
 
   async function markRead(id: string) {

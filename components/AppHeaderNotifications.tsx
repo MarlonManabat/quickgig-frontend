@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { safeSelect } from "@/lib/safeSelect";
 import { timeAgo } from "@/utils/time";
 
 type Row = { id: string; title: string; link: string | null; read: boolean; created_at: string };
@@ -19,20 +20,16 @@ export default function AppHeaderNotifications() {
       const { data } = await supa.auth.getUser();
       const uid = data.user?.id || null;
       if (!uid) return;
-      try {
-        const { data: rows } = await supa
+      const list = await safeSelect<Row[]>(
+        supa
           .from("notifications")
           .select("id,title,link,read,created_at")
           .eq("user_id", uid)
           .order("created_at", { ascending: false })
-          .limit(5);
-        const list = (rows as any) || [];
-        setItems(list);
-        setUnread(list.filter((r: any) => !r.read).length);
-      } catch {
-        setItems([]);
-        setUnread(0);
-      }
+          .limit(5),
+      );
+      setItems(list);
+      setUnread(list.filter((r) => !r.read).length);
       ch = supa
         .channel("notif-ch")
         .on(
