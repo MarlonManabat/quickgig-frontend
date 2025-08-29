@@ -11,9 +11,9 @@ export function __setSupabaseClient(client: any) {
 export async function submit(form: FormData) {
   const title = form.get('title') as string;
   const description = form.get('description') as string;
-  const region_code = form.get('region_code') as string;
-  const city_code = form.get('city_code') as string;
-  const price_php = Number(form.get('price_php'));
+  const regionCode = form.get('region_code') as string;
+  const cityCode = form.get('city_code') as string;
+  const pricePhp = form.get('price_php') as string;
 
   const { data: { user } } = await supa.auth.getUser();
   if (!user) throw new Error('Please log in');
@@ -21,9 +21,9 @@ export async function submit(form: FormData) {
   const payload = {
     p_title: title,
     p_description: description,
-    p_region_code: region_code,
-    p_city_code: city_code,
-    p_price_php: Number(price_php),
+    p_region_code: regionCode,
+    p_city_code: cityCode,
+    p_price_php: Number(pricePhp),
   };
 
   let { data, error } = await supa.rpc('create_gig_public', payload);

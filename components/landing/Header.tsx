@@ -1,4 +1,4 @@
-import { appHref } from '@/lib/appOrigin';
+import { appHref } from '@/lib/appLinks';
 
 export default function LandingHeader() {
   return (
