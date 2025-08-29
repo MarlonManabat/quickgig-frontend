@@ -8,7 +8,7 @@ import AppLogo from "@/components/AppLogo";
 import { getStubRole } from "@/lib/testAuth";
 
 const links = [
-  { href: "/find?focus=search", label: copy.nav.findWork, id: "nav-find" },
+  { href: "/find", label: copy.nav.findWork, id: "nav-find" },
   { href: "/gigs?mine=1", label: copy.nav.myGigs, id: "app-nav-my-gigs" },
   {
     href: "/applications",
@@ -16,7 +16,7 @@ const links = [
     id: "app-nav-applications",
   },
   { href: "/saved", label: copy.nav.saved, id: "app-nav-saved" },
-  { href: "/employer/post", label: copy.nav.postJob, id: "nav-post" },
+  { href: "/post", label: copy.nav.postJob, id: "nav-post" },
 ];
 
 function IconMenu() {

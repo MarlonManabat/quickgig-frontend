@@ -29,10 +29,10 @@ export default function Nav() {
   return (
     <nav className="p-4 border-b mb-4 flex gap-4">
       <Link href="/home">Home</Link>
-      <Link href="/find?focus=search" data-testid="nav-find">
+      <Link href="/find" data-testid="nav-find">
         {copy.nav.findWork}
       </Link>
-      <Link href="/employer/post" data-testid="nav-post">
+      <Link href="/post" data-testid="nav-post">
         {copy.nav.postJob}
       </Link>
       {session ? (
