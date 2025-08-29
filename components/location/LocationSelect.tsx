@@ -155,7 +155,7 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
             const provinceCode = e.target.value || null;
             onChange({ regionCode: value.regionCode, provinceCode, cityCode: null });
           }}
-          disabled={disabled || !value.regionCode}
+          disabled={disabled ? true : !value.regionCode ? true : false}
         >
           <option value="">Select Province</option>
           {provinceOpts.map((p) => (

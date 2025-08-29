@@ -23,3 +23,11 @@ if (/missing the following properties.*value, onChange/i.test(summary)) {
     }
   }
 }
+
+// If Playwright logs contain "element is not enabled" for Province/HUC select on /post,
+// push a test patch that waits for enablement before selectOption.
+if (/Province\/Metro\/HUC/i.test(summary || '') && /element is not enabled/i.test(summary || '')) {
+  // open a branch and inject an await expect(province).toBeEnabled(...)
+  // (same snippet as above). Then open a PR titled:
+  // "Self-heal: wait for Province/HUC to enable before selecting (e2e/post-ncr)"
+}
