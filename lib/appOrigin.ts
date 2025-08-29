@@ -1,5 +1,5 @@
 export function appOrigin() {
-  const explicit = process.env.NEXT_PUBLIC_APP_URL; // e.g., https://app.quickgig.ph
+  const explicit = process.env.NEXT_PUBLIC_APP_ORIGIN; // e.g., https://app.quickgig.ph
   if (explicit) return explicit.replace(/\/$/, '');
 
   const env = process.env.NEXT_PUBLIC_VERCEL_ENV; // production | preview | development
