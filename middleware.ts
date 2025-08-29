@@ -1,26 +1,20 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { NextResponse, NextRequest } from 'next/server';
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
+const LANDING_HOSTS = new Set(['quickgig.ph', 'www.quickgig.ph']);
+const APP_HOST_PROD = 'app.quickgig.ph';
 
-  const supabase = createMiddlewareClient({ req, res }, {
-    cookieOptions: {
-      // Allows shared auth across app.quickgig.ph and quickgig.ph
-      domain: process.env.SUPABASE_AUTH_COOKIE_DOMAIN || undefined
-    }
-  });
+export function middleware(req: NextRequest) {
+  const url = new URL(req.url);
+  const path = url.pathname;
+  const isCandidate = path === '/post' || path === '/find' || path === '/login';
+  const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
 
-  // Triggers a refresh if the session is expired/expiring
-  await supabase.auth.getSession();
-
-  return res;
+  if (isProd && LANDING_HOSTS.has(url.hostname) && isCandidate) {
+    const redirect = new URL(req.url);
+    redirect.hostname = APP_HOST_PROD;
+    return NextResponse.redirect(redirect, 301);
+  }
+  return NextResponse.next();
 }
 
-// Exclude static assets and health endpoints
-export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|api/health).*)'
-  ]
-};
+export const config = { matcher: ['/post', '/find', '/login'] };
