@@ -3,30 +3,36 @@ import React, { useState } from 'react';
 import LocationSelect from '@/components/LocationSelect';
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 
-const supa = createBrowserSupabaseClient();
+let supa = createBrowserSupabaseClient();
+export function __setSupabaseClient(client: any) {
+  supa = client;
+}
 
-async function submit(form: FormData) {
+export async function submit(form: FormData) {
   const title = form.get('title') as string;
   const description = form.get('description') as string;
   const region_code = form.get('region_code') as string;
   const city_code = form.get('city_code') as string;
   const price_php = Number(form.get('price_php'));
 
-  // need the current user id for ticket debit
   const { data: { user } } = await supa.auth.getUser();
   if (!user) throw new Error('Please log in');
 
-  const res = await fetch('/api/gigs/create', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      title, description, region_code, city_code, price_php, user_id: user.id,
-    }),
-  });
+  const payload = {
+    p_title: title,
+    p_description: description,
+    p_region_code: region_code,
+    p_city_code: city_code,
+    p_price_php: Number(price_php),
+  };
 
-  const json = await res.json();
-  if (!res.ok) throw new Error(json?.error || 'Failed to create gig');
-  return json;
+  let { data, error } = await supa.rpc('create_gig_public', payload);
+  if (error && /function.*not found|schema cache/i.test(error.message)) {
+    await new Promise((r) => setTimeout(r, 1200));
+    ({ data, error } = await supa.rpc('create_gig_public', payload));
+  }
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export default function PostJobPage() {
@@ -41,6 +47,7 @@ export default function PostJobPage() {
 
     try {
       await submit(new FormData(e.currentTarget));
+      setForm({ title:'', description:'', region_code:'', city_code:'', price_php:'' });
       window.location.href = `/find`;
     } catch (e: any) {
       setErr(e.message || 'Create failed');

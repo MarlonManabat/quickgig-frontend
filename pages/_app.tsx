@@ -15,10 +15,8 @@ import { supabase } from "@/utils/supabaseClient";
 import AppErrorBoundary from "@/components/AppErrorBoundary";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-  const isError = router.pathname === "/404" || router.pathname === "/500";
-  const isApp = typeof window !== "undefined" && window.location.hostname.startsWith("app.");
-  const showHeader = isApp ? true : process.env.NEXT_PUBLIC_LEGACY_UI !== "1";
+    const router = useRouter();
+    const isError = router.pathname === "/404" || router.pathname === "/500";
   useEffect(() => {
     setupErrlog();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -45,13 +43,13 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <AppErrorBoundary>
         <div className="min-h-screen bg-surface text-text flex flex-col">
-          {!isError && showHeader && <AppHeader />}
+            {!isError && <AppHeader />}
           <main className="flex-1 py-6 bg-surface">
             <Container>
               <Component {...pageProps} />
             </Container>
           </main>
-          {!isError && showHeader && <AppFooter />}
+            {!isError && <AppFooter />}
         </div>
       </AppErrorBoundary>
     </>
