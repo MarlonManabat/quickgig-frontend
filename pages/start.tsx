@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { safeSelect } from "@/lib/safeSelect";
+import { safeSelect } from "@/lib/supabase-safe";
 import { hasMockSession } from "@/lib/session";
 
 export default function Start() {

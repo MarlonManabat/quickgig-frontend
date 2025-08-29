@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
-import { safeSelect } from "@/lib/safeSelect";
+import { safeSelect } from "@/lib/supabase-safe";
 import { useRequireUser } from "@/lib/useRequireUser";
 import { uploadAvatar } from "@/lib/avatar";
 import { getBalance } from "@/lib/tickets";

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
-import { safeSelect } from "@/lib/safeSelect";
+import { safeSelect } from "@/lib/supabase-safe";
 import { timeAgo } from "@/utils/time";
 
 type Row = {

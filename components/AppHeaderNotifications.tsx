@@ -1,98 +1,68 @@
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { safeSelect } from "@/lib/safeSelect";
-import { timeAgo } from "@/utils/time";
+'use client';
 
-type Row = { id: string; title: string; link: string | null; read: boolean; created_at: string };
+import React from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { safeSelect } from '@/lib/supabase-safe';
+
+type NotificationRow = {
+  id: string;
+  title: string;
+  link: string | null;
+  read: boolean;
+  created_at: string;
+  user_id?: string;
+};
 
 export default function AppHeaderNotifications() {
-  const [unread, setUnread] = useState(0);
-  const [items, setItems] = useState<Row[]>([]);
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    const supa = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
-    let ch: any = null;
+  const supa = createClientComponentClient();
+  const [items, setItems] = React.useState<NotificationRow[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let mounted = true;
+
     (async () => {
-      const { data } = await supa.auth.getUser();
-      const uid = data.user?.id || null;
-      if (!uid) return;
-      const list = await safeSelect<Row[]>(
+      const { data: { user } } = await supa.auth.getUser();
+      const uid = user?.id;
+      if (!uid) { if (mounted) setItems([]); setLoading(false); return; }
+
+      const list = await safeSelect<NotificationRow[]>(
         supa
-          .from("notifications")
-          .select("id,title,link,read,created_at")
-          .eq("user_id", uid)
-          .order("created_at", { ascending: false })
-          .limit(5),
+          .from('notifications')
+          .select('id,title,link,read,created_at')
+          .eq('user_id', uid)
+          .order('created_at', { ascending: false })
+          .limit(5)
       );
-      setItems(list);
-      setUnread(list.filter((r) => !r.read).length);
-      ch = supa
-        .channel("notif-ch")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "notifications",
-            filter: `user_id=eq.${uid}`,
-          },
-          (payload) => {
-            setUnread((x) => x + 1);
-            setItems((rows) => [payload.new as any, ...rows].slice(0, 5));
-          },
-        )
-        .subscribe();
+
+      if (mounted) {
+        setItems(Array.isArray(list) ? list : []);
+        setLoading(false);
+      }
     })();
-    return () => {
-      if (ch) supa.removeChannel(ch);
-    };
-  }, []);
+
+    return () => { mounted = false; };
+  }, [supa]);
+
+  // Render a minimal non-fatal UI
+  if (loading) return null;
+  if (!items.length) return null;
 
   return (
     <div className="relative">
-      <button
-        aria-label="Notifications"
-        className="relative"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span className="i-bell" />
-        {unread > 0 && (
-          <span className="absolute -top-1 -right-1 text-xs rounded-full bg-red-500 text-white px-1">
-            {unread}
-          </span>
-        )}
-      </button>
-      {open && (
-        <div className="absolute right-0 mt-2 w-72 bg-white border rounded shadow-md z-50">
-          <ul className="max-h-80 overflow-auto">
-            {items.map((n) => (
-              <li key={n.id} className="p-2 border-b last:border-0">
-                {n.link ? (
-                  <Link href={n.link} className="block text-sm">
-                    {n.title}
-                  </Link>
-                ) : (
-                  <span className="block text-sm">{n.title}</span>
-                )}
-                <div className="text-xs text-brand-subtle">{timeAgo(n.created_at)}</div>
-              </li>
-            ))}
-            {items.length === 0 && (
-              <li className="p-2 text-sm">No notifications</li>
-            )}
-          </ul>
-          <Link
-            href="/notifications"
-            className="block text-center text-sm p-2 underline"
-          >
-            View all
-          </Link>
-        </div>
-      )}
+      {/* Your bell icon / dropdown here; keep it simple to avoid SSR issues */}
+      <div className="absolute right-0 mt-2 w-72 bg-white border rounded-xl shadow">
+        <ul className="p-2">
+          {items.map(n => (
+            <li key={n.id} className="py-2 px-3 hover:bg-gray-50 rounded-lg">
+              <a href={n.link || '#'} className="block text-sm">
+                <span className="font-medium">{n.title}</span>
+                <span className="block text-xs opacity-60">{new Date(n.created_at).toLocaleString()}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

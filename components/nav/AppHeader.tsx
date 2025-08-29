@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { supabase } from "@/utils/supabaseClient";
-import { safeSelect } from "@/lib/safeSelect";
+import { safeSelect } from "@/lib/supabase-safe";
 import { getStubRole } from "@/lib/testAuth";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
 import AppLogo from "@/components/AppLogo";
