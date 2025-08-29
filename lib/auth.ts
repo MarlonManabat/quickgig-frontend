@@ -12,17 +12,17 @@ export async function sendMagicLink(
   params?: { next?: string; role?: string },
 ) {
   const supabase = createClientComponentClient();
-  const base =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : process.env.NEXT_PUBLIC_SITE_URL!;
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://app.quickgig.ph";
   const qp = new URLSearchParams();
   if (params?.next) qp.set("next", params.next);
   if (params?.role) qp.set("role", params.role);
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${base}/auth/callback${qp.toString() ? `?${qp.toString()}` : ""}`,
+      emailRedirectTo: `${siteUrl}/api/auth/callback${
+        qp.toString() ? `?${qp.toString()}` : "?next=/"
+      }`,
     },
   });
   return { error };
