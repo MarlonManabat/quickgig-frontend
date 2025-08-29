@@ -1,21 +1,25 @@
-import { NextResponse, NextRequest } from 'next/server';
-
-const LANDING_HOSTS = new Set(['quickgig.ph', 'www.quickgig.ph']);
-const APP_HOST_PROD = 'app.quickgig.ph';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(req: NextRequest) {
-  const url = new URL(req.url);
-  const path = url.pathname;
-  const isLandingHost = LANDING_HOSTS.has(url.hostname);
-  const isProd = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
-  const needsApp = path === '/post' || path === '/find' || path === '/login';
+  const url = req.nextUrl;
+  const host = req.headers.get('host') ?? '';
+  const isApp = host.startsWith('app.');
+  const { pathname } = url;
 
-  if (isProd && isLandingHost && needsApp) {
-    const to = new URL(req.url);
-    to.hostname = APP_HOST_PROD;
-    return NextResponse.redirect(to, 301);
+  if (!isApp && pathname === '/') {
+    url.pathname = '/landing';
+    return NextResponse.rewrite(url);
   }
+
+  if (isApp && pathname === '/landing') {
+    url.pathname = '/';
+    return NextResponse.redirect(url);
+  }
+
   return NextResponse.next();
 }
 
-export const config = { matcher: ['/post', '/find', '/login'] };
+export const config = {
+  matcher: ['/', '/landing'],
+};
