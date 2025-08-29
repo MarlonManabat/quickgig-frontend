@@ -10,20 +10,17 @@ export default function PostJobPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const res = await fetch('/api/gigs/create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        title: form.title,
-        description: form.description,
-        region_code: form.region_code,
-        city_code: form.city_code,
-        budget: form.budget ? Number(form.budget) : null
-      })
+        ...form,
+        budget: form.budget ? Number(form.budget) : null,
+      }),
     });
     if (res.status === 402) { setBuyOpen(true); return; }
     if (!res.ok) { alert('Failed to create gig'); return; }
     const { gig_id } = await res.json();
-    window.location.href = `/gigs/${gig_id}`;
+    window.location.href = `/find`; // or `/gigs/${gig_id}` once detail page exists
   };
 
   return (

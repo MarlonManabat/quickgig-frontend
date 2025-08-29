@@ -45,3 +45,8 @@ curl -X POST -H "Content-Type: application/json" -d '{"proof_url":"https://.../r
 curl -X POST -H "Content-Type: application/json" -d '{"decision":"paid"}' https://app.quickgig.ph/api/orders/<id>/decide
 curl https://app.quickgig.ph/api/users/me/eligibility
 ```
+
+## Deployment notes
+
+* After deploy, run **/api/admin/seed** once to promote `SEED_ADMIN_EMAIL` to admin.
+* Apply the migration via Supabase Studio → SQL or `supabase db push`.

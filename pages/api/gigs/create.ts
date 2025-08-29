@@ -12,8 +12,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'MISSING_FIELDS' });
 
   const { data, error } = await supabase.rpc('decrement_credit_and_create_gig', {
-    p_title: title, p_description: description,
-    p_region_code: region_code, p_city_code: city_code, p_budget: budget ?? null
+    p_title: title,
+    p_description: description,
+    p_region_code: region_code,
+    p_city_code: city_code,
+    p_budget: budget ?? null,
   });
 
   if (error) {

@@ -1,4 +1,4 @@
--- PROFILES (idempotent)
+-- PROFILES
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   role text not null default 'user',
@@ -7,22 +7,21 @@ create table if not exists public.profiles (
 );
 alter table public.profiles enable row level security;
 
--- RLS for profiles
 do $$
 begin
   if not exists (select 1 from pg_policies where policyname='profiles: read own' and tablename='profiles') then
-    create policy "profiles: read own" on public.profiles for select using (auth.uid() = id);
+    create policy "profiles: read own"   on public.profiles for select using (auth.uid() = id);
   end if;
   if not exists (select 1 from pg_policies where policyname='profiles: update own' and tablename='profiles') then
     create policy "profiles: update own" on public.profiles for update using (auth.uid() = id);
   end if;
 end $$;
 
--- Trigger to auto-create profile on signup (idempotent)
 create or replace function public.handle_new_user() returns trigger
 language plpgsql security definer as $$
+declare v_default int := coalesce(current_setting('app.default_post_credits', true)::int, 3);
 begin
-  insert into public.profiles (id) values (new.id)
+  insert into public.profiles (id, post_credits) values (new.id, v_default)
   on conflict (id) do nothing;
   return new;
 end$$;
@@ -32,7 +31,7 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- GIGS (idempotent)
+-- GIGS
 create table if not exists public.gigs (
   id uuid primary key default gen_random_uuid(),
   employer_id uuid not null references auth.users(id),
@@ -51,13 +50,13 @@ begin
     create policy "gigs: insert own" on public.gigs for insert with check (auth.uid() = employer_id);
   end if;
   if not exists (select 1 from pg_policies where policyname='gigs: read all' and tablename='gigs') then
-    create policy "gigs: read all" on public.gigs for select using (true);
+    create policy "gigs: read all"  on public.gigs for select using (true);
   end if;
 end $$;
 
 create index if not exists gigs_region_city_idx on public.gigs (region_code, city_code);
 
--- ORDERS (manual top-up via GCash)
+-- ORDERS (manual top-up)
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id),
@@ -67,6 +66,8 @@ create table if not exists public.orders (
   proof_path text,
   approved_by uuid references auth.users(id),
   approved_at timestamptz,
+  notes text,
+  payment_method text not null default 'gcash',
   created_at timestamptz not null default now()
 );
 alter table public.orders enable row level security;
@@ -78,22 +79,23 @@ begin
   end if;
   if not exists (select 1 from pg_policies where policyname='orders: create own pending' and tablename='orders') then
     create policy "orders: create own pending" on public.orders for insert
-    with check (auth.uid() = user_id and status = 'pending');
+      with check (auth.uid() = user_id and status = 'pending');
   end if;
   if not exists (select 1 from pg_policies where policyname='orders: admins manage' and tablename='orders') then
     create policy "orders: admins manage" on public.orders for all
-    using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'));
+      using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin'));
   end if;
 end $$;
+
+create index if not exists orders_user_status_idx on public.orders (user_id, status, created_at desc);
+create index if not exists profiles_role_idx on public.profiles (role);
 
 -- STORAGE bucket for proofs (private)
 do $$
 begin
   perform storage.create_bucket('payments', false, false);
 exception when others then
-  if sqlstate <> '23505' then
-    raise notice 'create_bucket failed: %', sqlerrm;
-  end if;
+  if sqlstate <> '23505' then raise notice 'create_bucket failed: %', sqlerrm; end if;
 end $$;
 
 create policy if not exists "payments: user insert own proofs" on storage.objects
@@ -159,4 +161,3 @@ begin
 end $$;
 
 grant execute on function public.admin_approve_order(uuid) to authenticated;
-
