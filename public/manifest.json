@@ -57,7 +57,7 @@
       "name": "Post Job",
       "short_name": "Post Job",
       "description": "Post a new job or gig",
-      "url": "/post",
+        "url": "/employer/post",
       "icons": [
         {
           "src": "/logo-icon.png",

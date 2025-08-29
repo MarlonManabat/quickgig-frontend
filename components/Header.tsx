@@ -16,7 +16,7 @@ const links = [
     id: "app-nav-applications",
   },
   { href: "/saved", label: copy.nav.saved, id: "app-nav-saved" },
-  { href: "/post?intent=employer", label: copy.nav.postJob, id: "nav-post" },
+  { href: "/employer/post", label: copy.nav.postJob, id: "nav-post" },
 ];
 
 function IconMenu() {

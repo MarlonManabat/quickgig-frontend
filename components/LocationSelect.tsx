@@ -1,14 +1,10 @@
 import React from 'react';
-import locations from '@/data/ph_locations.json';
+import { getRegions, getCitiesByRegion } from '@/lib/locations';
 
 type Value = { region_code?: string; city_code?: string };
 
 export default function LocationSelect({
-  value,
-  onChange,
-  regionLabel = 'Select Region',
-  cityLabel = 'Select City',
-  className = ''
+  value, onChange, regionLabel = 'Select Region', cityLabel = 'Select City', className = ''
 }: {
   value?: Value;
   onChange: (v: Value) => void;
@@ -20,15 +16,12 @@ export default function LocationSelect({
   const [city, setCity] = React.useState(value?.city_code || '');
 
   React.useEffect(() => {
-    // keep internal state in sync if parent resets
     setRegion(value?.region_code || '');
     setCity(value?.city_code || '');
   }, [value?.region_code, value?.city_code]);
 
-  const cities = React.useMemo(
-    () => locations.cities.filter(c => !region || c.region_code === region),
-    [region]
-  );
+  const regions = React.useMemo(() => getRegions(), []);
+  const cities  = React.useMemo(() => getCitiesByRegion(region), [region]);
 
   return (
     <div className={`grid gap-3 sm:grid-cols-2 ${className}`}>
@@ -36,36 +29,30 @@ export default function LocationSelect({
         aria-label="Region"
         value={region}
         onChange={(e) => {
-          const nextRegion = e.target.value;
-          setRegion(nextRegion);
+          const next = e.target.value;
+          setRegion(next);
           setCity('');
-          onChange({ region_code: nextRegion, city_code: '' });
+          onChange({ region_code: next, city_code: '' });
         }}
         className="border rounded-xl p-2"
       >
         <option value="">{regionLabel}</option>
-        {locations.regions.map(r => (
-          <option key={r.code} value={r.code}>{r.name}</option>
-        ))}
+        {regions.map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
       </select>
 
       <select
         aria-label="City"
         value={city}
         onChange={(e) => {
-          const nextCity = e.target.value;
-          setCity(nextCity);
-          onChange({ region_code: region, city_code: nextCity });
+          const next = e.target.value;
+          setCity(next);
+          onChange({ region_code: region, city_code: next });
         }}
         className="border rounded-xl p-2"
         disabled={!region}
       >
-        <option value="">
-          {region ? cityLabel : 'Select Region First'}
-        </option>
-        {cities.map(c => (
-          <option key={c.code} value={c.code}>{c.name}</option>
-        ))}
+        <option value="">{region ? cityLabel : 'Select Region First'}</option>
+        {cities.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
       </select>
     </div>
   );

@@ -27,11 +27,16 @@ export default function AppHeader() {
       const user = data.user;
       setUser(user);
       if (!user) return;
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("role_pref")
-        .single();
-      setRole((prof?.role_pref as "worker" | "employer" | null) ?? null);
+      try {
+        const { data: prof, error } = await supabase
+          .from("profiles")
+          .select("role_pref")
+          .single();
+        if (error) throw error;
+        setRole((prof?.role_pref as "worker" | "employer" | null) ?? null);
+      } catch {
+        setRole(null);
+      }
     });
   }, []);
 
