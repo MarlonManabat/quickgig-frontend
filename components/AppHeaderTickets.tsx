@@ -16,13 +16,13 @@ export default function AppHeaderTickets() {
     })();
   }, []);
 
-  const { data } = useSWR(uid ? ["balance", uid] : null, async () => {
+  const { data } = useSWR(uid ? ["tickets", uid] : null, async () => {
     const { data } = await supabase
-      .from("tickets_balances")
-      .select("balance")
-      .eq("user_id", uid!)
-      .maybeSingle();
-    return data?.balance ?? 0;
+      .from("profiles")
+      .select("tickets")
+      .eq("id", uid!)
+      .single();
+    return data?.tickets ?? 0;
   });
 
   if (!uid) return null;

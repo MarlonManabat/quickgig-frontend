@@ -6,17 +6,24 @@ import { safeSelect } from "@/lib/supabase-safe";
 import { getStubRole } from "@/lib/testAuth";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
 import AppLogo from "@/components/AppLogo";
-import { getCredits } from "@/lib/credits";
 import { APP_URL } from "@/lib/urls";
 
 export default function AppHeader() {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<"worker" | "employer" | null>(null);
   const [open, setOpen] = useState(false);
-  const { data: credits } = useSWR(
-    user && role === "employer" ? "credits" : null,
-    getCredits,
+  const { data: ticketData } = useSWR(
+    user && role === "employer" ? (["tickets", user.id] as const) : null,
+    async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("tickets")
+        .eq("id", user!.id)
+        .single();
+      return data?.tickets ?? 0;
+    },
   );
+  const tickets = (ticketData as number | undefined) ?? 0;
 
   useEffect(() => {
     const stub = getStubRole();
@@ -60,16 +67,22 @@ export default function AppHeader() {
           )}
           {user && role === "employer" && (
             <>
-              <Link href="/jobs/new" data-testid="nav-post">Post job</Link>
+              <Link
+                href={tickets > 0 ? "/jobs/new" : "/wallet"}
+                data-testid="nav-post"
+                className={tickets === 0 ? "opacity-50" : undefined}
+              >
+                Post job
+              </Link>
               <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
             </>
           )}
-          {user && role === "employer" && credits !== undefined && (
+          {user && role === "employer" && tickets !== undefined && (
             <span
-              data-testid="credits-pill"
+              data-testid="tickets-pill"
               className="text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800"
             >
-              Credits: {credits}
+              Tickets: {tickets}
             </span>
           )}
           <AppHeaderNotifications />
@@ -118,7 +131,11 @@ export default function AppHeader() {
             )}
             {user && role === "employer" && (
               <>
-                <Link href="/jobs/new" className="py-2" data-testid="nav-post">
+                <Link
+                  href={tickets > 0 ? "/jobs/new" : "/wallet"}
+                  className="py-2"
+                  data-testid="nav-post"
+                >
                   Post job
                 </Link>
                 <Link href="/find?focus=search" className="py-2" data-testid="nav-find">

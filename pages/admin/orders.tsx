@@ -18,9 +18,9 @@ export default function AdminOrders({ orders }: { orders: any[] }) {
 
   const approve = async (id: string) => {
     setBusy(id);
-    const res = await fetch('/api/orders/approve', {
+    const res = await fetch('/api/orders/admin/approve', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order_id: id })
+      body: JSON.stringify({ orderId: id })
     });
     setBusy(null);
     if (!res.ok) return alert('Approve failed');

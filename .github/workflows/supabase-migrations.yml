@@ -8,16 +8,28 @@ on:
 jobs:
   migrate:
     runs-on: ubuntu-latest
-    env:
-      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: supabase/setup-cli@v1
-      - run: supabase link --project-ref $SUPABASE_PROJECT_REF
+      - name: Install Supabase CLI
+        run: npm i -g supabase@2
+      - name: Show Supabase CLI version
+        run: supabase --version
+      - name: Build DB_URL from secrets
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-      - run: supabase db push
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -eu
+          if [ -z "${SUPABASE_PROJECT_REF:-}" ] || [ -z "${SUPABASE_DB_PASSWORD:-}" ]; then
+            echo "::error::Missing SUPABASE_PROJECT_REF or SUPABASE_DB_PASSWORD secrets"
+            exit 1
+          fi
+          echo "DB_URL=postgresql://postgres:${SUPABASE_DB_PASSWORD}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres" >> $GITHUB_ENV
+      - name: Apply migrations (main)
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          DB_URL: ${{ env.DB_URL }}
+        run: |
+          set -eu
+          echo "Applying migrations to remote DB…"
+          supabase db push --db-url "$DB_URL" --non-interactive --include-all
+          echo "Migrations applied."

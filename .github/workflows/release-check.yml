@@ -25,6 +25,74 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - run: npm ci
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Show Supabase CLI version
+        run: supabase --version
+
+      - id: migcheck
+        name: Check if migrations folder is empty
+        run: |
+          if [ -z "$(ls -A supabase/migrations 2>/dev/null)" ]; then
+            echo "empty=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "empty=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: resolve-ipv4
+        if: steps.migcheck.outputs.empty == 'false'
+        name: Resolve IPv4 and build DB_URL (TLS-safe hostaddr)
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -eu
+          H="db.${SUPABASE_PROJECT_REF}.supabase.co"
+          # Prefer getent; fallback to Python to get A/IPv4
+          IPV4="$(getent ahostsv4 "$H" | awk 'NR==1 {print $1}' || true)"
+          if [ -z "${IPV4:-}" ]; then
+            IPV4="$(python3 - <<'PY'
+import socket, sys
+print(socket.getaddrinfo(sys.argv[1], 5432, family=socket.AF_INET)[0][4][0])
+PY
+            "$H")"
+          fi
+          echo "Resolved $H -> ${IPV4}"
+          # Keep hostname for SNI/TLS; force IPv4 via hostaddr
+          echo "DB_URL_IP=postgresql://postgres:${SUPABASE_DB_PASSWORD}@${H}:5432/postgres?hostaddr=${IPV4}&sslmode=require" >> $GITHUB_ENV
+
+      # --- PR validation (dry-run) with 6543 retry ---
+      - id: validate-migrations
+        if: github.event_name == 'pull_request' && steps.migcheck.outputs.empty == 'false'
+        name: Validate migrations (dry-run over 5432)
+        continue-on-error: true
+        run: supabase db push --db-url "$DB_URL_IP" --include-all --dry-run
+
+      - id: retry-validate-6543
+        if: github.event_name == 'pull_request' && steps.migcheck.outputs.empty == 'false' && steps.validate-migrations.outcome == 'failure'
+        name: Retry validation via PgBouncer (6543)
+        run: |
+          set -eu
+          echo "DB_URL_IP=${DB_URL_IP/5432/6543}" >> $GITHUB_ENV
+          supabase db push --db-url "$DB_URL_IP" --include-all --dry-run
+
+      # --- Apply on main with 6543 retry ---
+      - id: apply-migrations
+        if: github.ref == 'refs/heads/main' && steps.migcheck.outputs.empty == 'false'
+        name: Apply migrations to Production (5432)
+        continue-on-error: true
+        run: supabase db push --db-url "$DB_URL_IP" --include-all
+
+      - id: retry-apply-6543
+        if: github.ref == 'refs/heads/main' && steps.migcheck.outputs.empty == 'false' && steps.apply-migrations.outcome == 'failure'
+        name: Retry apply via PgBouncer (6543)
+        run: |
+          set -eu
+          echo "DB_URL_IP=${DB_URL_IP/5432/6543}" >> $GITHUB_ENV
+          supabase db push --db-url "$DB_URL_IP" --include-all
       - run: npm run build
       - name: Upload build artifacts
         if: always()
