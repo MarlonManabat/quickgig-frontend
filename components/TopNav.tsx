@@ -50,7 +50,7 @@ export default function TopNav() {
             </Link>
           )}
           <Link
-            href="/post?intent=employer"
+            href="/employer/post"
             data-testid="nav-post"
             className={`btn-primary ${loggedIn && !eligible ? "opacity-50 pointer-events-none" : ""}`}
             title={

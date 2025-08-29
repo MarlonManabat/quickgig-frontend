@@ -68,6 +68,9 @@ const baseConfig = {
       { source: "/gigs/new", destination: "/post", permanent: true },
       { source: "/jobs", destination: "/find", permanent: true },
       { source: "/jobs/:path*", destination: "/find", permanent: true },
+      { source: "/post", destination: "/employer/post", permanent: true },
+      { source: "/jobs/post", destination: "/employer/post", permanent: true },
+      { source: "/work", destination: "/find", permanent: true },
     ];
   },
 };

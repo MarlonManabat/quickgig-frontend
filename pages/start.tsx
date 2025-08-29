@@ -10,8 +10,8 @@ export default function Start() {
   useEffect(() => {
     (async () => {
       const intentParam = (router.query.intent as string) || "worker";
-      const intent = intentParam === "employer" ? "employer" : "worker";
-      const target = intent === "worker" ? "/find" : "/post";
+        const intent = intentParam === "employer" ? "employer" : "worker";
+        const target = intent === "worker" ? "/find" : "/employer/post";
 
       // who am i?
       const {

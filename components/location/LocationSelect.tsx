@@ -6,6 +6,7 @@ import {
   Province,
   City,
 } from '@/lib/ph-data';
+import { safeSortByName } from '@/lib/locations';
 
 export interface LocationValue {
   regionCode: string | null;
@@ -114,10 +115,10 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
     return Array.from(map.values()).sort((a, b) => String(a[nameKey]).localeCompare(String(b[nameKey])));
   }
 
-  const regionOpts = regions.sort((a, b) => a.region_name.localeCompare(b.region_name));
+  const regionOpts = safeSortByName(regions);
   const provinceOpts = value.regionCode === NCR_REGION_CODE
     ? provinces.filter((p) => p.province_code === NCR_PROVINCE_CODE)
-    : provinces.filter((p) => p.region_code === value.regionCode).sort((a, b) => a.province_name.localeCompare(b.province_name));
+    : safeSortByName(provinces.filter((p) => p.region_code === value.regionCode));
   const cityOpts = value.regionCode === NCR_REGION_CODE
     ? cities.filter((c) => c.region_code === NCR_REGION_CODE)
     : cities.filter((c) => c.province_code === value.provinceCode);
@@ -175,11 +176,9 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
         disabled={disabled || !value.regionCode || (value.regionCode !== NCR_REGION_CODE && !value.provinceCode)}
       >
         <option value="">Select City/Municipality</option>
-        {cityOpts
-          .sort((a, b) => a.city_name.localeCompare(b.city_name))
-          .map((c) => (
-            <option key={c.city_code} value={c.city_code}>{c.city_name}</option>
-          ))}
+        {safeSortByName(cityOpts).map((c) => (
+          <option key={c.city_code} value={c.city_code}>{c.city_name}</option>
+        ))}
       </select>
     </div>
   );

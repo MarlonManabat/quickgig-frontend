@@ -14,25 +14,26 @@ export default function AppHeaderNotifications() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     );
-    let uid: string | null = null;
-
-    supa.auth.getUser().then(({ data }) => {
-      uid = data.user?.id || null;
+    let ch: any = null;
+    (async () => {
+      const { data } = await supa.auth.getUser();
+      const uid = data.user?.id || null;
       if (!uid) return;
-
-      supa
-        .from("notifications")
-        .select("id,title,link,read,created_at")
-        .eq("user_id", uid)
-        .order("created_at", { ascending: false })
-        .limit(5)
-        .then(({ data }) => {
-          const rows = (data as any) || [];
-          setItems(rows);
-          setUnread(rows.filter((r: any) => !r.read).length);
-        });
-
-      const ch = supa
+      try {
+        const { data: rows } = await supa
+          .from("notifications")
+          .select("id,title,link,read,created_at")
+          .eq("user_id", uid)
+          .order("created_at", { ascending: false })
+          .limit(5);
+        const list = (rows as any) || [];
+        setItems(list);
+        setUnread(list.filter((r: any) => !r.read).length);
+      } catch {
+        setItems([]);
+        setUnread(0);
+      }
+      ch = supa
         .channel("notif-ch")
         .on(
           "postgres_changes",
@@ -48,10 +49,10 @@ export default function AppHeaderNotifications() {
           },
         )
         .subscribe();
-      return () => {
-        supa.removeChannel(ch);
-      };
-    });
+    })();
+    return () => {
+      if (ch) supa.removeChannel(ch);
+    };
   }, []);
 
   return (

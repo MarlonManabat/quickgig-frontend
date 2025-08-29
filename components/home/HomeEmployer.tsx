@@ -181,7 +181,7 @@ export default function HomeEmployer() {
         <Card title="Quick Actions">
           {role === "employer" || role === "admin" ? (
             <div className="flex flex-wrap gap-2">
-              <Link href="/post" className="qg-btn qg-btn--primary px-3 py-2">
+              <Link href="/employer/post" className="qg-btn qg-btn--primary px-3 py-2">
                 Post Job
               </Link>
               <Link
@@ -236,7 +236,7 @@ export default function HomeEmployer() {
         <>
           <Section
             title="Your job posts"
-            actionHref="/post"
+            actionHref="/employer/post"
             actionLabel="Post new"
           />
           <Grid>

@@ -12,6 +12,7 @@ import Container from "@/components/Container";
 import { useEffect } from "react";
 import { setupErrlog } from "@/lib/errlog";
 import { supabase } from "@/utils/supabaseClient";
+import AppErrorBoundary from "@/components/AppErrorBoundary";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -40,15 +41,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           content="Find work or hire quickly with simple, ticket-based matches."
         />
       </Head>
-      <div className="min-h-screen bg-surface text-text flex flex-col">
-        {!isError && <AppHeader />}
-        <main className="flex-1 py-6 bg-surface">
-          <Container>
-            <Component {...pageProps} />
-          </Container>
-        </main>
-        {!isError && <AppFooter />}
-      </div>
+      <AppErrorBoundary>
+        <div className="min-h-screen bg-surface text-text flex flex-col">
+          {!isError && <AppHeader />}
+          <main className="flex-1 py-6 bg-surface">
+            <Container>
+              <Component {...pageProps} />
+            </Container>
+          </main>
+          {!isError && <AppFooter />}
+        </div>
+      </AppErrorBoundary>
     </>
   );
 }

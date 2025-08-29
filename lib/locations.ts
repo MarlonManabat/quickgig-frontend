@@ -1,50 +1,39 @@
-import { supabase } from "./supabaseClient";
-import type { LocationRow } from "./types";
-import { asString } from "./normalize";
+import dataset from '@/data/ph_locations.json';
 
-export type RegionOption = { label: string; value: string };
-export type CityOption = { label: string; value: string };
+// Backward-compatible normalization
+type RegionLike = { code?: string; name?: string; region_code?: string; region_name?: string };
+type CityLike   = { code?: string; name?: string; city_code?: string; city_name?: string; region_code?: string };
 
-export function toRegionOptions(data: unknown): RegionOption[] {
-  const rows: LocationRow[] = Array.isArray(data)
-    ? (data as unknown[]).filter(
-        (r): r is LocationRow =>
-          !!r &&
-          typeof (r as any).region_slug === "string" &&
-          typeof (r as any).region === "string",
-      )
-    : [];
-  const map = new Map<string, string>();
-  for (const row of rows) {
-    if (!map.has(row.region_slug)) map.set(row.region_slug, row.region);
-  }
-  return Array.from(map, ([value, label]) => ({ label, value }));
+const label = (x: any) =>
+  (x?.name ?? x?.region_name ?? x?.city_name ?? '').toString();
+
+const toRegion = (r: RegionLike) => ({
+  code: r.code ?? r.region_code ?? '',
+  name: (r.name ?? r.region_name ?? '').toString(),
+});
+
+const toCity = (c: CityLike) => ({
+  code: c.code ?? c.city_code ?? '',
+  name: (c.name ?? c.city_name ?? '').toString(),
+  region_code: c.region_code ?? '',
+});
+
+export function getRegions() {
+  return (dataset?.regions ?? [])
+    .map(toRegion)
+    .filter(r => r.code && r.name)
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getRegions(): Promise<RegionOption[]> {
-  const { data, error } = await supabase
-    .from("locations")
-    .select("region, region_slug")
-    .order("region");
-  if (error) throw error;
-  return toRegionOptions(data);
+export function getCitiesByRegion(region_code: string) {
+  if (!region_code) return [];
+  return (dataset?.cities ?? [])
+    .map(toCity)
+    .filter(c => c.region_code === region_code && c.code && c.name)
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getCities(regionSlug: string): Promise<CityOption[]> {
-  const { data, error } = await supabase
-    .from("locations")
-    .select("city, city_slug")
-    .eq("region_slug", regionSlug)
-    .order("city");
-  if (error) throw error;
-  const rows: CityOption[] = Array.isArray(data)
-    ? (data as any[])
-        .map((row) => {
-          const city = asString(row.city);
-          const slug = asString(row.city_slug);
-          return city && slug ? { label: city, value: slug } : null;
-        })
-        .filter((r): r is CityOption => !!r)
-    : [];
-  return rows;
+// Utility for any legacy array sorts in the codebase:
+export function safeSortByName<T extends Record<string, any>>(items: T[]) {
+  return [...(items ?? [])].sort((a, b) => label(a).localeCompare(label(b)));
 }
