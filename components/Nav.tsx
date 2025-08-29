@@ -32,8 +32,8 @@ export default function Nav() {
       <Link href="/find?focus=search" data-testid="nav-find">
         {copy.nav.findWork}
       </Link>
-      <Link href="/post?intent=employer" data-testid="nav-post">
-        {copy.nav.postJob}
+      <Link href="/post" className="btn btn-primary">
+        Post Job
       </Link>
       {session ? (
         <button onClick={logout}>Logout</button>
