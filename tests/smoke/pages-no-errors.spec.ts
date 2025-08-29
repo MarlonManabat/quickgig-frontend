@@ -12,8 +12,7 @@ async function captureNoPageErrors(page: any) {
 test('@smoke /employer/post renders without client errors', async ({ page }) => {
   const finish = await captureNoPageErrors(page);
   await page.goto('/employer/post', { waitUntil: 'domcontentloaded' });
-  // Don’t assert a specific heading; just ensure the page responds and doesn’t error.
-  await expect(page).toHaveURL(/\/employer\/post|\/post/);
+  await expect(page.getByRole('heading', { name: /Post a Job/i })).toBeVisible();
   finish();
 });
 
