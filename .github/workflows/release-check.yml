@@ -26,7 +26,9 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Install Supabase CLI
-        run: npm i -g supabase@2
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
       - name: Show Supabase CLI version
         run: supabase --version
       - name: Build DB_URL from secrets
@@ -40,27 +42,29 @@ jobs:
             exit 1
           fi
           echo "DB_URL=postgresql://postgres:${SUPABASE_DB_PASSWORD}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres" >> $GITHUB_ENV
+
+      - name: Skip if no migrations
+        id: migcheck
+        run: |
+          if [ ! -d supabase/migrations ] || [ -z "$(ls -A supabase/migrations || true)" ]; then
+            echo "empty=true" >> $GITHUB_OUTPUT
+          else
+            echo "empty=false" >> $GITHUB_OUTPUT
+          fi
       - name: Validate migrations (PR)
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' && steps.migcheck.outputs.empty == 'false' }}
         env:
           DB_URL: ${{ env.DB_URL }}
         run: |
           set -eu
-          echo "Validating migrations against remote DB (dry-run)…"
-          supabase db push --db-url "$DB_URL" --dry-run --include-all || {
-            echo "::error::Migration validation failed"
-            exit 1
-          }
-          echo "Migrations validation OK."
+          supabase db push --db-url "$DB_URL" --dry-run --include-all
       - name: Apply migrations (main)
-        if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && steps.migcheck.outputs.empty == 'false' }}
         env:
           DB_URL: ${{ env.DB_URL }}
         run: |
           set -eu
-          echo "Applying migrations to remote DB…"
           supabase db push --db-url "$DB_URL" --non-interactive --include-all
-          echo "Migrations applied."
       - run: npm run build
       - name: Upload build artifacts
         if: always()
