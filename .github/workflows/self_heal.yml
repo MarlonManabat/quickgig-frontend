@@ -1,21 +1,12 @@
-name: Self Heal
+name: self_heal
 on:
-  workflow_run:
-    workflows: ["Release Check (PR smoke)", "Final QA (full)"]
-    types: [completed]
-permissions:
-  contents: write
-  pull-requests: write
-  actions: read
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number (optional)
+        required: false
 jobs:
-  heal:
-    if: ${{ contains(fromJson('["failure","cancelled","timed_out"]'), github.event.workflow_run.conclusion) }}
+  noop:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - name: Post note if artifacts exist
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.info('Self-heal bootstrap active. A follow-up PR can push automated fixes.')
+      - run: echo "Self-heal placeholder. No automated changes."

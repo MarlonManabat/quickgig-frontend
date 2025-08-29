@@ -1,10 +1,10 @@
 # Manual GCash Top-up
 
-Finance operators can review manual GCash payments in the Supabase `payment_proofs` table and the `gcash-proofs` storage bucket.
+Finance operators review manual GCash payments via the `orders` table and `payments` storage bucket.
 
-1. Users submit proofs via the app.
-2. Visit `/admin/billing` to see pending proofs.
-3. Approve to grant credits via the `grant_credits` RPC or reject with a note.
-4. Files are stored in the private `gcash-proofs` bucket.
+1. Users submit proofs via the app (uploaded to `payments` bucket under `proofs/{user_id}/`).
+2. Visit `/admin/orders` to see pending orders.
+3. Approve to grant credits via the `admin_approve_order` RPC.
+4. Files remain private in the `payments` bucket.
 
-Price per credit: ₱100.
+Price per bundle is configured by `NEXT_PUBLIC_TICKET_PRICE_PHP` (default ₱99 for 3 credits).
