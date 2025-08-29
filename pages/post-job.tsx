@@ -6,12 +6,13 @@ import { useRequireUser } from "@/lib/useRequireUser";
 import { uploadPublicFile } from "@/lib/storage";
 import { hasApprovedOrder } from "@/utils/billing";
 import Link from "next/link";
+import LocationSelect from "@/components/LocationSelect";
 
 export default function PostJobPage() {
   const [title, setTitle] = useState("");
   const [description, setDesc] = useState("");
   const [budget, setBudget] = useState<number | "">("");
-  const [city, setCity] = useState("");
+  const [loc, setLoc] = useState<{ region_code: string; city_code: string }>({ region_code: "", city_code: "" });
   const [imageUrl, setImageUrl] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const router = useRouter();
@@ -44,7 +45,8 @@ export default function PostJobPage() {
         title,
         description,
         budget: budget === "" ? null : Number(budget),
-        city,
+        region_code: loc.region_code || null,
+        city_code: loc.city_code || null,
         image_url: imageUrl,
       })
       .select("id")
@@ -114,11 +116,9 @@ export default function PostJobPage() {
           value={budget}
           onChange={(e) => setBudget(e.target.value as any)}
         />
-        <input
-          className="input"
-          placeholder="City (optional)"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
+        <LocationSelect
+          value={loc}
+          onChange={(v) => setLoc((prev) => ({ ...prev, ...v }))}
         />
         <div className="space-y-2">
           {imageUrl && (

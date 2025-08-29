@@ -3,12 +3,13 @@ import { supabase } from "@/utils/supabaseClient";
 import Shell from "@/components/Shell";
 import Link from "next/link";
 import SaveButton from "@/components/SaveButton";
+import LocationSelect from "@/components/LocationSelect";
 
 const PAGE_SIZE = 12;
 
 export default function FindWorkPage() {
   const [q, setQ] = useState("");
-  const [city, setCity] = useState("");
+  const [loc, setLoc] = useState<{ region_code: string; city_code: string }>({ region_code: "", city_code: "" });
   const [minBudget, setMinBudget] = useState<string>("");
   const [maxBudget, setMaxBudget] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -29,7 +30,8 @@ export default function FindWorkPage() {
       if (q.trim()) {
         query = query.ilike("title", `%${q}%`).or(`description.ilike.%${q}%`);
       }
-      if (city) query = query.eq("city", city);
+      if (loc.city_code) query = query.eq("city_code", loc.city_code);
+      else if (loc.region_code) query = query.eq("region_code", loc.region_code);
       if (minBudget) query = query.gte("budget", Number(minBudget));
       if (maxBudget) query = query.lte("budget", Number(maxBudget));
 
@@ -50,7 +52,7 @@ export default function FindWorkPage() {
     return () => {
       ignore = true;
     };
-  }, [q, city, minBudget, maxBudget, page]);
+  }, [q, loc.region_code, loc.city_code, minBudget, maxBudget, page]);
 
   const total = count;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -66,12 +68,7 @@ export default function FindWorkPage() {
           placeholder="Search title/description"
           className="input"
         />
-        <input
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder="City"
-          className="input"
-        />
+        <LocationSelect value={loc} onChange={(v) => setLoc((p) => ({ ...p, ...v }))} />
         <input
           value={minBudget}
           onChange={(e) => setMinBudget(e.target.value)}
@@ -100,7 +97,7 @@ export default function FindWorkPage() {
               {g.description}
             </p>
             <div className="mt-2 flex items-center justify-between text-sm">
-              <span>{g.city ?? "—"}</span>
+              <span>{g.city_code ?? "—"}</span>
               <Link className="underline" href={`/gigs/${g.id}`} prefetch>
                 View
               </Link>
