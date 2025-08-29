@@ -26,29 +26,41 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Install Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-      - name: Supabase version
+        run: npm i -g supabase@2
+      - name: Show Supabase CLI version
         run: supabase --version
-      - name: Link Supabase project
+      - name: Build DB_URL from secrets
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           set -eu
-          supabase link \
-            --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}" \
-            --password    "${{ secrets.SUPABASE_DB_PASSWORD }}"
+          if [ -z "${SUPABASE_PROJECT_REF:-}" ] || [ -z "${SUPABASE_DB_PASSWORD:-}" ]; then
+            echo "::error::Missing SUPABASE_PROJECT_REF or SUPABASE_DB_PASSWORD secrets"
+            exit 1
+          fi
+          echo "DB_URL=postgresql://postgres:${SUPABASE_DB_PASSWORD}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres" >> $GITHUB_ENV
       - name: Validate migrations (PR)
         if: ${{ github.event_name == 'pull_request' }}
+        env:
+          DB_URL: ${{ env.DB_URL }}
         run: |
           set -eu
-          supabase db push --dry-run --non-interactive
+          echo "Validating migrations against remote DB (dry-run)…"
+          supabase db push --db-url "$DB_URL" --dry-run --include-all || {
+            echo "::error::Migration validation failed"
+            exit 1
+          }
+          echo "Migrations validation OK."
       - name: Apply migrations (main)
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+        env:
+          DB_URL: ${{ env.DB_URL }}
         run: |
           set -eu
-          supabase db push --non-interactive
+          echo "Applying migrations to remote DB…"
+          supabase db push --db-url "$DB_URL" --non-interactive --include-all
+          echo "Migrations applied."
       - run: npm run build
       - name: Upload build artifacts
         if: always()
@@ -76,30 +88,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - run: npm ci
-      - name: Install Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-      - name: Supabase version
-        run: supabase --version
-      - name: Link Supabase project
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: |
-          set -eu
-          supabase link \
-            --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}" \
-            --password    "${{ secrets.SUPABASE_DB_PASSWORD }}"
-      - name: Validate migrations (PR)
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          set -eu
-          supabase db push --dry-run --non-interactive
-      - name: Apply migrations (main)
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
-          set -eu
-          supabase db push --non-interactive
       - run: npm run build
       - run: npx playwright install --with-deps
       - run: npm run test:smoke
