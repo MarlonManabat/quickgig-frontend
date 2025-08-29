@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
-import provincesJson from '../../../public/data/ph/provinces.json';
+import adminAreas from '../../../public/data/ph/admin_areas.json';
 
 const NCR_REGION_CODE = '130000000';
 
@@ -35,9 +35,9 @@ export default async function handler(
   }
 
   if (!rows || !rows.length) {
-    rows = (provincesJson as any[])
-      .filter((p: any) => p.region_code === regionId)
-      .map((p: any) => ({ id: p.province_code, name: p.province_name }));
+    rows = (adminAreas as any[])
+      .filter((p: any) => p.regionCode === regionId && p.type !== 'NCR_METRO')
+      .map((p: any) => ({ id: p.code, name: p.name }));
   }
 
   res.setHeader(
