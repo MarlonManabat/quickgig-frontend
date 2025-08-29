@@ -30,14 +30,14 @@
         <nav>
           <a href="#features">Features</a>
           <a
-            href="/find?focus=search"
+            href="/search"
             data-testid="nav-find"
             aria-label="Maghanap ng trabaho sa QuickGig app"
             data-app-root
             >Maghanap ng Trabaho</a
           >
           <a
-            href="/post?intent=employer"
+            href="/post"
             data-testid="nav-post"
             aria-label="Post job on QuickGig app"
             data-app-root
@@ -52,7 +52,7 @@
           >
           <a
             class="btn btn-primary"
-            href="/start"
+            href="/signup"
             data-testid="cta-signup"
             aria-label="Sign up on QuickGig app"
             data-app-root
@@ -78,7 +78,7 @@
           <a
             id="cta-start"
             class="qg-btn qg-btn--primary"
-            href="/search?intent=worker"
+            href="/post"
             data-testid="cta-start-now"
             aria-label="Open QuickGig app"
             data-app-root
@@ -86,11 +86,11 @@
           >
           <a
             class="btn btn-ghost"
-            href="/post?intent=employer"
-            data-testid="cta-post-job"
-            aria-label="Post job on QuickGig app"
+            href="/search"
+            data-testid="cta-browse"
+            aria-label="Browse jobs on QuickGig app"
             data-app-root
-            >Post a Job</a
+            >Browse Jobs</a
           >
         </div>
       </div>
@@ -136,7 +136,7 @@
             >Privacy</a
           >
           <a
-            href="/search?intent=worker"
+            href="/post"
             data-testid="footer-open-app"
             aria-label="Open the QuickGig app"
             data-app-root
@@ -146,11 +146,10 @@
       </div>
     </footer>
     <script>
-      const APP_URL =
-        window.NEXT_PUBLIC_APP_URL ||
-        window.APP_URL ||
-        "https://app.quickgig.ph";
-      const appRoot = APP_URL.replace(/\/+$/, "");
+      const APP_ORIGIN =
+        window.NEXT_PUBLIC_APP_ORIGIN ||
+        `https://app.${window.location.host}`;
+      const appRoot = APP_ORIGIN.replace(/\/+$/, "");
       document.querySelectorAll("[data-app-root]").forEach((el) => {
         const path = el.getAttribute("href") || "/";
         const normalized = path.startsWith("/") ? path : `/${path}`;

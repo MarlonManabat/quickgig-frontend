@@ -3,7 +3,7 @@ import {
   staticPhData,
   loadStaticPhData,
   Region,
-  Province,
+  AdminArea,
   City,
 } from '@/lib/ph-data';
 
@@ -25,14 +25,14 @@ const NCR_PROVINCE_CODE = 'NCR';
 
 export default function LocationSelect({ value, onChange, disabled, compact }: Props) {
   const [regions, setRegions] = useState<Region[]>(staticPhData.regions);
-  const [provinces, setProvinces] = useState<Province[]>(staticPhData.provinces);
+  const [adminAreas, setAdminAreas] = useState<AdminArea[]>(staticPhData.provinces);
   const [cities, setCities] = useState<City[]>(staticPhData.cities);
 
   useEffect(() => {
     loadStaticPhData()
       .then((d) => {
         setRegions(d.regions);
-        setProvinces(d.provinces);
+        setAdminAreas(d.provinces);
         setCities(d.cities);
       })
       .catch(() => {});
@@ -61,7 +61,7 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
             province_code: p.id || p.code,
             province_name: p.name,
           }));
-          setProvinces((prev) => mergeByCode(prev, mapped, 'province_code', 'province_name'));
+          setAdminAreas((prev) => mergeByCode(prev, mapped, 'province_code', 'province_name'));
         }
       })
       .catch(() => {});
@@ -115,9 +115,11 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
   }
 
   const regionOpts = regions.sort((a, b) => a.region_name.localeCompare(b.region_name));
-  const provinceOpts = value.regionCode === NCR_REGION_CODE
-    ? provinces.filter((p) => p.province_code === NCR_PROVINCE_CODE)
-    : provinces.filter((p) => p.region_code === value.regionCode).sort((a, b) => a.province_name.localeCompare(b.province_name));
+  const provinceOpts = (value.regionCode === NCR_REGION_CODE
+    ? adminAreas.filter((p) => p.province_code === NCR_PROVINCE_CODE)
+    : adminAreas.filter((p) => p.region_code === value.regionCode)).sort((a, b) =>
+      a.province_name.localeCompare(b.province_name),
+    );
   const cityOpts = value.regionCode === NCR_REGION_CODE
     ? cities.filter((c) => c.region_code === NCR_REGION_CODE)
     : cities.filter((c) => c.province_code === value.provinceCode);
@@ -142,27 +144,21 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
         ))}
       </select>
 
-      {value.regionCode === NCR_REGION_CODE ? (
-        <select className="border rounded p-2" value={NCR_PROVINCE_CODE} disabled>
-          <option value={NCR_PROVINCE_CODE}>Metro Manila</option>
-        </select>
-      ) : (
-        <select
-          data-testid="province-select"
-          className="border rounded p-2"
-          value={value.provinceCode || ''}
-          onChange={(e) => {
-            const provinceCode = e.target.value || null;
-            onChange({ regionCode: value.regionCode, provinceCode, cityCode: null });
-          }}
-          disabled={disabled ? true : !value.regionCode ? true : false}
-        >
-          <option value="">Select Province</option>
-          {provinceOpts.map((p) => (
-            <option key={p.province_code} value={p.province_code}>{p.province_name}</option>
-          ))}
-        </select>
-      )}
+      <select
+        data-testid="province-select"
+        className="border rounded p-2"
+        value={value.provinceCode || ''}
+        onChange={(e) => {
+          const provinceCode = e.target.value || null;
+          onChange({ regionCode: value.regionCode, provinceCode, cityCode: null });
+        }}
+        disabled={disabled || !value.regionCode}
+      >
+        <option value="">Select Province/HUC</option>
+        {provinceOpts.map((p) => (
+          <option key={p.province_code} value={p.province_code}>{p.province_name}</option>
+        ))}
+      </select>
 
       <select
         data-testid="city-select"
