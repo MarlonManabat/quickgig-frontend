@@ -1,186 +1,79 @@
-import React, { useEffect, useState } from 'react';
-import {
-  staticPhData,
-  loadStaticPhData,
-  Region,
-  Province,
-  City,
-} from '@/lib/ph-data';
+'use client';
+import { useEffect, useMemo, useState } from 'react';
+import { safeJson } from '@/lib/safeFetch';
 
-export interface LocationValue {
-  regionCode: string | null;
-  provinceCode: string | null;
-  cityCode: string | null;
-}
+export type LocationValue = { regionCode?: string; adminUnitCode?: string; cityCode?: string };
 
-interface Props {
-  value: LocationValue;
-  onChange: (v: LocationValue) => void;
-  disabled?: boolean;
-  compact?: boolean;
-}
+type Props = { value: LocationValue; onChange: (v: LocationValue) => void; disabled?: boolean };
 
-const NCR_REGION_CODE = '130000000';
-const NCR_PROVINCE_CODE = 'NCR';
+export default function LocationSelect({ value, onChange, disabled }: Props) {
+  const [regions, setRegions] = useState<any[]>([]);
+  const [admins,  setAdmins ] = useState<any[]>([]);
+  const [cities,  setCities ] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function LocationSelect({ value, onChange, disabled, compact }: Props) {
-  const [regions, setRegions] = useState<Region[]>(staticPhData.regions);
-  const [provinces, setProvinces] = useState<Province[]>(staticPhData.provinces);
-  const [cities, setCities] = useState<City[]>(staticPhData.cities);
+  // Minimal NCR fallback so UI never whitescreens
+  const NCR = {
+    regions:[{code:'NCR',name:'National Capital Region'}],
+    admins:[{code:'NCR_METRO',name:'Metro Manila',regionCode:'NCR',type:'NCR_METRO'}],
+    cities:[
+      'Caloocan','Las Piñas','Makati','Malabon','Mandaluyong','Manila','Marikina','Muntinlupa',
+      'Navotas','Parañaque','Pasay','Pasig','Quezon City','San Juan','Taguig','Valenzuela','Pateros'
+    ].map((n,i)=>({code:`NCR_${i}`,name:n,adminUnitCode:'NCR_METRO',regionCode:'NCR',type:'CITY'})),
+  };
 
   useEffect(() => {
-    loadStaticPhData()
-      .then((d) => {
-        setRegions(d.regions);
-        setProvinces(d.provinces);
-        setCities(d.cities);
-      })
-      .catch(() => {});
+    let dead = false;
+    (async () => {
+      const [r,a,c] = await Promise.all([
+        safeJson<any[]>('/data/ph/regions.json', NCR.regions),
+        safeJson<any[]>('/data/ph/admin_areas.json', NCR.admins),
+        safeJson<any[]>('/data/ph/cities.json', NCR.cities),
+      ]);
+      if (dead) return;
+      setRegions(r); setAdmins(a); setCities(c); setLoading(false);
+    })();
+    return () => { dead = true; };
   }, []);
 
-  // hydrate from API when available
-  useEffect(() => {
-    fetch('/api/locations/regions')
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((rows) => {
-        if (Array.isArray(rows) && rows.length) {
-          setRegions((prev) => mergeByCode(prev, rows, 'region_code', 'region_name'));
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const regionAdmins = useMemo(
+    () => admins.filter(u => u.regionCode === value.regionCode),
+    [admins, value.regionCode]
+  );
 
-  useEffect(() => {
-    if (!value.regionCode || value.regionCode === NCR_REGION_CODE) return;
-    fetch(`/api/locations/provinces?region_id=${value.regionCode}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((rows) => {
-        if (Array.isArray(rows) && rows.length) {
-          const mapped = rows.map((p: any) => ({
-            region_code: value.regionCode!,
-            province_code: p.id || p.code,
-            province_name: p.name,
-          }));
-          setProvinces((prev) => mergeByCode(prev, mapped, 'province_code', 'province_name'));
-        }
-      })
-      .catch(() => {});
-  }, [value.regionCode]);
+  const adminCities = useMemo(() => {
+    const au = admins.find(u => u.code === value.adminUnitCode);
+    if (!au) return [];
+    if (au.type === 'HUC') return [{ code: au.code, name: au.name, adminUnitCode: au.code, regionCode: au.regionCode }];
+    return cities.filter(c => c.adminUnitCode === value.adminUnitCode);
+  }, [admins, cities, value.adminUnitCode]);
 
-  useEffect(() => {
-    if (!value.regionCode) return;
-    if (value.regionCode === NCR_REGION_CODE) {
-      fetch(`/api/locations/cities?region_id=${value.regionCode}`)
-        .then((r) => (r.ok ? r.json() : Promise.reject()))
-        .then((rows) => {
-          if (Array.isArray(rows) && rows.length) {
-            const mapped = rows.map((c: any) => ({
-              region_code: value.regionCode!,
-              province_code: NCR_PROVINCE_CODE,
-              city_code: c.id || c.code,
-              city_name: c.name,
-              is_city: true,
-              is_municipality: false,
-            }));
-            setCities((prev) => mergeByCode(prev, mapped, 'city_code', 'city_name'));
-          }
-        })
-        .catch(() => {});
-      return;
-    }
-    if (!value.provinceCode) return;
-    fetch(`/api/locations/cities?region_id=${value.regionCode}&province_id=${value.provinceCode}`)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((rows) => {
-        if (Array.isArray(rows) && rows.length) {
-          const mapped = rows.map((c: any) => ({
-            region_code: value.regionCode!,
-            province_code: value.provinceCode!,
-            city_code: c.id || c.code,
-            city_name: c.name,
-            is_city: true,
-            is_municipality: false,
-          }));
-          setCities((prev) => mergeByCode(prev, mapped, 'city_code', 'city_name'));
-        }
-      })
-      .catch(() => {});
-  }, [value.regionCode, value.provinceCode]);
-
-  function mergeByCode<T extends Record<string, any>>(base: T[], incoming: T[], codeKey: keyof T, nameKey: keyof T): T[] {
-    const map = new Map<string, T>();
-    base.forEach((b) => map.set(String(b[codeKey]), b));
-    incoming.forEach((r) => map.set(String(r[codeKey]), r));
-    return Array.from(map.values()).sort((a, b) => String(a[nameKey]).localeCompare(String(b[nameKey])));
-  }
-
-  const regionOpts = regions.sort((a, b) => a.region_name.localeCompare(b.region_name));
-  const provinceOpts = value.regionCode === NCR_REGION_CODE
-    ? provinces.filter((p) => p.province_code === NCR_PROVINCE_CODE)
-    : provinces.filter((p) => p.region_code === value.regionCode).sort((a, b) => a.province_name.localeCompare(b.province_name));
-  const cityOpts = value.regionCode === NCR_REGION_CODE
-    ? cities.filter((c) => c.region_code === NCR_REGION_CODE)
-    : cities.filter((c) => c.province_code === value.provinceCode);
-
-  const layout = compact ? 'grid grid-cols-3 gap-2' : 'grid grid-cols-1 sm:grid-cols-3 gap-2';
+  const upd = (patch: Partial<LocationValue>) => onChange({ ...value, ...patch });
 
   return (
-    <div className={layout}>
-      <select
-        data-testid="region-select"
-        className="border rounded p-2"
-        value={value.regionCode || ''}
-        onChange={(e) => {
-          const regionCode = e.target.value || null;
-          onChange({ regionCode, provinceCode: null, cityCode: null });
-        }}
-        disabled={disabled}
-      >
-        <option value="">Select Region</option>
-        {regionOpts.map((r) => (
-          <option key={r.region_code} value={r.region_code}>{r.region_name}</option>
-        ))}
-      </select>
-
-      {value.regionCode === NCR_REGION_CODE ? (
-        <select className="border rounded p-2" value={NCR_PROVINCE_CODE} disabled>
-          <option value={NCR_PROVINCE_CODE}>Metro Manila</option>
+    <fieldset aria-busy={loading} className="grid gap-3" disabled={disabled}>
+      <label>Region
+        <select name="region" value={value.regionCode || ''} onChange={e => upd({ regionCode: e.target.value, adminUnitCode: undefined, cityCode: undefined })}>
+          <option value="">Select Region</option>
+          {regions.map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
         </select>
-      ) : (
-        <select
-          data-testid="province-select"
-          className="border rounded p-2"
-          value={value.provinceCode || ''}
-          onChange={(e) => {
-            const provinceCode = e.target.value || null;
-            onChange({ regionCode: value.regionCode, provinceCode, cityCode: null });
-          }}
-          disabled={disabled || !value.regionCode}
-        >
-          <option value="">Select Province</option>
-          {provinceOpts.map((p) => (
-            <option key={p.province_code} value={p.province_code}>{p.province_name}</option>
-          ))}
-        </select>
-      )}
+      </label>
 
-      <select
-        data-testid="city-select"
-        className="border rounded p-2"
-        value={value.cityCode || ''}
-        onChange={(e) => {
-          const cityCode = e.target.value || null;
-          onChange({ regionCode: value.regionCode, provinceCode: value.provinceCode, cityCode });
-        }}
-        disabled={disabled || !value.regionCode || (value.regionCode !== NCR_REGION_CODE && !value.provinceCode)}
-      >
-        <option value="">Select City/Municipality</option>
-        {cityOpts
-          .sort((a, b) => a.city_name.localeCompare(b.city_name))
-          .map((c) => (
-            <option key={c.city_code} value={c.city_code}>{c.city_name}</option>
-          ))}
-      </select>
-    </div>
+      <label>Province / Metro / HUC
+        <select name="province" value={value.adminUnitCode || ''} disabled={!value.regionCode}
+                onChange={e => upd({ adminUnitCode: e.target.value, cityCode: undefined })}>
+          <option value="">Select Province / Metro / HUC</option>
+          {regionAdmins.map(a => <option key={a.code} value={a.code}>{a.name}</option>)}
+        </select>
+      </label>
+
+      <label>City / LGU
+        <select name="city" value={value.cityCode || ''} disabled={!value.adminUnitCode}
+                onChange={e => upd({ cityCode: e.target.value })}>
+          <option value="">Select City</option>
+          {adminCities.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+        </select>
+      </label>
+    </fieldset>
   );
 }

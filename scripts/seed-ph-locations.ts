@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import regions from '../public/data/ph/regions.json';
-import provinces from '../public/data/ph/provinces.json';
+import adminAreas from '../public/data/ph/admin_areas.json';
 import cities from '../public/data/ph/cities.json';
 
 async function run() {
@@ -12,22 +12,20 @@ async function run() {
   const key = process.env.SUPABASE_SERVICE_ROLE!;
   const supabase = createClient(url, key);
   await supabase.from('ph_regions').upsert(
-    regions.map((r) => ({ code: r.region_code, name: r.region_name }))
+    regions.map((r) => ({ code: r.code, name: r.name }))
   );
   await supabase.from('ph_provinces').upsert(
-    provinces.map((p) => ({
-      code: p.province_code,
-      region_code: p.region_code,
-      name: p.province_name,
-    }))
+    adminAreas
+      .filter((a) => a.type === 'PROVINCE')
+      .map((p) => ({ code: p.code, region_code: p.regionCode, name: p.name }))
   );
   await supabase.from('ph_cities').upsert(
     cities.map((c) => ({
-      code: c.city_code,
-      province_code: c.province_code,
-      region_code: c.region_code,
-      name: c.city_name,
-      class: c.is_city ? 'City' : 'Municipality',
+      code: c.code,
+      province_code: c.adminUnitCode,
+      region_code: c.regionCode,
+      name: c.name,
+      class: c.type,
     }))
   );
   console.log('Seeded PH locations');

@@ -54,6 +54,14 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps
+      - name: Smoke (/post)
+        env:
+          PREVIEW_URL: ${{ vars.PREVIEW_URL || env.PREVIEW_URL }}
+          LANDING_URL: ${{ vars.LANDING_URL || env.LANDING_URL }}
+        run: |
+          npx playwright test e2e/post-no-errors.spec.ts --reporter=line
+          npx playwright test e2e/post-ncr.spec.ts --reporter=line
+          npx playwright test e2e/post-ph-coverage.spec.ts --reporter=line
       - run: npm run test:smoke
       - name: Upload Playwright report
         if: always()

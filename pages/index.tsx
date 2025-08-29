@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Card from "@/components/ui/Card";
 import { H1, P } from "@/components/ui/Text";
 import { getProfile } from "@/utils/session";
 import { copy } from "@/copy";
+import { resolveAppOrigin } from "@/lib/appOrigin";
 
 export default function Home() {
   const [canPost, setCanPost] = useState(false);
@@ -17,21 +17,21 @@ export default function Home() {
       <H1>QuickGig.ph</H1>
       <P>Connect with opportunities — find work or hire talent quickly.</P>
       <div className="flex justify-center gap-4">
-        <Link
-          href="/find?focus=search"
+        <a
+          href={`${resolveAppOrigin()}/search`}
           className="btn-primary"
           data-testid="cta-findwork"
         >
           {copy.nav.findWork}
-        </Link>
+        </a>
         {canPost && (
-          <Link
-            href="/jobs/new"
+          <a
+            href={`${resolveAppOrigin()}/post`}
             className="btn-secondary"
             data-testid="cta-postjob"
           >
             {copy.nav.postJob}
-          </Link>
+          </a>
         )}
       </div>
     </Card>
