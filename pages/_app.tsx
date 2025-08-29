@@ -27,6 +27,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       sub.subscription.unsubscribe();
     };
   }, [router]);
+  useEffect(() => {
+    try {
+      ['LEGACY_UI', 'LEGACY_STRICT_SHELL', 'NEXT_PUBLIC_LEGACY_UI', 'NEXT_PUBLIC_LEGACY_STRICT_SHELL']
+        .forEach(k => localStorage.removeItem(k));
+    } catch {}
+  }, []);
   return (
     <>
       <Head>
