@@ -25,14 +25,21 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - run: npm ci
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-      - name: Push DB migrations (PR env)
+      - name: Install Supabase CLI
+        run: |
+          curl -fsSL https://cli.supabase.com/install.sh | sh -s -- -b "$HOME/.supabase"
+          echo "$HOME/.supabase/bin" >> "$GITHUB_PATH"
+      - name: Link Supabase project
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
         run: |
-          supabase db push --project-ref "$SUPABASE_PROJECT_REF" --non-interactive
+          supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}" --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+      - name: Push DB migrations (PR env)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: supabase db push --non-interactive --include-roles
+      - name: Push DB migrations (main)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: supabase db push --non-interactive --include-roles
       - run: npm run build
       - name: Upload build artifacts
         if: always()
@@ -60,14 +67,21 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - run: npm ci
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-      - name: Push DB migrations (PR env)
+      - name: Install Supabase CLI
+        run: |
+          curl -fsSL https://cli.supabase.com/install.sh | sh -s -- -b "$HOME/.supabase"
+          echo "$HOME/.supabase/bin" >> "$GITHUB_PATH"
+      - name: Link Supabase project
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
         run: |
-          supabase db push --project-ref "$SUPABASE_PROJECT_REF" --non-interactive
+          supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}" --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+      - name: Push DB migrations (PR env)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: supabase db push --non-interactive --include-roles
+      - name: Push DB migrations (main)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: supabase db push --non-interactive --include-roles
       - run: npm run build
       - run: npx playwright install --with-deps
       - run: npm run test:smoke
