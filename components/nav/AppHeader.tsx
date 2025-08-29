@@ -7,6 +7,7 @@ import { getStubRole } from "@/lib/testAuth";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
 import AppLogo from "@/components/AppLogo";
 import { getCredits } from "@/lib/credits";
+import { APP_URL } from "@/lib/urls";
 
 export default function AppHeader() {
   const [user, setUser] = useState<any>(null);
@@ -128,6 +129,12 @@ export default function AppHeader() {
             <Link href="/notifications" className="py-2">
               Notifications
             </Link>
+            <a
+              href="${APP_URL}/post"
+              className="sm:hidden block px-4 py-3 rounded-lg bg-black text-white text-sm font-semibold text-center"
+            >
+              Post a Job
+            </a>
           </div>
         )}
       </div>

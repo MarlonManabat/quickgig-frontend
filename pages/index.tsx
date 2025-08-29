@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+const MobileStickyCTA = dynamic(() => import("@/components/MobileStickyCTA"), { ssr: false });
 import Card from "@/components/ui/Card";
 import { H1, P } from "@/components/ui/Text";
 import { getProfile } from "@/utils/session";
@@ -13,28 +15,31 @@ export default function Home() {
   }, []);
 
   return (
-    <Card className="p-6 text-center space-y-4">
-      <H1>QuickGig.ph</H1>
-      <P>Connect with opportunities — find work or hire talent quickly.</P>
-      <div className="flex justify-center gap-4">
-        <Link
-          href="/find?focus=search"
-          className="btn-primary"
-          data-testid="cta-findwork"
-        >
-          {copy.nav.findWork}
-        </Link>
-        {canPost && (
+    <>
+      <Card className="p-6 text-center space-y-4">
+        <H1>QuickGig.ph</H1>
+        <P>Connect with opportunities — find work or hire talent quickly.</P>
+        <div className="flex justify-center gap-4">
           <Link
-            href="/jobs/new"
-            className="btn-secondary"
-            data-testid="cta-postjob"
+            href="/find?focus=search"
+            className="btn-primary"
+            data-testid="cta-findwork"
           >
-            {copy.nav.postJob}
+            {copy.nav.findWork}
           </Link>
-        )}
-      </div>
-    </Card>
+          {canPost && (
+            <Link
+              href="/jobs/new"
+              className="btn-secondary"
+              data-testid="cta-postjob"
+            >
+              {copy.nav.postJob}
+            </Link>
+          )}
+        </div>
+      </Card>
+      <MobileStickyCTA />
+    </>
   );
 }
 
