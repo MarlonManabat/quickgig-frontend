@@ -6,7 +6,7 @@ import "../styles/accessibility.css";
 // Load legacy fonts via plain CSS to avoid bundler/format issues
 import "@/public/fonts/css/legacy.css";
 import { useRouter } from "next/router";
-import AppHeader from "@/components/nav/AppHeader";
+import AppHeader from "@/components/app/AppHeader";
 import AppFooter from "@/components/nav/AppFooter";
 import Container from "@/components/Container";
 import { useEffect } from "react";
