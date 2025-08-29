@@ -23,3 +23,6 @@
 
 ## Notes
 - Full PSA dataset included.
+- Expose dataset at `/data/ph_locations.json` for smoke tests.
+- API fallback at `/api/locations`.
+- Migration file renamed to match `YYYYMMDDHHMMSS_description.sql` convention.
