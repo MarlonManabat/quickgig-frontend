@@ -1,10 +1,35 @@
 'use client';
 import React, { useState } from 'react';
 import LocationSelect from '@/components/LocationSelect';
-import { createClient } from '@/lib/supabase';
+import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
+
+const supa = createBrowserSupabaseClient();
+
+async function submit(form: FormData) {
+  const title = form.get('title') as string;
+  const description = form.get('description') as string;
+  const region_code = form.get('region_code') as string;
+  const city_code = form.get('city_code') as string;
+  const price_php = Number(form.get('price_php'));
+
+  // need the current user id for ticket debit
+  const { data: { user } } = await supa.auth.getUser();
+  if (!user) throw new Error('Please log in');
+
+  const res = await fetch('/api/gigs/create', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      title, description, region_code, city_code, price_php, user_id: user.id,
+    }),
+  });
+
+  const json = await res.json();
+  if (!res.ok) throw new Error(json?.error || 'Failed to create gig');
+  return json;
+}
 
 export default function PostJobPage() {
-  const supa = createClient();
   const [form, setForm] = useState({ title:'', description:'', region_code:'', city_code:'', price_php:'' });
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string|null>(null);
@@ -14,29 +39,14 @@ export default function PostJobPage() {
     setSubmitting(true);
     setErr(null);
 
-    const fd = new FormData(e.currentTarget);
-    const title       = String(fd.get('title') || '').trim();
-    const description = String(fd.get('description') || '').trim();
-    const region_code = String(fd.get('region_code') || '').trim();
-    const city_code   = String(fd.get('city_code') || '').trim();
-    const price_php   = Number(fd.get('price_php') || 0);
-
-    const { data, error } = await supa.rpc('create_gig_public', {
-      p_title: title,
-      p_description: description,
-      p_region_code: region_code,
-      p_city_code: city_code,
-      p_price_php: price_php,
-    });
-
-    setSubmitting(false);
-
-    if (error) {
-      setErr(error.message || 'Create failed');
-      return;
+    try {
+      await submit(new FormData(e.currentTarget));
+      window.location.href = `/find`;
+    } catch (e: any) {
+      setErr(e.message || 'Create failed');
+    } finally {
+      setSubmitting(false);
     }
-
-    window.location.href = `/find`;
   }
 
   return (

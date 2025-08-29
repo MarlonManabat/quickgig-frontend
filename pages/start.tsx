@@ -12,7 +12,7 @@ export default function Start() {
     (async () => {
       const intentParam = (router.query.intent as string) || "worker";
         const intent = intentParam === "employer" ? "employer" : "worker";
-        const target = intent === "worker" ? "/find" : "/employer/post";
+        const target = intent === "worker" ? "/find" : "/post";
 
       // who am i?
       const {

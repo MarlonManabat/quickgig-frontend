@@ -6,7 +6,6 @@ import { safeSelect } from "@/lib/supabase-safe";
 import { getStubRole } from "@/lib/testAuth";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
 import AppLogo from "@/components/AppLogo";
-import { APP_URL } from "@/lib/urls";
 
 export default function AppHeader() {
   const [user, setUser] = useState<any>(null);
@@ -57,24 +56,24 @@ export default function AppHeader() {
         <nav aria-label="Primary" className="hidden md:flex items-center gap-6">
           {!user && (
             <>
-              <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
-              <Link href="/jobs/new" data-testid="nav-post">Post job</Link>
+              <Link href="/find" data-testid="nav-find">Find work</Link>
+              <Link href="/post" data-testid="nav-post">Post job</Link>
               <Link href="/login" data-testid="nav-login">Login</Link>
             </>
           )}
           {user && role === "worker" && (
-            <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
+            <Link href="/find" data-testid="nav-find">Find work</Link>
           )}
           {user && role === "employer" && (
             <>
               <Link
-                href={tickets > 0 ? "/jobs/new" : "/wallet"}
+                href="/post"
                 data-testid="nav-post"
                 className={tickets === 0 ? "opacity-50" : undefined}
               >
                 Post job
               </Link>
-              <Link href="/find?focus=search" data-testid="nav-find">Find work</Link>
+              <Link href="/find" data-testid="nav-find">Find work</Link>
             </>
           )}
           {user && role === "employer" && tickets !== undefined && (
@@ -105,15 +104,15 @@ export default function AppHeader() {
           >
             {!user && (
               <>
-                <Link
-                  href="/find?focus=search"
+              <Link
+                  href="/find"
                   className="py-2"
                   data-testid="nav-find"
                 >
                   Find work
                 </Link>
                 <Link
-                  href="/jobs/new"
+                  href="/post"
                   className="py-2"
                   data-testid="nav-post"
                 >
@@ -125,20 +124,20 @@ export default function AppHeader() {
               </>
             )}
             {user && role === "worker" && (
-              <Link href="/find?focus=search" className="py-2" data-testid="nav-find">
+              <Link href="/find" className="py-2" data-testid="nav-find">
                 Find work
               </Link>
             )}
             {user && role === "employer" && (
               <>
                 <Link
-                  href={tickets > 0 ? "/jobs/new" : "/wallet"}
+                  href="/post"
                   className="py-2"
                   data-testid="nav-post"
                 >
                   Post job
                 </Link>
-                <Link href="/find?focus=search" className="py-2" data-testid="nav-find">
+                <Link href="/find" className="py-2" data-testid="nav-find">
                   Find work
                 </Link>
               </>
@@ -146,12 +145,12 @@ export default function AppHeader() {
             <Link href="/notifications" className="py-2">
               Notifications
             </Link>
-            <a
-              href="${APP_URL}/post"
+            <Link
+              href="/post"
               className="sm:hidden block px-4 py-3 rounded-lg bg-black text-white text-sm font-semibold text-center"
             >
               Post a Job
-            </a>
+            </Link>
           </div>
         )}
       </div>
