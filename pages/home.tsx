@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { safeSelect } from "@/lib/supabase-safe";
 import { useRequireUser } from "@/lib/useRequireUser";
 import { uploadAvatar } from "@/lib/avatar";
 import { getBalance } from "@/lib/tickets";
@@ -16,27 +17,33 @@ export default function Home() {
   useEffect(() => {
     if (!ready || !userId) return;
     (async () => {
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("role_pref, avatar_url")
-        .eq("id", userId)
-        .single();
+      const prof = await safeSelect<any>(
+        supabase
+          .from("profiles")
+          .select("role_pref, avatar_url")
+          .eq("id", userId)
+          .single(),
+      );
       setProfile(prof);
       if (prof?.role_pref === "employer") {
-        const { data: js } = await supabase
-          .from("jobs")
-          .select("id,title")
-          .eq("owner", userId)
-          .order("created_at", { ascending: false });
+        const js = await safeSelect<any[]>(
+          supabase
+            .from("jobs")
+            .select("id,title")
+            .eq("owner", userId)
+            .order("created_at", { ascending: false }),
+        );
         setJobs(js ?? []);
         const bal = await getBalance(userId);
         setBalance(bal);
       } else if (prof?.role_pref === "worker") {
-        const { data: ap } = await supabase
-          .from("applications")
-          .select("id")
-          .eq("applicant_id", userId)
-          .limit(1);
+        const ap = await safeSelect<any[]>(
+          supabase
+            .from("applications")
+            .select("id")
+            .eq("applicant_id", userId)
+            .limit(1),
+        );
         setHasApps((ap ?? []).length > 0);
       }
     })();

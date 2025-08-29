@@ -2,818 +2,984 @@
   "regions": [
     {
       "code": "NCR",
-      "name": "National Capital Region"
+      "name": "National Capital Region",
+      "region_name": "National Capital Region"
     },
     {
       "code": "CAR",
-      "name": "Cordillera Administrative Region"
+      "name": "Cordillera Administrative Region",
+      "region_name": "Cordillera Administrative Region"
     },
     {
       "code": "REGION_I",
-      "name": "Ilocos Region (Region I)"
+      "name": "Ilocos Region (Region I)",
+      "region_name": "Ilocos Region (Region I)"
     },
     {
       "code": "REGION_II",
-      "name": "Cagayan Valley (Region II)"
+      "name": "Cagayan Valley (Region II)",
+      "region_name": "Cagayan Valley (Region II)"
     },
     {
       "code": "REGION_III",
-      "name": "Central Luzon (Region III)"
+      "name": "Central Luzon (Region III)",
+      "region_name": "Central Luzon (Region III)"
     },
     {
       "code": "REGION_IV_A",
-      "name": "CALABARZON (Region IV-A)"
+      "name": "CALABARZON (Region IV-A)",
+      "region_name": "CALABARZON (Region IV-A)"
     },
     {
       "code": "REGION_IV_B",
-      "name": "MIMAROPA (Region IV-B)"
+      "name": "MIMAROPA (Region IV-B)",
+      "region_name": "MIMAROPA (Region IV-B)"
     },
     {
       "code": "REGION_V",
-      "name": "Bicol Region (Region V)"
+      "name": "Bicol Region (Region V)",
+      "region_name": "Bicol Region (Region V)"
     },
     {
       "code": "REGION_VI",
-      "name": "Western Visayas (Region VI)"
+      "name": "Western Visayas (Region VI)",
+      "region_name": "Western Visayas (Region VI)"
     },
     {
       "code": "REGION_VII",
-      "name": "Central Visayas (Region VII)"
+      "name": "Central Visayas (Region VII)",
+      "region_name": "Central Visayas (Region VII)"
     },
     {
       "code": "REGION_VIII",
-      "name": "Eastern Visayas (Region VIII)"
+      "name": "Eastern Visayas (Region VIII)",
+      "region_name": "Eastern Visayas (Region VIII)"
     },
     {
       "code": "REGION_IX",
-      "name": "Zamboanga Peninsula (Region IX)"
+      "name": "Zamboanga Peninsula (Region IX)",
+      "region_name": "Zamboanga Peninsula (Region IX)"
     },
     {
       "code": "REGION_X",
-      "name": "Northern Mindanao (Region X)"
+      "name": "Northern Mindanao (Region X)",
+      "region_name": "Northern Mindanao (Region X)"
     },
     {
       "code": "REGION_XI",
-      "name": "Davao Region (Region XI)"
+      "name": "Davao Region (Region XI)",
+      "region_name": "Davao Region (Region XI)"
     },
     {
       "code": "REGION_XII",
-      "name": "SOCCSKSARGEN (Region XII)"
+      "name": "SOCCSKSARGEN (Region XII)",
+      "region_name": "SOCCSKSARGEN (Region XII)"
     },
     {
       "code": "REGION_XIII",
-      "name": "Caraga (Region XIII)"
+      "name": "Caraga (Region XIII)",
+      "region_name": "Caraga (Region XIII)"
     },
     {
       "code": "BARMM",
-      "name": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)"
+      "name": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+      "region_name": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)"
     }
   ],
   "cities": [
     {
       "code": "manila",
       "name": "Manila",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Manila"
     },
     {
       "code": "quezon-city",
       "name": "Quezon City",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Quezon City"
     },
     {
       "code": "caloocan",
       "name": "Caloocan",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Caloocan"
     },
     {
       "code": "las-pinas",
       "name": "Las Piñas",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Las Piñas"
     },
     {
       "code": "makati",
       "name": "Makati",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Makati"
     },
     {
       "code": "malabon",
       "name": "Malabon",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Malabon"
     },
     {
       "code": "mandaluyong",
       "name": "Mandaluyong",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Mandaluyong"
     },
     {
       "code": "marikina",
       "name": "Marikina",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Marikina"
     },
     {
       "code": "muntinlupa",
       "name": "Muntinlupa",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Muntinlupa"
     },
     {
       "code": "navotas",
       "name": "Navotas",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Navotas"
     },
     {
       "code": "paranaque",
       "name": "Parañaque",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Parañaque"
     },
     {
       "code": "pasay",
       "name": "Pasay",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Pasay"
     },
     {
       "code": "pasig",
       "name": "Pasig",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Pasig"
     },
     {
       "code": "san-juan",
       "name": "San Juan",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "San Juan"
     },
     {
       "code": "taguig",
       "name": "Taguig",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Taguig"
     },
     {
       "code": "valenzuela",
       "name": "Valenzuela",
-      "region_code": "NCR"
+      "region_code": "NCR",
+      "city_name": "Valenzuela"
     },
     {
       "code": "baguio",
       "name": "Baguio",
-      "region_code": "CAR"
+      "region_code": "CAR",
+      "city_name": "Baguio"
     },
     {
       "code": "tabuk",
       "name": "Tabuk",
-      "region_code": "CAR"
+      "region_code": "CAR",
+      "city_name": "Tabuk"
     },
     {
       "code": "laoag",
       "name": "Laoag",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "Laoag"
     },
     {
       "code": "batac",
       "name": "Batac",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "Batac"
     },
     {
       "code": "vigan",
       "name": "Vigan",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "Vigan"
     },
     {
       "code": "candon",
       "name": "Candon",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "Candon"
     },
     {
       "code": "san-fernando-la-union",
       "name": "San Fernando",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "San Fernando"
     },
     {
       "code": "dagupan",
       "name": "Dagupan",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "Dagupan"
     },
     {
       "code": "san-carlos-pangasinan",
       "name": "San Carlos",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "San Carlos"
     },
     {
       "code": "urdaneta",
       "name": "Urdaneta",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "Urdaneta"
     },
     {
       "code": "alaminos",
       "name": "Alaminos",
-      "region_code": "REGION_I"
+      "region_code": "REGION_I",
+      "city_name": "Alaminos"
     },
     {
       "code": "tuguegarao",
       "name": "Tuguegarao",
-      "region_code": "REGION_II"
+      "region_code": "REGION_II",
+      "city_name": "Tuguegarao"
     },
     {
       "code": "ilagan",
       "name": "Ilagan",
-      "region_code": "REGION_II"
+      "region_code": "REGION_II",
+      "city_name": "Ilagan"
     },
     {
       "code": "cauayan",
       "name": "Cauayan",
-      "region_code": "REGION_II"
+      "region_code": "REGION_II",
+      "city_name": "Cauayan"
     },
     {
       "code": "santiago",
       "name": "Santiago",
-      "region_code": "REGION_II"
+      "region_code": "REGION_II",
+      "city_name": "Santiago"
     },
     {
       "code": "balanga",
       "name": "Balanga",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Balanga"
     },
     {
       "code": "malolos",
       "name": "Malolos",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Malolos"
     },
     {
       "code": "meycauayan",
       "name": "Meycauayan",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Meycauayan"
     },
     {
       "code": "san-jose-del-monte",
       "name": "San Jose del Monte",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "San Jose del Monte"
     },
     {
       "code": "baliwag",
       "name": "Baliwag",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Baliwag"
     },
     {
       "code": "cabanatuan",
       "name": "Cabanatuan",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Cabanatuan"
     },
     {
       "code": "gapan",
       "name": "Gapan",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Gapan"
     },
     {
       "code": "san-jose-nueva-ecija",
       "name": "San Jose",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "San Jose"
     },
     {
       "code": "palayan",
       "name": "Palayan",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Palayan"
     },
     {
       "code": "science-city-of-munoz",
       "name": "Science City of Muñoz",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Science City of Muñoz"
     },
     {
       "code": "angeles",
       "name": "Angeles",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Angeles"
     },
     {
       "code": "mabalacat",
       "name": "Mabalacat",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Mabalacat"
     },
     {
       "code": "san-fernando-pampanga",
       "name": "San Fernando",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "San Fernando"
     },
     {
       "code": "tarlac",
       "name": "Tarlac",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Tarlac"
     },
     {
       "code": "olongapo",
       "name": "Olongapo",
-      "region_code": "REGION_III"
+      "region_code": "REGION_III",
+      "city_name": "Olongapo"
     },
     {
       "code": "bacoor",
       "name": "Bacoor",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Bacoor"
     },
     {
       "code": "cavite",
       "name": "Cavite City",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Cavite City"
     },
     {
       "code": "dasmarinas",
       "name": "Dasmariñas",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Dasmariñas"
     },
     {
       "code": "imus",
       "name": "Imus",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Imus"
     },
     {
       "code": "tagaytay",
       "name": "Tagaytay",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Tagaytay"
     },
     {
       "code": "trece-martires",
       "name": "Trece Martires",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Trece Martires"
     },
     {
       "code": "general-trias",
       "name": "General Trias",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "General Trias"
     },
     {
       "code": "carmona",
       "name": "Carmona",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Carmona"
     },
     {
       "code": "binan",
       "name": "Biñan",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Biñan"
     },
     {
       "code": "cabuyao",
       "name": "Cabuyao",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Cabuyao"
     },
     {
       "code": "calamba",
       "name": "Calamba",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Calamba"
     },
     {
       "code": "san-pablo",
       "name": "San Pablo",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "San Pablo"
     },
     {
       "code": "santa-rosa",
       "name": "Santa Rosa",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Santa Rosa"
     },
     {
       "code": "san-pedro",
       "name": "San Pedro",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "San Pedro"
     },
     {
       "code": "batangas",
       "name": "Batangas City",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Batangas City"
     },
     {
       "code": "lipa",
       "name": "Lipa",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Lipa"
     },
     {
       "code": "tanauan",
       "name": "Tanauan",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Tanauan"
     },
     {
       "code": "sto-tomas",
       "name": "Sto. Tomas",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Sto. Tomas"
     },
     {
       "code": "calaca",
       "name": "Calaca",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Calaca"
     },
     {
       "code": "antipolo",
       "name": "Antipolo",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Antipolo"
     },
     {
       "code": "lucena",
       "name": "Lucena",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Lucena"
     },
     {
       "code": "tayabas",
       "name": "Tayabas",
-      "region_code": "REGION_IV_A"
+      "region_code": "REGION_IV_A",
+      "city_name": "Tayabas"
     },
     {
       "code": "calapan",
       "name": "Calapan",
-      "region_code": "REGION_IV_B"
+      "region_code": "REGION_IV_B",
+      "city_name": "Calapan"
     },
     {
       "code": "puerto-princesa",
       "name": "Puerto Princesa",
-      "region_code": "REGION_IV_B"
+      "region_code": "REGION_IV_B",
+      "city_name": "Puerto Princesa"
     },
     {
       "code": "legazpi",
       "name": "Legazpi",
-      "region_code": "REGION_V"
+      "region_code": "REGION_V",
+      "city_name": "Legazpi"
     },
     {
       "code": "ligao",
       "name": "Ligao",
-      "region_code": "REGION_V"
+      "region_code": "REGION_V",
+      "city_name": "Ligao"
     },
     {
       "code": "tabaco",
       "name": "Tabaco",
-      "region_code": "REGION_V"
+      "region_code": "REGION_V",
+      "city_name": "Tabaco"
     },
     {
       "code": "iriga",
       "name": "Iriga",
-      "region_code": "REGION_V"
+      "region_code": "REGION_V",
+      "city_name": "Iriga"
     },
     {
       "code": "naga-camarines-sur",
       "name": "Naga",
-      "region_code": "REGION_V"
+      "region_code": "REGION_V",
+      "city_name": "Naga"
     },
     {
       "code": "masbate",
       "name": "Masbate City",
-      "region_code": "REGION_V"
+      "region_code": "REGION_V",
+      "city_name": "Masbate City"
     },
     {
       "code": "sorsogon",
       "name": "Sorsogon City",
-      "region_code": "REGION_V"
+      "region_code": "REGION_V",
+      "city_name": "Sorsogon City"
     },
     {
       "code": "roxas",
       "name": "Roxas",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Roxas"
     },
     {
       "code": "iloilo",
       "name": "Iloilo City",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Iloilo City"
     },
     {
       "code": "passi",
       "name": "Passi",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Passi"
     },
     {
       "code": "bacolod",
       "name": "Bacolod",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Bacolod"
     },
     {
       "code": "bago",
       "name": "Bago",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Bago"
     },
     {
       "code": "cadiz",
       "name": "Cadiz",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Cadiz"
     },
     {
       "code": "escalante",
       "name": "Escalante",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Escalante"
     },
     {
       "code": "himamaylan",
       "name": "Himamaylan",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Himamaylan"
     },
     {
       "code": "kabankalan",
       "name": "Kabankalan",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Kabankalan"
     },
     {
       "code": "la-carlota",
       "name": "La Carlota",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "La Carlota"
     },
     {
       "code": "sagay",
       "name": "Sagay",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Sagay"
     },
     {
       "code": "san-carlos-negros-occidental",
       "name": "San Carlos",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "San Carlos"
     },
     {
       "code": "silay",
       "name": "Silay",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Silay"
     },
     {
       "code": "sipalay",
       "name": "Sipalay",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Sipalay"
     },
     {
       "code": "talisay-negros-occidental",
       "name": "Talisay",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Talisay"
     },
     {
       "code": "victorias",
       "name": "Victorias",
-      "region_code": "REGION_VI"
+      "region_code": "REGION_VI",
+      "city_name": "Victorias"
     },
     {
       "code": "tagbilaran",
       "name": "Tagbilaran",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Tagbilaran"
     },
     {
       "code": "bogo",
       "name": "Bogo",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Bogo"
     },
     {
       "code": "carcar",
       "name": "Carcar",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Carcar"
     },
     {
       "code": "cebu",
       "name": "Cebu City",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Cebu City"
     },
     {
       "code": "danao",
       "name": "Danao",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Danao"
     },
     {
       "code": "lapu-lapu",
       "name": "Lapu-Lapu",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Lapu-Lapu"
     },
     {
       "code": "mandaue",
       "name": "Mandaue",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Mandaue"
     },
     {
       "code": "naga-cebu",
       "name": "Naga",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Naga"
     },
     {
       "code": "talisay-cebu",
       "name": "Talisay",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Talisay"
     },
     {
       "code": "toledo",
       "name": "Toledo",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Toledo"
     },
     {
       "code": "bais",
       "name": "Bais",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Bais"
     },
     {
       "code": "bayawan",
       "name": "Bayawan",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Bayawan"
     },
     {
       "code": "canlaon",
       "name": "Canlaon",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Canlaon"
     },
     {
       "code": "dumaguete",
       "name": "Dumaguete",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Dumaguete"
     },
     {
       "code": "guihulngan",
       "name": "Guihulngan",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Guihulngan"
     },
     {
       "code": "tanjay",
       "name": "Tanjay",
-      "region_code": "REGION_VII"
+      "region_code": "REGION_VII",
+      "city_name": "Tanjay"
     },
     {
       "code": "borongan",
       "name": "Borongan",
-      "region_code": "REGION_VIII"
+      "region_code": "REGION_VIII",
+      "city_name": "Borongan"
     },
     {
       "code": "ormoc",
       "name": "Ormoc",
-      "region_code": "REGION_VIII"
+      "region_code": "REGION_VIII",
+      "city_name": "Ormoc"
     },
     {
       "code": "tacloban",
       "name": "Tacloban",
-      "region_code": "REGION_VIII"
+      "region_code": "REGION_VIII",
+      "city_name": "Tacloban"
     },
     {
       "code": "baybay",
       "name": "Baybay",
-      "region_code": "REGION_VIII"
+      "region_code": "REGION_VIII",
+      "city_name": "Baybay"
     },
     {
       "code": "calbayog",
       "name": "Calbayog",
-      "region_code": "REGION_VIII"
+      "region_code": "REGION_VIII",
+      "city_name": "Calbayog"
     },
     {
       "code": "catbalogan",
       "name": "Catbalogan",
-      "region_code": "REGION_VIII"
+      "region_code": "REGION_VIII",
+      "city_name": "Catbalogan"
     },
     {
       "code": "maasin",
       "name": "Maasin",
-      "region_code": "REGION_VIII"
+      "region_code": "REGION_VIII",
+      "city_name": "Maasin"
     },
     {
       "code": "dapitan",
       "name": "Dapitan",
-      "region_code": "REGION_IX"
+      "region_code": "REGION_IX",
+      "city_name": "Dapitan"
     },
     {
       "code": "dipolog",
       "name": "Dipolog",
-      "region_code": "REGION_IX"
+      "region_code": "REGION_IX",
+      "city_name": "Dipolog"
     },
     {
       "code": "isabela",
       "name": "Isabela",
-      "region_code": "REGION_IX"
+      "region_code": "REGION_IX",
+      "city_name": "Isabela"
     },
     {
       "code": "pagadian",
       "name": "Pagadian",
-      "region_code": "REGION_IX"
+      "region_code": "REGION_IX",
+      "city_name": "Pagadian"
     },
     {
       "code": "zamboanga",
       "name": "Zamboanga City",
-      "region_code": "REGION_IX"
+      "region_code": "REGION_IX",
+      "city_name": "Zamboanga City"
     },
     {
       "code": "malaybalay",
       "name": "Malaybalay",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "Malaybalay"
     },
     {
       "code": "valencia",
       "name": "Valencia",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "Valencia"
     },
     {
       "code": "iligan",
       "name": "Iligan",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "Iligan"
     },
     {
       "code": "oroquieta",
       "name": "Oroquieta",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "Oroquieta"
     },
     {
       "code": "ozamiz",
       "name": "Ozamiz",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "Ozamiz"
     },
     {
       "code": "tangub",
       "name": "Tangub",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "Tangub"
     },
     {
       "code": "cagayan-de-oro",
       "name": "Cagayan de Oro",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "Cagayan de Oro"
     },
     {
       "code": "el-salvador",
       "name": "El Salvador",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "El Salvador"
     },
     {
       "code": "gingoog",
       "name": "Gingoog",
-      "region_code": "REGION_X"
+      "region_code": "REGION_X",
+      "city_name": "Gingoog"
     },
     {
       "code": "davao",
       "name": "Davao City",
-      "region_code": "REGION_XI"
+      "region_code": "REGION_XI",
+      "city_name": "Davao City"
     },
     {
       "code": "digos",
       "name": "Digos",
-      "region_code": "REGION_XI"
+      "region_code": "REGION_XI",
+      "city_name": "Digos"
     },
     {
       "code": "panabo",
       "name": "Panabo",
-      "region_code": "REGION_XI"
+      "region_code": "REGION_XI",
+      "city_name": "Panabo"
     },
     {
       "code": "samal",
       "name": "Samal",
-      "region_code": "REGION_XI"
+      "region_code": "REGION_XI",
+      "city_name": "Samal"
     },
     {
       "code": "tagum",
       "name": "Tagum",
-      "region_code": "REGION_XI"
+      "region_code": "REGION_XI",
+      "city_name": "Tagum"
     },
     {
       "code": "mati",
       "name": "Mati",
-      "region_code": "REGION_XI"
+      "region_code": "REGION_XI",
+      "city_name": "Mati"
     },
     {
       "code": "kidapawan",
       "name": "Kidapawan",
-      "region_code": "REGION_XII"
+      "region_code": "REGION_XII",
+      "city_name": "Kidapawan"
     },
     {
       "code": "general-santos",
       "name": "General Santos",
-      "region_code": "REGION_XII"
+      "region_code": "REGION_XII",
+      "city_name": "General Santos"
     },
     {
       "code": "koronadal",
       "name": "Koronadal",
-      "region_code": "REGION_XII"
+      "region_code": "REGION_XII",
+      "city_name": "Koronadal"
     },
     {
       "code": "tacurong",
       "name": "Tacurong",
-      "region_code": "REGION_XII"
+      "region_code": "REGION_XII",
+      "city_name": "Tacurong"
     },
     {
       "code": "butuan",
       "name": "Butuan",
-      "region_code": "REGION_XIII"
+      "region_code": "REGION_XIII",
+      "city_name": "Butuan"
     },
     {
       "code": "cabadbaran",
       "name": "Cabadbaran",
-      "region_code": "REGION_XIII"
+      "region_code": "REGION_XIII",
+      "city_name": "Cabadbaran"
     },
     {
       "code": "bayugan",
       "name": "Bayugan",
-      "region_code": "REGION_XIII"
+      "region_code": "REGION_XIII",
+      "city_name": "Bayugan"
     },
     {
       "code": "surigao",
       "name": "Surigao City",
-      "region_code": "REGION_XIII"
+      "region_code": "REGION_XIII",
+      "city_name": "Surigao City"
     },
     {
       "code": "bislig",
       "name": "Bislig",
-      "region_code": "REGION_XIII"
+      "region_code": "REGION_XIII",
+      "city_name": "Bislig"
     },
     {
       "code": "tandag",
       "name": "Tandag",
-      "region_code": "REGION_XIII"
+      "region_code": "REGION_XIII",
+      "city_name": "Tandag"
     },
     {
       "code": "cotabato",
       "name": "Cotabato City",
-      "region_code": "BARMM"
+      "region_code": "BARMM",
+      "city_name": "Cotabato City"
     },
     {
       "code": "marawi",
       "name": "Marawi",
-      "region_code": "BARMM"
+      "region_code": "BARMM",
+      "city_name": "Marawi"
     },
     {
       "code": "lamitan",
       "name": "Lamitan",
-      "region_code": "BARMM"
+      "region_code": "BARMM",
+      "city_name": "Lamitan"
     }
   ]
 }

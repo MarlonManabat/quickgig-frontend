@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import locations from '@/data/ph_locations.json';
+import { getRegions, getCitiesByRegion } from '@/lib/locations';
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse) {
-  res.status(200).json(locations);
+  const regions = getRegions();
+  const cities = regions.flatMap((r) => getCitiesByRegion(r.code));
+  res.status(200).json({ regions, cities });
 }

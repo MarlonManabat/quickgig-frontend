@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { supabase } from "@/utils/supabaseClient";
+import { safeSelect } from "@/lib/supabase-safe";
 import { getStubRole } from "@/lib/testAuth";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
 import AppLogo from "@/components/AppLogo";
@@ -27,16 +28,10 @@ export default function AppHeader() {
       const user = data.user;
       setUser(user);
       if (!user) return;
-      try {
-        const { data: prof, error } = await supabase
-          .from("profiles")
-          .select("role_pref")
-          .single();
-        if (error) throw error;
-        setRole((prof?.role_pref as "worker" | "employer" | null) ?? null);
-      } catch {
-        setRole(null);
-      }
+      const prof = await safeSelect<any>(
+        supabase.from("profiles").select("role_pref").single(),
+      );
+      setRole((prof?.role_pref as "worker" | "employer" | null) ?? null);
     });
   }, []);
 
