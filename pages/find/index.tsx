@@ -1,10 +1,11 @@
 'use client';
 import React from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/types/db';
 import LocationSelect from '@/components/LocationSelect';
 
 export default function FindPage() {
-  const supa = createClientComponentClient();
+  const supa = createClientComponentClient<Database>();
   const [q, setQ] = React.useState('');
   const [region_code, setRegion] = React.useState('');
   const [city_code, setCity] = React.useState('');

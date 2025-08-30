@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/db';
 import citiesJson from '../../../public/data/ph/cities.json';
 
 const NCR_REGION_CODE = '130000000';
@@ -15,7 +16,7 @@ export default async function handler(
   let rows: { id: string; name: string }[] | null = null;
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    const supabase = createClient(
+    const supabase = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     );

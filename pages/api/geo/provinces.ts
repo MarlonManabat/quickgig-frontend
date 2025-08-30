@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/db';
 import { env, requireServer } from '@/lib/env';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -8,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const url = env.NEXT_PUBLIC_SUPABASE_URL;
   const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
   if (!url || !key) return res.status(500).json([]);
-  const supabase = createClient(url, key);
+  const supabase = createClient<Database>(url, key);
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), 2500);
   try {

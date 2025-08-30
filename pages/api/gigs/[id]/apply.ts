@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import type { Database, Insert } from '@/types/db';
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,7 +10,7 @@ export default async function handler(
     res.status(405).json({ error: "method not allowed" });
     return;
   }
-  const supabase = createPagesServerClient({ req, res }, {
+  const supabase = createPagesServerClient<Database>({ req, res }, {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   });
@@ -22,11 +23,15 @@ export default async function handler(
   }
   const id = req.query.id;
   const { cover_letter } = req.body || {};
-  const { error } = await supabase.from("applications").insert({
-    applicant_id: user.id,
-    gig_id: id,
-    message: cover_letter ?? null,
-  });
+  const { error } = await supabase
+    .from("applications")
+    .insert([
+      {
+        applicant_id: user.id,
+        gig_id: id,
+        message: cover_letter ?? null,
+      } satisfies Insert<"applications">,
+    ]);
   if (error) {
     if ((error as any).code === "23505") {
       res.status(409).json({ error: "already applied" });

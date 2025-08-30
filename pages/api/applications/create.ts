@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSupabase } from '@/lib/supabase-server';
+import type { Insert } from '@/types/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -49,12 +50,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { data, error } = await supabase
     .from('applications')
-    .insert({
-      job_id: jobId,
-      worker_id: user.id,
-      message: message.trim(),
-      expected_rate: rateNum,
-    })
+    .insert([
+      {
+        job_id: jobId,
+        worker_id: user.id,
+        message: message.trim(),
+        expected_rate: rateNum,
+      } satisfies Insert<'applications'>,
+    ])
     .select('id')
     .single();
   if (error)

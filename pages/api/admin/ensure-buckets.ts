@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/db";
 import { env, requireServer } from "@/lib/env";
 
 const url = env.NEXT_PUBLIC_SUPABASE_URL;
@@ -19,7 +20,7 @@ export default async function handler(
     res.status(401).json({ error: "unauthorized" });
     return;
   }
-  const supabase = createClient(url, serviceRole);
+  const supabase = createClient<Database>(url, serviceRole);
 
   for (const id of ["avatars", "payment-proofs"]) {
     await supabase.storage.createBucket(id, { public: true }).catch(() => {});

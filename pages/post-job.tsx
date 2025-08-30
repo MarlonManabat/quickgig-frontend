@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import type { Insert } from "@/types/db";
 import Shell from "@/components/Shell";
 import { useRouter } from "next/router";
 import { useRequireUser } from "@/lib/useRequireUser";
@@ -40,15 +41,17 @@ export default function PostJobPage() {
 
     const { data, error } = await supabase
       .from("gigs")
-      .insert({
-        owner: userId,
-        title,
-        description,
-        budget: budget === "" ? null : Number(budget),
-        region_code: loc.region_code || null,
-        city_code: loc.city_code || null,
-        image_url: imageUrl,
-      })
+      .insert([
+        {
+          owner: userId,
+          title,
+          description,
+          budget: budget === "" ? null : Number(budget),
+          region_code: loc.region_code || null,
+          city_code: loc.city_code || null,
+          image_url: imageUrl,
+        } satisfies Insert<"gigs">,
+      ])
       .select("id")
       .single();
 

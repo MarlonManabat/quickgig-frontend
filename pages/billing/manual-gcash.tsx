@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database, Insert } from '@/types/db';
 import { PRICE_PER_CREDIT, MAX_PROOF_SIZE_MB, ALLOWED_PROOF_TYPES } from '@/config/billing';
 import { uploadProof } from '@/lib/storage';
 
 export default function ManualGCashPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
   const [amount, setAmount] = useState('');
   const [credits, setCredits] = useState(0);
   const [file, setFile] = useState<File | null>(null);
@@ -42,14 +43,18 @@ export default function ManualGCashPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const file_url = await uploadProof(file, user.id);
-    await supabase.from('payment_proofs').insert({
-      user_id: user.id,
-      amount: Number(amount),
-      credits,
-      file_url,
-      note: note || null,
-      status: 'pending',
-    });
+    await supabase
+      .from('payment_proofs')
+      .insert([
+        {
+          user_id: user.id,
+          amount: Number(amount),
+          credits,
+          file_url,
+          note: note || null,
+          status: 'pending',
+        } satisfies Insert<'payment_proofs'>,
+      ]);
     setSubmitted(true);
   }
 

@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import type { Database, Insert, Update } from "@/types/db";
 import { env, requireServer } from "@/lib/env";
 
 const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
 const supabase = key
-  ? createClient(env.NEXT_PUBLIC_SUPABASE_URL, key)
+  ? createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key)
   : undefined;
 
 export default async function handler(
@@ -28,11 +29,14 @@ export default async function handler(
     const { data: gigs } = await q;
     if (gigs && gigs.length) {
       await supabase.from("notifications").insert(
-        gigs.map((g: any) => ({
-          user_id: a.user_id,
-          kind: "alert_match",
-          payload: { gig_id: g.id, title: g.title },
-        })),
+        gigs.map(
+          (g: any) =>
+            ({
+              user_id: a.user_id,
+              kind: "alert_match",
+              payload: { gig_id: g.id, title: g.title },
+            } satisfies Insert<"notifications">),
+        ),
       );
       if (process.env.RESEND_API_KEY && process.env.NOTIFY_FROM) {
         const {
@@ -59,7 +63,7 @@ export default async function handler(
       }
       await supabase
         .from("gig_alerts")
-        .update({ last_notified_at: now })
+        .update({ last_notified_at: now } as Update<"gig_alerts">)
         .eq("id", a.id);
     }
   }

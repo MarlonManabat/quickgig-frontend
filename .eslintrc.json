@@ -12,5 +12,19 @@
     "landing_public_html/**",
     "public_html/**",
     "node_modules/**"
-  ]
+  ],
+  "rules": {
+    // Encourage array-form insert/upsert for Supabase typing
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "CallExpression[callee.property.name='insert'] > ObjectExpression",
+        "message": "Use array-form: .insert([{ ... }]) to keep Supabase types sound."
+      },
+      {
+        "selector": "CallExpression[callee.property.name='upsert'] > ObjectExpression",
+        "message": "Use array-form: .upsert([{ ... }]) to keep Supabase types sound."
+      }
+    ]
+  }
 }

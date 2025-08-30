@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import type { Database, Insert } from '@/types/db';
 import { TICKET_PRICE_PHP, makeRef } from "@/lib/payments";
 import { isAdmin } from "@/lib/auth";
 
@@ -7,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const supabase = createPagesServerClient({ req, res }, {
+  const supabase = createPagesServerClient<Database>({ req, res }, {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   });
@@ -27,12 +28,14 @@ export default async function handler(
   if (req.method === "POST") {
     const { data, error } = await supabase
       .from("orders")
-      .insert({
-        user_id: user.id,
-        amount: TICKET_PRICE_PHP,
-        reference: makeRef(),
-        status: "pending",
-      })
+      .insert([
+        {
+          user_id: user.id,
+          amount: TICKET_PRICE_PHP,
+          reference: makeRef(),
+          status: "pending",
+        } satisfies Insert<"orders">,
+      ])
       .select("id, reference")
       .single();
     if (error) {

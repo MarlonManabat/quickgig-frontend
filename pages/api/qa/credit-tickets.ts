@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/db";
 import { env, requireServer } from "@/lib/env";
 function assertQA(req: NextApiRequest) {
   if (process.env.QA_TEST_MODE !== "true") throw new Error("QA disabled");
@@ -18,7 +19,7 @@ export default async function handler(
     if (!userId) return res.status(400).json({ error: "userId required" });
     const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
     if (!key) return res.status(500).end();
-    const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
+    const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
     const { error } = await supa.rpc("credit_tickets_admin", {
       p_user: userId,
       p_tickets: tickets,

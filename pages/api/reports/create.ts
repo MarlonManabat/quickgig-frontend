@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/utils/supabaseClient";
+import type { Insert } from "@/types/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,7 +26,9 @@ export default async function handler(
 
   const { error } = await supabase
     .from("reports")
-    .insert({ kind, target_id, reason, reporter: user.id });
+    .insert([
+      { kind, target_id, reason, reporter: user.id } satisfies Insert<"reports">,
+    ]);
   if (error) {
     res.status(400).json({ error: error.message });
     return;

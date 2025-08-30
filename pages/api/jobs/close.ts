@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSupabase } from '@/lib/supabase-server';
+import type { Update } from '@/types/db';
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,7 +24,7 @@ export default async function handler(
 
   const { error } = await supabase
     .from('jobs')
-    .update({ is_closed: true })
+    .update({ is_closed: true } as Update<'jobs'>)
     .eq('id', jobId)
     .eq('is_closed', false);
   if (error)

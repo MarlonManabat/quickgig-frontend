@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import type { Database, Insert, Update } from "@/types/db";
 import { env, requireServer } from "@/lib/env";
 
 function assertQA(req: NextApiRequest) {
@@ -22,7 +23,7 @@ export default async function handler(
 
     const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
     if (!key) return res.status(500).end();
-    const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
+    const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
 
     // Upsert users + profiles
     const createOrFindUser = async (email: string) => {
@@ -34,12 +35,16 @@ export default async function handler(
 
       if (created.data?.user?.id) {
         const uid = created.data.user.id;
-        await supa.from("profiles").upsert({
-          id: uid,
-          email,
-          full_name: email.split("@")[0],
-          is_admin: false,
-        });
+        await supa
+          .from("profiles")
+          .upsert([
+            {
+              id: uid,
+              email,
+              full_name: email.split("@")[0],
+              is_admin: false,
+            } satisfies Insert<"profiles">,
+          ]);
         return uid;
       }
 
@@ -58,12 +63,16 @@ export default async function handler(
         );
         if (match) {
           const uid = match.id;
-          await supa.from("profiles").upsert({
-            id: uid,
-            email,
-            full_name: email.split("@")[0],
-            is_admin: false,
-          });
+          await supa
+            .from("profiles")
+            .upsert([
+              {
+                id: uid,
+                email,
+                full_name: email.split("@")[0],
+                is_admin: false,
+              } satisfies Insert<"profiles">,
+            ]);
           return uid;
         }
 
@@ -80,34 +89,40 @@ export default async function handler(
     // Make employer NOT admin and reset tickets to 0
     await supa
       .from("profiles")
-      .update({ is_admin: false })
+      .update({ is_admin: false } as Update<"profiles">)
       .eq("id", employerId);
     await supa
       .from("ticket_balances")
-      .upsert({ user_id: employerId, balance: 0 });
+      .upsert([
+        { user_id: employerId, balance: 0 } satisfies Insert<"ticket_balances">,
+      ]);
 
     // Create gig owned by employer
     const { data: gig } = await supa
       .from("gigs")
-      .insert({
-        owner_id: employerId,
-        title: "Playwright E2E Gig",
-        description: "seeded",
-        price: 123,
-        tags: ["e2e"],
-        location: "remote",
-      })
+      .insert([
+        {
+          owner_id: employerId,
+          title: "Playwright E2E Gig",
+          description: "seeded",
+          price: 123,
+          tags: ["e2e"],
+          location: "remote",
+        } satisfies Insert<"gigs">,
+      ])
       .select()
       .single();
 
     // Create application by worker (status: pending)
     const { data: app } = await supa
       .from("applications")
-      .insert({
-        gig_id: gig!.id,
-        applicant_id: workerId,
-        status: "pending",
-      })
+      .insert([
+        {
+          gig_id: gig!.id,
+          applicant_id: workerId,
+          status: "pending",
+        } satisfies Insert<"applications">,
+      ])
       .select()
       .single();
 

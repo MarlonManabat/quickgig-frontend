@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import type { Update } from "@/types/db";
 
 export async function uploadAvatar(file: File): Promise<string> {
   const { data: auth } = await supabase.auth.getUser();
@@ -16,7 +17,7 @@ export async function uploadAvatar(file: File): Promise<string> {
 
   const { error: upProfileErr } = await supabase
     .from("profiles")
-    .update({ avatar_url: publicUrl })
+    .update({ avatar_url: publicUrl } as Update<"profiles">)
     .eq("id", auth.user.id);
   if (upProfileErr) throw upProfileErr;
 

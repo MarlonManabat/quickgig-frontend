@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/db";
 import { env } from "@/lib/env";
 
 export default async function handler(
@@ -8,7 +9,7 @@ export default async function handler(
 ) {
   let supabaseStatus: "ok" | "error" = "ok";
   try {
-    const supa = createClient(
+    const supa = createClient<Database>(
       env.NEXT_PUBLIC_SUPABASE_URL,
       env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     );

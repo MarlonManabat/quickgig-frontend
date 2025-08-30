@@ -1,12 +1,13 @@
 'use client';
 import React from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/types/db';
 import { nanoid } from 'nanoid';
 
 export default function PaymentProofModal({
   open, onClose, pricePHP, credits
 }: { open: boolean; onClose: () => void; pricePHP: number; credits: number; }) {
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
   const [file, setFile] = React.useState<File | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);

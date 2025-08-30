@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { Database } from "@/types/db";
 
 const REDIRECT_GUARD_PAGES = ["/start", "/onboarding", "/profile", "/home"];
 const CALLBACK_FLAG = "__qg_auth_redirected";
@@ -13,7 +14,7 @@ export default function AuthCallback() {
 
   useEffect(() => {
     if (isTest) return;
-    createClientComponentClient();
+    createClientComponentClient<Database>();
     const params = new URLSearchParams(window.location.search);
     const next =
       params.get("next") ||

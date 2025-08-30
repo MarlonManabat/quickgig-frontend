@@ -2,6 +2,7 @@ import { useRequireUser } from "@/lib/useRequireUser";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import type { Insert } from "@/types/db";
 import Link from "next/link";
 import Spinner from "@/components/Spinner";
 
@@ -29,11 +30,15 @@ export default function ApplyGig() {
     e.preventDefault();
     setMsg(null);
     setSaving(true);
-    const { error } = await supabase.from("applications").insert({
-      gig_id: Number(id),
-      worker: userId,
-      cover_letter: cover || null,
-    });
+    const { error } = await supabase
+      .from("applications")
+      .insert([
+        {
+          gig_id: Number(id),
+          worker: userId,
+          cover_letter: cover || null,
+        } satisfies Insert<"applications">,
+      ]);
     if (error) setMsg(error.message);
     else {
       setMsg("Applied! View your applications in Dashboard.");

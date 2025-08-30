@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/supabaseClient";
+import type { Insert } from "@/types/db";
 
 export async function getOrCreateApplication(
   gigId: string,
@@ -15,11 +16,13 @@ export async function getOrCreateApplication(
   if (data) return data;
   const { data: inserted, error: insErr } = await supabase
     .from("applications")
-    .insert({
-      gig_id: gigId,
-      applicant: applicantId,
-      cover_letter: coverLetter || null,
-    })
+    .insert([
+      {
+        gig_id: gigId,
+        applicant: applicantId,
+        cover_letter: coverLetter || null,
+      } satisfies Insert<"applications">,
+    ])
     .select()
     .single();
   if (insErr) throw insErr;
@@ -36,7 +39,9 @@ export async function getOrCreateThread(applicationId: string) {
   if (data) return data;
   const { data: inserted, error: insErr } = await supabase
     .from("threads")
-    .insert({ application_id: applicationId })
+    .insert([
+      { application_id: applicationId } satisfies Insert<"threads">,
+    ])
     .select()
     .single();
   if (insErr) throw insErr;

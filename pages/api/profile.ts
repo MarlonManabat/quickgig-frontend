@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/utils/supabaseClient";
+import type { Insert } from "@/types/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,7 +15,9 @@ export default async function handler(
   if (!user) return res.status(401).json({ error: "unauthorized" });
   const { data, error } = await supabase
     .from("profiles")
-    .upsert({ id: user.id, full_name, avatar_url }, { onConflict: "id" })
+    .upsert([
+      { id: user.id, full_name, avatar_url } satisfies Insert<"profiles">,
+    ], { onConflict: "id" })
     .select()
     .single();
   if (error) return res.status(400).json({ error: error.message });

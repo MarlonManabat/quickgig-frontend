@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/db";
 import { env, requireServer } from "../lib/env";
 
 const url = env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,7 +10,7 @@ const userEmail = "demo-user@quickgig.test";
 const newUserEmail = "new-user@quickgig.test";
 
 async function run() {
-  const supabase = createClient(url, serviceKey, {
+  const supabase = createClient<Database>(url, serviceKey, {
     auth: { persistSession: false },
   });
 

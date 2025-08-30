@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { Database, Update } from "@/types/db";
 import { hasMockSession } from "@/lib/session";
 import { toStr } from "@/lib/normalize";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
   const [loading, setLoading] = useState(true);
   const [firstName, setFirstName] = useState("");
   const [city, setCity] = useState("");
@@ -51,7 +52,7 @@ export default function ProfilePage() {
             first_name: firstName,
             city,
             avatar_url: avatarUrl,
-          })
+          } as Update<"profiles">)
           .eq("id", user.id);
       }
       router.replace(nextTarget);

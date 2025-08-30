@@ -1,9 +1,10 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { Database } from "@/types/db";
 import { useEffect, useState } from "react";
 import { toNum } from "@/lib/normalize";
 
 export default function Wallet() {
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
   const [rows, setRows] = useState<any[]>([]);
   const [balance, setBalance] = useState<number>(0);
 

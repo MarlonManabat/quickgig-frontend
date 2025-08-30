@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/supabaseClient";
+import type { Insert } from "@/types/db";
 
 export async function isSaved(gigId: number) {
   const { data } = await supabase
@@ -14,7 +15,11 @@ export async function toggleSave(gigId: number) {
     await supabase.from("saved_gigs").delete().eq("gig_id", gigId);
     return false;
   } else {
-    await supabase.from("saved_gigs").insert({ gig_id: gigId });
+    await supabase
+      .from("saved_gigs")
+      .insert([
+        { gig_id: gigId } satisfies Insert<"saved_gigs">,
+      ]);
     return true;
   }
 }

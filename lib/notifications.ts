@@ -1,6 +1,7 @@
 import "server-only";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
+import type { Database, Insert } from "@/types/db";
 import { env, requireServer } from "@/lib/env";
 
 const FROM = process.env.NOTIF_EMAIL_FROM || "QuickGig <no-reply@quickgig.ph>";
@@ -63,18 +64,20 @@ export async function emitNotification(p: NotifPayload) {
 
   const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
   if (!key) return;
-  const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
+  const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
 
   const { error: insErr } = await supa
     .from("notifications")
-    .insert({
-      user_id: p.userId,
-      type: p.type,
-      title: p.title,
-      body: p.body,
-      link: p.link,
-      uniq_key: p.uniq || null,
-    })
+    .insert([
+      {
+        user_id: p.userId,
+        type: p.type,
+        title: p.title,
+        body: p.body,
+        link: p.link,
+        uniq_key: p.uniq || null,
+      } satisfies Insert<"notifications">,
+    ])
     .select()
     .maybeSingle();
 
