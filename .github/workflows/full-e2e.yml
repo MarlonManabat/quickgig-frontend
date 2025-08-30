@@ -16,71 +16,118 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      # Provide sane defaults so CI doesn’t regress when secrets aren’t set.
+      # Safe defaults to avoid missing secrets regressions
       NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN || 'https://app.quickgig.ph' }}
       APP_ORIGIN:             ${{ secrets.APP_ORIGIN || 'https://app.quickgig.ph' }}
       NEXT_PUBLIC_SUPABASE_URL:      ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
+      PORT: 3000
+      BASE_URL: http://localhost:3000
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 1) Setup Node (no pnpm cache here to avoid premature pnpm use)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # 2) Install pnpm before caching
-      - name: Setup pnpm
+      # Auto-detect package manager and prepare commands
+      - name: Detect package manager
+        id: pm
+        shell: bash
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            echo "name=pnpm" >> $GITHUB_OUTPUT
+            echo "install=pnpm install --frozen-lockfile" >> $GITHUB_OUTPUT
+            echo "build=pnpm build" >> $GITHUB_OUTPUT
+            echo "start=pnpm start" >> $GITHUB_OUTPUT
+            echo "exec=pnpm exec" >> $GITHUB_OUTPUT
+          elif [ -f yarn.lock ]; then
+            echo "name=yarn" >> $GITHUB_OUTPUT
+            echo "install=yarn --frozen-lockfile" >> $GITHUB_OUTPUT
+            echo "build=yarn build" >> $GITHUB_OUTPUT
+            echo "start=yarn start" >> $GITHUB_OUTPUT
+            echo "exec=yarn" >> $GITHUB_OUTPUT
+          else
+            # Default to npm; use ci when package-lock.json exists, else install
+            if [ -f package-lock.json ]; then
+              echo "name=npm" >> $GITHUB_OUTPUT
+              echo "install=npm ci" >> $GITHUB_OUTPUT
+            else
+              echo "name=npm" >> $GITHUB_OUTPUT
+              echo "install=npm install" >> $GITHUB_OUTPUT
+            fi
+            echo "build=npm run build" >> $GITHUB_OUTPUT
+            echo "start=npm run start" >> $GITHUB_OUTPUT
+            echo "exec=npx" >> $GITHUB_OUTPUT
+          fi
+          echo "Using package manager: ${{ steps.pm.outputs.name }}"
+
+      # If pnpm is detected, install it and cache its store; if yarn, set up corepack + cache; else npm cache
+      - name: Setup pnpm (only when pnpm)
+        if: ${{ steps.pm.outputs.name == 'pnpm' }}
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
 
-      # 3) Cache pnpm store
       - name: Determine pnpm store path
-        id: pnpm-cache
+        if: ${{ steps.pm.outputs.name == 'pnpm' }}
+        id: pnpm-store
         run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Cache pnpm store
+        if: ${{ steps.pm.outputs.name == 'pnpm' }}
         uses: actions/cache@v4
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
           key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             pnpm-store-${{ runner.os }}-
 
-      # 4) Install deps
+      - name: Enable Corepack (only when yarn)
+        if: ${{ steps.pm.outputs.name == 'yarn' }}
+        run: corepack enable
+
+      - name: Cache Yarn
+        if: ${{ steps.pm.outputs.name == 'yarn' }}
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/yarn
+            **/.yarn/cache
+          key: yarn-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-${{ runner.os }}-
+
+      - name: Cache npm
+        if: ${{ steps.pm.outputs.name == 'npm' }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-cache-${{ runner.os }}-
+
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: ${{ steps.pm.outputs.install }}
 
-      # 5) Install Playwright browsers + system deps
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        run: ${{ steps.pm.outputs.exec }} playwright install --with-deps
 
-      # 6) Build with required envs
       - name: Build
-        run: pnpm build
+        run: ${{ steps.pm.outputs.build }}
 
-      # 7) Start app in background and wait until it’s ready
       - name: Start app (background)
-        env:
-          PORT: 3000
         run: |
-          pnpm start &> .next-app.log &
-          npx wait-on --timeout 120000 http://localhost:3000
+          ${{ steps.pm.outputs.start }} &> .next-app.log &
+          ${{ steps.pm.outputs.exec }} wait-on --timeout 120000 http://localhost:3000
 
-      # 8) Run Full E2E tests; pass BASE_URL & APP_ORIGIN envs
       - name: Run Full E2E
-        env:
-          BASE_URL: http://localhost:3000
-          APP_ORIGIN: ${{ env.APP_ORIGIN }}
-          NEXT_PUBLIC_APP_ORIGIN: ${{ env.NEXT_PUBLIC_APP_ORIGIN }}
-        run: pnpm exec playwright test
+        run: ${{ steps.pm.outputs.exec }} playwright test
 
-      # 9) Always upload reports for debugging
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
