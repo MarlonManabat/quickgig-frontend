@@ -29,6 +29,7 @@ jobs:
       - name: Run full E2E
         run: npx playwright test e2e/full --reporter=github,html
         env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
           APP_ORIGIN: ${{ vars.APP_ORIGIN }}
           MARKETING_HOST: ${{ vars.MARKETING_HOST }}
           QA_TEST_MODE: ${{ vars.QA_TEST_MODE }}
