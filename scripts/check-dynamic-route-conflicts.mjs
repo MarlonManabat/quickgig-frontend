@@ -1,40 +1,24 @@
 import { globby } from 'globby';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 
-const root = path.dirname(fileURLToPath(import.meta.url));
-const proj = path.join(root, '..');
+const pages = await globby(['src/app/**/page.tsx', 'src/pages/**/*.tsx'], {
+  gitignore: true,
+});
 
-function keyOf(file) {
-  // normalize path key by removing param name inside [...]
-  return file
-    .replace(proj + path.sep, '')
-    .replace(/\[(.+?)\]/g, '[param]');
-}
+const routes = new Map();
+for (const file of pages) {
+  const route = path
+    .dirname(file)
+    .replace(/^src\/app/, '')
+    .replace(/^src\/pages/, '')
+    .replace(/\/page$/, '')
+    || '/';
 
-const files = await globby([
-  'pages/**/*.tsx',
-  'pages/**/*.ts',
-  'app/**/*.tsx',
-  'app/**/*.ts'
-], { cwd: proj, absolute: true, gitignore: true });
-
-const dyn = files.filter(f => /\[.+?\]\.(t|j)sx?$/.test(f));
-const map = new Map();
-
-for (const f of dyn) {
-  const k = keyOf(f);
-  if (!map.has(k)) map.set(k, []);
-  map.get(k).push(f);
-}
-
-const conflicts = [...map.entries()].filter(([, arr]) => arr.length > 1);
-if (conflicts.length) {
-  console.error('Dynamic route param conflicts detected:\n');
-  for (const [k, arr] of conflicts) {
-    console.error(`Path key: ${k}`);
-    arr.forEach(p => console.error('  - ' + path.relative(proj, p)));
+  if (routes.has(route)) {
+    const first = routes.get(route);
+    console.error(`Route conflict: "${route}" defined by:\n - ${first}\n - ${file}`);
+    process.exit(1);
   }
-  process.exit(1);
+  routes.set(route, file);
 }
