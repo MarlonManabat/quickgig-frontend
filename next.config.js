@@ -19,6 +19,7 @@ const baseConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias ?? {}),
       '@': path.resolve(process.cwd(), 'src'),
+      '@data': path.resolve(process.cwd(), 'src/data'),
     };
     if (process.env.CI === 'true' || process.env.DISABLE_STRIPE === '1') {
       config.resolve.alias['stripe'] = path.resolve(__dirname, 'stubs/stripe.js');

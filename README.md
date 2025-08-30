@@ -31,9 +31,8 @@ git apply autofix.patch
 
 ### Build/CI quirks
 
-- We intentionally pin **globby@13.x**.
-- **v13** API: `import { globby } from 'globby'`
-- **v14** API: `import globby from 'globby'` (default export)
+- We intentionally pin **globby@14.x**.
+- **v14** API: `import { globby } from 'globby'` (named export)
 - Action: We'll revisit upgrading to v14 when registry/yank issues stop causing noise.
 
 ### Health endpoint for CI

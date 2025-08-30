@@ -1,6 +1,6 @@
-import regions from '../public/data/ph/regions.json';
-import provinces from '../public/data/ph/provinces.json';
-import cities from '../public/data/ph/cities.json';
+import regions from '@data/ph/regions.json';
+import provinces from '@data/ph/provinces.json';
+import cities from '@data/ph/cities.json';
 
 export interface Region { region_code: string; region_name: string }
 export interface Province { region_code: string; province_code: string; province_name: string }
