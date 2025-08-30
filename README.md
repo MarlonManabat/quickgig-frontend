@@ -29,6 +29,11 @@ If lint-based fixes are available an `autofix.patch` artifact is generated which
 git apply autofix.patch
 ```
 
+### Build/CI quirks
+
+- Prebuild route-conflict check requires `globby` as a runtime dependency.
+- `@sindresorhus/merge-streams` is overridden to `merge-streams@^2` via npm "overrides" to avoid a yanked package.
+
 ## Testing
 
 ```bash
