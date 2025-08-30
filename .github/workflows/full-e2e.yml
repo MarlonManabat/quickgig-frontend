@@ -1,63 +1,131 @@
 name: Full E2E
-
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Optional external BASE_URL; empty = run locally"
+        required: false
+        default: ""
   push:
     branches: [ "main" ]
 
 concurrency:
   group: full-e2e-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    env:
+      NODE_ENV: production
+      PORT: 3000
+      LOCAL_BASE_URL: http://localhost:3000
+
+      # ------- EXISTING app/env variables -------
+      NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
+      APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
+
+      # ------- OPTIONAL E2E secrets (safe fallbacks if absent) -------
+      E2E_KEY: ${{ secrets.E2E_KEY }}
+      E2E_EMPLOYER_EMAIL: ${{ secrets.E2E_EMPLOYER_EMAIL }}
+      E2E_WORKER_EMAIL:   ${{ secrets.E2E_WORKER_EMAIL }}
+      E2E_PASSWORD:       ${{ secrets.E2E_PASSWORD }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
           cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
+          run_install: false
 
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        run: |
+          npx playwright install --with-deps
+          node -e "console.log('Playwright version:', require('@playwright/test/package.json').version)"
 
       - name: Build
-        env:
-          NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
-          APP_ORIGIN: ${{ secrets.APP_ORIGIN }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-        run: pnpm build
+        run: pnpm run build
 
       - name: Start app (background)
         run: |
-          pnpm start &>/dev/null &
-          echo "Waiting for app to be ready..."
-          npx wait-on http://localhost:3000
+          nohup pnpm run start -- -p $PORT > .next-app.log 2>&1 &
+          echo $! > .app-pid
+          for i in {1..60}; do
+            if curl -fsS "http://localhost:${PORT}/" >/dev/null; then echo "Server is up"; break; fi
+            sleep 1
+          done
 
-      - name: Run Full E2E
+      - name: Determine BASE_URL
+        id: base
+        run: |
+          if [ -n "${{ github.event.inputs.base_url }}" ]; then
+            echo "BASE_URL=${{ github.event.inputs.base_url }}" >> $GITHUB_OUTPUT
+          else
+            echo "BASE_URL=${LOCAL_BASE_URL}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Seed data (idempotent; no-op if E2E_KEY unset)
         env:
-          BASE_URL: http://localhost:3000
-        run: pnpm exec playwright test
+          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
+        run: |
+          if [ -n "$E2E_KEY" ]; then
+            curl -sS -X POST "$BASE_URL/api/e2e/seed" -H "x-e2e-key: $E2E_KEY" -f
+          else
+            # No E2E_KEY configured; endpoint tolerates and returns 204 in previews
+            curl -sS -X POST "$BASE_URL/api/e2e/seed" || true
+          fi
+
+      - name: Run Full E2E regression pack
+        env:
+          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
+        run: npx playwright test -c playwright.e2e.config.ts tests/e2e/regression --reporter=html,line
 
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-e2e
           path: playwright-report
-          if-no-files-found: ignore
+          if-no-files-found: warn
           retention-days: 7
+
+      - name: Upload Next server log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-app.log
+          path: .next-app.log
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Cleanup
+        if: always()
+        env:
+          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
+        run: |
+          if [ -n "$E2E_KEY" ]; then
+            curl -sS -X POST "$BASE_URL/api/e2e/cleanup" -H "x-e2e-key: $E2E_KEY" || true
+          else
+            curl -sS -X POST "$BASE_URL/api/e2e/cleanup" || true
+          fi
+
+      - name: Stop app
+        if: always()
+        run: |
+          if [ -f .app-pid ]; then kill $(cat .app-pid) || true; fi

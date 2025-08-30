@@ -167,7 +167,7 @@ export default function HomeEmployer() {
       {/* Top cards */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <Card title="Tickets">
-          <div className="text-3xl font-semibold mb-3">{balance}</div>
+          <div data-testid="ticket-balance" className="text-3xl font-semibold mb-3">{balance}</div>
           <div className="flex gap-2">
             <Link href="/wallet" className="qg-btn qg-btn--primary px-3 py-2">
               Buy Tickets

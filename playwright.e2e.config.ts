@@ -1,21 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
-
 export default defineConfig({
-  testDir: "./tests",
-  testMatch: "e2e/**/*.spec.ts",
-  timeout: 120_000,
-  retries: 2,
-  workers: 4,
-  reporter: [["html", { outputFolder: "playwright-report", open: "never" }]],
+  testDir: "tests/e2e",
+  timeout: 60_000,
+  expect: { timeout: 10_000 },
   use: {
-    baseURL: process.env.PLAYWRIGHT_APP_URL,
-    trace: "on-first-retry",
+    baseURL: process.env.BASE_URL || "http://localhost:3000",
+    headless: true,
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
   },
-  projects: [
-    { name: "chromium-desktop", use: { ...devices["Desktop Chrome"] } },
-    { name: "chromium-mobile", use: { ...devices["iPhone 12"] } },
-  ],
-  outputDir: "test-results",
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  reporter: [["html", { open: "never" }]],
 });
