@@ -1,26 +1,23 @@
-## Why (context + intent)
-- Goal: <what this change moves us toward in the product milestone>
-- User impact: <what improves for workers/employers/admins>
-- Scope: <what’s in / what’s explicitly out>
+## Summary
+- <what this change moves us toward and user impact>
 
-## What changed (summary)
+## Changes
 - <bullet list of concrete edits>
 
-## Lessons applied from previous tasks
-- <What went wrong before + what we’re doing differently now>
-- <Alignment with repo conventions (package manager, env names, CI patterns)>
+## Testing
+- <commands run>
 
-## Risks & mitigations
-- Risks: <behavioral/infra/test>
-- Mitigations: <gates, fallbacks, feature flags>
+## Smoke
+- <quick smoke validation>
 
-## Validation plan
-- Local: <commands run>
-- CI: <which workflows should go green + artifacts to check>
-- Manual: <quick checklist to smoke the feature>
+## Acceptance
+- <acceptance criteria>
 
-## Rollback plan
-- <simple steps to revert / safe toggles>
+## Notes / Next Steps
+- <follow-ups or future work>
+
+## Reflection & Lessons Learned
+- <what went wrong/right last time and how to avoid regressions>
 
 ---
 

@@ -7,13 +7,17 @@ import { useRequireUser } from "@/lib/useRequireUser";
 import { uploadPublicFile } from "@/lib/storage";
 import { hasApprovedOrder } from "@/utils/billing";
 import Link from "next/link";
-import LocationSelect from "@/components/LocationSelect";
+import LocationSelect, { LocationValue } from "@/components/location/LocationSelect";
 
 export default function PostJobPage() {
   const [title, setTitle] = useState("");
   const [description, setDesc] = useState("");
   const [budget, setBudget] = useState<number | "">("");
-  const [loc, setLoc] = useState<{ region_code: string; city_code: string }>({ region_code: "", city_code: "" });
+  const [loc, setLoc] = useState<LocationValue>({
+    regionCode: null,
+    provinceCode: null,
+    cityCode: null,
+  });
   const [imageUrl, setImageUrl] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const router = useRouter();
@@ -47,8 +51,8 @@ export default function PostJobPage() {
           title,
           description,
           budget: budget === "" ? null : Number(budget),
-          region_code: loc.region_code || null,
-          city_code: loc.city_code || null,
+          region_code: loc.regionCode || null,
+          city_code: loc.cityCode || null,
           image_url: imageUrl,
         } satisfies Insert<"gigs">,
       ])
