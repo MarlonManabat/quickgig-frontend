@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import type { Update } from "@/types/db";
 import toast from "@/utils/toast";
 import { toNum } from "@/lib/normalize";
 
@@ -72,7 +73,10 @@ export default function Applicants() {
       }
       setBalance((b) => b - 1);
     }
-    await supabase.from("applications").update({ status }).eq("id", appId);
+    await supabase
+      .from("applications")
+      .update({ status } as Update<"applications">)
+      .eq("id", appId);
     setRows((r) => r.map((x) => (x.id === appId ? { ...x, status } : x)));
   }
 

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import type { Database, Insert } from '@/types/db';
 
 const limiter = new Map<string, { count: number; ts: number }>();
 
@@ -24,7 +25,7 @@ export default async function handler(
     limiter.set(ip, { count: 1, ts: now });
   }
 
-  const supabase = createPagesServerClient({ req, res }, {
+  const supabase = createPagesServerClient<Database>({ req, res }, {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   });
@@ -85,17 +86,19 @@ export default async function handler(
 
   const { data, error } = await supabase
     .from('jobs')
-    .insert({
-      title,
-      description,
-      region_code,
-      province_code,
-      city_code,
-      region_name: region.name,
-      province_name: province.name,
-      city_name: city.name,
-      owner_id: user.id,
-    })
+    .insert([
+      {
+        title,
+        description,
+        region_code,
+        province_code,
+        city_code,
+        region_name: region.name,
+        province_name: province.name,
+        city_name: city.name,
+        owner_id: user.id,
+      } satisfies Insert<'jobs'>,
+    ])
     .select('id')
     .single();
   if (error) return res.status(400).json({ error: { code: 'DB_ERROR', message: error.message } });

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import type { Database, Insert } from "@/types/db";
 import { env, requireServer } from "@/lib/env";
 
 function assertQA(req: NextApiRequest) {
@@ -15,12 +16,16 @@ async function getOrCreateUser(supa: any, email: string): Promise<string> {
     .catch(() => null);
   if (created?.data?.user?.id) {
     const uid = created.data.user.id;
-    await supa.from("profiles").upsert({
-      id: uid,
-      email,
-      full_name: email.split("@")[0],
-      is_admin: false,
-    });
+    await supa
+      .from("profiles")
+      .upsert([
+        {
+          id: uid,
+          email,
+          full_name: email.split("@")[0],
+          is_admin: false,
+        } satisfies Insert<"profiles">,
+      ]);
     return uid;
   }
 
@@ -35,12 +40,16 @@ async function getOrCreateUser(supa: any, email: string): Promise<string> {
     );
     if (match) {
       const uid = match.id;
-      await supa.from("profiles").upsert({
-        id: uid,
-        email,
-        full_name: email.split("@")[0],
-        is_admin: false,
-      });
+      await supa
+        .from("profiles")
+        .upsert([
+          {
+            id: uid,
+            email,
+            full_name: email.split("@")[0],
+            is_admin: false,
+          } satisfies Insert<"profiles">,
+        ]);
       return uid;
     }
     if (data.users.length < perPage) break;
@@ -63,7 +72,7 @@ export default async function handler(
 
     const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
     if (!key) return res.status(500).end();
-    const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
+    const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
     const id = await getOrCreateUser(supa, email);
 
     if (typeof tickets === "number" && tickets > 0) {

@@ -1,10 +1,11 @@
 import useSWR from "swr";
 import Link from "next/link";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { Database } from "@/types/db";
 import { useEffect, useState } from "react";
 
 export default function AppHeaderTickets() {
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
   const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {

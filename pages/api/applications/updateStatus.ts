@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSupabase } from '@/lib/supabase-server';
+import type { Insert, Update } from '@/types/db';
 
 const allowed = ['accepted', 'declined'];
 
@@ -27,7 +28,7 @@ export default async function handler(
 
   const { data, error } = await supabase
     .from('applications')
-    .update({ status })
+    .update({ status } as Update<'applications'>)
     .eq('id', applicationId)
     .select('worker_id, job_id')
     .single();
@@ -36,13 +37,17 @@ export default async function handler(
       .status(400)
       .json({ error: { code: 'DB_ERROR', message: error.message } });
 
-  const { error: notifErr } = await supabase.from('notifications').insert({
-    user_id: data!.worker_id,
-    type: 'application_status',
-    title: 'Application status updated',
-    body: `Your application was ${status}.`,
-    link: `/applications/${applicationId}`,
-  });
+  const { error: notifErr } = await supabase
+    .from('notifications')
+    .insert([
+      {
+        user_id: data!.worker_id,
+        type: 'application_status',
+        title: 'Application status updated',
+        body: `Your application was ${status}.`,
+        link: `/applications/${applicationId}`,
+      } satisfies Insert<'notifications'>,
+    ]);
   if (notifErr) console.error('notification error', notifErr.message);
 
   res.status(200).json({ ok: true });

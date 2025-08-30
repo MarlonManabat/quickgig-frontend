@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
 import { isAdmin } from "@/lib/auth";
 import { asString } from "@/lib/normalize";
+import type { Database, Update } from '@/types/db';
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,7 +12,7 @@ export default async function handler(
     res.status(405).json({ error: "method not allowed" });
     return;
   }
-  const supabase = createPagesServerClient({ req, res }, {
+  const supabase = createPagesServerClient<Database>({ req, res }, {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   });
@@ -38,7 +39,7 @@ export default async function handler(
   if (!id) return res.status(400).json({ error: "id required" });
   const { error } = await supabase
     .from("orders")
-    .update({ status: decision })
+    .update({ status: decision } as Update<'orders'>)
     .eq("id", id);
   if (error) {
     res.status(400).json({ error: error.message });

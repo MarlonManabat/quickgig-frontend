@@ -1,11 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/db";
 import { env, requireServer } from "../lib/env";
 
 const url = env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = requireServer('SUPABASE_SERVICE_ROLE_KEY')!;
 const adminEmail = process.env.SEED_ADMIN_EMAIL!;
 
-const supabase = createClient(url, serviceKey, {
+const supabase = createClient<Database>(url, serviceKey, {
   auth: { persistSession: false },
 });
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database, Update } from '@/types/db';
 import ProofCard from '@/components/billing/ProofCard';
 import { withAdminGuard } from '@/components/guards/withAdminGuard';
 import toast from '@/utils/toast';
@@ -7,7 +8,7 @@ import toast from '@/utils/toast';
 type Status = 'pending' | 'approved' | 'rejected';
 
 function AdminBillingPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
   const [status, setStatus] = useState<Status>('pending');
   const [proofs, setProofs] = useState<any[]>([]);
 
@@ -38,7 +39,7 @@ function AdminBillingPage() {
       .update({
         status: 'approved',
         reviewed_at: new Date().toISOString(),
-      })
+      } as Update<'payment_proofs'>)
       .eq('id', p.id);
     if (error) toast.error('Update failed');
     else toast.success('Approved');
@@ -51,7 +52,7 @@ function AdminBillingPage() {
       .update({
         status: 'rejected',
         reviewed_at: new Date().toISOString(),
-      })
+      } as Update<'payment_proofs'>)
       .eq('id', p.id);
     if (error) toast.error('Update failed');
     else toast.success('Rejected');

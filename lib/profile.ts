@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import type { Insert } from "@/types/db";
 
 export async function getMyProfile() {
   const { data, error } = await supabase.from("profiles").select("*").single();
@@ -16,7 +17,9 @@ export async function upsertMyProfile(payload: {
   if (!user) throw new Error("Not authenticated");
   const { data, error } = await supabase
     .from("profiles")
-    .upsert({ id: user.id, ...payload }, { onConflict: "id" })
+    .upsert([
+      { id: user.id, ...payload } satisfies Insert<"profiles">,
+    ], { onConflict: "id" })
     .select()
     .single();
   if (error) throw error;

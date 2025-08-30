@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
 import { getServerSupabase } from '@/lib/credits-server';
+import type { Insert } from '@/types/db';
 
 const BodySchema = z.object({
   applicationId: z.string().min(1),
@@ -48,17 +49,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Insert message
   const { data: msg, error: msgErr } = await supabase
     .from('messages')
-    .insert({ application_id: app.id, sender_id: me, body })
+    .insert([
+      { application_id: app.id, sender_id: me, body } satisfies Insert<'messages'>,
+    ])
     .select('id')
     .single();
   if (msgErr || !msg) return res.status(500).json({ error: { code: 'MESSAGE_CREATE_FAILED' } });
 
   // Best-effort notification
-  await supabase.from('notifications').insert({
-    user_id: other,
-    type: 'message_new',
-    data: { applicationId: app.id, messageId: msg.id },
-  });
+  await supabase
+    .from('notifications')
+    .insert([
+      {
+        user_id: other,
+        type: 'message_new',
+        data: { applicationId: app.id, messageId: msg.id },
+      } satisfies Insert<'notifications'>,
+    ]);
 
   return res.status(201).json({ id: msg.id });
 }

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/db';
 import regions from '../public/data/ph/regions.json';
 import provinces from '../public/data/ph/provinces.json';
 import cities from '../public/data/ph/cities.json';
@@ -10,7 +11,7 @@ async function run() {
   }
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const key = process.env.SUPABASE_SERVICE_ROLE!;
-  const supabase = createClient(url, key);
+  const supabase = createClient<Database>(url, key);
   await supabase.from('ph_regions').upsert(
     regions.map((r) => ({ code: r.region_code, name: r.region_name }))
   );

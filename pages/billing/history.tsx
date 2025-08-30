@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/types/db';
 import ProofCard from '@/components/billing/ProofCard';
 
 export default function BillingHistory() {
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
   const [proofs, setProofs] = useState<any[]>([]);
 
   useEffect(() => {

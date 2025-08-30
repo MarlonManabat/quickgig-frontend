@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import type { Database, Update } from '@/types/db';
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,7 +10,7 @@ export default async function handler(
     res.status(405).end();
     return;
   }
-  const supabase = createPagesServerClient({ req, res }, {
+  const supabase = createPagesServerClient<Database>({ req, res }, {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   });
@@ -31,7 +32,7 @@ export default async function handler(
   }
   const { error } = await supabase
     .from("notifications")
-    .update({ read: true })
+    .update({ read: true } as Update<'notifications'>)
     .eq("user_id", uid)
     .eq("read", false);
   if (error) {

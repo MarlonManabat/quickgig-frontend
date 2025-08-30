@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/types/db';
 
 interface Proof {
   id: string;
@@ -14,7 +15,7 @@ interface Proof {
 }
 
 export default function ProofCard({ proof, children }: { proof: Proof; children?: React.ReactNode }) {
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {

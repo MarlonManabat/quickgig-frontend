@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import type { Insert } from "@/types/db";
 import { uploadPaymentProof } from "@/utils/uploadProof";
 
 export default function Billing() {
@@ -28,14 +29,18 @@ export default function Billing() {
     try {
       const result = await uploadPaymentProof(user.id, file);
       // create a new pending order with proof
-      const { error } = await supabase.from("orders").insert({
-        user_id: user.id,
-        amount: 0,
-        currency: "PHP",
-        status: "pending",
-        proof_url: result.publicUrl,
-        method: "gcash",
-      });
+      const { error } = await supabase
+        .from("orders")
+        .insert([
+          {
+            user_id: user.id,
+            amount: 0,
+            currency: "PHP",
+            status: "pending",
+            proof_url: result.publicUrl,
+            method: "gcash",
+          } satisfies Insert<"orders">,
+        ]);
       if (error) throw error;
       const { data } = await supabase
         .from("orders")

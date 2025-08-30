@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/db";
 import { env, requireServer } from "@/lib/env";
 
 function assertQA(req: NextApiRequest) {
@@ -20,7 +21,7 @@ export default async function handler(
     if (!email) return res.status(400).json({ error: "email required" });
     const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
     if (!key) return res.status(500).end();
-    const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key);
+    const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
     const { data: profile } = await supa
       .from("profiles")
       .select("id")

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import type { Database, Update } from "@/types/db";
 
 export default async function handler(
   req: NextApiRequest,
@@ -7,7 +8,7 @@ export default async function handler(
 ) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
-  const supabase = createServerSupabaseClient({ req, res });
+  const supabase = createServerSupabaseClient<Database>({ req, res });
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -16,7 +17,7 @@ export default async function handler(
   const { agreementId } = req.body as { agreementId: string };
   const { data: ag, error } = await supabase
     .from("agreements")
-    .update({ status: "agreed" })
+    .update({ status: "agreed" } as Update<"agreements">)
     .eq("id", agreementId)
     .select("*")
     .single();

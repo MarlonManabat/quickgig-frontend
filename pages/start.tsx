@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import type { Database, Update } from "@/types/db";
 import { safeSelect } from "@/lib/supabase-safe";
 import { hasMockSession } from "@/lib/session";
 
 export default function Start() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClientComponentClient<Database>();
 
   useEffect(() => {
     (async () => {
@@ -43,7 +44,7 @@ export default function Start() {
       if (!profile?.role_pref) {
         await supabase
           .from("profiles")
-          .update({ role_pref: intent })
+          .update({ role_pref: intent } as Update<"profiles">)
           .eq("id", user.id);
       }
 

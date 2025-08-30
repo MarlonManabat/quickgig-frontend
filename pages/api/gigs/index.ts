@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import type { Database, Insert } from '@/types/db';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const supabase = createPagesServerClient({ req, res }, {
+  const supabase = createPagesServerClient<Database>({ req, res }, {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   });
@@ -36,13 +37,15 @@ export default async function handler(
     }
     const { data, error } = await supabase
       .from("gigs")
-      .insert({
-        title,
-        description,
-        city,
-        budget,
-        created_by: user.id,
-      })
+      .insert([
+        {
+          title,
+          description,
+          city,
+          budget,
+          created_by: user.id,
+        } satisfies Insert<"gigs">,
+      ])
       .select()
       .single();
     if (error) return res.status(400).json({ error: error.message });

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import type { Insert } from "@/types/db";
 
 export type NewJob = {
   title: string;
@@ -30,7 +31,9 @@ export async function createJob(job: NewJob) {
   };
   const { data, error } = await supabase
     .from("jobs")
-    .insert(payload)
+    .insert([
+      payload satisfies Insert<"jobs">,
+    ])
     .select()
     .single();
   if (error) throw error;
