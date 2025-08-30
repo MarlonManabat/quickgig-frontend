@@ -44,8 +44,10 @@ jobs:
           node-version: 20
           cache: 'npm'
 
+      # Note: Use npm install here because E2E runs may coincide with lockfile drift.
+      # Release workflows can stay strict with `npm ci`.
       - name: Install deps
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Install Playwright browsers
         run: |
