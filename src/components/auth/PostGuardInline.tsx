@@ -1,16 +1,10 @@
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 
 type SessionLike = { user?: unknown } | null;
 
-type Props = {
-  session: SessionLike;
-  children: React.ReactNode;
-};
-
-export default function PostGuardInline({ session, children }: Props) {
+export default function PostGuardInline({ session, children }: { session: SessionLike; children: React.ReactNode; }) {
   if (!session || !('user' in (session as any)) || !(session as any).user) {
-    // Inline guard visible text for E2E:
     return (
       <div role="alert" aria-live="polite" className="max-w-xl mx-auto p-4">
         <p>please log in</p>
@@ -22,3 +16,4 @@ export default function PostGuardInline({ session, children }: Props) {
   }
   return <>{children}</>;
 }
+

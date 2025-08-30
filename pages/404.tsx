@@ -11,7 +11,7 @@ export default function NotFound() {
         <Link href="/find" className="qg-btn qg-btn--primary px-4 py-2">
           Find work
         </Link>
-        <Link href="/post" className="qg-btn qg-btn--outline px-4 py-2">
+        <Link href="/posts" className="qg-btn qg-btn--outline px-4 py-2">
           Post a job
         </Link>
       </div>

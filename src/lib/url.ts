@@ -1,15 +1,14 @@
 export function getAppOrigin(): string {
   const fromPublic = process.env.NEXT_PUBLIC_APP_ORIGIN || "";
   const fromBuild  = process.env.APP_ORIGIN || "";
-  const raw = (fromPublic || fromBuild || "").trim();
-  // Ensure we have a scheme; if someone sets app.quickgig.ph, prefix https://
-  const withScheme = raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw;
-  return (withScheme || "").replace(/\/+$/, "");
+  const fallback   = "https://app.quickgig.ph"; // env-proof fallback
+  let raw = (fromPublic || fromBuild || fallback).trim();
+  if (raw && !/^https?:\/\//i.test(raw)) raw = `https://${raw}`;
+  return raw.replace(/\/+$/, ""); // drop trailing slash
 }
 
 export function withAppOrigin(path: string): string {
   const p = path.startsWith("/") ? path : `/${path}`;
   const origin = getAppOrigin();
-  // If origin is empty (local dev), return p so local works.
-  return origin ? `${origin}${p}`.replace(/([^:]\/)\/+/g, "$1") : p;
+  return `${origin}${p}`.replace(/([^:]\/)\/+/g, "$1");
 }
