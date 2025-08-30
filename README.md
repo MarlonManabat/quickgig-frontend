@@ -36,6 +36,10 @@ git apply autofix.patch
 - **v14** API: `import globby from 'globby'` (default export)
 - Action: We'll revisit upgrading to v14 when registry/yank issues stop causing noise.
 
+### Health endpoint for CI
+CI and E2E use the App Router health check at `/api/health` (file: `app/api/health/route.ts`).
+Avoid duplicating the same route under `pages/api/*` to prevent Next.js build conflicts.
+
 ## Testing
 
 ```bash
