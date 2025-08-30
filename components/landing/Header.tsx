@@ -1,25 +1,25 @@
 import Link from 'next/link';
-import { appHref } from '@/lib/appOrigin';
+import { withAppOrigin } from '@/lib/url';
 
 export default function LandingHeader() {
   return (
     <nav className="...">
       <Link
-        href={appHref('/find')}
+        href={withAppOrigin('/find')}
         prefetch={false}
         className="..."
       >
         Find work
       </Link>
       <Link
-        href={appHref('/post')}
+        href={withAppOrigin('/post')}
         prefetch={false}
         className="..."
       >
         Post job
       </Link>
       <Link
-        href={appHref('/login')}
+        href={withAppOrigin('/login')}
         prefetch={false}
         className="..."
       >

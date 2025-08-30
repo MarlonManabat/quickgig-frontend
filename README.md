@@ -50,3 +50,7 @@ curl https://app.quickgig.ph/api/users/me/eligibility
 
 * After deploy, run **/api/admin/seed** once to promote `SEED_ADMIN_EMAIL` to admin.
 * Apply the migration via Supabase Studio → SQL or `supabase db push`.
+
+### APP origin for landing → app links
+Set `NEXT_PUBLIC_APP_ORIGIN` (preferred) or `APP_ORIGIN` to the app host, e.g. `https://app.quickgig.ph`.
+All landing CTAs resolve via `withAppOrigin()`.
