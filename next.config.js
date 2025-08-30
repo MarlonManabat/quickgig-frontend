@@ -10,6 +10,9 @@ const baseConfig = {
     forceSwcTransforms: true,
   },
   webpack: (config) => {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias["@"] = path.resolve(__dirname, "src");
     // Ensure woff/woff2 are always handled as assets when imported by css.
     config.module.rules.push({
       test: /\.(woff|woff2)$/i,
@@ -17,8 +20,6 @@ const baseConfig = {
       generator: { filename: "static/fonts/[name][ext]" },
     });
     if (process.env.CI === 'true' || process.env.DISABLE_STRIPE === '1') {
-      config.resolve = config.resolve || {};
-      config.resolve.alias = config.resolve.alias || {};
       config.resolve.alias['stripe'] = path.resolve(__dirname, 'stubs/stripe.js');
     }
     return config;
