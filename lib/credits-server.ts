@@ -1,9 +1,10 @@
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import { Database } from '@/types/db';
 
 export async function getServerSupabase() {
   const { cookies, headers } = require('next/headers') as typeof import('next/headers');
   const cookieStore = cookies();
-  return createPagesServerClient(
+  return createPagesServerClient<Database>(
     { cookies: () => cookieStore, headers } as any,
     {
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,

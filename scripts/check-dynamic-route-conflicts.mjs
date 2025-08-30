@@ -1,4 +1,4 @@
-import globbyModule from 'globby';
+import { globby } from 'globby';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
@@ -12,8 +12,6 @@ function keyOf(file) {
     .replace(proj + path.sep, '')
     .replace(/\[(.+?)\]/g, '[param]');
 }
-
-const globby = globbyModule.globby || globbyModule;
 
 const files = await globby([
   'pages/**/*.tsx',

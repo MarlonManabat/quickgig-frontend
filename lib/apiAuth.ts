@@ -1,10 +1,11 @@
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
+import { Database } from '@/types/db'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export type ApiCtx = { req: NextApiRequest; res: NextApiResponse }
 
 export async function requireUser(ctx: ApiCtx) {
-  const supabase = createPagesServerClient({ req: ctx.req, res: ctx.res })
+  const supabase = createPagesServerClient<Database>({ req: ctx.req, res: ctx.res })
   const { data: { user }, error } = await supabase.auth.getUser()
   if (error || !user) {
     ctx.res.status(401).json({ error: 'unauthorized' })

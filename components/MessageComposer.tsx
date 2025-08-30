@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
+import { Insert } from "@/types/db";
 
 export default function MessageComposer({
   threadId,
@@ -27,7 +28,13 @@ export default function MessageComposer({
     setText("");
     const { data, error } = await supabase
       .from("messages")
-      .insert({ thread_id: threadId, sender_id: userId, body: optimistic.body })
+      .insert([
+        {
+          thread_id: threadId,
+          sender_id: userId,
+          body: optimistic.body,
+        } satisfies Insert<"messages">,
+      ])
       .select("*")
       .single();
     setSending(false);

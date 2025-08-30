@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { Insert } from "@/types/db";
 
 export async function submitSupportTicket(
   subject: string,
@@ -7,12 +8,16 @@ export async function submitSupportTicket(
 ) {
   const { data: u } = await supabase.auth.getUser();
   if (!u?.user) throw new Error("Not authenticated");
-  const { error } = await supabase.from("support_tickets").insert({
-    user_id: u.user.id,
-    subject,
-    body,
-    email: email ?? null,
-  });
+  const { error } = await supabase
+    .from("support_tickets")
+    .insert([
+      {
+        user_id: u.user.id,
+        subject,
+        body,
+        email: email ?? null,
+      } satisfies Insert<"support_tickets">,
+    ]);
   if (error) throw error;
 }
 
