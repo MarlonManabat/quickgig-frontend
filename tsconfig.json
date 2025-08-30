@@ -12,7 +12,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -23,22 +23,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "zod": [
-        "lib/zod"
-      ],
-      "@/*": [
-        "*",
-        "src/*"
-      ],
-      "@lib/*": [
-        "lib/*"
-      ],
-      "@utils/*": [
-        "utils/*"
-      ],
-      "@components/*": [
-        "components/*"
-      ]
+      "@/*": ["src/*"]
     },
     "typeRoots": [
       "./types",

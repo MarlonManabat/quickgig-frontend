@@ -1,10 +1,10 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import "../styles/theme.css";
-import "../styles/globals.css";
+import '@/styles/globals.css';
 import "../styles/accessibility.css";
 // Load legacy fonts via plain CSS to avoid bundler/format issues
-import "@/public/fonts/css/legacy.css";
+import '../public/fonts/css/legacy.css';
 import { useRouter } from "next/router";
 import AppHeader from "@/components/app/AppHeader";
 import AppFooter from "@/components/nav/AppFooter";

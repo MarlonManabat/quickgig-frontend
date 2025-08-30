@@ -1,4 +1,4 @@
-import { cn } from "@utils/cn";
+import { cn } from "@/utils/cn";
 import React from "react";
 
 export const H1 = (p: React.HTMLAttributes<HTMLHeadingElement>) => (
