@@ -34,6 +34,9 @@ export default function HomeSeeker() {
               {(apps?.length ?? 0) > 1 ? "s" : ""}.
             </p>
           )}
+          <p data-testid="ticket-balance" className="text-sm text-gray-600">
+            Ticket balance: {profile?.tickets ?? 0}
+          </p>
         </div>
       </header>
 
@@ -97,7 +100,10 @@ export default function HomeSeeker() {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-medium">Suggested jobs for you</h2>
-          <Link href="/find?focus=search" className="text-sm text-blue-600 underline">
+          <Link
+            href="/find?focus=search"
+            className="text-sm text-blue-600 underline"
+          >
             See all
           </Link>
         </div>
@@ -137,7 +143,10 @@ export default function HomeSeeker() {
       <section>
         <h2 className="text-lg font-medium mb-3">Quick actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <Link href="/find?focus=search" className="border rounded-xl p-4 hover:shadow-sm">
+          <Link
+            href="/find?focus=search"
+            className="border rounded-xl p-4 hover:shadow-sm"
+          >
             Browse jobs
           </Link>
           <Link

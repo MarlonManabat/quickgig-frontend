@@ -1,4 +1,5 @@
 name: Full E2E
+
 on:
   workflow_dispatch:
     inputs:
@@ -7,7 +8,9 @@ on:
         required: false
         default: ""
   push:
-    branches: [ "main" ]
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 concurrency:
   group: full-e2e-${{ github.ref }}
@@ -18,27 +21,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
+      # Existing app envs (NO NEW NAMES)
+      NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
       NODE_ENV: production
       PORT: 3000
       LOCAL_BASE_URL: http://localhost:3000
 
-      # ------- EXISTING app/env variables -------
-      NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
-      APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
-
-      # ------- OPTIONAL E2E secrets (safe fallbacks if absent) -------
-      E2E_KEY: ${{ secrets.E2E_KEY }}
+      # Optional E2E overrides (safe fallbacks if absent)
       E2E_EMPLOYER_EMAIL: ${{ secrets.E2E_EMPLOYER_EMAIL }}
-      E2E_WORKER_EMAIL:   ${{ secrets.E2E_WORKER_EMAIL }}
-      E2E_PASSWORD:       ${{ secrets.E2E_PASSWORD }}
+      E2E_EMPLOYER_PASSWORD: ${{ secrets.E2E_EMPLOYER_PASSWORD }}
+      E2E_WORKER_EMAIL: ${{ secrets.E2E_WORKER_EMAIL }}
+      E2E_WORKER_PASSWORD: ${{ secrets.E2E_WORKER_PASSWORD }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Install pnpm FIRST so Node's pnpm cache can resolve properly
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -49,61 +51,69 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
+      # Install deps even if no pnpm-lock.yaml exists (handle both cases)
       - name: Install deps
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Install Playwright browsers
         run: |
-          npx playwright install --with-deps
-          node -e "console.log('Playwright version:', require('@playwright/test/package.json').version)"
+          if [ -f pnpm-lock.yaml ]; then
+            echo "Found pnpm-lock.yaml -> using frozen lockfile"
+            pnpm install --frozen-lockfile
+          else
+            echo "No pnpm-lock.yaml -> installing without lockfile"
+            pnpm install --no-frozen-lockfile
+          fi
 
+      # Ensure Playwright binary + browsers are available
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      # Build the app
       - name: Build
         run: pnpm run build
 
+      # Start Next.js locally in background (for local runs)
       - name: Start app (background)
         run: |
-          nohup pnpm run start -- -p $PORT > .next-app.log 2>&1 &
-          echo $! > .app-pid
-          for i in {1..60}; do
-            if curl -fsS "http://localhost:${PORT}/" >/dev/null; then echo "Server is up"; break; fi
-            sleep 1
-          done
+          pnpm start > .next-app.log 2>&1 &
+          echo $! > .next-app.pid
+        if: ${{ inputs.base_url == '' }}
 
-      - name: Determine BASE_URL
+      # Decide BASE_URL (external if provided, otherwise local)
+      - name: Resolve BASE_URL
         id: base
         run: |
-          if [ -n "${{ github.event.inputs.base_url }}" ]; then
-            echo "BASE_URL=${{ github.event.inputs.base_url }}" >> $GITHUB_OUTPUT
+          if [ -n "${{ inputs.base_url }}" ]; then
+            echo "base_url=${{ inputs.base_url }}" >> $GITHUB_OUTPUT
           else
-            echo "BASE_URL=${LOCAL_BASE_URL}" >> $GITHUB_OUTPUT
+            echo "base_url=${LOCAL_BASE_URL}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Seed data (idempotent; no-op if E2E_KEY unset)
-        env:
-          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
-        run: |
-          if [ -n "$E2E_KEY" ]; then
-            curl -sS -X POST "$BASE_URL/api/e2e/seed" -H "x-e2e-key: $E2E_KEY" -f
-          else
-            # No E2E_KEY configured; endpoint tolerates and returns 204 in previews
-            curl -sS -X POST "$BASE_URL/api/e2e/seed" || true
-          fi
+      # Wait for local server if running locally
+      - name: Wait for local app
+        run: npx wait-on ${{ steps.base.outputs.base_url }}
+        if: ${{ inputs.base_url == '' }}
 
-      - name: Run Full E2E regression pack
-        env:
-          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
-        run: npx playwright test -c playwright.e2e.config.ts tests/e2e/regression --reporter=html,line
+      # Seed test users/data via our seed API (no-op if already present)
+      - name: Seed test data
+        run: curl -fsS -X POST "${{ steps.base.outputs.base_url }}/api/e2e/seed"
 
+      # Run the full e2e tests against BASE_URL
+      - name: Run Full E2E
+        env:
+          BASE_URL: ${{ steps.base.outputs.base_url }}
+        run: pnpm run test:e2e
+
+      # Always try to upload Playwright report and server logs
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-e2e
-          path: playwright-report
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
           if-no-files-found: warn
-          retention-days: 7
 
       - name: Upload Next server log
         if: always()
@@ -112,20 +122,16 @@ jobs:
           name: next-app.log
           path: .next-app.log
           if-no-files-found: warn
-          retention-days: 7
 
-      - name: Cleanup
+      # Cleanup data after tests (regardless of pass/fail)
+      - name: Cleanup test data
         if: always()
-        env:
-          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
-        run: |
-          if [ -n "$E2E_KEY" ]; then
-            curl -sS -X POST "$BASE_URL/api/e2e/cleanup" -H "x-e2e-key: $E2E_KEY" || true
-          else
-            curl -sS -X POST "$BASE_URL/api/e2e/cleanup" || true
-          fi
+        run: curl -fsS -X POST "${{ steps.base.outputs.base_url }}/api/e2e/cleanup" || true
 
+      # Stop the background app if we started it
       - name: Stop app
-        if: always()
+        if: always() && inputs.base_url == ''
         run: |
-          if [ -f .app-pid ]; then kill $(cat .app-pid) || true; fi
+          if [ -f .next-app.pid ]; then
+            kill -9 $(cat .next-app.pid) || true
+          fi

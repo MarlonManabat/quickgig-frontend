@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
   if (req.method !== "POST") return res.status(405).end();
-
-  // Optional protection (same contract as /seed)
-  const requiredKey = process.env.E2E_KEY;
-  if (requiredKey && req.headers["x-e2e-key"] !== requiredKey) return res.status(401).end();
+  if (process.env.VERCEL_ENV === "production") return res.status(404).end();
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined;
   const role = process.env.SUPABASE_SERVICE_ROLE as string | undefined;
