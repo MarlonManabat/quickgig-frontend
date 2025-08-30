@@ -23,7 +23,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Important: do NOT set cache:'pnpm' here; it can call pnpm before it's installed
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
