@@ -9,7 +9,7 @@
 **Env (Vercel Project → Settings → Environment Variables)**
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` (server-only, not used in this PR but required later)
+- `SUPABASE_SERVICE_ROLE` (server-only, not used in this PR but required later)
 - `NEXT_PUBLIC_SITE_URL=https://app.quickgig.ph`
 - `SUPABASE_AUTH_COOKIE_DOMAIN=.quickgig.ph`
 

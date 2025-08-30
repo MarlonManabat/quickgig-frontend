@@ -8,7 +8,7 @@ const employerEmail = "demo-user@quickgig.test";
 const employerId = "00000000-0000-0000-0000-000000000001";
 const workerEmail = "new-user@quickgig.test";
 const workerId = "00000000-0000-0000-0000-000000000002";
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE;
 
 test.skip(!serviceRoleKey, "missing service role");
 
