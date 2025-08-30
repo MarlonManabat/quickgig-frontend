@@ -1,9 +1,18 @@
 import Container from "./Container";
+import LandingCTAs from "@/components/landing/LandingCTAs";
 
 export default function Footer() {
   return (
     <footer className="qg-footer border-t border-brand-border">
-      <Container className="py-6">© 2025 QuickGig.ph</Container>
+      <Container className="py-6 flex items-center justify-between">
+        <p className="text-sm text-gray-500">
+          © {new Date().getFullYear()} QuickGig
+        </p>
+        <LandingCTAs
+          findClassName="hover:underline text-sm"
+          postClassName="hover:underline text-sm"
+        />
+      </Container>
     </footer>
   );
 }
