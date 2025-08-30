@@ -1,6 +1,6 @@
-import regions from '@data/ph/regions.json';
-import provinces from '@data/ph/provinces.json';
-import cities from '@data/ph/cities.json';
+import regions from '@/data/ph/regions.json';
+import provinces from '@/data/ph/provinces.json';
+import cities from '@/data/ph/cities.json';
 
 export type Region = {
   code: string;

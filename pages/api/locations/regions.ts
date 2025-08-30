@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/db';
-import regionsJson from '@data/ph/regions.json';
+import { PH_REGIONS } from '@/lib/ph-data';
 
 export default async function handler(_: NextApiRequest, res: NextApiResponse) {
   let rows: { id: string; name: string }[] | null = null;
@@ -19,7 +19,7 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
   }
 
   if (!rows || !rows.length) {
-    rows = (regionsJson as any[]).map((r: any) => ({ id: r.region_code, name: r.region_name }));
+    rows = PH_REGIONS.map((r) => ({ id: r.code, name: r.name }));
   }
 
   res.setHeader(

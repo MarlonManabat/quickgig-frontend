@@ -23,8 +23,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@data/*": ["src/data/*"]
+      "@/*": ["src/*"]
     },
     "typeRoots": [
       "./types",
