@@ -4,6 +4,8 @@ const BASE_URL =
   process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
 
 export default defineConfig({
+  timeout: 30_000,
+  expect: { timeout: 10_000 },
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
@@ -24,7 +26,7 @@ export default defineConfig({
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key',
         },
       },
-  reporter: [['html', { outputFolder: 'playwright-report', open: 'never' }]],
+  reporter: [['html', { open: 'never' }], ['github']],
   projects: [
     {
       name: 'smoke',
