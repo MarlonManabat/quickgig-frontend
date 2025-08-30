@@ -54,3 +54,8 @@ curl https://app.quickgig.ph/api/users/me/eligibility
 ### APP origin for landing → app links
 Set `NEXT_PUBLIC_APP_ORIGIN` (preferred) or `APP_ORIGIN` to the app host, e.g. `https://app.quickgig.ph`.
 All landing CTAs resolve via `withAppOrigin()`.
+
+- Landing CTAs use plain `<a>` elements (not Next.js `Link`) with `withAppOrigin()` for absolute links.
+- `getAppOrigin()` resolves from `NEXT_PUBLIC_APP_ORIGIN`, `APP_ORIGIN`, or defaults to `https://app.quickgig.ph`.
+- `/create` is a real page guarded by `PostGuardInline` which shows “please log in” when unauthenticated.
+- Landing and other public pages must not import Supabase helpers.
