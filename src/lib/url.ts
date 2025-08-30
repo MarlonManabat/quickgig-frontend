@@ -4,7 +4,7 @@ export function getAppOrigin(): string {
   const fallback   = "https://app.quickgig.ph"; // env-proof fallback
   let raw = (fromPublic || fromBuild || fallback).trim();
   if (raw && !/^https?:\/\//i.test(raw)) raw = `https://${raw}`;
-  return raw.replace(/\/+$/, ""); // drop trailing slash
+  return raw.replace(/\/+$/, "");
 }
 
 export function withAppOrigin(path: string): string {
