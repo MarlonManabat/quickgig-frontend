@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/supabaseClient";
+import { Insert } from "@/types/db";
 
 export async function createReview(
   appId: number,
@@ -8,7 +9,7 @@ export async function createReview(
 ) {
   return supabase
     .from("reviews")
-    .insert({ app_id: appId, reviewee, rating, comment });
+    .insert([{ app_id: appId, reviewee, rating, comment } satisfies Insert<"reviews">]);
 }
 
 export async function listReviewsForUser(userId: string, limit = 10) {

@@ -1,4 +1,5 @@
 import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
+import { Database } from '@/types/db';
 
 /** Never construct Supabase during build/SSR; return null instead. */
 export function getSupabaseBrowser() {
@@ -6,5 +7,8 @@ export function getSupabaseBrowser() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
   if (!url || !key) return null; // tolerate missing env in CI
-  return createPagesBrowserClient({ supabaseUrl: url, supabaseKey: key } as any);
+  return createPagesBrowserClient<Database>({
+    supabaseUrl: url,
+    supabaseKey: key,
+  } as any);
 }

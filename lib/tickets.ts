@@ -1,5 +1,6 @@
 import { supabase } from "./supabaseClient";
 import { asNumber } from "./normalize";
+import { Insert } from "@/types/db";
 
 export async function getBalance(userId: string): Promise<number> {
   const { data, error } = await supabase
@@ -14,7 +15,9 @@ export async function getBalance(userId: string): Promise<number> {
 export async function addEntry(userId: string, delta: number, reason: string) {
   const { error } = await supabase
     .from("tickets_ledger")
-    .insert({ user_id: userId, delta, reason });
+    .insert([
+      { user_id: userId, delta, reason } satisfies Insert<"tickets_ledger">,
+    ]);
   if (error) throw error;
 }
 
