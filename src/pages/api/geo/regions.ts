@@ -5,7 +5,7 @@ import { env, requireServer } from '@/lib/env';
 
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
   const url = env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  const key = requireServer('SUPABASE_SERVICE_ROLE');
   if (!url || !key) return res.status(500).json([]);
   const supabase = createClient<Database>(url, key);
   const controller = new AbortController();

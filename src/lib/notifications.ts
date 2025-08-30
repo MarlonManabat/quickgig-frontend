@@ -62,7 +62,7 @@ export type NotifPayload = {
 export async function emitNotification(p: NotifPayload) {
   if (process.env.NOTIFICATIONS_ENABLED !== "true") return;
 
-  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  const key = requireServer('SUPABASE_SERVICE_ROLE');
   if (!key) return;
   const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
 

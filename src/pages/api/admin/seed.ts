@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const email = process.env.SEED_ADMIN_EMAIL;
   if (!email) return res.status(200).json({ ok: true, note: 'SEED_ADMIN_EMAIL not set' });
 
-  const admin = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+  const admin = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE!);
   const { data: users, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (error) return res.status(400).json({ error: error.message });
 

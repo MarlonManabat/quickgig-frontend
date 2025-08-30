@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const serviceRole = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  const serviceRole = requireServer('SUPABASE_SERVICE_ROLE');
   if (!serviceRole) {
     res.status(500).json({ error: 'missing service role' });
     return;

@@ -70,7 +70,7 @@ export default async function handler(
     if (!email || !role)
       return res.status(400).json({ error: "email and role required" });
 
-    const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+    const key = requireServer('SUPABASE_SERVICE_ROLE');
     if (!key) return res.status(500).end();
     const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
     const id = await getOrCreateUser(supa, email);

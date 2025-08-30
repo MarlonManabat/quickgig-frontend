@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const regionCode = String(req.query.regionCode || '');
   if (!regionCode) return res.status(400).json({ error: 'regionCode required' });
   const url = env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  const key = requireServer('SUPABASE_SERVICE_ROLE');
   if (!url || !key) return res.status(500).json([]);
   const supabase = createClient<Database>(url, key);
   const controller = new AbortController();

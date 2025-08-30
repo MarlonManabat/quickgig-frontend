@@ -6,7 +6,7 @@ Set the following in Vercel Project Settings → Environment Variables:
 
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_SERVICE_ROLE`
 - `NEXT_PUBLIC_SITE_URL` (e.g., `https://app.quickgig.ph`)
 
 After setting these, redeploy with **Clear build cache**.

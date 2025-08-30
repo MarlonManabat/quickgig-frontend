@@ -17,7 +17,7 @@ export default async function handler(
     assertQA(req);
     const { userId, tickets = 5 } = req.body || {};
     if (!userId) return res.status(400).json({ error: "userId required" });
-    const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+    const key = requireServer('SUPABASE_SERVICE_ROLE');
     if (!key) return res.status(500).end();
     const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
     const { error } = await supa.rpc("credit_tickets_admin", {

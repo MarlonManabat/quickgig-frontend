@@ -17,7 +17,7 @@
 - Settings → Environment Variables:
   - `NEXT_PUBLIC_SUPABASE_URL` = (project URL)
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = (anon public)
-  - `SUPABASE_SERVICE_ROLE_KEY` = (server-only)
+  - `SUPABASE_SERVICE_ROLE` = (server-only)
   - `NEXT_PUBLIC_SITE_URL` = https://app.quickgig.ph
   - (optional) `NEXT_PUBLIC_STORAGE_BUCKET` = assets
   - (optional) `RESEND_API_KEY`, `NOTIFY_FROM`, `APP_URL`

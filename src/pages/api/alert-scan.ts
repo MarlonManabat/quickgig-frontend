@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database, Insert, Update } from "@/types/db";
 import { env, requireServer } from "@/lib/env";
 
-const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+const key = requireServer('SUPABASE_SERVICE_ROLE');
 const supabase = key
   ? createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key)
   : undefined;

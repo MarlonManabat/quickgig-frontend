@@ -20,7 +20,7 @@ export default async function handler(
     const { titlePrefix } = req.body || {};
     if (!titlePrefix)
       return res.status(400).json({ error: "titlePrefix required" });
-    const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+    const key = requireServer('SUPABASE_SERVICE_ROLE');
     if (!key) return res.status(500).end();
     const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
     await supa.from("gigs").delete().ilike("title", `${titlePrefix}%`);

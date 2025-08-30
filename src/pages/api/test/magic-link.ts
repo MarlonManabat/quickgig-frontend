@@ -14,7 +14,7 @@ export default async function handler(
   if (req.method !== "POST") return res.status(405).end();
   const { email } = req.body || {};
   if (!email) return res.status(400).json({ error: "email required" });
-  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  const key = requireServer('SUPABASE_SERVICE_ROLE');
   if (!key) return res.status(500).end();
   const supabase = createClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,

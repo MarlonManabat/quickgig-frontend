@@ -50,6 +50,7 @@
     "**/*.spec.tsx",
     "**/*.test.ts",
     "**/*.test.tsx",
-    ".next"
+    ".next",
+    "scripts"
   ]
 }

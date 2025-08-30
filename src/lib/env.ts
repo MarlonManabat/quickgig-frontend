@@ -8,8 +8,10 @@ const Env = z.object({
 
 export const env = Env.parse(process.env);
 
-export function requireServer(key: keyof typeof env) {
-  const val = env[key];
-  if (!val && key !== 'SUPABASE_SERVICE_ROLE') throw new Error(`Missing env: ${String(key)}`);
-  return val;
+export type ServerEnvKeys = 'SUPABASE_SERVICE_ROLE' | 'SEED_ADMIN_EMAIL' | 'SEED_ADMIN_PASSWORD';
+
+export function requireServer<K extends ServerEnvKeys>(key: K): string {
+  const v = process.env[key];
+  if (!v) throw new Error(`Missing required server env: ${key}`);
+  return v;
 }

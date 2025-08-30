@@ -11,7 +11,7 @@ export default async function handler(
     res.setHeader("Allow", "POST");
     return res.status(405).end();
   }
-  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  const key = requireServer('SUPABASE_SERVICE_ROLE');
   if (!key) return res.status(500).end();
   const supa = createClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, key);
   const { message, stack, path } = (req.body || {}) as {
