@@ -29,6 +29,8 @@ If lint-based fixes are available an `autofix.patch` artifact is generated which
 git apply autofix.patch
 ```
 
+We pin `globby@13.x` for CI stability. `globby@14` currently pulls a yanked transitive dependency and breaks installs on some builders. Revisit when upstream resolves.
+
 ## Testing
 
 ```bash
