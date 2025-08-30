@@ -1,17 +1,16 @@
-import Link from 'next/link';
 import { withAppOrigin } from '@/lib/url';
 
 export default function LandingHero() {
   return (
     <section className="...">
-      <Link href={withAppOrigin('/')} prefetch={false} className="btn btn-primary">
+      <a href={withAppOrigin('/')} className="btn btn-primary">
         Simulan na
-      </Link>
-      <Link href={withAppOrigin('/find')} prefetch={false} className="btn btn-secondary">
+      </a>
+      <a href={withAppOrigin('/find')} className="btn btn-secondary">
         Browse jobs
-      </Link>
+      </a>
       {/* If you show a “Mag-post ng Gig” button here, link it too */}
-      {/* <Link href={withAppOrigin('/post')} prefetch={false} className="btn">Mag-post ng Gig</Link> */}
+      {/* <a href={withAppOrigin('/post')} className="btn">Mag-post ng Gig</a> */}
     </section>
   );
 }
