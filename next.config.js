@@ -16,9 +16,12 @@ const baseConfig = {
       type: "asset/resource",
       generator: { filename: "static/fonts/[name][ext]" },
     });
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "@": path.resolve(__dirname, "src"),
+    };
     if (process.env.CI === 'true' || process.env.DISABLE_STRIPE === '1') {
-      config.resolve = config.resolve || {};
-      config.resolve.alias = config.resolve.alias || {};
       config.resolve.alias['stripe'] = path.resolve(__dirname, 'stubs/stripe.js');
     }
     return config;
