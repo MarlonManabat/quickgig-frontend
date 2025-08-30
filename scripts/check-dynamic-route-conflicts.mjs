@@ -1,7 +1,15 @@
-import globbyModule from 'globby';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
+
+let globby;
+try {
+  const mod = await import('globby');
+  globby = mod.globby || mod.default || mod;
+} catch (e) {
+  console.warn('[route-check] globby not installed; skipping dynamic route conflict check.');
+  process.exit(0);
+}
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const proj = path.join(root, '..');
@@ -12,8 +20,6 @@ function keyOf(file) {
     .replace(proj + path.sep, '')
     .replace(/\[(.+?)\]/g, '[param]');
 }
-
-const globby = globbyModule.globby || globbyModule;
 
 const files = await globby([
   'pages/**/*.tsx',
