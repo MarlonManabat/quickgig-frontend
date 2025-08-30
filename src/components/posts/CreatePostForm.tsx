@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import LocationSelect from "@/components/LocationSelect";
+import LocationSelect, { LocationValue } from "@/components/location/LocationSelect";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
 
 let supabase = getBrowserSupabase();
@@ -38,7 +38,14 @@ export async function submit(form: FormData) {
 }
 
 export default function CreatePostForm() {
-  const [form, setForm] = React.useState({ title:'', description:'', region_code:'', city_code:'', price_php:'' });
+  const [form, setForm] = React.useState({
+    title: '',
+    description: '',
+    region_code: '',
+    province_code: '',
+    city_code: '',
+    price_php: '',
+  });
   const [submitting, setSubmitting] = React.useState(false);
   const [err, setErr] = React.useState<string|null>(null);
 
@@ -49,7 +56,7 @@ export default function CreatePostForm() {
 
     try {
       await submit(new FormData(e.currentTarget));
-      setForm({ title:'', description:'', region_code:'', city_code:'', price_php:'' });
+      setForm({ title:'', description:'', region_code:'', province_code:'', city_code:'', price_php:'' });
       window.location.href = `/find`;
     } catch (e: any) {
       setErr(e.message || 'Create failed');
@@ -66,9 +73,23 @@ export default function CreatePostForm() {
                value={form.title} onChange={e=>setForm(f=>({...f, title:e.target.value}))} />
         <textarea name="description" className="border rounded-xl p-2 w-full" placeholder="Description"
                   value={form.description} onChange={e=>setForm(f=>({...f, description:e.target.value}))} />
-        <LocationSelect value={{ region_code: form.region_code, city_code: form.city_code }}
-                        onChange={(v)=>setForm(f=>({...f, ...v}))} />
+        <LocationSelect
+          value={{
+            regionCode: form.region_code || null,
+            provinceCode: form.province_code || null,
+            cityCode: form.city_code || null,
+          } as LocationValue}
+          onChange={(v) =>
+            setForm((f) => ({
+              ...f,
+              region_code: v.regionCode || '',
+              province_code: v.provinceCode || '',
+              city_code: v.cityCode || '',
+            }))
+          }
+        />
         <input type="hidden" name="region_code" value={form.region_code} />
+        <input type="hidden" name="province_code" value={form.province_code} />
         <input type="hidden" name="city_code" value={form.city_code} />
         <input name="price_php" className="border rounded-xl p-2 w-full" placeholder="Budget (optional)" inputMode="numeric"
                value={form.price_php} onChange={e=>setForm(f=>({...f, price_php:e.target.value}))} />
