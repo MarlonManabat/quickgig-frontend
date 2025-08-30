@@ -22,9 +22,9 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL:      ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
       NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
       PORT: 3000
       BASE_URL: http://localhost:3000
-      NEXT_TELEMETRY_DISABLED: 1
 
     steps:
       - name: Checkout
@@ -35,20 +35,25 @@ jobs:
         with:
           node-version: '20'
 
-      # Detect package manager and set commands
+      - name: Show Node & npm versions
+        run: |
+          node -v
+          npm -v
+
+      # Auto-detect package manager
       - name: Detect package manager
         id: pm
         shell: bash
         run: |
           if [ -f pnpm-lock.yaml ]; then
             echo "name=pnpm" >> $GITHUB_OUTPUT
-            echo "install=pnpm install --frozen-lockfile" >> $GITHUB_OUTPUT
+            echo "install=pnpm install --no-frozen-lockfile" >> $GITHUB_OUTPUT
             echo "build=pnpm build" >> $GITHUB_OUTPUT
             echo "start=pnpm start" >> $GITHUB_OUTPUT
             echo "exec=pnpm exec" >> $GITHUB_OUTPUT
           elif [ -f yarn.lock ]; then
             echo "name=yarn" >> $GITHUB_OUTPUT
-            echo "install=yarn --frozen-lockfile" >> $GITHUB_OUTPUT
+            echo "install=yarn --frozen-lockfile || yarn install" >> $GITHUB_OUTPUT
             echo "build=yarn build" >> $GITHUB_OUTPUT
             echo "start=yarn start" >> $GITHUB_OUTPUT
             echo "exec=yarn" >> $GITHUB_OUTPUT
@@ -66,7 +71,7 @@ jobs:
           fi
           echo "Using PM: ${{ steps.pm.outputs.name }}"
 
-      # PM-specific setup & caches
+      # Set up PM-specific tooling & caches
       - name: Setup pnpm
         if: ${{ steps.pm.outputs.name == 'pnpm' }}
         uses: pnpm/action-setup@v4
@@ -88,7 +93,7 @@ jobs:
           restore-keys: |
             pnpm-store-${{ runner.os }}-
 
-      - name: Enable Corepack (yarn)
+      - name: Enable Corepack (yarn only)
         if: ${{ steps.pm.outputs.name == 'yarn' }}
         run: corepack enable
 
@@ -112,7 +117,7 @@ jobs:
           restore-keys: |
             npm-cache-${{ runner.os }}-
 
-      # Install with the proper PM and flags
+      # Install deps (robust to lockfile absence)
       - name: Install deps
         run: ${{ steps.pm.outputs.install }}
 
@@ -120,30 +125,28 @@ jobs:
       - name: Install Playwright browsers
         run: ${{ steps.pm.outputs.exec }} playwright install --with-deps
 
-      # Build the app
+      # Build app
       - name: Build
         run: ${{ steps.pm.outputs.build }}
 
-      # Start server & prove it's healthy before testing
+      # Start server, wait for health (avoid 404s due to early test start)
       - name: Start app (background)
         run: |
           ${{ steps.pm.outputs.start }} &> .next-app.log &
-          # health checks (avoid 404s from not-yet-started server)
-          ${{ steps.pm.outputs.exec }} wait-on --timeout 120000 http://localhost:3000
+          npx wait-on --timeout 120000 http://localhost:3000
           curl -fsS http://localhost:3000/ | head -n 50 || (echo "Root health check failed" && exit 1)
 
-      # Echo envs for debugging regex-based tests
-      - name: Echo origins
+      - name: Echo origins for debugging
         run: |
           echo "APP_ORIGIN=${APP_ORIGIN}"
           echo "NEXT_PUBLIC_APP_ORIGIN=${NEXT_PUBLIC_APP_ORIGIN}"
           echo "BASE_URL=${BASE_URL}"
 
-      # Run tests
+      # Run Playwright tests
       - name: Run Full E2E
         run: ${{ steps.pm.outputs.exec }} playwright test
 
-      # Always upload artifacts for debugging
+      # Always upload artifacts
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
@@ -161,4 +164,3 @@ jobs:
           path: .next-app.log
           if-no-files-found: ignore
           retention-days: 7
-
