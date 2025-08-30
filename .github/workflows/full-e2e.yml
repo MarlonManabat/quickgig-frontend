@@ -18,10 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      NODE_ENV: production
       PORT: 3000
       LOCAL_BASE_URL: http://localhost:3000
-
+      
       # ------- EXISTING app/env variables -------
       NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
       APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
@@ -56,6 +55,8 @@ jobs:
         run: npm run build
 
       - name: Start app (background)
+        env:
+          NODE_ENV: production
         run: |
           nohup npm run start -- -p $PORT > .next-app.log 2>&1 &
           echo $! > .app-pid
