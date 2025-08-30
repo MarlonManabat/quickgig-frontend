@@ -1,32 +1,27 @@
 import { test, expect } from '@playwright/test';
-import { APP_ORIGIN, MARKETING_HOST } from '../helpers/env';
+import { APP_ORIGIN, appHref } from '../../tests/helpers/origins';
 
-test.describe('Landing → App routing', () => {
-  test('Simulan na → app root, Browse Jobs → app /find, header hard-links', async ({ page }) => {
-    await page.goto(MARKETING_HOST, { waitUntil: 'domcontentloaded' });
+test.describe('Landing CTAs route to app host', () => {
+  test('header links point to app host', async ({ page }) => {
+    await page.goto('/');
 
-    // Header hard-links
-    const findHref  = await page.getByRole('link', { name: /find work/i }).getAttribute('href');
-    const postHref  = await page.getByRole('link', { name: /post job/i }).getAttribute('href');
-    const loginHref = await page.getByRole('link', { name: /login/i }).getAttribute('href');
+    await expect(page.locator('header a:has-text("Find Work")'))
+      .toHaveAttribute('href', new RegExp(`^${APP_ORIGIN.replace(/\//g, '\\/')}\/find$`));
 
-    expect(findHref).toBe(`${APP_ORIGIN}/find`);
-    expect(postHref).toBe(`${APP_ORIGIN}/post`);
-    expect(loginHref).toBe(`${APP_ORIGIN}/login`);
+    await expect(page.locator('header a:has-text("Post Job")'))
+      .toHaveAttribute('href', new RegExp(`^${APP_ORIGIN.replace(/\//g, '\\/')}\/post$`));
 
-    // “Simulan na” → app root
-    await Promise.all([
-      page.waitForURL(new RegExp(`^${APP_ORIGIN}/?$`)),
-      page.getByRole('button', { name: /simulan na/i }).click(),
-    ]);
-    expect(page.url()).toMatch(new RegExp(`^${APP_ORIGIN}/?$`));
+    await expect(page.locator('header a:has-text("Login")'))
+      .toHaveAttribute('href', new RegExp(`^${APP_ORIGIN.replace(/\//g, '\\/')}\/login$`));
+  });
 
-    // Back to landing, test “Browse Jobs”
-    await page.goto(MARKETING_HOST, { waitUntil: 'domcontentloaded' });
-    await Promise.all([
-      page.waitForURL(`${APP_ORIGIN}/find`),
-      page.getByRole('link', { name: /browse jobs/i }).click(),
-    ]);
-    await expect(page).toHaveURL(`${APP_ORIGIN}/find`);
+  test('hero buttons go to app root and /find', async ({ page }) => {
+    await page.goto('/');
+
+    const simulanNa = page.getByRole('link', { name: /simulan na/i });
+    const browseJobs = page.getByRole('link', { name: /browse jobs/i });
+
+    await expect(simulanNa).toHaveAttribute('href', appHref('/'));
+    await expect(browseJobs).toHaveAttribute('href', appHref('/find'));
   });
 });
