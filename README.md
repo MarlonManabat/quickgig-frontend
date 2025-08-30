@@ -65,3 +65,9 @@ All landing CTAs resolve via `withAppOrigin()`.
 - `withAppOrigin()` resolves from `NEXT_PUBLIC_APP_ORIGIN | APP_ORIGIN | https://app.quickgig.ph`.
 - `/create` is a real page rendering an inline guard (`"please log in"`) when logged out; no redirects and no RPC.
 - Full E2E runs on every push to `main` and via manual dispatch. Playwright report is uploaded as an artifact.
+
+### Full E2E workflow
+- Runs on pull requests to `main`, pushes to `main`, and manual dispatch.
+- `APP_ORIGIN` and `NEXT_PUBLIC_APP_ORIGIN` are injected into build and tests.
+- `BASE_URL` defaults to http://localhost:3000 in CI.
+- Playwright HTML report is uploaded as an artifact on every run.
