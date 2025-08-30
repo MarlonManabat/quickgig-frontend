@@ -1,4 +1,4 @@
-import Link from "next/link";
+import LandingCTAs from "@/components/landing/LandingCTAs";
 
 export default function NotFound() {
   return (
@@ -8,18 +8,16 @@ export default function NotFound() {
         Sorry, hindi namin mahanap ang page na ito. Try one of these:
       </p>
       <div className="flex gap-3 justify-center">
-        <Link href="/find" className="qg-btn qg-btn--primary px-4 py-2">
-          Find work
-        </Link>
-        <Link href="/posts" className="qg-btn qg-btn--outline px-4 py-2">
-          Post a job
-        </Link>
+        <LandingCTAs
+          findClassName="qg-btn qg-btn--primary px-4 py-2"
+          postClassName="qg-btn qg-btn--outline px-4 py-2"
+        />
       </div>
       <p className="text-sm text-slate-500">
         Or go to{" "}
-        <Link className="qg-link" href="/">
+        <a className="qg-link" href="/">
           home
-        </Link>
+        </a>
         .
       </p>
     </main>

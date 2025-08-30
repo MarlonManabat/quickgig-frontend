@@ -1,46 +1,63 @@
-name: Full E2E (manual)
+name: Full E2E
+
 on:
   workflow_dispatch: {}
+  push:
+    branches: [ "main" ]
 
-env:
-  E2E_STUB: '1'
-  NEXT_TELEMETRY_DISABLED: '1'
-  DISABLE_STRIPE: '1'
-  NEXT_PUBLIC_SUPABASE_URL: http://localhost:3000
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon
+concurrency:
+  group: full-e2e-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: package-lock.json
-      - run: npm ci --no-audit --no-fund
-      - name: Build
-        run: npm run build
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-      - name: Start server
-        run: npx next start -p 3000 & npx wait-on http://localhost:3000
-      - name: Run full E2E
-        run: npx playwright test e2e/full --reporter=github,html
+        run: pnpm exec playwright install --with-deps
+
+      - name: Build
         env:
-          PLAYWRIGHT_BASE_URL: http://localhost:3000
-          APP_ORIGIN: ${{ vars.APP_ORIGIN }}
-          MARKETING_HOST: ${{ vars.MARKETING_HOST }}
-          QA_TEST_MODE: ${{ vars.QA_TEST_MODE }}
-          QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
-          QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
-      - name: Upload test artifacts
+          NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
+          APP_ORIGIN: ${{ secrets.APP_ORIGIN }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: pnpm build
+
+      - name: Start app (background)
+        run: |
+          pnpm start &>/dev/null &
+          echo "Waiting for app to be ready..."
+          npx wait-on http://localhost:3000
+
+      - name: Run Full E2E
+        env:
+          BASE_URL: http://localhost:3000
+        run: pnpm exec playwright test
+
+      - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-e2e
-          path: |
-            playwright-report
-            test-results/**
+          name: playwright-report
+          path: playwright-report
           if-no-files-found: ignore
+          retention-days: 7

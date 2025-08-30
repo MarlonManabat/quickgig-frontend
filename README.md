@@ -59,3 +59,9 @@ All landing CTAs resolve via `withAppOrigin()`.
 - `getAppOrigin()` resolves from `NEXT_PUBLIC_APP_ORIGIN`, `APP_ORIGIN`, or defaults to `https://app.quickgig.ph`.
 - `/create` is a real page guarded by `PostGuardInline` which shows “please log in” when unauthenticated.
 - Landing and other public pages must not import Supabase helpers.
+
+### Landing → App CTAs and E2E
+- Landing uses plain `<a>` + `withAppOrigin()` for absolute links (no `next/link`).
+- `withAppOrigin()` resolves from `NEXT_PUBLIC_APP_ORIGIN | APP_ORIGIN | https://app.quickgig.ph`.
+- `/create` is a real page rendering an inline guard (`"please log in"`) when logged out; no redirects and no RPC.
+- Full E2E runs on every push to `main` and via manual dispatch. Playwright report is uploaded as an artifact.

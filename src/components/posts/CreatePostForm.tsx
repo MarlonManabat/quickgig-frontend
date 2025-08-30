@@ -1,21 +1,23 @@
 "use client";
 import * as React from "react";
 import LocationSelect from "@/components/LocationSelect";
-import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { getBrowserSupabase } from "@/lib/supabase-browser";
 
-let supabase = createBrowserSupabaseClient();
+let supabase = getBrowserSupabase();
 export function __setSupabaseClient(client: any) {
   supabase = client;
 }
 
 export async function submit(form: FormData) {
+  const sb = supabase || getBrowserSupabase();
+  if (!sb) throw new Error('No Supabase client');
   const title = form.get('title') as string;
   const description = form.get('description') as string;
   const region_code = form.get('region_code') as string;
   const city_code = form.get('city_code') as string;
   const price_php = Number(form.get('price_php'));
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) throw new Error('Please log in');
 
   const payload = {
@@ -26,10 +28,10 @@ export async function submit(form: FormData) {
     p_price_php: Number(price_php),
   };
 
-  let { data, error } = await supabase.rpc('create_gig_public', payload);
+  let { data, error } = await sb.rpc('create_gig_public', payload);
   if (error && /function.*not found|schema cache/i.test(error.message)) {
     await new Promise((r) => setTimeout(r, 1200));
-    ({ data, error } = await supabase.rpc('create_gig_public', payload));
+    ({ data, error } = await sb.rpc('create_gig_public', payload));
   }
   if (error) throw new Error(error.message);
   return data;
