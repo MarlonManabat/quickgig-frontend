@@ -117,7 +117,7 @@ export default function Home() {
         <input type="file" onChange={onAvatar} disabled={uploading} />
       </div>
       <div className="border rounded p-4 space-y-2">
-        <p>Ticket balance: {balance}</p>
+        <p data-testid="ticket-balance">Ticket balance: {balance}</p>
         <Link href="/post" className="qg-btn qg-btn--primary px-4 py-2">
           Post a job
         </Link>
