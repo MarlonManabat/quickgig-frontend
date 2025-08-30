@@ -48,6 +48,9 @@ const baseConfig = {
   },
   async redirects() {
     return [
+      // legacy to canonical
+      { source: "/post", destination: "/posts", permanent: true },
+      { source: "/finds", destination: "/find", permanent: true },
       {
         source: "/simulan",
         destination: "/start?intent=worker",

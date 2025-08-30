@@ -1,14 +1,13 @@
 import { withAppOrigin } from '@/lib/url';
+import LandingCTAs from '@/components/landing/LandingCTAs';
 
 export default function LandingHeader() {
   return (
     <nav className="...">
-      <a href={withAppOrigin('/find')} className="...">
-        Find work
-      </a>
-      <a href={withAppOrigin('/post')} className="...">
-        Post job
-      </a>
+      <LandingCTAs
+        findClassName="hover:underline"
+        postClassName="btn btn-primary"
+      />
       <a href={withAppOrigin('/login')} className="...">
         Login
       </a>
