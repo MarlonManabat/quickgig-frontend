@@ -20,18 +20,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 1) Setup Node (no pnpm cache here)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
-      # Fix: ensure pnpm exists on the runner
+      # 2) Install pnpm before any caching
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
+
+      # 3) Cache pnpm store independently
+      - name: Determine pnpm store path
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-store-${{ runner.os }}-
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
