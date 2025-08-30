@@ -19,6 +19,7 @@ jobs:
           npx playwright test --reporter=github,html --shard=1/2
           npx playwright test --reporter=github,html --shard=2/2
         env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || '' }}
       - name: Upload report
