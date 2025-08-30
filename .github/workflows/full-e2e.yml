@@ -2,7 +2,7 @@ name: Full E2E
 on:
   workflow_dispatch:
     inputs:
-      base_url:
+      BASE_URL:
         description: "Optional external BASE_URL; empty = run locally"
         required: false
         default: ""
@@ -38,21 +38,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: 'npm'
 
       - name: Install deps
-        run: pnpm install --no-frozen-lockfile
+        run: npm ci
 
       - name: Install Playwright browsers
         run: |
@@ -60,12 +53,15 @@ jobs:
           node -e "console.log('Playwright version:', require('@playwright/test/package.json').version)"
 
       - name: Build
-        run: pnpm run build
+        run: npm run build
 
       - name: Start app (background)
         run: |
-          nohup pnpm run start -- -p $PORT > .next-app.log 2>&1 &
+          nohup npm run start -- -p $PORT > .next-app.log 2>&1 &
           echo $! > .app-pid
+
+      - name: Wait for app to be ready
+        run: |
           for i in {1..60}; do
             if curl -fsS "http://localhost:${PORT}/" >/dev/null; then echo "Server is up"; break; fi
             sleep 1
@@ -74,27 +70,19 @@ jobs:
       - name: Determine BASE_URL
         id: base
         run: |
-          if [ -n "${{ github.event.inputs.base_url }}" ]; then
-            echo "BASE_URL=${{ github.event.inputs.base_url }}" >> $GITHUB_OUTPUT
+          if [ -n "${{ github.event.inputs.BASE_URL }}" ]; then
+            echo "BASE_URL=${{ github.event.inputs.BASE_URL }}" >> $GITHUB_OUTPUT
           else
             echo "BASE_URL=${LOCAL_BASE_URL}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Seed data (idempotent; no-op if E2E_KEY unset)
-        env:
-          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
-        run: |
-          if [ -n "$E2E_KEY" ]; then
-            curl -sS -X POST "$BASE_URL/api/e2e/seed" -H "x-e2e-key: $E2E_KEY" -f
-          else
-            # No E2E_KEY configured; endpoint tolerates and returns 204 in previews
-            curl -sS -X POST "$BASE_URL/api/e2e/seed" || true
-          fi
+      - name: Seed test data
+        run: npm run db:seed:test
 
       - name: Run Full E2E regression pack
         env:
           BASE_URL: ${{ steps.base.outputs.BASE_URL }}
-        run: npx playwright test -c playwright.e2e.config.ts tests/e2e/regression --reporter=html,line
+        run: npm run test:e2e
 
       - name: Upload Playwright report
         if: always()
@@ -113,17 +101,6 @@ jobs:
           path: .next-app.log
           if-no-files-found: warn
           retention-days: 7
-
-      - name: Cleanup
-        if: always()
-        env:
-          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
-        run: |
-          if [ -n "$E2E_KEY" ]; then
-            curl -sS -X POST "$BASE_URL/api/e2e/cleanup" -H "x-e2e-key: $E2E_KEY" || true
-          else
-            curl -sS -X POST "$BASE_URL/api/e2e/cleanup" || true
-          fi
 
       - name: Stop app
         if: always()
