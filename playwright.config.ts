@@ -1,7 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-const BASE_URL =
-  process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 export default defineConfig({
   timeout: 30_000,
@@ -11,6 +10,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'off',
     baseURL: BASE_URL,
+    headless: true,
   },
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined

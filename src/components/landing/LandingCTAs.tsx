@@ -18,12 +18,20 @@ export default function LandingCTAs({
   return (
     <div className="flex gap-3">
       {showFind && (
-        <a href={withAppOrigin(ROUTE_FIND)} className={findClassName}>
+        <a
+          data-testid="find-work-link"
+          href={withAppOrigin(ROUTE_FIND)}
+          className={findClassName}
+        >
           Find Work
         </a>
       )}
       {showPost && (
-        <a href={withAppOrigin(ROUTE_POSTS)} className={postClassName}>
+        <a
+          data-testid="post-job-link"
+          href={withAppOrigin(ROUTE_POSTS)}
+          className={postClassName}
+        >
           Post Job
         </a>
       )}
