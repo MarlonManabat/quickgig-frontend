@@ -3,7 +3,7 @@ import * as React from 'react';
 import LocationSelect from '@/components/LocationSelect';
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
 import PostGuardInline from '@/components/auth/PostGuardInline';
-import { createClient } from '@supabase/supabase-js';
+import { getBrowserSupabase } from '@/lib/supabase-browser';
 
 let supabase = createBrowserSupabaseClient();
 export function __setSupabaseClient(client: any) {
@@ -40,29 +40,23 @@ export async function submit(form: FormData) {
 function useSupabaseSession() {
   const [session, setSession] = React.useState<any>(null);
   React.useEffect(() => {
-    let isMounted = true;
-    async function fetchSession() {
+    let mounted = true;
+    async function run() {
       try {
-        const sb: any =
-          (typeof supabase !== 'undefined' && supabase) ||
-          (typeof supabaseClient !== 'undefined' && supabaseClient) ||
-          (typeof window !== 'undefined'
-            ? createClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-              )
-            : null);
-
-        if (!sb) return setSession(null);
+        const sb = getBrowserSupabase();
+        if (!sb) {
+          if (mounted) setSession(null);
+          return;
+        }
         const { data } = await sb.auth.getSession();
-        if (isMounted) setSession(data?.session ?? null);
+        if (mounted) setSession(data?.session ?? null);
       } catch {
-        if (isMounted) setSession(null);
+        if (mounted) setSession(null);
       }
     }
-    fetchSession();
+    run();
     return () => {
-      isMounted = false;
+      mounted = false;
     };
   }, []);
   return session;
