@@ -14,17 +14,7 @@ concurrency:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
-    env:
-      # Safe defaults so tests don’t fail if secrets are missing
-      NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN || 'https://app.quickgig.ph' }}
-      APP_ORIGIN:             ${{ secrets.APP_ORIGIN || 'https://app.quickgig.ph' }}
-      NEXT_PUBLIC_SUPABASE_URL:      ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' }}
-      NODE_ENV: production
-      NEXT_TELEMETRY_DISABLED: 1
-      PORT: 3000
-      BASE_URL: http://localhost:3000
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -34,70 +24,45 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
 
-      # --- pnpm setup (we standardize on pnpm even if no lockfile is committed) ---
+      # Fix: ensure pnpm exists on the runner
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
 
-      - name: Determine pnpm store path
-        id: pnpm-store
-        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
-          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-store-${{ runner.os }}-
-
-      # --- install (robust if pnpm-lock.yaml is absent) ---
       - name: Install deps
         run: pnpm install --no-frozen-lockfile
 
-      # --- playwright & OS deps ---
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
-      # --- build app (prebuild script runs and now has globby) ---
       - name: Build
+        env:
+          NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
+          APP_ORIGIN: ${{ secrets.APP_ORIGIN }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         run: pnpm build
 
-      # --- start app & wait until healthy to avoid 404/timing issues ---
       - name: Start app (background)
         run: |
-          pnpm start &> .next-app.log &
-          npx wait-on --timeout 120000 http://localhost:3000
-          curl -fsS http://localhost:3000/ | head -n 50 || (echo "Root health check failed" && exit 1)
+          pnpm start &>/dev/null &
+          npx wait-on http://localhost:3000
 
-      - name: Echo envs (debug)
-        run: |
-          echo "APP_ORIGIN=${APP_ORIGIN}"
-          echo "NEXT_PUBLIC_APP_ORIGIN=${NEXT_PUBLIC_APP_ORIGIN}"
-          echo "BASE_URL=${BASE_URL}"
-
-      # --- run e2e ---
       - name: Run Full E2E
+        env:
+          BASE_URL: http://localhost:3000
         run: pnpm exec playwright test
 
-      # --- always upload artifacts for debugging ---
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report
-          if-no-files-found: warn
-          retention-days: 7
-
-      - name: Upload Next server log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: next-server-log
-          path: .next-app.log
           if-no-files-found: ignore
           retention-days: 7
+
