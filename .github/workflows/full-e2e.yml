@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      # Safe defaults so CI never regresses if secrets are missing
+      # Safe defaults so tests don’t fail if secrets are missing
       NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN || 'https://app.quickgig.ph' }}
       APP_ORIGIN:             ${{ secrets.APP_ORIGIN || 'https://app.quickgig.ph' }}
       NEXT_PUBLIC_SUPABASE_URL:      ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || '' }}
@@ -35,57 +35,18 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Show Node & npm versions
-        run: |
-          node -v
-          npm -v
-
-      # Auto-detect package manager
-      - name: Detect package manager
-        id: pm
-        shell: bash
-        run: |
-          if [ -f pnpm-lock.yaml ]; then
-            echo "name=pnpm" >> $GITHUB_OUTPUT
-            echo "install=pnpm install --no-frozen-lockfile" >> $GITHUB_OUTPUT
-            echo "build=pnpm build" >> $GITHUB_OUTPUT
-            echo "start=pnpm start" >> $GITHUB_OUTPUT
-            echo "exec=pnpm exec" >> $GITHUB_OUTPUT
-          elif [ -f yarn.lock ]; then
-            echo "name=yarn" >> $GITHUB_OUTPUT
-            echo "install=yarn --frozen-lockfile || yarn install" >> $GITHUB_OUTPUT
-            echo "build=yarn build" >> $GITHUB_OUTPUT
-            echo "start=yarn start" >> $GITHUB_OUTPUT
-            echo "exec=yarn" >> $GITHUB_OUTPUT
-          else
-            if [ -f package-lock.json ]; then
-              echo "name=npm" >> $GITHUB_OUTPUT
-              echo "install=npm ci" >> $GITHUB_OUTPUT
-            else
-              echo "name=npm" >> $GITHUB_OUTPUT
-              echo "install=npm install" >> $GITHUB_OUTPUT
-            fi
-            echo "build=npm run build" >> $GITHUB_OUTPUT
-            echo "start=npm run start" >> $GITHUB_OUTPUT
-            echo "exec=npx" >> $GITHUB_OUTPUT
-          fi
-          echo "Using PM: ${{ steps.pm.outputs.name }}"
-
-      # Set up PM-specific tooling & caches
+      # --- pnpm setup (we standardize on pnpm even if no lockfile is committed) ---
       - name: Setup pnpm
-        if: ${{ steps.pm.outputs.name == 'pnpm' }}
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
 
       - name: Determine pnpm store path
-        if: ${{ steps.pm.outputs.name == 'pnpm' }}
         id: pnpm-store
         run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Cache pnpm store
-        if: ${{ steps.pm.outputs.name == 'pnpm' }}
         uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
@@ -93,60 +54,36 @@ jobs:
           restore-keys: |
             pnpm-store-${{ runner.os }}-
 
-      - name: Enable Corepack (yarn only)
-        if: ${{ steps.pm.outputs.name == 'yarn' }}
-        run: corepack enable
-
-      - name: Cache Yarn
-        if: ${{ steps.pm.outputs.name == 'yarn' }}
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/yarn
-            **/.yarn/cache
-          key: yarn-cache-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            yarn-cache-${{ runner.os }}-
-
-      - name: Cache npm
-        if: ${{ steps.pm.outputs.name == 'npm' }}
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            npm-cache-${{ runner.os }}-
-
-      # Install deps (robust to lockfile absence)
+      # --- install (robust if pnpm-lock.yaml is absent) ---
       - name: Install deps
-        run: ${{ steps.pm.outputs.install }}
+        run: pnpm install --no-frozen-lockfile
 
-      # Install Playwright browsers + OS deps
+      # --- playwright & OS deps ---
       - name: Install Playwright browsers
-        run: ${{ steps.pm.outputs.exec }} playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
 
-      # Build app
+      # --- build app (prebuild script runs and now has globby) ---
       - name: Build
-        run: ${{ steps.pm.outputs.build }}
+        run: pnpm build
 
-      # Start server, wait for health (avoid 404s due to early test start)
+      # --- start app & wait until healthy to avoid 404/timing issues ---
       - name: Start app (background)
         run: |
-          ${{ steps.pm.outputs.start }} &> .next-app.log &
+          pnpm start &> .next-app.log &
           npx wait-on --timeout 120000 http://localhost:3000
           curl -fsS http://localhost:3000/ | head -n 50 || (echo "Root health check failed" && exit 1)
 
-      - name: Echo origins for debugging
+      - name: Echo envs (debug)
         run: |
           echo "APP_ORIGIN=${APP_ORIGIN}"
           echo "NEXT_PUBLIC_APP_ORIGIN=${NEXT_PUBLIC_APP_ORIGIN}"
           echo "BASE_URL=${BASE_URL}"
 
-      # Run Playwright tests
+      # --- run e2e ---
       - name: Run Full E2E
-        run: ${{ steps.pm.outputs.exec }} playwright test
+        run: pnpm exec playwright test
 
-      # Always upload artifacts
+      # --- always upload artifacts for debugging ---
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
