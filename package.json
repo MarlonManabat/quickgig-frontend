@@ -31,6 +31,7 @@
     "autofix:ci": "tsx scripts/autofix.ts",
     "test:smoke": "playwright test --project=smoke",
     "test:e2e": "playwright test --project=e2e",
+    "test:e2e:full": "playwright test e2e/full --reporter=list",
     "test:clickmap": "playwright test e2e/clickmap.spec.ts --reporter=line",
     "codex:pr": "codex run -p ./codex/tasks/credits_gate.md",
     "codex:e2e": "codex run -p ./codex/tasks/e2e_reliability.md",

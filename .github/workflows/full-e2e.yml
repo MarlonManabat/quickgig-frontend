@@ -27,7 +27,13 @@ jobs:
       - name: Start server
         run: npx next start -p 3000 & npx wait-on http://localhost:3000
       - name: Run full E2E
-        run: npx playwright test --project=e2e --reporter=github,html
+        run: npx playwright test e2e/full --reporter=github,html
+        env:
+          APP_ORIGIN: ${{ vars.APP_ORIGIN }}
+          MARKETING_HOST: ${{ vars.MARKETING_HOST }}
+          QA_TEST_MODE: ${{ vars.QA_TEST_MODE }}
+          QA_TEST_EMAIL: ${{ secrets.QA_TEST_EMAIL }}
+          QA_TEST_SECRET: ${{ secrets.QA_TEST_SECRET }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
