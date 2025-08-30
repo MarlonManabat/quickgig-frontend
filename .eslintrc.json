@@ -25,6 +25,7 @@
         "selector": "CallExpression[callee.property.name='upsert'] > ObjectExpression",
         "message": "Use array-form: .upsert([{ ... }]) to keep Supabase types sound."
       }
-    ]
+    ],
+    "no-restricted-imports": ["error", { "patterns": ["public/*"] }]
   }
 }

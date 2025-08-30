@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/db";
-import { env, requireServer } from "../lib/env";
+import { env, requireServer } from "@/lib/env";
 
 const url = env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = requireServer('SUPABASE_SERVICE_ROLE_KEY')!;
