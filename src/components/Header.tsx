@@ -7,8 +7,8 @@ export default function Header() {
       <div className="mx-auto max-w-5xl flex items-center justify-between p-4">
         <Link href="/" className="font-semibold">QuickGig</Link>
         <nav className="flex items-center gap-4">
-          <Link href="/gigs" className="hover:underline">Browse jobs</Link>
-          <Link href="/post" className="hover:underline">Post a job</Link>
+          <Link href="/gigs" className="hover:underline">Find Work</Link>
+          <Link href="/post" className="hover:underline">Post Job</Link>
         </nav>
       </div>
     </header>

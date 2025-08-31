@@ -1,29 +1,33 @@
 import { NextResponse } from 'next/server';
-import { adminSupabase } from '@/lib/supabase/server';
+import { publicSupabase } from '@/lib/supabase/server';
+import type { Gig } from '@/types/db';
 
-export async function GET() {
-  const supa = adminSupabase();
-  const { data, error } = await supa
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const search = searchParams.get('search')?.trim();
+  const city = searchParams.get('city')?.trim();
+
+  const supa = await publicSupabase();
+  if (!supa) return NextResponse.json({ items: [] });
+
+  let query = supa
     .from('gigs')
-    .select('id, title, description, city, budget, created_at, status, published')
-    .order('created_at', { ascending: false })
-    .limit(50);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ items: data ?? [] });
-}
+    .select('id, owner, title, description, budget, city, created_at, status, published')
+    .eq('published', true)
+    .order('created_at', { ascending: false });
 
-export async function POST(req: Request) {
-  const payload = await req.json();
-  const supa = adminSupabase();
-  const { data, error } = await supa.from('gigs').insert({
-    title: payload.title,
-    description: payload.description,
-    city: payload.city ?? null,
-    budget: payload.budget ?? null,
-    status: 'open',
-    published: true,
-    owner: payload.owner,
-  }).select('id').single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json({ id: data.id }, { status: 201 });
+  if (search) {
+    const like = `%${search}%`;
+    query = query.or(`title.ilike.${like},description.ilike.${like}`);
+  }
+  if (city) {
+    query = query.eq('city', city);
+  }
+
+  const { data, error } = await query;
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ items: (data as Gig[]) || [] });
 }

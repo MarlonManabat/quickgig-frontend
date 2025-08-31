@@ -1,10 +1,36 @@
-import type { Database } from "@/types/supabase";
-export type { Database }; // type-only export (works with isolatedModules)
+export interface Gig {
+  id: number;
+  owner: string;
+  title: string;
+  description: string;
+  budget: number | null;
+  city: string | null;
+  created_at: string;
+  status: string | null;
+  published: boolean;
+}
 
-type Tables = Database["public"]["Tables"];
-type Enums  = Database["public"]["Enums"];
+export interface GigInsert {
+  owner: string;
+  title: string;
+  description: string;
+  budget?: number | null;
+  city?: string | null;
+  status?: string | null;
+  published?: boolean;
+}
 
-export type Row<T extends keyof Tables>    = Tables[T]["Row"];
-export type Insert<T extends keyof Tables> = Tables[T]["Insert"];
-export type Update<T extends keyof Tables> = Tables[T]["Update"];
-export type Enum<T extends keyof Enums>    = Enums[T];
+export interface GigApplicationInsert {
+  gig_id: number;
+  applicant: string;
+  cover_letter?: string | null;
+}
+
+export interface Profile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  role: string | null;
+  created_at: string;
+  can_post_job: boolean | null;
+}

@@ -1,27 +1,27 @@
 import { notFound } from 'next/navigation';
-import { apiUrl } from '@/lib/urls';
+import ApplyButton from '@/components/ApplyButton';
+import type { Gig } from '@/types/db';
 
 export const dynamic = 'force-dynamic';
 
-async function fetchGig(id: string) {
-  const res = await fetch(apiUrl('/api/gigs'), { cache: 'no-store' });
-  if (!res.ok) return null;
-  const { items } = await res.json();
-  return items.find((g: any) => String(g.id) === id) ?? null;
+async function fetchGig(id: string): Promise<Gig | null> {
+  const res = await fetch(`/api/gigs/${id}`, { cache: 'no-store' });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error('Failed');
+  return (await res.json()) as Gig;
 }
 
-export default async function GigDetail({ params }: { params: { id: string }}) {
+export default async function GigDetail({ params }: { params: { id: string } }) {
   const gig = await fetchGig(params.id);
   if (!gig) return notFound();
   return (
-    <main className="mx-auto max-w-3xl p-6">
+    <main className="mx-auto max-w-3xl p-6 space-y-4">
       <h1 className="text-2xl font-semibold">{gig.title}</h1>
-      <p className="mt-2 whitespace-pre-wrap">{gig.description}</p>
-      <form action={`/api/applications`} method="post" className="mt-6 grid gap-2">
-        <input type="hidden" name="gig_id" value={gig.id} />
-        <textarea name="cover_letter" placeholder="Cover letter…" className="border rounded p-2 min-h-[120px]" />
-        <button className="rounded bg-black text-white px-4 py-2 w-fit">Apply</button>
-      </form>
+      <p className="text-sm text-slate-600">
+        {gig.city || 'Anywhere'} · {new Date(gig.created_at).toLocaleDateString()}
+      </p>
+      <p className="whitespace-pre-wrap">{gig.description}</p>
+      <ApplyButton gigId={gig.id} />
     </main>
   );
 }

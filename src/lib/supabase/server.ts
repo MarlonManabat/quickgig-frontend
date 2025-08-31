@@ -1,24 +1,42 @@
 import 'server-only';
+
+import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/types/db';
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const service = process.env.SUPABASE_SERVICE_ROLE!;
+export async function adminSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const service = process.env.SUPABASE_SERVICE_ROLE;
 
-function assertEnv() {
-  if (!url) throw new Error('Supabase URL is missing');
-  if (!anon) throw new Error('Supabase anon key is missing');
-  if (!service) throw new Error('Supabase service role key is missing');
+  if (!url || !service) return null;
+
+  return createClient<Database>(url, service, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 }
 
-/** Public client for browser-safe anon operations (still created on server). */
-export function publicSupabase() {
-  assertEnv();
-  return createClient(url, anon, { auth: { autoRefreshToken: false, persistSession: false } });
+export async function publicSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) return null;
+
+  const cookieStore = cookies();
+  return createServerClient<Database>(url, anon, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value;
+      },
+      set() {},
+      remove() {},
+    },
+  });
 }
 
-/** Admin client for secure server-side tasks. NEVER expose `service` to client. */
-export function adminSupabase() {
-  assertEnv();
-  return createClient(url, service, { auth: { autoRefreshToken: false, persistSession: false } });
+export async function userIdFromCookie() {
+  const supa = await publicSupabase();
+  if (!supa) return null;
+  const { data } = await supa.auth.getUser();
+  return data.user?.id ?? null;
 }
+

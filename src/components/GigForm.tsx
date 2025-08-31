@@ -1,130 +1,76 @@
-import { useState, ChangeEvent, FormEvent } from "react";
-import { getUserId } from "../utils/session";
-import Input from "@/components/ui/Input";
-import Textarea from "@/components/ui/Textarea";
-import Button from "@/components/ui/Button";
-import Banner from "@/components/ui/Banner";
+'use client';
 
-interface GigFormValues {
-  title?: string;
-  description?: string;
-  budget?: number | null;
-  city?: string;
-  image_url?: string | null;
-  owner?: string;
-}
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-interface GigFormProps {
-  initialGig: GigFormValues;
-  onSubmit: (gig: GigFormValues) => Promise<void> | void;
-  onFileUpload?: (file: File) => Promise<string | null>;
-  submitLabel?: string;
-}
+export default function GigForm() {
+  const router = useRouter();
+  const [form, setForm] = useState({ title: '', description: '', budget: '', city: '' });
+  const [error, setError] = useState<string | null>(null);
 
-export default function GigForm({
-  initialGig,
-  onSubmit,
-  onFileUpload,
-  submitLabel = "Save",
-}: GigFormProps) {
-  const [gig, setGig] = useState<GigFormValues>(initialGig ?? {});
-  const [message, setMessage] = useState<string | null>(null);
-
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setGig((prev) => ({
-      ...prev,
-      [name]: name === "budget" ? (value === "" ? null : Number(value)) : value,
-    }));
+    setForm((f) => ({ ...f, [name]: value }));
   };
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    if (!onFileUpload) return;
-    const f = e.target.files?.[0];
-    if (!f) return;
-    try {
-      const url = await onFileUpload(f);
-      setGig((prev) => ({ ...prev, image_url: url ?? null }));
-    } catch (err: any) {
-      setMessage(err.message ?? "File upload failed");
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage(null);
-    const uid = await getUserId();
-    if (!uid) {
-      setMessage("Please sign in");
+    setError(null);
+    const res = await fetch('/api/gigs/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: form.title,
+        description: form.description,
+        budget: form.budget ? Number(form.budget) : null,
+        city: form.city || null,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(data.error || 'Failed to create gig');
       return;
     }
-    try {
-      await onSubmit({ ...gig, owner: uid });
-    } catch (err: any) {
-      if (err?.status === 401 || err?.status === 403) {
-        setMessage("You are not allowed to edit this gig.");
-      } else {
-        setMessage(err.message ?? "An error occurred");
-      }
-    }
+    router.push(`/gigs/${data.id}`);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="md:grid md:grid-cols-2 md:gap-6">
-      {message && (
-        <Banner kind="error" className="md:col-span-2">
-          {message}
-        </Banner>
-      )}
-      <div className="space-y-3 md:col-span-1">
-        <Input
-          id="title"
-          className=""
-          placeholder="Title"
-          name="title"
-          value={gig.title ?? ""}
-          onChange={handleChange}
-        />
-        <Textarea
-          rows={5}
-          placeholder="Description"
-          name="description"
-          value={gig.description ?? ""}
-          onChange={handleChange}
-        />
-        <Input
-          placeholder="Budget"
-          name="budget"
-          type="number"
-          value={gig.budget ?? ""}
-          onChange={handleChange}
-        />
-        <Input
-          placeholder="City"
-          name="city"
-          value={gig.city ?? ""}
-          onChange={handleChange}
-        />
-        {onFileUpload && (
-          <div>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-            {gig.image_url && (
-              <img
-                src={gig.image_url ?? ""}
-                alt="Gig"
-                loading="lazy"
-                className="mt-2 max-w-xs"
-              />
-            )}
-          </div>
-        )}
-        <Button type="submit">{submitLabel}</Button>
-      </div>
-      <div className="md:col-span-1 md:pt-2 text-sm text-brand-subtle">
-        Provide as many details as possible to attract the right applicants.
-      </div>
+    <form onSubmit={submit} className="grid gap-2">
+      {error && <p className="text-red-600 text-sm">{error}</p>}
+      <input
+        name="title"
+        required
+        placeholder="Title"
+        className="border rounded p-2"
+        value={form.title}
+        onChange={handleChange}
+      />
+      <textarea
+        name="description"
+        required
+        placeholder="Description"
+        className="border rounded p-2 min-h-[120px]"
+        value={form.description}
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="budget"
+        placeholder="Budget"
+        className="border rounded p-2"
+        value={form.budget}
+        onChange={handleChange}
+      />
+      <input
+        name="city"
+        placeholder="City"
+        className="border rounded p-2"
+        value={form.city}
+        onChange={handleChange}
+      />
+      <button type="submit" className="rounded bg-black text-white px-4 py-2 w-fit">
+        Post
+      </button>
     </form>
   );
 }
