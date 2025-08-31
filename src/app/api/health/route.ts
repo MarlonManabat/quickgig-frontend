@@ -1,4 +1,9 @@
+'use server';
+
+import { NextResponse } from 'next/server';
+
 export const dynamic = 'force-dynamic';
+
 export async function GET() {
-  return new Response(JSON.stringify({ ok: true }), { headers: { 'content-type': 'application/json' } });
+  return NextResponse.json({ ok: true });
 }
