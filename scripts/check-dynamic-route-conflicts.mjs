@@ -1,19 +1,16 @@
-#!/usr/bin/env node
-import { globby } from 'globby';
-import path from 'node:path';
-import fs from 'node:fs';
+// Supports globby v11 (default) and v14 (named)
+let globbyFn;
+try { ({ globby: globbyFn } = await import('globby')); }
+catch { globbyFn = (await import('globby')).default; }
 
-const apis = await globby(['pages/api/**/*.ts','src/app/api/**/route.ts']);
-const normalized = apis.map(p => {
-  if (p.startsWith('pages/api/')) return 'api:' + p.replace(/^pages\/api\/|\.ts$/g,'');
-  return 'api:' + p.replace(/^src\/app\/api\/|\/route\.ts$/g,'');
-});
-const seen = new Set();
-for (const k of normalized) {
-  if (seen.has(k)) {
-    console.error('❌ API route conflict between Pages and App Router for:', k);
-    process.exit(1);
-  }
-  seen.add(k);
+import path from 'node:path';
+const patterns = ['src/app/**/page.tsx','src/pages/**/index.tsx']; // adjust if needed
+const files = await globbyFn(patterns);
+const names = files.map(f => path.basename(path.dirname(f)));
+const dupes = names.filter((n,i) => names.indexOf(n) !== i);
+if (dupes.length) {
+  console.error('Route name conflicts:', dupes);
+  process.exit(1);
 }
-console.log('✅ No API route conflicts');
+console.log('No dynamic route conflicts');
+
