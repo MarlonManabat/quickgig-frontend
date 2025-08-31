@@ -46,9 +46,8 @@
     "tests",
     "tests_disabled",
     "e2e",
+    ".storybook",
     "**/*.spec.*",
-    "**/*.test.*",
-    "playwright.*",
-    "playwright.config.*"
+    "**/*.test.*"
   ]
 }
