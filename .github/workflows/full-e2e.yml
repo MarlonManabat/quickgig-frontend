@@ -23,6 +23,12 @@ jobs:
     env:
       PORT: 3000
       LOCAL_BASE_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://example.com
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: anon
+      NEXT_PUBLIC_APP_ORIGIN: http://localhost:3000
+      SUPABASE_SERVICE_ROLE: stub_service_role
+      SEED_ADMIN_EMAIL: ci-admin@example.test
+      SEED_ADMIN_PASSWORD: Passw0rd!ci
     steps:
       - uses: actions/checkout@v4
 
@@ -46,17 +52,15 @@ jobs:
         run: node scripts/verify-next-config.mjs && npm run ci:verify && npm run typecheck
 
       - name: Write .env.local for build (GHA only)
-        if: ${{ env.GITHUB_ACTIONS == 'true' || github.workflow != '' }}
         run: |
           cat > .env.local <<'EOF'
           NEXT_PUBLIC_SUPABASE_URL=http://example.com
           NEXT_PUBLIC_SUPABASE_ANON_KEY=anon
           NEXT_PUBLIC_APP_ORIGIN=http://localhost:3000
+          SUPABASE_SERVICE_ROLE=stub_service_role
+          SEED_ADMIN_EMAIL=ci-admin@example.test
+          SEED_ADMIN_PASSWORD=Passw0rd!ci
           EOF
-
-      - name: Export server env for seed (GHA only)
-        if: ${{ env.GITHUB_ACTIONS == 'true' || github.workflow != '' }}
-        run: echo "SUPABASE_SERVICE_ROLE_KEY=stub_service_role" >> $GITHUB_ENV
 
       - name: Build
         run: npm run build

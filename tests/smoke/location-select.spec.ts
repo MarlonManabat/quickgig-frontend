@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import LocationSelect from '../../components/location/LocationSelect';
+import LocationSelect from '../../src/components/location/LocationSelect';
 
 function countRegionOptions(html: string) {
   const match = html.match(/data-testid="region-select"[^>]*>([\s\S]*?)<\/select>/);

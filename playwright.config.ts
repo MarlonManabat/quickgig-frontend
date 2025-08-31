@@ -1,4 +1,17 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { defineConfig } from '@playwright/test';
+
+(() => {
+  const dotenvPath = path.resolve(process.cwd(), '.env.local');
+  if (fs.existsSync(dotenvPath)) {
+    const lines = fs.readFileSync(dotenvPath, 'utf8').split('\n');
+    for (const line of lines) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+      if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+    }
+  }
+})();
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
