@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
@@ -14,7 +14,7 @@ const url = requireEnv('NEXT_PUBLIC_SUPABASE_URL');
 const anon = requireEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 const service = requireEnv('SUPABASE_SERVICE_ROLE');
 
-export async function publicSupabase() {
+export function publicSupabase() {
   const cookieStore = cookies();
   return createServerClient(url, anon, {
     cookies: {
@@ -27,14 +27,14 @@ export async function publicSupabase() {
   });
 }
 
-export async function adminSupabase() {
+export function adminSupabase() {
   return createClient(url, service, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
 
 export async function userIdFromCookie() {
-  const supa = await publicSupabase();
+  const supa = publicSupabase();
   const { data } = await supa.auth.getUser();
   return data.user?.id ?? null;
 }

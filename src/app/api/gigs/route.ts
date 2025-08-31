@@ -1,5 +1,3 @@
-'use server';
-
 import { NextResponse } from 'next/server';
 import { publicSupabase } from '@/lib/supabase/server';
 import type { Gig } from '@/types/db';
@@ -11,7 +9,7 @@ export async function GET(req: Request) {
   const search = searchParams.get('search')?.trim();
   const city = searchParams.get('city')?.trim();
 
-  const supa = await publicSupabase();
+  const supa = publicSupabase();
   let query = supa
     .from('gigs')
     .select('id, owner, title, description, budget, city, created_at, status, published')

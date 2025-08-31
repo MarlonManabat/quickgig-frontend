@@ -1,5 +1,3 @@
-'use server';
-
 import { NextResponse } from 'next/server';
 import { adminSupabase, userIdFromCookie } from '@/lib/supabase/server';
 import type { GigInsert } from '@/types/db';
@@ -10,7 +8,7 @@ export async function POST(req: Request) {
   const uid = await userIdFromCookie();
   if (!uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const supa = await adminSupabase();
+  const supa = adminSupabase();
   const { data: profile, error: profErr } = await supa
     .from('profiles')
     .select('can_post_job')

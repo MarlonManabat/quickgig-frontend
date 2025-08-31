@@ -1,5 +1,3 @@
-'use server';
-
 import { NextResponse } from 'next/server';
 import { publicSupabase, userIdFromCookie } from '@/lib/supabase/server';
 import type { Gig } from '@/types/db';
@@ -7,7 +5,7 @@ import type { Gig } from '@/types/db';
 export const dynamic = 'force-dynamic';
 
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
-  const supa = await publicSupabase();
+  const supa = publicSupabase();
   const uid = await userIdFromCookie();
   const id = Number(params.id);
 
