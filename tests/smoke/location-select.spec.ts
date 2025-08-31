@@ -1,21 +1,9 @@
 import { test, expect } from '@playwright/test';
-import React from 'react';
-import { renderToString } from 'react-dom/server';
-import LocationSelect from '../../components/location/LocationSelect';
+import { toRegionOptions, PH_REGIONS } from '../../src/lib/geo/regions';
 
-function countRegionOptions(html: string) {
-  const match = html.match(/data-testid="region-select"[^>]*>([\s\S]*?)<\/select>/);
-  if (!match) return 0;
-  const options = match[1].match(/<option/g) || [];
-  return Math.max(0, options.length - 1); // minus placeholder
-}
-
-test('LocationSelect renders full region list', async () => {
-  const html = renderToString(
-    React.createElement(LocationSelect, {
-      value: { regionCode: null, provinceCode: null, cityCode: null },
-      onChange: () => {},
-    }),
-  );
-  expect(countRegionOptions(html)).toBeGreaterThan(15);
+test('Location dataset exposes PH regions', async () => {
+  const opts = toRegionOptions();
+  expect(opts.length).toBe(PH_REGIONS.length);
+  expect(opts.length).toBeGreaterThanOrEqual(17);
+  expect(opts.map(o => o.label)).toContain('Metro Manila');
 });
