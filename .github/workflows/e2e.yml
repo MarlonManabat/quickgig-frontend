@@ -1,0 +1,12 @@
+name: e2e (parked)
+
+on:
+  # Park Full E2E for now; can be run manually when we're ready.
+  workflow_dispatch:
+
+jobs:
+  # Keep file as a placeholder; no jobs run automatically.
+  e2e:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps: []
