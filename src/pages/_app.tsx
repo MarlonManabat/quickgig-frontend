@@ -1,4 +1,5 @@
 import type { AppProps } from "next/app";
+// Legacy MyApp.getInitialProps removed; use page-level data fetching instead
 import Head from "next/head";
 import "../styles/theme.css";
 import "../styles/globals.css";
