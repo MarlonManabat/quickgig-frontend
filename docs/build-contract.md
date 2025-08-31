@@ -1,6 +1,7 @@
 # Build Contract
 
 - npm with committed `package-lock.json`
+- Node 20.x / npm 10.x engines are required
 - `@` alias points to `src` in both `tsconfig.json` and `next.config.js`
 - App Router APIs only; no duplicate routes between `pages/api` and `app/api`
 - No TypeScript imports from `public/**`
