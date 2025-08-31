@@ -8,9 +8,7 @@ test('Landing renders without runtime exceptions', async ({ page }) => {
   const consoleErrors: string[] = [];
 
   page.on('pageerror', (err) => {
-    const msg = String(err?.message ?? '');
-    const benign = [/Loading chunk \d+ failed/i].some((rx) => rx.test(msg));
-    if (!benign) exceptions.push(err);
+    exceptions.push(err);
   });
 
   const IGNORE = [
