@@ -41,7 +41,8 @@
     "codex:locations": "codex run -p ./codex/tasks/locations_cascade.md",
     "codex:review": "codex review --config ./codex/config.json",
     "typecheck:scripts": "tsc -p scripts/tsconfig.json",
-    "seed:demo": "tsx scripts/seed-demo.ts"
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "seed:e2e": "node --env-file=.env.local scripts/seed-demo.ts"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",

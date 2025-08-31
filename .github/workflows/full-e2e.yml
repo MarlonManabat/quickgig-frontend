@@ -1,7 +1,15 @@
 name: Full E2E
+
 on:
   workflow_dispatch:
+    inputs:
+      base_url:
+        description: Optional external BASE_URL; empty ⇒ run locally
+        required: false
+        default: ""
   push:
+    branches: [ "main" ]
+  pull_request:
     branches: [ "main" ]
 
 concurrency:
@@ -14,47 +22,27 @@ jobs:
     timeout-minutes: 45
     env:
       PORT: 3000
-
-      # ------- EXISTING app/env variables -------
-      NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
-      APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
-
-      # ------- OPTIONAL E2E secrets (safe fallbacks if absent) -------
-      E2E_KEY: ${{ secrets.E2E_KEY }}
-      E2E_EMPLOYER_EMAIL: ${{ secrets.E2E_EMPLOYER_EMAIL }}
-      E2E_WORKER_EMAIL:   ${{ secrets.E2E_WORKER_EMAIL }}
-      E2E_PASSWORD:       ${{ secrets.E2E_PASSWORD }}
-
+      LOCAL_BASE_URL: http://localhost:3000
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node
+      - uses: actions/checkout@v4
+
+      - name: Use Node 20 with npm cache
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
           cache: 'npm'
 
-      # Note: Use npm install here because E2E runs may coincide with lockfile drift.
-      # Release workflows can stay strict with `npm ci`.
-      - name: Install deps (dev + prod)
+      - name: Install deps (include dev; deterministic)
         run: |
           npm ci --include=dev || npm install --no-audit --no-fund
         env:
           NODE_ENV: development
 
       - name: Install Playwright browsers
-        run: |
-          npx playwright install --with-deps
-          node -e "console.log('Playwright version:', require('@playwright/test/package.json').version)"
+        run: npx playwright install --with-deps || true
 
       - name: Preflight
-        run: npm run ci:verify
-
-      - name: Type check
-        run: npm run typecheck
+        run: npm run ci:verify && npm run typecheck
 
       - name: Build
         run: npm run build
@@ -63,63 +51,35 @@ jobs:
 
       - name: Start app (background)
         run: |
-          nohup npm start > .next-app.log 2>&1 &
-          echo $! > .app-pid
+          npm run start > .next-app.log 2>&1 & echo $! > .next-app.pid
+
+      - name: Resolve BASE_URL
+        id: base
+        run: |
+          if [ -n "${{ inputs.base_url }}" ]; then echo "BASE_URL=${{ inputs.base_url }}" >> $GITHUB_OUTPUT; else echo "BASE_URL=${LOCAL_BASE_URL}" >> $GITHUB_OUTPUT; fi
 
       - name: Wait for readiness
-        id: resolve_base_url
         run: |
           for i in {1..60}; do
-            if curl -fsS "http://localhost:3000/api/health" >/dev/null; then echo "base_url=http://localhost:3000" >> $GITHUB_OUTPUT; break; fi
-            sleep 1
+            curl -fsS "${{ steps.base.outputs.BASE_URL }}/api/health" && exit 0
+            sleep 2
           done
+          echo "App did not become healthy in time"; exit 1
 
-      - name: Seed data (API -> script fallback)
-        env:
-          BASE_URL: ${{ steps.resolve_base_url.outputs.base_url }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
-          E2E_KEY: ${{ secrets.E2E_KEY }}
+      - name: Seed data (API → script fallback)
         run: |
-          set -e
-          echo "\uD83D\uDD38 Seeding via API\u2026"
-          if curl -fsS -X POST "$BASE_URL/api/e2e/seed" -H "Authorization: Bearer ${E2E_KEY}"; then
-            echo "\u2705 API seed ok"
-          else
-            echo "\u26A0\uFE0F API seed unavailable; trying local script fallback (guarded)"
-            if [ -n "$SUPABASE_SERVICE_ROLE" ] && [ -f scripts/seed-demo.ts ]; then
-              if [ -f node_modules/.bin/tsx ]; then
-                node_modules/.bin/tsx scripts/seed-demo.ts || true
-              else
-                npx --yes tsx scripts/seed-demo.ts || true
-              fi
-            else
-              echo "\u2139\uFE0F No SUPABASE_SERVICE_ROLE or seed script missing; skipping local seed"
-            fi
-          fi
+          curl -fsS -X POST "${{ steps.base.outputs.BASE_URL }}/api/e2e/seed" || npm run seed:e2e || true
 
       - name: Run Full E2E (Playwright)
-        env:
-          BASE_URL: ${{ steps.resolve_base_url.outputs.base_url }}
-        run: npm run test:e2e --silent
-
-      - name: Cleanup seeded data (best effort)
-        if: always()
-        env:
-          BASE_URL: ${{ steps.resolve_base_url.outputs.base_url }}
-          E2E_KEY: ${{ secrets.E2E_KEY }}
-        run: |
-          curl -fsS -X POST "$BASE_URL/api/e2e/cleanup" -H "Authorization: Bearer ${E2E_KEY}" || true
+        run: npx playwright test --reporter=line,junit
 
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-e2e
+          name: playwright-report
           path: playwright-report
-          if-no-files-found: warn
-          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Upload Next server log
         if: always()
@@ -127,10 +87,10 @@ jobs:
         with:
           name: next-app.log
           path: .next-app.log
-          if-no-files-found: warn
-          retention-days: 7
+          if-no-files-found: ignore
 
-      - name: Stop app
+      - name: Post cleanup
         if: always()
         run: |
-          if [ -f .app-pid ]; then kill $(cat .app-pid) || true; fi
+          if [ -f .next-app.pid ]; then kill $(cat .next-app.pid) || true; fi
+

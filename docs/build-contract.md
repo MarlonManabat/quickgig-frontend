@@ -1,10 +1,10 @@
 # Build Contract
 
-- npm with committed `package-lock.json`
-- Node 20.x / npm 10.x engines are required
-- `@` alias points to `src` in both `tsconfig.json` and `next.config.js`
-- App Router APIs only; no duplicate routes between `pages/api` and `app/api`
-- No TypeScript imports from `public/**`
-- Required modules: `src/styles/globals.css`, `src/components/app/AppHeader.tsx`, `src/lib/env.ts`, `src/utils/supabaseClient.ts`, and data files under `src/data/**`
-- Dependencies include `tailwindcss`, `postcss`, `autoprefixer`, `zod`, and `globby@^14` with named import
-- `npm run ci:verify` checks these rules before build
+- **Engines:** Node 20.x, npm 10.x across local, CI, and Vercel.
+- **Lockfile:** Always commit `package-lock.json`. If dependencies change, run `npm install` locally to regenerate.
+- **Install phase in CI:** Use `npm ci --include=dev` with `NODE_ENV=development`; only set `NODE_ENV=production` for `next build`.
+- **Required dev deps:** `tailwindcss`, `postcss`, `autoprefixer`, `globby`, `zod` must be present.
+- **Pathing:** `@` alias points to `src/` consistently in TS & webpack. No imports from `public/**`.
+- **App health & seeding:** E2E waits on `/api/health`; seeds via `/api/e2e/seed` with script fallback.
+- **Artifacts:** Always upload Playwright report and Next server log.
+
