@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       E2E_MODE: PR
-      NEXT_PUBLIC_SUPABASE_URL: http://example.com
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: anon
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:3000/api/mock
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: stub
       NEXT_PUBLIC_APP_ORIGIN: http://localhost:3000
       SUPABASE_SERVICE_ROLE: stub_service_role
       SEED_ADMIN_EMAIL: ci-admin@example.test
@@ -44,12 +44,9 @@ jobs:
       - name: Write .env.local
         run: |
           cat > .env.local <<'EOF2'
-          NEXT_PUBLIC_SUPABASE_URL=http://example.com
-          NEXT_PUBLIC_SUPABASE_ANON_KEY=anon
-          NEXT_PUBLIC_APP_ORIGIN=http://localhost:3000
-          SUPABASE_SERVICE_ROLE=stub_service_role
-          SEED_ADMIN_EMAIL=ci-admin@example.test
-          SEED_ADMIN_PASSWORD=Passw0rd!ci
+          E2E_MODE=smoke
+          NEXT_PUBLIC_SUPABASE_URL=http://localhost:3000/api/mock
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=stub
           EOF2
 
       - name: Build
@@ -79,11 +76,16 @@ jobs:
           name: playwright-report
           path: playwright-report/**
           if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload JUnit XML
         if: always()
         uses: actions/upload-artifact@v4
-        with: { name: junit-xml, path: test-results/junit.xml }
+        with:
+          name: junit-xml
+          path: test-results/junit.xml
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload traces/videos/screens
         if: always()
@@ -94,6 +96,8 @@ jobs:
             test-results/**/*.zip
             test-results/**/*.webm
             test-results/**/*-failed-*.png
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Upload console logs
         if: always()
@@ -102,11 +106,16 @@ jobs:
           name: console-logs
           path: test-results/artifacts/console/**
           if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload Next server log
         if: always()
         uses: actions/upload-artifact@v4
-        with: { name: next-app-log, path: .next-app.log }
+        with:
+          name: next-app-log
+          path: .next-app.log
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Stop app
         if: always()
