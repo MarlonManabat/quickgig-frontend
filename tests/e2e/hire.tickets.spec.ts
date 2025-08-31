@@ -12,7 +12,7 @@ const workerId = "00000000-0000-0000-0000-000000000002";
 test("@full hire requires tickets", async ({ page }) => {
   await loginAs(page, 'employer');
 
-  const key = requireServer('SUPABASE_SERVICE_ROLE_KEY');
+  const key = requireServer('SUPABASE_SERVICE_ROLE');
   if (!key) throw new Error('missing service role');
   const supa = createClient(env.NEXT_PUBLIC_SUPABASE_URL, key, {
     auth: { persistSession: false },

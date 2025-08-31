@@ -7,7 +7,7 @@
   - NEXT_PUBLIC_SITE_URL=https://app.quickgig.ph
   - NEXT_PUBLIC_SUPABASE_URL=…
   - NEXT_PUBLIC_SUPABASE_ANON_KEY=…
-  - SUPABASE_SERVICE_ROLE_KEY=… (Server)
+  - SUPABASE_SERVICE_ROLE=… (Server)
 - Redeploy → visit /api/health → expect { ok: true }
 
 ## Supabase

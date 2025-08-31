@@ -1,11 +1,6 @@
 name: Full E2E
 on:
   workflow_dispatch:
-    inputs:
-      BASE_URL:
-        description: "Optional external BASE_URL; empty = run locally"
-        required: false
-        default: ""
   push:
     branches: [ "main" ]
 
@@ -18,9 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      NODE_ENV: production
       PORT: 3000
-      LOCAL_BASE_URL: http://localhost:3000
 
       # ------- EXISTING app/env variables -------
       NEXT_PUBLIC_APP_ORIGIN: ${{ secrets.NEXT_PUBLIC_APP_ORIGIN }}
@@ -41,50 +34,83 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20.x'
           cache: 'npm'
 
       # Note: Use npm install here because E2E runs may coincide with lockfile drift.
       # Release workflows can stay strict with `npm ci`.
-      - name: Install deps
-        run: npm install --no-audit --no-fund
+      - name: Install deps (dev + prod)
+        run: |
+          npm ci --include=dev || npm install --no-audit --no-fund
+        env:
+          NODE_ENV: development
 
       - name: Install Playwright browsers
         run: |
           npx playwright install --with-deps
           node -e "console.log('Playwright version:', require('@playwright/test/package.json').version)"
 
+      - name: Preflight
+        run: npm run ci:verify
+
+      - name: Type check
+        run: npm run typecheck
+
       - name: Build
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Start app (background)
         run: |
-          nohup npm run start -- -p $PORT > .next-app.log 2>&1 &
+          nohup npm start > .next-app.log 2>&1 &
           echo $! > .app-pid
 
-      - name: Wait for app to be ready
+      - name: Wait for readiness
+        id: resolve_base_url
         run: |
           for i in {1..60}; do
-            if curl -fsS "http://localhost:${PORT}/" >/dev/null; then echo "Server is up"; break; fi
+            if curl -fsS "http://localhost:3000/api/health" >/dev/null; then echo "base_url=http://localhost:3000" >> $GITHUB_OUTPUT; break; fi
             sleep 1
           done
 
-      - name: Determine BASE_URL
-        id: base
+      - name: Seed data (API -> script fallback)
+        env:
+          BASE_URL: ${{ steps.resolve_base_url.outputs.base_url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE: ${{ secrets.SUPABASE_SERVICE_ROLE }}
+          E2E_KEY: ${{ secrets.E2E_KEY }}
         run: |
-          if [ -n "${{ github.event.inputs.BASE_URL }}" ]; then
-            echo "BASE_URL=${{ github.event.inputs.BASE_URL }}" >> $GITHUB_OUTPUT
+          set -e
+          echo "\uD83D\uDD38 Seeding via API\u2026"
+          if curl -fsS -X POST "$BASE_URL/api/e2e/seed" -H "Authorization: Bearer ${E2E_KEY}"; then
+            echo "\u2705 API seed ok"
           else
-            echo "BASE_URL=${LOCAL_BASE_URL}" >> $GITHUB_OUTPUT
+            echo "\u26A0\uFE0F API seed unavailable; trying local script fallback (guarded)"
+            if [ -n "$SUPABASE_SERVICE_ROLE" ] && [ -f scripts/seed-demo.ts ]; then
+              if [ -f node_modules/.bin/tsx ]; then
+                node_modules/.bin/tsx scripts/seed-demo.ts || true
+              else
+                npx --yes tsx scripts/seed-demo.ts || true
+              fi
+            else
+              echo "\u2139\uFE0F No SUPABASE_SERVICE_ROLE or seed script missing; skipping local seed"
+            fi
           fi
 
-      - name: Seed test data
-        run: npm run db:seed:test
-
-      - name: Run Full E2E regression pack
+      - name: Run Full E2E (Playwright)
         env:
-          BASE_URL: ${{ steps.base.outputs.BASE_URL }}
-        run: npm run test:e2e
+          BASE_URL: ${{ steps.resolve_base_url.outputs.base_url }}
+        run: npm run test:e2e --silent
+
+      - name: Cleanup seeded data (best effort)
+        if: always()
+        env:
+          BASE_URL: ${{ steps.resolve_base_url.outputs.base_url }}
+          E2E_KEY: ${{ secrets.E2E_KEY }}
+        run: |
+          curl -fsS -X POST "$BASE_URL/api/e2e/cleanup" -H "Authorization: Bearer ${E2E_KEY}" || true
 
       - name: Upload Playwright report
         if: always()

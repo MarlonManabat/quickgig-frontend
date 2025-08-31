@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.SUPABASE_URL;
 const key =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+  process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
 
 // If we don't have credentials (e.g., PRs), exit successfully so CI doesn't fail.
 if (!url || !key) {
