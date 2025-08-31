@@ -33,8 +33,7 @@ export default defineConfig({
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key',
         },
       },
-  // Filter what runs on PR: only smoke tests, skip @wip
-  grep: MODE === 'PR' ? /@smoke/ : undefined,
-  grepInvert: MODE === 'PR' ? /@wip/ : undefined,
+  // PR mode: ONLY smoke folder, skip @wip
   testMatch: MODE === 'PR' ? ['tests/smoke/**/*.spec.*'] : ['tests/**/*.spec.*'],
+  grepInvert: MODE === 'PR' ? /@wip/ : undefined,
 });
