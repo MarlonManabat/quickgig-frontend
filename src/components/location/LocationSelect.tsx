@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import {
   staticPhData,
   loadStaticPhData,
-  Region,
   Province,
   City,
 } from '@/lib/ph-data';
 import { safeSortByName } from '@/lib/locations';
+import { toRegionOptions } from '@/lib/geo/regions';
 
 export interface LocationValue {
   regionCode: string | null;
@@ -25,28 +25,14 @@ const NCR_REGION_CODE = '130000000';
 const NCR_PROVINCE_CODE = 'NCR';
 
 export default function LocationSelect({ value, onChange, disabled, compact }: Props) {
-  const [regions, setRegions] = useState<Region[]>(staticPhData.regions);
   const [provinces, setProvinces] = useState<Province[]>(staticPhData.provinces);
   const [cities, setCities] = useState<City[]>(staticPhData.cities);
 
   useEffect(() => {
     loadStaticPhData()
       .then((d) => {
-        setRegions(d.regions);
         setProvinces(d.provinces);
         setCities(d.cities);
-      })
-      .catch(() => {});
-  }, []);
-
-  // hydrate from API when available
-  useEffect(() => {
-    fetch('/api/locations/regions')
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((rows) => {
-        if (Array.isArray(rows) && rows.length) {
-          setRegions((prev) => mergeByCode(prev, rows, 'region_code', 'region_name'));
-        }
       })
       .catch(() => {});
   }, []);
@@ -115,7 +101,7 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
     return Array.from(map.values()).sort((a, b) => String(a[nameKey]).localeCompare(String(b[nameKey])));
   }
 
-  const regionOpts = safeSortByName(regions);
+  const regionOpts = toRegionOptions();
   const provinceOpts = value.regionCode === NCR_REGION_CODE
     ? provinces.filter((p) => p.province_code === NCR_PROVINCE_CODE)
     : safeSortByName(provinces.filter((p) => p.region_code === value.regionCode));
@@ -139,7 +125,7 @@ export default function LocationSelect({ value, onChange, disabled, compact }: P
       >
         <option value="">Select Region</option>
         {regionOpts.map((r) => (
-          <option key={r.region_code} value={r.region_code}>{r.region_name}</option>
+          <option key={r.value} value={r.value}>{r.label}</option>
         ))}
       </select>
 
