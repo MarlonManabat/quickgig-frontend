@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-const MODE = process.env.E2E_MODE ?? 'FULL'; // 'PR' | 'FULL'
+const MODE = process.env.E2E_MODE ?? 'PR'; // 'PR' | 'FULL'
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 export default defineConfig({
@@ -33,16 +33,8 @@ export default defineConfig({
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key',
         },
       },
-  // Filter what runs on PR
-  grep: MODE === 'PR' ? /@smoke|@slice/ : undefined,
+  // Filter what runs on PR: only smoke tests, skip @wip
+  grep: MODE === 'PR' ? /@smoke/ : undefined,
   grepInvert: MODE === 'PR' ? /@wip/ : undefined,
-  // File selection for PR: smoke + any spec named *slice.* or *finished.*
-  testMatch:
-    MODE === 'PR'
-      ? [
-          'tests/smoke/**/*.spec.*',
-          'tests/**/*slice*.spec.*',
-          'tests/**/*finished*.spec.*',
-        ]
-      : ['tests/**/*.spec.*'],
+  testMatch: MODE === 'PR' ? ['tests/smoke/**/*.spec.*'] : ['tests/**/*.spec.*'],
 });

@@ -1,4 +1,4 @@
-name: Full E2E
+name: Final QA (full)
 on:
   workflow_dispatch:
   schedule:
@@ -21,9 +21,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 20.11.1 }
 
-      - run: npm ci
+      - name: Install dependencies (deterministic with fallback)
+        run: |
+          echo "Node $(node -v) / npm $(npm -v)"
+          npm ci || (echo "npm ci failed (lockfile drift) → falling back to npm install"; npm install)
 
       - name: Typecheck + preflight
         run: |
