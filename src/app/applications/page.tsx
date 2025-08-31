@@ -1,8 +1,12 @@
+import { apiUrl } from '@/lib/urls';
+
+export const dynamic = 'force-dynamic';
+
 async function fetchMyApps(userId: string) {
-  const url = new URL(`${process.env.NEXT_PUBLIC_APP_ORIGIN}/api/applications`);
+  const url = new URL(apiUrl('/api/applications'));
   url.searchParams.set('user', userId);
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) return [];
+  const res = await fetch(url.toString(), { cache: 'no-store' });
+  if (!res.ok) throw new Error('Failed to load applications');
   const json = await res.json();
   return json.items ?? [];
 }

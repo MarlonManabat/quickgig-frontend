@@ -1,7 +1,10 @@
 import { notFound } from 'next/navigation';
+import { apiUrl } from '@/lib/urls';
+
+export const dynamic = 'force-dynamic';
 
 async function fetchGig(id: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_ORIGIN}/api/gigs`, { cache: 'no-store' });
+  const res = await fetch(apiUrl('/api/gigs'), { cache: 'no-store' });
   if (!res.ok) return null;
   const { items } = await res.json();
   return items.find((g: any) => String(g.id) === id) ?? null;

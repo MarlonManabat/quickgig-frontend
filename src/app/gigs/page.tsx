@@ -1,7 +1,10 @@
 import Link from 'next/link';
+import { apiUrl } from '@/lib/urls';
+
+export const dynamic = 'force-dynamic';
 
 async function fetchGigs() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_ORIGIN}/api/gigs`, { cache: 'no-store' });
+  const res = await fetch(apiUrl('/api/gigs'), { cache: 'no-store' });
   if (!res.ok) return [];
   const json = await res.json();
   return json.items ?? [];
