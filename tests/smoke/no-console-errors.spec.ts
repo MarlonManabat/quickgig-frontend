@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test";
-import { silenceNonErrors } from "../helpers/env";
+import { captureConsole } from "../e2e/_helpers/console";
 
 test("Landing renders without console errors", async ({ page }) => {
+  await captureConsole(page, "console-home.txt");
   let hasError = false;
   page.on("console", (msg) => {
     if (msg.type() === "error") hasError = true;
