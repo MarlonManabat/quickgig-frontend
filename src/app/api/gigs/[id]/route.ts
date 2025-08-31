@@ -3,9 +3,12 @@ import { publicSupabase, userIdFromCookie } from '@/lib/supabase/server';
 import type { Gig } from '@/types/db';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
-  const supa = publicSupabase();
+  const supa = await publicSupabase();
+  if (!supa) return NextResponse.json(null);
+
   const uid = await userIdFromCookie();
   const id = Number(params.id);
 

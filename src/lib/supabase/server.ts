@@ -3,20 +3,26 @@ import 'server-only';
 import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/auth-helpers-nextjs';
+import type { Database } from '@/types/db';
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing env: ${name}`);
-  return value;
+export async function adminSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const service = process.env.SUPABASE_SERVICE_ROLE;
+
+  if (!url || !service) return null;
+
+  return createClient<Database>(url, service, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 }
 
-const url = requireEnv('NEXT_PUBLIC_SUPABASE_URL');
-const anon = requireEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
-const service = requireEnv('SUPABASE_SERVICE_ROLE');
+export async function publicSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) return null;
 
-export function publicSupabase() {
   const cookieStore = cookies();
-  return createServerClient(url, anon, {
+  return createServerClient<Database>(url, anon, {
     cookies: {
       get(name: string) {
         return cookieStore.get(name)?.value;
@@ -27,14 +33,10 @@ export function publicSupabase() {
   });
 }
 
-export function adminSupabase() {
-  return createClient(url, service, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
-
 export async function userIdFromCookie() {
-  const supa = publicSupabase();
+  const supa = await publicSupabase();
+  if (!supa) return null;
   const { data } = await supa.auth.getUser();
   return data.user?.id ?? null;
 }
+

@@ -3,13 +3,16 @@ import { publicSupabase } from '@/lib/supabase/server';
 import type { Gig } from '@/types/db';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get('search')?.trim();
   const city = searchParams.get('city')?.trim();
 
-  const supa = publicSupabase();
+  const supa = await publicSupabase();
+  if (!supa) return NextResponse.json({ items: [] });
+
   let query = supa
     .from('gigs')
     .select('id, owner, title, description, budget, city, created_at, status, published')

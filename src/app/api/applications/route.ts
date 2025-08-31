@@ -3,14 +3,22 @@ import { adminSupabase, userIdFromCookie } from '@/lib/supabase/server';
 import type { GigApplicationInsert } from '@/types/db';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
   const uid = await userIdFromCookie();
   if (!uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const supa = await adminSupabase();
+  if (!supa)
+    return NextResponse.json(
+      { ok: false, error: 'service disabled in preview' },
+      { status: 501 }
+    );
+
   const body = await req.json();
   const gigId = body.gig_id;
   if (!gigId) return NextResponse.json({ error: 'gig_id required' }, { status: 400 });
-  const supa = adminSupabase();
 
   const { data: existing, error: existErr } = await supa
     .from('gig_applications')

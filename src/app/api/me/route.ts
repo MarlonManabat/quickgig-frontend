@@ -3,12 +3,15 @@ import { adminSupabase, userIdFromCookie } from '@/lib/supabase/server';
 import type { Profile } from '@/types/db';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET() {
   const uid = await userIdFromCookie();
   if (!uid) return NextResponse.json({ needsProfile: true });
 
-  const supa = adminSupabase();
+  const supa = await adminSupabase();
+  if (!supa) return NextResponse.json({ needsProfile: true });
+
   const { data, error } = await supa
     .from('profiles')
     .select('id, full_name, avatar_url, role, created_at, can_post_job')
