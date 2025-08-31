@@ -43,7 +43,7 @@ jobs:
         run: npx playwright install --with-deps || true
 
       - name: Preflight & typecheck
-        run: npm run ci:verify && npm run typecheck
+        run: node scripts/verify-next-config.mjs && npm run ci:verify && npm run typecheck
 
       - name: Build
         run: npm run build
