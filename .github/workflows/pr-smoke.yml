@@ -75,7 +75,10 @@ jobs:
       - name: Upload Playwright HTML
         if: always()
         uses: actions/upload-artifact@v4
-        with: { name: playwright-report, path: playwright-report/** }
+        with:
+          name: playwright-report
+          path: playwright-report/**
+          if-no-files-found: ignore
 
       - name: Upload JUnit XML
         if: always()
@@ -91,6 +94,14 @@ jobs:
             test-results/**/*.zip
             test-results/**/*.webm
             test-results/**/*-failed-*.png
+
+      - name: Upload console logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: console-logs
+          path: test-results/artifacts/console/**
+          if-no-files-found: ignore
 
       - name: Upload Next server log
         if: always()

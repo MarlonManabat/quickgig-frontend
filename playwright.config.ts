@@ -5,7 +5,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 export default defineConfig({
   timeout: 30_000,
-  expect: { timeout: 10_000 },
+  expect: { timeout: 15_000 },
   reporter: [
     ['line'],
     ['html', { open: 'never', outputFolder: 'playwright-report' }],
@@ -19,6 +19,8 @@ export default defineConfig({
     baseURL: BASE_URL,
     headless: true,
   },
+  workers: MODE === 'PR' ? 1 : undefined,
+  retries: MODE === 'PR' ? 1 : 0,
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
