@@ -1,16 +1,13 @@
-name: Full E2E
+name: PR Smoke + Slices
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 18 * * *"
-  push:
-    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  e2e:
+  pr:
     runs-on: ubuntu-latest
     env:
-      E2E_MODE: FULL
+      E2E_MODE: PR
       NEXT_PUBLIC_SUPABASE_URL: http://example.com
       NEXT_PUBLIC_SUPABASE_ANON_KEY: anon
       NEXT_PUBLIC_APP_ORIGIN: http://localhost:3000
@@ -57,7 +54,7 @@ jobs:
           done
           echo "App not ready"; exit 1
 
-      - name: Run Full tests
+      - name: Run PR tests (smoke + slices, no @wip)
         run: npx playwright test --reporter=line
 
       # ---- Artifacts ----

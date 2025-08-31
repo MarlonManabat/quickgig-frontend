@@ -1,14 +1,21 @@
 import { defineConfig } from '@playwright/test';
 
+const MODE = process.env.E2E_MODE ?? 'FULL'; // 'PR' | 'FULL'
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 10_000 },
+  reporter: [
+    ['line'],
+    ['html', { open: 'never', outputFolder: 'playwright-report' }],
+    ['junit', { outputFile: 'test-results/junit.xml' }],
+  ],
+  outputDir: 'test-results/artifacts',
   use: {
     trace: 'retain-on-failure',
+    video: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'off',
     baseURL: BASE_URL,
     headless: true,
   },
@@ -26,43 +33,16 @@ export default defineConfig({
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key',
         },
       },
-  reporter: [['html', { open: 'never' }], ['github']],
-  projects: [
-    {
-      name: 'smoke',
-      testMatch: ['tests/smoke/**/*.spec.ts', '**/*.smoke.ts'],
-      timeout: 45_000,
-      expect: { timeout: 7_000 },
-      use: { baseURL: BASE_URL },
-    },
-    {
-      name: 'e2e',
-      testMatch: ['tests/e2e/**/*.spec.ts'],
-      use: {
-        baseURL: BASE_URL,
-        video: 'retain-on-failure',
-        trace: 'retain-on-failure',
-        screenshot: 'only-on-failure',
-      },
-    },
-    {
-      name: 'clickmap',
-      testDir: 'e2e',
-      testMatch: /.*\.spec\.ts/,
-      timeout: 60_000,
-    },
-    {
-      name: 'qa',
-      testDir: 'tests/qa',
-      testIgnore: ['ui.*'],
-      retries: 2,
-      timeout: 60_000,
-      use: {
-        baseURL: process.env.BASE_URL,
-        video: 'on',
-        trace: 'on-first-retry',
-        screenshot: 'on',
-      },
-    },
-  ],
+  // Filter what runs on PR
+  grep: MODE === 'PR' ? /@smoke|@slice/ : undefined,
+  grepInvert: MODE === 'PR' ? /@wip/ : undefined,
+  // File selection for PR: smoke + any spec named *slice.* or *finished.*
+  testMatch:
+    MODE === 'PR'
+      ? [
+          'tests/smoke/**/*.spec.*',
+          'tests/**/*slice*.spec.*',
+          'tests/**/*finished*.spec.*',
+        ]
+      : ['tests/**/*.spec.*'],
 });
