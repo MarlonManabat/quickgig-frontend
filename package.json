@@ -14,7 +14,7 @@
     "start:prod": "next start -p 3000",
     "analyze": "ANALYZE=true next build",
     "build:profile": "NODE_OPTIONS='--trace-deopt --trace_gc' next build",
-    "seed": "node scripts/seed.mjs",
+    "seed": "node -r dotenv/config scripts/seed.mjs",
     "db:seed:ph": "tsx scripts/seed-ph-locations.ts",
     "db:seed:test": "node scripts/seedTestData.js",
     "ci:install": "npm ci --no-audit --no-fund",
