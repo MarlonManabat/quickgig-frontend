@@ -25,6 +25,17 @@ jobs:
           echo "Node $(node -v) / npm $(npm -v)"
           npm ci || (echo "npm ci failed (lockfile drift) → falling back to npm install"; npm install)
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright (Chromium + deps)
+        run: npx playwright install --with-deps chromium
+
       - name: Typecheck + preflight
         run: |
           npm run ci:verify || true
