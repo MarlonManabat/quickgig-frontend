@@ -67,9 +67,9 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Start app (background)
+      - name: Start app (background, tee logs)
         run: |
-          npm run start > .next-app.log 2>&1 & echo $! > .next-app.pid
+          (npm start 2>&1 | tee .next-app.log) & echo $! > .next-app.pid
 
       - name: Resolve BASE_URL
         id: base
@@ -93,23 +93,44 @@ jobs:
           curl -fsS -X POST "${{ steps.base.outputs.BASE_URL }}/api/e2e/seed" || npm run seed:e2e || true
 
       - name: Run Full E2E (Playwright)
-        run: npx playwright test --reporter=line,junit
-
-      - name: Upload Playwright report
+        run: npx playwright test
+      - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report
-          if-no-files-found: ignore
+          path: playwright-report/**
+
+      - name: Upload JUnit XML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-xml
+          path: test-results/junit.xml
+
+      - name: Upload traces / videos / screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            test-results/**/*.zip
+            test-results/**/*.webm
+            test-results/**/*-failed-*.png
+
+      - name: Upload console logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: console-logs
+          path: test-results/console/**
 
       - name: Upload Next server log
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: next-app.log
+          name: next-app-log
           path: .next-app.log
-          if-no-files-found: ignore
 
       - name: Cleanup
         if: always()

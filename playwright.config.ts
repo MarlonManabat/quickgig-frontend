@@ -18,10 +18,16 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 10_000 },
+  reporter: [
+    ['line'],
+    ['html', { open: 'never', outputFolder: 'playwright-report' }],
+    ['junit', { outputFile: 'test-results/junit.xml' }],
+  ],
+  outputDir: 'test-results/artifacts',
   use: {
     trace: 'retain-on-failure',
+    video: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'off',
     baseURL: BASE_URL,
     headless: true,
   },
@@ -39,7 +45,6 @@ export default defineConfig({
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'public-anon-key',
         },
       },
-  reporter: [['html', { open: 'never' }], ['github']],
   projects: [
     {
       name: 'smoke',
