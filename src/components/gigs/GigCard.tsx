@@ -1,30 +1,23 @@
-import { useState } from "react";
-import type { Gig } from "@/lib/db/types";
-import { toggleSave } from "@/lib/gigs/api";
+import Link from 'next/link';
+import type { GigCardData } from '@/types/gigs';
 
 interface Props {
-  gig: Gig;
-  initialSaved?: boolean;
+  gig: GigCardData;
 }
 
-export default function GigCard({ gig, initialSaved = false }: Props) {
-  const [saved, setSaved] = useState(initialSaved);
-  const onToggle = async () => {
-    const next = !saved;
-    setSaved(next);
-    try {
-      await toggleSave(gig.id, next);
-    } catch {
-      setSaved(!next);
-    }
-  };
+export default function GigCard({ gig }: Props) {
   return (
-    <div className="border p-4 space-y-2">
-      <h3 className="text-lg font-semibold">{gig.title}</h3>
-      <p>{gig.description}</p>
-      <button onClick={onToggle} className="text-sm text-blue-600">
-        {saved ? "Unsave" : "Save"}
-      </button>
-    </div>
+    <li className="rounded border p-4 space-y-1">
+      <h3 className="font-semibold">{gig.title}</h3>
+      <p className="text-sm text-slate-600">
+        {gig.company} • {gig.region}
+      </p>
+      <p className="text-sm">
+        {gig.rate ? `₱${gig.rate.toLocaleString()}` : '—'}
+      </p>
+      <Link href={`/gigs/${gig.id}`} className="text-sm text-blue-600">
+        View
+      </Link>
+    </li>
   );
 }
