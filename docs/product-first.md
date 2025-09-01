@@ -29,3 +29,10 @@ back to mock data when secrets are absent; replace by real DB later.
 The `/owner/gigs` pages and APIs are dynamic and fall back to in-memory mocks
 when Supabase secrets are absent. Preview builds can list gigs, view applicants,
 and update statuses without hitting the database.
+
+## Ops & UX scaffolding
+
+- Health endpoint `/api/health` and `/status` page expose basic runtime info without secrets.
+- Dynamic pages use preview-safe fallbacks when Supabase envs are missing.
+- Major routes ship `loading.tsx` skeletons to mask latency while fetching.
+- `robots.txt` and `sitemap.xml` serve canonical URLs and fall back to minimal entries if Supabase is unavailable.
