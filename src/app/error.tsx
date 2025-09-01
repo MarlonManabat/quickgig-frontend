@@ -1,16 +1,32 @@
 'use client';
 
-export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
+import { useEffect } from 'react';
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    // Log for observability; safe to remove later
+    console.error('App error:', error);
+  }, [error]);
+
   return (
-    <html>
-      <body>
-        <main className="mx-auto max-w-lg p-8">
-          <h1 className="text-2xl font-semibold mb-2">Something went wrong</h1>
-          <p className="text-slate-600 mb-4">Please try again in a moment.</p>
-          <pre className="text-xs bg-slate-100 p-3 rounded overflow-auto">{error.message}</pre>
-          <a className="underline mt-4 inline-block" href="/">Go home</a>
-        </main>
-      </body>
-    </html>
+    <main className="mx-auto max-w-xl p-10 text-center">
+      <h1 className="text-3xl font-semibold mb-2">Something went wrong</h1>
+      <p className="text-slate-600 mb-4">
+        Please try again. If the issue persists, try again later.
+      </p>
+      <button
+        onClick={() => reset()}
+        className="border rounded px-4 py-2"
+        aria-label="Retry"
+      >
+        Try again
+      </button>
+    </main>
   );
 }
