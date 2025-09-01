@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { publicSupabase } from '@/lib/supabase/server';
-import { gigById } from '@/lib/mock/gigs';
+import { getServerSupabase } from '@/lib/supabase/server';
 import type { GigDetail } from '@/types/gigs';
 
 export const runtime = 'nodejs';
@@ -10,12 +9,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
-  const supa = await publicSupabase();
-  if (!supa) {
-    const gig = gigById(id);
-    if (!gig) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    return NextResponse.json({ gig });
-  }
+  const supa = getServerSupabase();
   const { data, error } = await supa
     .from('gigs')
     .select('*')

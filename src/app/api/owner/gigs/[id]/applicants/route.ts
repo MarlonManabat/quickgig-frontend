@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { publicSupabase } from '@/lib/supabase/server';
-import { listApplicants } from '@/lib/mock/owner';
+import { getServerSupabase } from '@/lib/supabase/server';
 import type { ApplicantRow } from '@/types/owner';
 
 export const runtime = 'nodejs';
@@ -10,11 +9,7 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   const gigId = params.id;
-  const supa = await publicSupabase();
-  if (!supa) {
-    const items = listApplicants(gigId);
-    return NextResponse.json({ items });
-  }
+  const supa = getServerSupabase();
   try {
     const { data, error } = await supa
       .from('gig_applications')

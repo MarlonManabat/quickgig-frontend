@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import GeoSelect, { GeoValue } from "@/components/location/GeoSelect";
-import { getBrowserSupabase } from "@/lib/supabase-browser";
+import { getBrowserSupabase } from "@/lib/supabase/client";
 
 let supabase = getBrowserSupabase();
 export function __setSupabaseClient(client: any) {

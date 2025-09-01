@@ -1,10 +1,11 @@
+"use client";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { getBrowserClient } from "@/lib/supabase/browser";
+import { getBrowserSupabase } from "@/lib/supabase/client";
 import { validateAvatarFile, uploadAvatar } from "@/lib/storage/avatars";
 
 export default function ProfileForm() {
-  const supabase = getBrowserClient();
+  const supabase = getBrowserSupabase();
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [file, setFile] = useState<File | null>(null);

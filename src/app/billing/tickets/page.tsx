@@ -5,6 +5,7 @@ import { ensureTicketsRow, getTicketBalance } from '@/lib/tickets';
 import { safeNext } from '@/lib/safe-next';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function TicketsPage({ searchParams }: { searchParams: { next?: string } }) {
   const uid = await userIdFromCookie();
