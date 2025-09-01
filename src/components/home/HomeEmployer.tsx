@@ -181,9 +181,9 @@ export default function HomeEmployer() {
         <Card title="Quick Actions">
           {role === "employer" || role === "admin" ? (
             <div className="flex flex-wrap gap-2">
-              <Link href="/post" className="qg-btn qg-btn--primary px-3 py-2">
-                Post Job
-              </Link>
+                <Link href="/gigs/create" className="qg-btn qg-btn--primary px-3 py-2">
+                  Post Job
+                </Link>
               <Link
                 href="/admin/payments"
                 className="qg-btn qg-btn--outline px-3 py-2"
@@ -199,9 +199,9 @@ export default function HomeEmployer() {
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              <Link href="/find?focus=search" className="qg-btn qg-btn--primary px-3 py-2">
-                Browse Jobs
-              </Link>
+                <Link href="/gigs?focus=search" className="qg-btn qg-btn--primary px-3 py-2">
+                  Browse Jobs
+                </Link>
               <Link
                 href="/messages"
                 className="qg-btn qg-btn--outline px-3 py-2"
@@ -236,7 +236,7 @@ export default function HomeEmployer() {
         <>
           <Section
             title="Your job posts"
-            actionHref="/post"
+            actionHref="/gigs/create"
             actionLabel="Post new"
           />
           <Grid>
@@ -284,7 +284,7 @@ export default function HomeEmployer() {
         <>
           <Section
             title="Your applications"
-            actionHref="/find"
+            actionHref="/gigs"
             actionLabel="Find jobs"
           />
           <Grid>

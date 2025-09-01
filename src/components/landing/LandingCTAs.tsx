@@ -1,6 +1,5 @@
 import React from "react";
-import { withAppOrigin } from "@/lib/url";
-import { ROUTE_FIND, ROUTE_POSTS } from "@/config/routes";
+import Link from 'next/link';
 
 type Props = {
   findClassName?: string;
@@ -17,25 +16,25 @@ export default function LandingCTAs({
 }: Props) {
   return (
     <div className="flex gap-3">
-      {showFind && (
-        <a
-          data-testid="find-work-link"
-          href={withAppOrigin(ROUTE_FIND)}
-          className={findClassName}
-        >
-          Find Work
-        </a>
-      )}
-      {showPost && (
-        <a
-          data-testid="post-job-link"
-          href={withAppOrigin(ROUTE_POSTS)}
-          className={postClassName}
-        >
-          Post Job
-        </a>
-      )}
-    </div>
-  );
-}
+        {showFind && (
+          <Link
+            data-testid="find-work-link"
+            href="/gigs"
+            className={findClassName}
+          >
+            Find Work
+          </Link>
+        )}
+        {showPost && (
+          <Link
+            data-testid="post-job-link"
+            href="/gigs/create"
+            className={postClassName}
+          >
+            Post Job
+          </Link>
+        )}
+      </div>
+    );
+  }
 

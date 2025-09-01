@@ -54,40 +54,43 @@ const baseConfig = {
       },
     ];
   },
-  async redirects() {
-    return [
-      // legacy to canonical
-      { source: "/post", destination: "/posts", permanent: true },
-      { source: "/finds", destination: "/find", permanent: true },
-      {
-        source: "/simulan",
-        destination: "/start?intent=worker",
-        permanent: true,
-      },
-      { source: "/signup", destination: "/start", permanent: true },
-      {
-        source: "/start-worker",
-        destination: "/start?intent=worker",
-        permanent: true,
-      },
-      {
-        source: "/start-employer",
-        destination: "/start?intent=employer",
-        permanent: true,
-      },
-      { source: "/post-job", destination: "/post", permanent: true },
-      { source: "/gigs/new", destination: "/post", permanent: true },
-      { source: "/jobs", destination: "/find", permanent: true },
-      { source: "/jobs/:path*", destination: "/find", permanent: true },
-      { source: "/work", destination: "/find", permanent: true },
-    ];
-  },
-  async rewrites() {
-    return [
-      { source: "/employer/post", destination: "/post" },
-      { source: "/jobs/post", destination: "/post" },
-    ];
-  },
+    async redirects() {
+      return [
+        // legacy to canonical
+        { source: "/post", destination: "/gigs/create", permanent: true },
+        { source: "/posts", destination: "/gigs/create", permanent: true },
+        { source: "/post-job", destination: "/gigs/create", permanent: true },
+        { source: "/gigs/new", destination: "/gigs/create", permanent: true },
+        { source: "/find", destination: "/gigs", permanent: true },
+        { source: "/finds", destination: "/gigs", permanent: true },
+        { source: "/jobs", destination: "/gigs", permanent: true },
+        { source: "/jobs/:path*", destination: "/gigs", permanent: true },
+        { source: "/work", destination: "/gigs", permanent: true },
+        { source: "/find-work", destination: "/gigs", permanent: true },
+        {
+          source: "/simulan",
+          destination: "/start?intent=worker",
+          permanent: true,
+        },
+        { source: "/signup", destination: "/start", permanent: true },
+        {
+          source: "/start-worker",
+          destination: "/start?intent=worker",
+          permanent: true,
+        },
+        {
+          source: "/start-employer",
+          destination: "/start?intent=employer",
+          permanent: true,
+        },
+      ];
+    },
+    async rewrites() {
+      return [
+        { source: "/employer/post", destination: "/gigs/create" },
+        { source: "/jobs/post", destination: "/gigs/create" },
+      ];
+    },
 };
 
 const withAnalyzer =
