@@ -10,7 +10,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
-      - run: npm i -g @openai/codex
+      - name: Enable pnpm (corepack)
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm --version
+      - run: pnpm add -g @openai/codex
       - name: Run Codex review
         env:
           CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}

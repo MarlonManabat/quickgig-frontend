@@ -13,9 +13,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 ## Scripts
 
-- `npm run dev` - start development server
-- `npm run build` - build for production
-- `npm start` - run production build
+- `pnpm dev` - start development server
+- `pnpm build` - build for production
+- `pnpm start` - run production build
 
 ## CI
 
@@ -72,3 +72,13 @@ All landing CTAs resolve via `withAppOrigin()`.
 - `withAppOrigin()` resolves from `NEXT_PUBLIC_APP_ORIGIN | APP_ORIGIN | https://app.quickgig.ph`.
 - `/create` is a real page rendering an inline guard (`"please log in"`) when logged out; no redirects and no RPC.
 - Full E2E runs on every push to `main` and via manual dispatch. Playwright report is uploaded as an artifact.
+
+## Package manager
+
+We use **pnpm** (via Corepack).
+
+- First time: `corepack enable && corepack prepare pnpm@9 --activate`
+- Install: `pnpm install`
+- Build: `pnpm build`
+
+CI and Vercel are pinned to pnpm with `pnpm-lock.yaml` checked in.

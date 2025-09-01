@@ -1,6 +1,7 @@
 {
   "name": "quickgig-frontend",
   "private": true,
+  "packageManager": "pnpm@9",
   "scripts": {
     "dev": "next dev",
     "ci:verify": "node scripts/ci-verify.mjs",
@@ -17,7 +18,7 @@
     "seed": "node -r dotenv/config scripts/seed.mjs",
     "db:seed:ph": "tsx scripts/seed-ph-locations.ts",
     "db:seed:test": "node scripts/seedTestData.js",
-    "ci:install": "npm ci --no-audit --no-fund",
+    "ci:install": "pnpm install --frozen-lockfile",
     "ci:check-lock": "node scripts/ci-check-lock.mjs",
     "ci:seed": "node scripts/ci-seed.mjs",
     "autofix:ci": "tsx scripts/autofix.ts",
