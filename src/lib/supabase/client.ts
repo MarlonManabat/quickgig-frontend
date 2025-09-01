@@ -1,9 +1,9 @@
-// client-only Supabase auth (safe with anon key)
-import { createClient } from '@supabase/supabase-js';
+"use client";
+import { createBrowserClient } from "@supabase/ssr";
 
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-export const supabase = createClient(URL, ANON, {
-  auth: { persistSession: true, flowType: 'pkce' }
-});
+export function getSupabaseBrowser() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}

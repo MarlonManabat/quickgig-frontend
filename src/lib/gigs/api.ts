@@ -1,8 +1,9 @@
-import { getBrowserClient } from "@/lib/supabase/browser";
+"use client";
+import { getSupabaseBrowser } from "@/lib/supabase/client";
 import type { Gig } from "@/lib/db/types";
 import type { Insert, Update } from "@/types/db";
 
-const supabase = getBrowserClient();
+const supabase = getSupabaseBrowser();
 
 export function listGigs() {
   return supabase

@@ -1,6 +1,7 @@
+"use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { supabase } from "@/lib/supabaseClient";
+import { getSupabaseBrowser } from "@/lib/supabase/client";
 import { uploadAvatar } from "@/lib/avatar";
 import { toStr } from "@/lib/normalize";
 
@@ -10,6 +11,7 @@ export default function AvatarUploader() {
 
   useEffect(() => {
     (async () => {
+      const supabase = getSupabaseBrowser();
       const {
         data: { user },
       } = await supabase.auth.getUser();

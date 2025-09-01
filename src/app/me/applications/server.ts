@@ -1,5 +1,5 @@
 import 'server-only';
-import { userIdFromCookie, publicSupabase } from '@/lib/supabase/server';
+import { userIdFromCookie, getSupabaseServer } from '@/lib/supabase/server';
 
 type Row = {
   id: string;
@@ -14,8 +14,7 @@ export async function applicationsForUser(): Promise<{ items: Row[]; canMutate: 
     const uid = await userIdFromCookie();
     if (!uid) return { items: [], canMutate: false, issue: 'no user session' };
 
-    const supa = await publicSupabase?.();
-    if (!supa) return { items: mock(uid), canMutate: false, issue: 'supabase env not configured' };
+    const supa = getSupabaseServer();
 
     // Expect RLS to allow selecting own applications
     const { data, error } = await supa

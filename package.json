@@ -42,6 +42,7 @@
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/auth-helpers-shared": "^0.7.0",
     "@supabase/supabase-js": "^2.45.0",
+    "@supabase/ssr": "^0.5.0",
     "autoprefixer": "^10",
     "cookie": "^0.6.0",
     "globby": "^14",

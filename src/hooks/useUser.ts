@@ -1,10 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseBrowser } from '@/lib/supabase/client';
 
 export function useUser() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<null | { id: string; email?: string }>(null);
+
+  const supabase = getSupabaseBrowser();
 
   useEffect(() => {
     let mounted = true;

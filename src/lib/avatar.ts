@@ -1,7 +1,9 @@
-import { supabase } from "@/lib/supabaseClient";
+"use client";
+import { getSupabaseBrowser } from "@/lib/supabase/client";
 import type { Update } from "@/types/db";
 
 export async function uploadAvatar(file: File): Promise<string> {
+  const supabase = getSupabaseBrowser();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth?.user) throw new Error("Not authenticated");
 

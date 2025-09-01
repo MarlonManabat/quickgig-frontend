@@ -1,6 +1,7 @@
+"use client";
 import { useRouter } from 'next/router';
 import GigForm from './GigForm';
-import { getSupabaseBrowser } from '@/lib/supabase.client';
+import { getSupabaseBrowser } from '@/lib/supabase/client';
 
 interface Props {
   gig: any;
