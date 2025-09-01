@@ -41,8 +41,8 @@
     "@jobuntux/psgc": "^0.2.1",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/auth-helpers-shared": "^0.7.0",
-    "@supabase/supabase-js": "2.x",
-    "@supabase/ssr": "0.5.x",
+    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/ssr": "^0.5.0",
     "autoprefixer": "^10",
     "cookie": "^0.6.0",
     "nanoid": "^3.3.11",
@@ -60,7 +60,6 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^15.5.0",
     "@playwright/test": "^1.48.0",
-    "@supabase/supabase-js": "^2.45.0",
     "@types/cookie": "^0.6.0",
     "@types/node": "^20",
     "@types/react": "^18",
