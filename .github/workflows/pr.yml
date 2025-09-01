@@ -39,6 +39,11 @@ jobs:
         continue-on-error: true
         run: npm run lint
 
+      - name: prebuild
+        run: |
+          node ./scripts/check-dynamic-route-conflicts.mjs
+          npx --yes tsx ./scripts/assert-valid-revalidate.ts
+
       - name: Build
         env:
           NEXT_PUBLIC_SUPABASE_URL: http://localhost:3000/api/mock
