@@ -1,10 +1,12 @@
 export default function Loading() {
   return (
-    <main className="mx-auto max-w-3xl p-6 animate-pulse space-y-4">
-      <div className="h-8 w-2/3 bg-slate-200" />
-      <div className="h-4 w-1/3 bg-slate-200" />
-      <div className="h-4 w-1/4 bg-slate-200" />
-      <div className="h-40 w-full bg-slate-200" />
+    <main className="mx-auto max-w-5xl p-6 animate-pulse">
+      <div className="h-8 w-64 bg-slate-200 rounded mb-6" />
+      <div className="space-y-3">
+        <div className="h-24 bg-slate-200 rounded" />
+        <div className="h-24 bg-slate-200 rounded" />
+        <div className="h-24 bg-slate-200 rounded" />
+      </div>
     </main>
   );
 }
