@@ -37,3 +37,15 @@ export const gigs: MockGig[] = [
     created_at: new Date().toISOString(),
   },
 ];
+
+export function list() {
+  return gigs;
+}
+
+export function gigById(id: string | number) {
+  return gigs.find((g) => g.id === Number(id)) ?? null;
+}
+
+export function apply(gigId: string | number) {
+  return { id: `mock-${Date.now()}`, gig_id: String(gigId), status: 'submitted' as const };
+}
