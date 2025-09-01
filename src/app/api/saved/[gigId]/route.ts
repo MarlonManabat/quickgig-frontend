@@ -1,30 +1,25 @@
-'use server';
-
-import { NextResponse } from 'next/server';
+// No 'use server' here.
 import { userIdFromCookie } from '@/lib/supabase/server';
 import { saveGig, unsaveGig } from '@/lib/saved/store';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function PUT(_req: Request, { params }: { params: { gigId: string } }) {
+type Body = { saved?: boolean }; // saved=true -> save; false -> unsave
+
+export async function PUT(req: Request, { params }: { params: { gigId: string } }) {
   const uid = await userIdFromCookie();
-  if (!uid) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  if (!uid) return new Response('Unauthorized', { status: 401 });
 
-  const gigId = params?.gigId?.trim();
-  if (!gigId) return NextResponse.json({ error: 'invalid_gig' }, { status: 400 });
+  const { saved }: Body = await req.json().catch(() => ({} as Body));
+  if (typeof saved !== 'boolean') return new Response('Missing saved flag', { status: 400 });
 
-  await saveGig(uid, gigId);
-  return NextResponse.json({ ok: true });
+  if (saved) {
+    await saveGig({ uid, gigId: params.gigId });
+  } else {
+    await unsaveGig({ uid, gigId: params.gigId });
+  }
+
+  return Response.json({ ok: true });
 }
 
-export async function DELETE(_req: Request, { params }: { params: { gigId: string } }) {
-  const uid = await userIdFromCookie();
-  if (!uid) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-
-  const gigId = params?.gigId?.trim();
-  if (!gigId) return NextResponse.json({ error: 'invalid_gig' }, { status: 400 });
-
-  await unsaveGig(uid, gigId);
-  return NextResponse.json({ ok: true });
-}

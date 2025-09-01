@@ -62,19 +62,22 @@ async function removeDb(uid: UserId, gid: GigId): Promise<void> {
   if (error) throw error;
 }
 
-export async function listSaved(uid: UserId): Promise<GigId[]> {
+export async function listSaved({ uid }: { uid: UserId }): Promise<GigId[]> {
   if (SUPABASE_URL && SUPABASE_SERVICE_ROLE) return listDb(uid);
-  mem.ensure(); return mem.list(uid);
+  mem.ensure();
+  return mem.list(uid);
 }
 
-export async function saveGig(uid: UserId, gid: GigId): Promise<void> {
-  if (!gid) return;
-  if (SUPABASE_URL && SUPABASE_SERVICE_ROLE) return addDb(uid, gid);
-  mem.ensure(); mem.add(uid, gid);
+export async function saveGig({ uid, gigId }: { uid: UserId; gigId: GigId }): Promise<void> {
+  if (!gigId) return;
+  if (SUPABASE_URL && SUPABASE_SERVICE_ROLE) return addDb(uid, gigId);
+  mem.ensure();
+  mem.add(uid, gigId);
 }
 
-export async function unsaveGig(uid: UserId, gid: GigId): Promise<void> {
-  if (!gid) return;
-  if (SUPABASE_URL && SUPABASE_SERVICE_ROLE) return removeDb(uid, gid);
-  mem.ensure(); mem.remove(uid, gid);
+export async function unsaveGig({ uid, gigId }: { uid: UserId; gigId: GigId }): Promise<void> {
+  if (!gigId) return;
+  if (SUPABASE_URL && SUPABASE_SERVICE_ROLE) return removeDb(uid, gigId);
+  mem.ensure();
+  mem.remove(uid, gigId);
 }
