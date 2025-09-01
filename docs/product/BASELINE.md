@@ -93,6 +93,8 @@
 #### FEAT-TICKETS-GATE — Tickets gating (3 free, ₱20 after)
 | Date | Ref | Subject |
 |------|-----|---------|
+| 2025-09-01 | #544 | Merge pull request #544 from MarlonManabat/codex/add-free-starter-tickets-for-new-users |
+| 2025-09-01 | daf6b23 | feat(tickets): seed free starter tickets on first login and ensure user_tickets row exists |
 | 2025-09-01 | #541 | Merge pull request #541 from MarlonManabat/codex/add-ticket-balance-badge-and-link |
 | 2025-09-01 | c73464d | feat(ui): header tickets badge and quick Buy link to /billing/tickets |
 | 2025-09-01 | #539 | Merge pull request #539 from MarlonManabat/codex/add-gcash-upload-and-polling-to-tickets-page |
