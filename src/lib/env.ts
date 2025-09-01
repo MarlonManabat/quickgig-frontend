@@ -1,17 +1,16 @@
-import { z } from 'zod';
-
-const Env = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
-  SUPABASE_SERVICE_ROLE: z.string().optional()
-});
-
-export const env = Env.parse(process.env);
-
-export type ServerEnvKeys = 'SUPABASE_SERVICE_ROLE' | 'SEED_ADMIN_EMAIL' | 'SEED_ADMIN_PASSWORD';
-
-export function requireServer<K extends ServerEnvKeys>(key: K): string {
-  const v = process.env[key];
-  if (!v) throw new Error(`Missing required server env: ${key}`);
+// No side effects; import when needed.
+function read(key: string, fallback?: string) {
+  const v = process.env[key] ?? fallback;
   return v;
 }
+
+export const ENV = {
+  NODE_ENV: read('NODE_ENV', 'development')!,
+  APP_ORIGIN: read('NEXT_PUBLIC_APP_ORIGIN', 'http://localhost:3000')!,
+  SUPABASE_URL: read('NEXT_PUBLIC_SUPABASE_URL', ''),
+  SUPABASE_ANON: read('NEXT_PUBLIC_SUPABASE_ANON_KEY', ''),
+  // server-only (not used yet here)
+  // SUPABASE_SERVICE_ROLE: read('SUPABASE_SERVICE_ROLE', ''),
+};
+
+export const IS_PROD = ENV.NODE_ENV === 'production';
