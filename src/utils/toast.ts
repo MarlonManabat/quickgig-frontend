@@ -7,6 +7,10 @@ export const toast = {
     if (typeof window !== "undefined") window.alert(message);
     else console.error("ERROR:", message);
   },
+  info(message: string) {
+    if (typeof window !== "undefined") window.alert(message);
+    else console.log("INFO:", message);
+  },
 };
 
 export default toast;

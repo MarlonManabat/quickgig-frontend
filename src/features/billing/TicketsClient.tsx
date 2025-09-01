@@ -1,56 +1,89 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import toast from '@/utils/toast';
 import PaymentProofModal from '@/components/PaymentProofModal';
 import { TICKET_PRICE_PHP } from '@/lib/payments';
 
-type Props = { balance: number; next?: string | null };
+type Props = {
+  initialBalance: number;
+  next: string | null;
+};
 
-export default function TicketsClient({ balance, next }: Props) {
+export default function TicketsClient({ initialBalance, next }: Props) {
+  const [balance, setBalance] = useState(initialBalance);
   const [open, setOpen] = useState(false);
-  const [pending, setPending] = useState(false);
-  const [bal, setBal] = useState(balance);
-  const router = useRouter();
+  const [uploading, setUploading] = useState(false);
+  const [polling, setPolling] = useState(false);
 
   useEffect(() => {
-    if (!pending) return;
+    if (!polling) return;
+    let tries = 0;
     const id = setInterval(async () => {
-      const res = await fetch('/api/billing/status');
-      if (res.ok) {
-        const j = await res.json();
-        const t = j.tickets ?? 0;
-        setBal(t);
-        if (t > balance) {
-          router.replace(next || '/gigs/create');
+      tries++;
+      try {
+        const r = await fetch('/api/billing/balance', { cache: 'no-store' });
+        if (r.ok) {
+          const { balance } = await r.json();
+          setBalance(balance);
+          if (balance >= 1) {
+            toast.success('Tickets credited!');
+            if (next) location.replace(next);
+            else location.replace('/gigs/create');
+          }
         }
+      } catch {}
+      if (tries > 22) {
+        clearInterval(id);
+        setPolling(false);
+        toast.info('Still pending approval. We’ll credit your ticket once verified.');
       }
-    }, 5000);
+    }, 8000);
     return () => clearInterval(id);
-  }, [pending, next, balance, router]);
+  }, [polling, next]);
+
+  function handleProofSubmitted() {
+    toast.success('Proof submitted. Waiting for admin approval…');
+    setPolling(true);
+  }
 
   return (
     <div className="space-y-4">
-      <p>Current ticket balance: {bal}</p>
+      <div className="rounded-lg border p-3">
+        <div className="text-sm opacity-70">Current tickets</div>
+        <div className="text-3xl font-semibold">{balance}</div>
+      </div>
+
       <button
         className="rounded-xl border px-4 py-2"
         onClick={() => setOpen(true)}
+        disabled={uploading}
       >
-        Buy Ticket
+        Upload GCash proof
       </button>
-      {pending && <p>Pending admin approval…</p>}
+
       <PaymentProofModal
         open={open}
-        onClose={() => {
-          setOpen(false);
-          setPending(true);
-        }}
+        onClose={() => setOpen(false)}
         pricePHP={TICKET_PRICE_PHP}
         credits={1}
         next={next || undefined}
+        onStart={() => setUploading(true)}
+        onDone={() => { setUploading(false); handleProofSubmitted(); }}
+        onError={() => { setUploading(false); toast.error('Upload failed. Please try again.'); }}
       />
-      {next && <input type="hidden" name="next" value={next} />}
+
+      {!polling && (
+        <p className="text-sm opacity-70">
+          After you upload your GCash receipt, we’ll automatically credit your ticket once approved.
+        </p>
+      )}
+
+      {polling && (
+        <p className="text-sm">
+          Waiting for approval… we’ll check every few seconds. You can leave this page.
+        </p>
+      )}
     </div>
   );
 }
-
