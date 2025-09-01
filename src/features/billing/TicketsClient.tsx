@@ -49,6 +49,11 @@ export default function TicketsClient({ initialBalance, next }: Props) {
 
   return (
     <div className="space-y-4">
+      {initialBalance >= 1 && (
+        <div className="rounded-lg border p-3 bg-green-50">
+          You’ve received {initialBalance} free starter {initialBalance === 1 ? 'ticket' : 'tickets'} 🎉
+        </div>
+      )}
       <div className="rounded-lg border p-3">
         <div className="text-sm opacity-70">Current tickets</div>
         <div className="text-3xl font-semibold">{balance}</div>
