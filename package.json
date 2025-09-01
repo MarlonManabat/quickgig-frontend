@@ -9,7 +9,7 @@
     "start": "next start -p 3000",
     "start:preview": "next start -p 3000",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "next lint --no-error-on-unmatched-pattern || eslint .",
+    "lint": "next lint --max-warnings=0",
     "build:prod": "next build",
     "start:prod": "next start -p 3000",
     "analyze": "ANALYZE=true next build",

@@ -47,7 +47,7 @@ export default function ApplicationsPageClient({ initialApps }: { initialApps: A
       </thead>
       <tbody>
         {items.map((a) => (
-          <tr key={a.id} className="border-t">
+          <tr data-testid="application-item" key={a.id} className="border-t">
             <td className="py-2">{a.title}</td>
             <td className="py-2">{a.company}</td>
             <td className="py-2 capitalize">{a.status}</td>

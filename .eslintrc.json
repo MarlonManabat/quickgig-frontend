@@ -27,5 +27,50 @@
       }
     ],
     "no-restricted-imports": ["error", { "patterns": ["public/*"] }]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/app/**/page.ts",
+        "src/app/**/page.tsx",
+        "src/app/**/layout.ts",
+        "src/app/**/layout.tsx",
+        "src/app/**/loading.tsx",
+        "src/app/**/error.tsx",
+        "src/app/**/template.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react",
+                "importNames": [
+                  "useState",
+                  "useEffect",
+                  "useRef",
+                  "useMemo",
+                  "useCallback",
+                  "useReducer",
+                  "useTransition",
+                  "useOptimistic",
+                  "useActionState"
+                ]
+              },
+              {
+                "name": "next/navigation",
+                "importNames": [
+                  "useRouter",
+                  "usePathname",
+                  "useSearchParams"
+                ]
+              }
+            ],
+            "patterns": ["react-hot-toast*", "@/utils/toast"]
+          }
+        ]
+      }
+    }
+  ]
 }
