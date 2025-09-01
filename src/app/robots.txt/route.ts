@@ -1,9 +1,18 @@
+import { getOrigin } from '@/lib/origin';
+
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export function GET() {
+
+export async function GET() {
+  const origin = getOrigin();
   const body = [
     'User-agent: *',
     'Allow: /',
-    'Sitemap: https://'+process.env.NEXT_PUBLIC_APP_ORIGIN?.replace(/^https?:\/\//,'')+'/sitemap.xml'
+    `Sitemap: ${origin}/sitemap.xml`,
+    '',
   ].join('\n');
-  return new Response(body, { headers: { 'Content-Type': 'text/plain' } });
+
+  return new Response(body, {
+    headers: { 'content-type': 'text/plain' },
+  });
 }
