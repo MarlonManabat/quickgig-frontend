@@ -1,3 +1,6 @@
+// Do NOT add "use server" in this file.
+// Route handlers may export GET/POST/etc and a few config exports (runtime, dynamic).
+
 import { userIdFromCookie } from '@/lib/supabase/server';
 import {
   moderateApplication,
@@ -17,9 +20,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
   let body: Body = {};
   try {
-    body = await req.json();
+    body = (await req.json()) as Body;
   } catch {
-    /* keep default empty body */
+    /* allow empty body; will fail validation below */
   }
 
   const action = body.action;
@@ -28,13 +31,13 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   }
 
   try {
-    const result = await moderateApplication({ id: params.id, action, by: uid });
+    const result = await moderateApplication({ id: params.id, action, uid });
     return Response.json(result);
-  } catch (e) {
-    if (e instanceof ForbiddenError) return new Response('Forbidden', { status: 403 });
-    if (e instanceof NotFoundError) return new Response('Not Found', { status: 404 });
-    if (e instanceof BadRequestError) return new Response(e.message, { status: 400 });
-    console.error(e);
+  } catch (err) {
+    if (err instanceof ForbiddenError) return new Response(err.message, { status: 403 });
+    if (err instanceof NotFoundError) return new Response(err.message, { status: 404 });
+    if (err instanceof BadRequestError) return new Response(err.message, { status: 400 });
+    console.error('applications/moderate error', err);
     return new Response('Internal Server Error', { status: 500 });
   }
 }
