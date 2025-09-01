@@ -1,0 +1,73 @@
+name: Deploy via Vercel Hooks (main + label:deploy)
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'next.config.*'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'vercel.json'
+  pull_request:
+    types: [ labeled, synchronize ]
+    paths:
+      - 'src/**'
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'next.config.*'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - 'vercel.json'
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: 'preview or production'
+        required: false
+        default: 'preview'
+      url:
+        description: 'override hook url'
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decide target
+        id: pick
+        run: |
+          KIND="skip"
+          HOOK=""
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == "main" ]]; then
+            KIND="production"
+            HOOK="${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Deploy preview ONLY if the PR has label "deploy"
+            HAS_LABEL=$(jq -r '.pull_request.labels[].name' <<< '${{ toJson(github.event) }}' | grep -i '^deploy$' || true)
+            if [[ -n "$HAS_LABEL" ]]; then
+              KIND="preview"
+              HOOK="${{ secrets.VERCEL_PREVIEW_HOOK_URL }}"
+            fi
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            KIND="${{ github.event.inputs.kind }}"
+            HOOK="${{ github.event.inputs.url }}"
+          fi
+          echo "kind=$KIND" >> $GITHUB_OUTPUT
+          echo "hook=$HOOK" >> $GITHUB_OUTPUT
+
+      - name: Skip if not requested
+        if: steps.pick.outputs.kind == 'skip' || steps.pick.outputs.hook == ''
+        run: echo "No deploy requested."
+
+      - name: Trigger Vercel Deploy Hook
+        if: steps.pick.outputs.kind != 'skip' && steps.pick.outputs.hook != ''
+        run: curl -fsSL -X POST "${{ steps.pick.outputs.hook }}"

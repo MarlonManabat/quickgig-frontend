@@ -1,70 +1,71 @@
+#!/usr/bin/env node
 /**
- * Vercel ignoreCommand:
- * - exit(0)  => skip deployment
- * - exit(1+) => proceed with build
+ * Vercel Ignored Build Step — return 0 to SKIP deploy, 1 to proceed.
+ * Never throws; defaults to proceed if uncertain (to avoid skipping real changes).
  *
- * We proceed only if runtime-relevant files changed.
- * You can force a deploy by including "[force deploy]" in the commit title/body
- * or setting env FORCE_VERCEL_DEPLOY=1 in the Vercel UI.
+ * Skip when ONLY docs/CI/tests/workflows changed, or commit message requests skip.
  */
-const { execSync } = require('node:child_process');
 
-function log(msg) { process.stdout.write(`${msg}\n`); }
+const { execSync } = require('node:child_process');
+const path = require('node:path');
+
+function safeLog(msg) { process.stdout.write(`[ignore-build] ${msg}\n`); }
 
 try {
-  // Force deploy knobs
-  const forceEnv = process.env.FORCE_VERCEL_DEPLOY === '1';
-  const commitMsg = (process.env.VERCEL_GIT_COMMIT_MESSAGE || '').toLowerCase();
-  const forceMsg = commitMsg.includes('[force deploy]');
-  if (forceEnv || forceMsg) {
-    log('force deploy requested -> proceed');
-    process.exit(1);
-  }
-
-  // Base/head SHAs provided by Vercel
-  const base = process.env.VERCEL_GIT_PREVIOUS_SHA || 'origin/main';
-  const head = process.env.VERCEL_GIT_COMMIT_SHA || 'HEAD';
-
-  // List changed files
-  const diff = execSync(`git diff --name-only ${base} ${head}`, { encoding: 'utf8' })
-    .split('\n')
-    .map(s => s.trim())
-    .filter(Boolean);
-
-  if (!diff.length) {
-    log('no changed files detected -> skip deploy');
+  const msg = process.env.VERCEL_GIT_COMMIT_MESSAGE || '';
+  if (/\[(skip deploy|docs|chore-ci)\]/i.test(msg)) {
+    safeLog(`Skipping due to commit tag: "${msg}"`);
     process.exit(0);
   }
 
-  // Files that SHOULD trigger a build/deploy
-  const shouldBuild = diff.some((p) => {
-    return (
-      // App/runtime code & assets
-      /^src\//.test(p) ||
-      /^app\//.test(p) ||
-      /^public\//.test(p) ||
-      // Package & lockfiles
-      /^package(-lock)?\.json$/.test(p) ||
-      /^pnpm-lock\.yaml$/.test(p) ||
-      /^yarn\.lock$/.test(p) ||
-      // Next/Vercel runtime config
-      /^next\.config\.(js|mjs|cjs|ts)$/.test(p) ||
-      /^vercel\.json$/.test(p) ||
-      // TypeScript project config that may change build output
-      /^tsconfig\.json$/.test(p) ||
-      /^next-env\.d\.ts$/.test(p)
-    );
-  });
-
-  if (shouldBuild) {
-    log('runtime-relevant changes found -> proceed with deploy');
+  // Determine diff range
+  const a = process.env.VERCEL_GIT_PREVIOUS_SHA || '';
+  const b = process.env.VERCEL_GIT_COMMIT_SHA || '';
+  let out = '';
+  try {
+    if (a && b) out = execSync(`git diff --name-only ${a} ${b}`, { stdio: ['ignore','pipe','ignore'] }).toString();
+    else out = execSync(`git diff --name-only HEAD~1`, { stdio: ['ignore','pipe','ignore'] }).toString();
+  } catch {
+    // Fall back to "proceed"
+    safeLog('No git diff available; proceeding.');
     process.exit(1);
-  } else {
-    log('only docs/CI/misc changes -> skip deploy');
+  }
+
+  const changed = out.split('\n').map(s => s.trim()).filter(Boolean);
+  if (!changed.length) {
+    safeLog('No changed files; skipping.');
     process.exit(0);
   }
-} catch (err) {
-  // On any error, proceed to avoid accidentally blocking a real deploy
-  console.error('ignore-build error (proceeding with deploy):', err?.message || err);
+
+  // Paths that require a deploy
+  const IMPACT = [
+    'src/', 'app/', 'components/', 'lib/', 'public/',
+    'next.config', 'package.json', 'pnpm-workspace.yaml', 'package-lock.json', 'pnpm-lock.yaml',
+    'tsconfig', 'vercel.json', 'supabase/', 'prisma/'
+  ];
+
+  // Safe paths (docs/ci/tests) — if ALL changes are in these, skip
+  const SAFE = [
+    'docs/', '.github/', 'tests/', 'playwright.', 'CHANGELOG', 'README', 'LICENSE',
+    'scripts/ci/', '.vscode/', '.idea/', '.prettierrc', '.eslintrc', '.env', '.env.'
+  ];
+
+  const isImpact = (f) => IMPACT.some(p => f.startsWith(p) || f.includes(p));
+  const isSafe   = (f) => SAFE.some(p => f.startsWith(p) || f.includes(p))
+                       || /\.(md|mdx|png|jpg|svg|gif|yml|yaml)$/.test(f);
+
+  const anyImpact = changed.some(isImpact);
+  const allSafe   = changed.every(isSafe);
+
+  if (!anyImpact && allSafe) {
+    safeLog(`Only safe paths changed (${changed.length} files); skipping.`);
+    process.exit(0);
+  }
+
+  safeLog(`App-impacting changes detected; proceeding.`);
+  process.exit(1);
+} catch (e) {
+  // On error, TO BE SAFE: proceed (do not skip a real deploy).
+  safeLog(`Error in ignore script; proceeding. ${e?.message || e}`);
   process.exit(1);
 }
