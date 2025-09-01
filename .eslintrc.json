@@ -77,6 +77,31 @@
           }
         ]
       }
+    },
+    {
+      "files": ["src/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-syntax": [
+          "warn",
+          {
+            "selector": "CallExpression[callee.name='fetch'] Literal[value^='/api/locations']",
+            "message": "Do not fetch locations from API; use static PSGC dataset (FEAT-PSGC-STATIC)."
+          }
+        ],
+        "no-restricted-imports": [
+          "warn",
+          {
+            "patterns": [
+              "@/lib/locations*",
+              "@/services/locations*",
+              "@/*/api/locations*"
+            ],
+            "paths": [
+              { "name": "@/utils/toast", "message": "Use only in client files." }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
