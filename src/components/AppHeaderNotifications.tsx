@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import type { Database } from '@/types/db';
+import { supabaseBrowser } from '@/lib/supabase/browser';
 import { safeSelect } from '@/lib/supabase-safe';
 
 type NotificationRow = {
@@ -15,7 +14,7 @@ type NotificationRow = {
 };
 
 export default function AppHeaderNotifications() {
-  const supa = createClientComponentClient<Database>();
+  const supa = supabaseBrowser;
   const [items, setItems] = React.useState<NotificationRow[]>([]);
   const [loading, setLoading] = React.useState(true);
 

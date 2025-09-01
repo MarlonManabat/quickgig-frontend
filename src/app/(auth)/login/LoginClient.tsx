@@ -1,12 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { supabaseBrowser } from '@/lib/supabase/browser';
 import { safeNext } from '@/lib/safe-next';
 
-export const dynamic = 'force-dynamic';
-
-export default function LoginPage() {
+export default function LoginClient() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -19,7 +17,7 @@ export default function LoginPage() {
     const dest = `${location.origin}/auth/confirm${
       next ? `?next=${encodeURIComponent(next)}` : ''
     }`;
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabaseBrowser.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: dest }
     });

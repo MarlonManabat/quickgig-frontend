@@ -2,11 +2,26 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
-import { createServerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import type { Database } from '@/types/db';
 
+export function getServerSupabase() {
+  const cookieStore = cookies();
+  const url = process.env.SUPABASE_URL!;
+  const anon = process.env.SUPABASE_ANON_KEY!;
+  if (!url || !anon) throw new Error('SUPABASE_URL/ANON key missing');
+
+  return createServerClient<Database>(url, anon, {
+    cookies: {
+      get(name: string) { return cookieStore.get(name)?.value; },
+      set() {},
+      remove() {},
+    },
+  });
+}
+
 export async function adminSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = process.env.SUPABASE_URL;
   const service = process.env.SUPABASE_SERVICE_ROLE;
 
   if (!url || !service) return null;
@@ -17,20 +32,11 @@ export async function adminSupabase() {
 }
 
 export async function publicSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) return null;
-
-  const cookieStore = cookies();
-  return createServerClient<Database>(url, anon, {
-    cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
-      },
-      set() {},
-      remove() {},
-    },
-  });
+  try {
+    return getServerSupabase();
+  } catch {
+    return null;
+  }
 }
 
 export async function userIdFromCookie() {

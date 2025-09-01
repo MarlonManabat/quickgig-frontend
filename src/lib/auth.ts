@@ -5,14 +5,14 @@ export const isAdmin = (email?: string) =>
     .map((s) => s.trim())
     .includes((email || "").toLowerCase());
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { supabaseBrowser } from "@/lib/supabase/browser";
 import type { Database } from "@/types/db";
 
 export async function sendMagicLink(
   email: string,
   params?: { next?: string; role?: string },
 ) {
-  const supabase = createClientComponentClient<Database>();
+  const supabase = supabaseBrowser;
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://app.quickgig.ph";
   const qp = new URLSearchParams();
