@@ -37,11 +37,18 @@ const mock = (() => {
   };
 })();
 
-export async function moderateApplication(
-  employerUid: string,
-  applicationId: string,
-  action: 'approve' | 'reject'
-): Promise<void> {
+export async function moderateApplication({
+  by,
+  id,
+  action,
+}: {
+  by: string;
+  id: string;
+  action: 'approve' | 'reject';
+}): Promise<{ ok: true }> {
+  const applicationId = id?.trim();
+  if (!applicationId) throw new BadRequestError('invalid_id');
+
   const nextStatus: Status = action === 'approve' ? 'hired' : 'rejected';
 
   // If we have service credentials, do a real update with owner check.
@@ -68,7 +75,7 @@ export async function moderateApplication(
       .single();
 
     if (gigErr || !gig) throw new NotFoundError('gig');
-    if (gig.owner_id !== employerUid) throw new ForbiddenError('not owner');
+    if (gig.owner_id !== by) throw new ForbiddenError('not owner');
 
     // 3) update status
     const { error: updErr, count } = await supa
@@ -80,7 +87,7 @@ export async function moderateApplication(
 
     if (updErr) throw updErr;
     if (!count) throw new NotFoundError('application');
-    return;
+    return { ok: true } as const;
   }
 
   // Fallback mock (Preview / local without secrets)
@@ -89,7 +96,8 @@ export async function moderateApplication(
   if (!row) throw new NotFoundError('application');
   // In mock, we also enforce ownership.
   // (Seeded rows should set ownerId to the employer who posted the gig.)
-  if (row && employerUid !== row.ownerId) throw new ForbiddenError('not owner');
+  if (row && by !== row.ownerId) throw new ForbiddenError('not owner');
   mock.set(applicationId, nextStatus);
+  return { ok: true } as const;
 }
 
