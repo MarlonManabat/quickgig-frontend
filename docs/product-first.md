@@ -29,3 +29,11 @@ back to mock data when secrets are absent; replace by real DB later.
 The `/owner/gigs` pages and APIs are dynamic and fall back to in-memory mocks
 when Supabase secrets are absent. Preview builds can list gigs, view applicants,
 and update statuses without hitting the database.
+
+## Candidate dashboard
+
+`/me/applications` lists a worker's own gig applications. It is dynamic and uses mock data when Supabase secrets are absent or policies block reads. Withdraw buttons are disabled in preview when writes aren't allowed.
+
+## Withdraw API
+
+`POST /api/applications/:id/withdraw` sets an application's status to `withdrawn`. When Supabase write access is missing, the endpoint responds with `501` and performs no update.
