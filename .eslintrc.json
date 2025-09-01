@@ -27,5 +27,56 @@
       }
     ],
     "no-restricted-imports": ["error", { "patterns": ["public/*"] }]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/app/**/page.tsx",
+        "src/app/**/layout.tsx"
+      ],
+      "excludedFiles": [
+        "src/app/**/error.tsx",
+        "src/app/**/loading.tsx",
+        "src/app/**/not-found.tsx",
+        "src/app/**/global-error.tsx",
+        "src/app/login/**/page.tsx",
+        "src/app/auth/**/page.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react",
+                "importNames": [
+                  "useState",
+                  "useEffect",
+                  "useRef",
+                  "useMemo",
+                  "useCallback",
+                  "useReducer",
+                  "useTransition",
+                  "useOptimistic",
+                  "useActionState"
+                ]
+              },
+              {
+                "name": "next/navigation",
+                "importNames": [
+                  "useRouter",
+                  "usePathname",
+                  "useSearchParams"
+                ]
+              }
+            ],
+            "patterns": [
+              "react-hot-toast*",
+              "@/utils/toast"
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

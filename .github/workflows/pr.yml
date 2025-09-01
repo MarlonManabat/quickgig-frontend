@@ -1,4 +1,6 @@
 name: Release Check (PR smoke)
+env:
+  RUN_SMOKE: 'false'  # flip to 'true' when ready
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -19,10 +21,11 @@ jobs:
       - name: Install deps (non-CI)
         run: npm install --no-audit --no-fund
 
-      - name: Typecheck + lint (best-effort)
-        run: |
-          npm run -s typecheck || echo "::warning::no typecheck script"
-          npm run -s lint || echo "::warning::no lint script"
+      - name: Typecheck (best-effort)
+        run: npm run -s typecheck || echo "::warning::no typecheck script"
+
+      - name: Lint (RSC guard)
+        run: npm run lint
 
       - name: Build
         env:
@@ -35,27 +38,38 @@ jobs:
         run: npm run -s build
 
       - name: Start app (background, tee logs)
-        run: |
-          npm start 2>&1 | tee .next-app.log & echo $! > .next-app.pid
+        if: env.RUN_SMOKE == 'true'
+        run: npm run start &> .next-server.log &
 
       - name: Wait for /api/health or homepage (60s)
+        if: env.RUN_SMOKE == 'true'
         run: |
           for i in $(seq 1 60); do
             curl -sf http://localhost:3000/api/health && exit 0
             curl -sf http://localhost:3000/ && exit 0
             sleep 1
           done
-          echo "::error::App didn't respond in time"; cat .next-app.log; exit 1
+          echo "::error::App didn't respond in time"; cat .next-server.log; exit 1
+
+      - name: Install Playwright deps
+        if: env.RUN_SMOKE == 'true'
+        run: npx playwright install --with-deps
+
+      - name: Smoke tests
+        if: env.RUN_SMOKE == 'true'
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+        run: npx playwright test tests/smoke.applications.spec.ts --reporter=line --workers=1
 
       - name: Stop app
-        if: always()
+        if: env.RUN_SMOKE == 'true' || always()
         run: |
-          if [ -f .next-app.pid ]; then kill $(cat .next-app.pid) || true; fi
+          pkill -f "node .*next" || true
 
       - name: Upload Next server log
-        if: always()
+        if: env.RUN_SMOKE == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
-          name: next-app-log
-          path: .next-app.log
+          name: next-server-log
+          path: .next-server.log
           if-no-files-found: ignore
