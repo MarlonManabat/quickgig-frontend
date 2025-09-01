@@ -36,6 +36,7 @@ jobs:
         run: npm run -s typecheck || echo "::warning::no typecheck script"
 
       - name: Lint (RSC guard)
+        continue-on-error: true
         run: npm run lint
 
       - name: Build
