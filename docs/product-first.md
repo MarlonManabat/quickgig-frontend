@@ -30,9 +30,14 @@ The `/owner/gigs` pages and APIs are dynamic and fall back to in-memory mocks
 when Supabase secrets are absent. Preview builds can list gigs, view applicants,
 and update statuses without hitting the database.
 
-## Ops & UX scaffolding
+## Candidate dashboard
+`/me/applications` lists a worker's gig applications. It is dynamic (no SSG) and uses mock data when Supabase secrets are absent or policies block reads.
 
-- Health endpoint `/api/health` and `/status` page expose basic runtime info without secrets.
-- Dynamic pages use preview-safe fallbacks when Supabase envs are missing.
-- Major routes ship `loading.tsx` skeletons to mask latency while fetching.
+## Withdraw API
+`POST /api/applications/:id/withdraw` sets an application's status to `withdrawn`. When Supabase write access is missing, the endpoint responds with a stubbed 200 and an echo payload so flows still work in Preview.
+
+## Ops & UX scaffolding
+- Health endpoints `/api/health` and `/api/status` expose basic runtime info without secrets.
+- Dynamic pages use `loading.tsx` skeletons to mask latency while fetching.
 - `robots.txt` and `sitemap.xml` serve canonical URLs and fall back to minimal entries if Supabase is unavailable.
+main
