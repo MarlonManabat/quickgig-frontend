@@ -1,0 +1,25 @@
+# Features we track across PRs (extend as we ship)
+- id: FEAT-RSC-GUARD
+  name: RSC hook guard
+  match: "(rsc|use client|client component|useState only works|server component split)"
+- id: FEAT-APPL-CLIENT-SPLIT
+  name: Applications page split
+  match: "(applications page|split.*client|ApplicationsPageClient)"
+- id: FEAT-CI-SMOKE-TOGGLE
+  name: CI smoke toggle
+  match: "(playwright|smoke test|RUN_SMOKE|e2e)"
+- id: FEAT-PSGC-STATIC
+  name: Static PSGC dataset & GeoSelect
+  match: "(psgc|psa|geo.?select|locations dataset|regions|provinces|cities|municipalities)"
+- id: FEAT-TICKETS-GATE
+  name: Tickets gating (3 free, ₱20 after)
+  match: "(ticket|tickets|deduct|refund|agree|buy|withdraw)"
+- id: FEAT-GCASH-FLOW
+  name: GCash receipts & review
+  match: "(gcash|receipt|proof.*upload|admin review)"
+- id: FEAT-ROUTE-UNIFY
+  name: Route unification (Landing ↔ App)
+  match: "(post job|find work|shared component|route unif(y|ication)|landing)"
+- id: FEAT-MSG-NOTIFS
+  name: Messaging & notifications
+  match: "(message|thread|chat|notification|offer|hire)"

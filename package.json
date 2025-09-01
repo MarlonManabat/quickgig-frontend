@@ -26,6 +26,7 @@
     "codex:billing": "codex run -p ./codex/tasks/manual_gcash.md",
     "codex:locations": "codex run -p ./codex/tasks/locations_cascade.md",
     "codex:review": "codex review --config ./codex/config.json",
+    "baseline:backfill": "node scripts/baseline/backfill.js",
     "typecheck:scripts": "tsc -p scripts/tsconfig.json",
     "seed:demo": "tsx scripts/seed-demo.ts",
     "test": "echo \"E2E disabled while product is WIP\" && exit 0"
