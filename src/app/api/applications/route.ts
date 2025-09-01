@@ -2,13 +2,10 @@ import { NextResponse } from 'next/server';
 import { adminSupabase, userIdFromCookie } from '@/lib/supabase/server';
 import { apply as mockApply } from '@/lib/mock/gigs';
 import { list as mockList } from '@/lib/mock/applications';
-import type {
-  Application,
-  ApplicationRequest,
-  ApplicationCreateResponse,
-} from '@/types/applications';
+import type { Application, ApplicationCreateResponse } from '@/types/applications';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   const supa = await adminSupabase();
@@ -33,32 +30,32 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  let body: ApplicationRequest;
+  let body: any;
   try {
-    body = (await req.json()) as ApplicationRequest;
+    body = await req.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
   if (!body.gig_id) {
     return NextResponse.json({ error: 'gig_id required' }, { status: 400 });
   }
+  const userId = typeof body.user_id === 'string' && body.user_id ? body.user_id : 'anon';
 
   const supa = await adminSupabase();
-  const userId = (await userIdFromCookie()) ?? 'anon';
 
   if (!supa) {
     const res = mockApply(body.gig_id);
-    return NextResponse.json({ id: res.id, status: res.status });
+    return NextResponse.json({ id: res.id, status: res.status }, { status: 201 });
   }
 
   try {
     const { data, error } = await supa
-      .from('applications')
-      .insert({ user_id: userId, gig_id: body.gig_id, status: 'submitted' })
+      .from('gig_applications')
+      .insert({ gig_id: body.gig_id, applicant: userId, status: 'submitted' })
       .select('id,status')
       .single();
     if (error) throw error;
-    return NextResponse.json(data as ApplicationCreateResponse);
+    return NextResponse.json(data as ApplicationCreateResponse, { status: 201 });
   } catch (err) {
     return NextResponse.json(
       { error: (err as Error).message || 'Unexpected error' },
