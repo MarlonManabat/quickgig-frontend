@@ -1,10 +1,10 @@
-import { getBrowserClient } from "@/lib/supabase/browser";
+import { getBrowserSupabase } from "@/lib/supabase/client";
 import type { Gig } from "@/lib/db/types";
 import type { Insert, Update } from "@/types/db";
 
-const supabase = getBrowserClient();
-
 export function listGigs() {
+  const supabase = getBrowserSupabase();
+  if (!supabase) return null;
   return supabase
     .from("gigs")
     .select("*")
@@ -12,10 +12,14 @@ export function listGigs() {
 }
 
 export function getGig(id: number) {
+  const supabase = getBrowserSupabase();
+  if (!supabase) return null;
   return supabase.from("gigs").select("*").eq("id", id).single();
 }
 
 export function createGig(gig: Partial<Gig>) {
+  const supabase = getBrowserSupabase();
+  if (!supabase) return null;
   return supabase
     .from("gigs")
     .insert([{ ...(gig as any) } satisfies Insert<"gigs">])
@@ -24,6 +28,8 @@ export function createGig(gig: Partial<Gig>) {
 }
 
 export function updateGig(id: number, gig: Partial<Gig>) {
+  const supabase = getBrowserSupabase();
+  if (!supabase) return null;
   return supabase
     .from("gigs")
     .update((gig as Update<"gigs">))
@@ -33,6 +39,8 @@ export function updateGig(id: number, gig: Partial<Gig>) {
 }
 
 export async function toggleSave(id: number, saved: boolean) {
+  const supabase = getBrowserSupabase();
+  if (!supabase) throw new Error("Missing Supabase client");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -52,6 +60,8 @@ export async function toggleSave(id: number, saved: boolean) {
 }
 
 export async function applyToGig(id: number, message: string) {
+  const supabase = getBrowserSupabase();
+  if (!supabase) throw new Error("Missing Supabase client");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -64,6 +74,8 @@ export async function applyToGig(id: number, message: string) {
 }
 
 export async function listMyApplications() {
+  const supabase = getBrowserSupabase();
+  if (!supabase) throw new Error("Missing Supabase client");
   const {
     data: { user },
   } = await supabase.auth.getUser();
