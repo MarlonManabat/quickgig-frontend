@@ -1,27 +1,32 @@
-import { notFound } from 'next/navigation';
-import ApplyButton from '@/components/ApplyButton';
-import type { Gig } from '@/types/db';
+import GigDetail from '@/components/gigs/GigDetail';
+import ApplyPanel from '@/components/gigs/ApplyPanel';
+import Empty from '@/components/gigs/Empty';
+import { getOrigin } from '@/lib/origin';
+import type { Gig } from '@/types/gigs';
 
 export const dynamic = 'force-dynamic';
 
 async function fetchGig(id: string): Promise<Gig | null> {
-  const res = await fetch(`/api/gigs/${id}`, { cache: 'no-store' });
+  const res = await fetch(`${getOrigin()}/api/gigs/${id}`, { cache: 'no-store' });
   if (res.status === 404) return null;
-  if (!res.ok) throw new Error('Failed');
-  return (await res.json()) as Gig;
+  if (!res.ok) throw new Error('Failed to load gig');
+  const data = (await res.json()) as { gig: Gig };
+  return data.gig;
 }
 
-export default async function GigDetail({ params }: { params: { id: string } }) {
+export default async function GigPage({ params }: { params: { id: string } }) {
   const gig = await fetchGig(params.id);
-  if (!gig) return notFound();
+  if (!gig) {
+    return (
+      <main className="mx-auto max-w-3xl p-6">
+        <Empty />
+      </main>
+    );
+  }
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">{gig.title}</h1>
-      <p className="text-sm text-slate-600">
-        {gig.city || 'Anywhere'} · {new Date(gig.created_at).toLocaleDateString()}
-      </p>
-      <p className="whitespace-pre-wrap">{gig.description}</p>
-      <ApplyButton gigId={gig.id} />
+      <GigDetail gig={gig} />
+      <ApplyPanel gigId={params.id} />
     </main>
   );
 }

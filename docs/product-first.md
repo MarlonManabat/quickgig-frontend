@@ -5,3 +5,10 @@
 
 ## Filters & pagination
 The gigs list page reads query parameters for search and paging. When Supabase secrets are absent, the API falls back to a local mock so previews still show sample gigs.
+
+## Gig detail + apply
+The gig detail page and applications API also fall back to in-memory mocks when
+Supabase secrets are missing. Preview builds can browse sample gig details and
+"apply" without hitting a real database. To use real data, provide Supabase
+credentials and swap the mock helpers with actual `gigs` and `applications`
+tables.
