@@ -1,10 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseSafe } from '@/lib/supabase/safeClient';
 import { nextOr } from '@/lib/next-redirect';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 export default function Confirm() {
   const [ok, setOk] = useState<boolean | null>(null);
@@ -13,6 +15,12 @@ export default function Confirm() {
   const dest = nextOr(searchParams.get('next'), '/');
 
   useEffect(() => {
+    const supabase = getSupabaseSafe();
+    if (!supabase) {
+      setOk(false);
+      setMsg('Missing Supabase client');
+      return;
+    }
     supabase.auth.exchangeCodeForSession(window.location.href)
       .then(({ error }) => {
         if (error) { setOk(false); setMsg(error.message); }
