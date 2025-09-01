@@ -23,3 +23,9 @@ in-memory mock store so the flow still works.
 
 `/applications` is dynamic (no SSG) to avoid preview build failures. It falls
 back to mock data when secrets are absent; replace by real DB later.
+
+## Employer dashboard
+
+The `/owner/gigs` pages and APIs are dynamic and fall back to in-memory mocks
+when Supabase secrets are absent. Preview builds can list gigs, view applicants,
+and update statuses without hitting the database.

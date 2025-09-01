@@ -9,6 +9,9 @@ export default function MainNav() {
       <Link href="/gigs/create" className="hover:underline">
         Post a Gig
       </Link>
+      <Link href="/owner/gigs" className="hover:underline">
+        My Gigs
+      </Link>
     </nav>
   );
 }
