@@ -1,9 +1,7 @@
-import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import type { Database } from "@/types/db";
+'use client';
+import { createClient } from '@supabase/supabase-js';
 
-let client: ReturnType<typeof createBrowserSupabaseClient<Database>>;
-
-export function getBrowserClient() {
-  if (!client) client = createBrowserSupabaseClient<Database>();
-  return client;
-}
+export const supabaseBrowser = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);

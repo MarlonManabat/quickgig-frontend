@@ -30,7 +30,7 @@ jobs:
           fi
 
       - name: Install deps
-        run: npm install --no-audit --no-fund --prefer-offline
+        run: npm ci
 
       - name: Typecheck (best-effort)
         run: npm run -s typecheck || echo "::warning::no typecheck script"

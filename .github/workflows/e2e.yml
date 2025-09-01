@@ -1,62 +1,42 @@
 name: E2E (manual or nightly)
-
 on:
   workflow_dispatch:
-    inputs:
-      base_url:
-        description: "Run against an existing URL (leave blank to build & start locally)"
-        required: false
-        default: ""
   schedule:
-    - cron: "30 8 * * *"  # daily 08:30 UTC (adjust)
+    - cron: '0 9 * * *'
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      NODE_ENV: production
-      NEXT_TELEMETRY_DISABLED: "1"
-      # Enable test endpoints
-      CI_ALLOW_TEST_ENDPOINTS: "1"
-      # Supabase test project (set in repo Secrets)
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      # Optional: run against an existing deployment
-      BASE_URL: ${{ github.event.inputs.base_url }}
-
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: 'npm'
 
-      - name: Install deps
-        run: npm ci
-
-      - name: Build (only if not using external BASE_URL)
-        if: ${{ !inputs.base_url }}
-        run: npm run build
+      - name: Install deps (robust)
+        run: |
+          npm ci || npm install --no-audit --prefer-offline
 
       - name: Playwright install
-        run: npm run playwright:install
+        run: npx playwright install --with-deps
 
-      - name: Seed data
-        run: npm run e2e:seed
-
-      - name: Start server (background, only if local)
-        if: ${{ !inputs.base_url }}
-        run: |
-          nohup npm run start:prod > .next-serve.log 2>&1 &
-          npx wait-on http://localhost:3000
+      - name: Build
+        run: npm run build
         env:
-          PORT: 3000
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Start server (background)
+        run: |
+          nohup npm start >/tmp/next.log 2>&1 &
+          npx wait-on http://localhost:3000/health
 
       - name: Run E2E
-        run: npm run e2e
+        run: npx playwright test --reporter=line
 
       - name: Upload Playwright report
         if: always()
@@ -64,14 +44,16 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
+          if-no-files-found: ignore
 
       - name: Upload Next server log
-        if: always() && !inputs.base_url
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: next-server-log
-          path: .next-serve.log
+          name: next-log
+          path: /tmp/next.log
+          if-no-files-found: ignore
 
-      - name: Cleanup data
+      - name: Cleanup test data
         if: always()
-        run: npm run e2e:cleanup
+        run: npx tsx scripts/e2e/cleanup.ts
