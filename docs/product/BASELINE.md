@@ -77,6 +77,8 @@
 #### FEAT-PSGC-STATIC — Static PSGC dataset & GeoSelect
 | Date | Ref | Subject |
 |------|-----|---------|
+| 2025-08-31 | #534 | Merge pull request #534 from MarlonManabat/codex/add-static-psgc-locations-via-geoselect |
+| 2025-08-31 | 567275a | feat(location): static PSGC via @jobuntux/psgc and GeoSelect; wire Post Job & Find Work (no DB/API) |
 | 2025-08-31 | #531 | Merge pull request #531 from MarlonManabat/codex/add-static-psgc-dataset-and-geoselect |
 | 2025-08-31 | 800c0be | docs(psgc): note missing dataset |
 | 2025-08-28 | #460 | Merge pull request #460 from MarlonManabat/codex/implement-regions-and-cities-update |
