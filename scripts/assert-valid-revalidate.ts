@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { globby } from 'globby';
 import fs from 'node:fs';
 
