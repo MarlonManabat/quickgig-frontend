@@ -31,6 +31,7 @@
 #### FEAT-RSC-GUARD — RSC hook guard
 | Date | Ref | Subject |
 |------|-----|---------|
+| 2025-08-31 | c531fd8 | feat(routes): unify Landing ↔ App for Post Job & Find Work using shared client components |
 | 2025-08-31 | e96c0af | chore: scope RSC hook guard |
 | 2025-08-31 | d22f059 | chore: add RSC lint guard and Applications smoke test |
 | 2025-08-31 | 4973897 | fix(app): split applications page into server wrapper + client UI to resolve RSC hook violation |
@@ -92,6 +93,12 @@
 #### FEAT-TICKETS-GATE — Tickets gating (3 free, ₱20 after)
 | Date | Ref | Subject |
 |------|-----|---------|
+| 2025-09-01 | #541 | Merge pull request #541 from MarlonManabat/codex/add-ticket-balance-badge-and-link |
+| 2025-09-01 | c73464d | feat(ui): header tickets badge and quick Buy link to /billing/tickets |
+| 2025-09-01 | #539 | Merge pull request #539 from MarlonManabat/codex/add-gcash-upload-and-polling-to-tickets-page |
+| 2025-09-01 | 44a8e23 | feat(billing): tickets page with balance, GCash upload, polling, and auto-redirect after approval |
+| 2025-08-31 | #537 | Merge pull request #537 from MarlonManabat/codex/implement-ticket-gating-for-/gigs/create |
+| 2025-08-31 | ff67a27 | feat(tickets): gate /gigs/create by tickets and atomically deduct on create |
 | 2025-08-31 | #529 | Merge pull request #529 from MarlonManabat/codex/add-withdraw-endpoint-and-ui |
 | 2025-08-31 | 9783e46 | feat(applications): add withdraw flow |
 | 2025-08-31 | #526 | Merge pull request #526 from MarlonManabat/codex/implement-withdraw-application-endpoint |
@@ -133,6 +140,7 @@
 #### FEAT-ROUTE-UNIFY — Route unification (Landing ↔ App)
 | Date | Ref | Subject |
 |------|-----|---------|
+| 2025-08-31 | #536 | Merge pull request #536 from MarlonManabat/codex/unify-landing-and-app-routes-for-jobs |
 | 2025-08-30 | #482 | Merge pull request #482 from MarlonManabat/codex/implement-landing-ctas-and-/create-page-changes |
 | 2025-08-30 | 8a0ee11 | feat: centralize env-aware landing links |
 | 2025-08-29 | #481 | Merge pull request #481 from MarlonManabat/codex/implement-landing-ctas-and-create-page |
@@ -162,11 +170,12 @@
 | 2025-08-23 | 45d079e | fix(landing): force CTAs + logo to app root (absolute APP_URL) chore(app): redirects /find /login /signup -> / test(smoke): temporarily accept app root OR /find; increase timeouts; TODO root-only next PR |
 | 2025-08-23 | 59cc588 | test(smoke): make landing CTAs role-agnostic and assert app redirect |
 | 2025-08-23 | 6747012 | test(smoke): expect landing CTAs & logo to link to app root; use RegExp; update Taglish to \u201cMaghanap ng Trabaho\u201d |
-| 2025-08-23 | #358 | Merge pull request #358 from MarlonManabat/codex/fix-landing-ctas-and-add-app-redirects |
 
 #### FEAT-MSG-NOTIFS — Messaging & notifications
 | Date | Ref | Subject |
 |------|-----|---------|
+| 2025-09-01 | #538 | Merge pull request #538 from MarlonManabat/codex/harden-applications-thread-view |
+| 2025-09-01 | 29e543e | feat(messages): harden applications thread (stable load, polling, optimistic send, mark-read) |
 | 2025-08-27 | #433 | Merge pull request #433 from MarlonManabat/codex/refactor-messages-create-api-for-type-safety |
 | 2025-08-27 | 722b97b | fix(messages): type-safe API; remove brittle join; deterministic counterparty |
 | 2025-08-27 | #430 | Merge pull request #430 from MarlonManabat/codex/implement-employer-management-and-notifications |
@@ -195,7 +204,5 @@
 | 2025-08-18 | #174 | Merge pull request #174 from MarlonManabat/codex/add-in-app-toasts-and-webhook-for-messages |
 | 2025-08-18 | 8a7229c | feat(notify+chat): toasts, webhook, chat polish |
 | 2025-08-17 | #173 | Merge pull request #173 from MarlonManabat/codex/add-messages-mvp-features |
-| 2025-08-17 | da0415d | feat(messages mvp): threads + API + UI |
-| 2025-08-15 | 243dfa7 | feat: add optional email notifications |
 
 <!-- BACKFILL:END -->
