@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { useUser } from '@/hooks/useUser';
 
 export default function PostGigForm() {
+  const { user } = useUser();
   const [title, setTitle] = useState('');
   const [company, setCompany] = useState('');
   const [location, setLocation] = useState('');
@@ -17,6 +19,10 @@ export default function PostGigForm() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    if (!user) {
+      setError('Please sign in to post a gig.');
+      return;
+    }
     if (!title.trim() || !company.trim() || !description.trim()) {
       setError('Title, company and description are required');
       return;
@@ -33,6 +39,8 @@ export default function PostGigForm() {
         payMin: payMin ? Number(payMin) : undefined,
         payMax: payMax ? Number(payMax) : undefined,
         remote,
+        owner: user.id,
+        user_id: user.id,
       }),
     });
     if (!res.ok) {
