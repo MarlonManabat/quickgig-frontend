@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import GeoSelect, { GeoValue } from '@/components/location/GeoSelect';
 
 export default function GigForm() {
   const router = useRouter();
-  const [form, setForm] = useState({ title: '', description: '', budget: '', city: '' });
+  const [form, setForm] = useState({ title: '', description: '', budget: '' });
+  const [geo, setGeo] = useState<GeoValue>({});
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -23,7 +25,10 @@ export default function GigForm() {
         title: form.title,
         description: form.description,
         budget: form.budget ? Number(form.budget) : null,
-        city: form.city || null,
+        city: geo.cityName || null,
+        region_code: geo.regionCode ?? null,
+        province_code: geo.provinceCode ?? null,
+        city_code: geo.cityCode ?? null,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -61,13 +66,11 @@ export default function GigForm() {
         value={form.budget}
         onChange={handleChange}
       />
-      <input
-        name="city"
-        placeholder="City"
-        className="border rounded p-2"
-        value={form.city}
-        onChange={handleChange}
-      />
+      <GeoSelect value={geo} onChange={setGeo} className="" />
+      <input type="hidden" name="region_code" value={geo.regionCode ?? ''} />
+      <input type="hidden" name="province_code" value={geo.provinceCode ?? ''} />
+      <input type="hidden" name="city_code" value={geo.cityCode ?? ''} />
+      <input type="hidden" name="city_name" value={geo.cityName ?? ''} />
       <button type="submit" className="rounded bg-black text-white px-4 py-2 w-fit">
         Post
       </button>

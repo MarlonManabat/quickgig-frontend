@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import LocationSelect, { LocationValue } from "@/components/location/LocationSelect";
+import GeoSelect, { GeoValue } from "@/components/location/GeoSelect";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
 
 let supabase = getBrowserSupabase();
@@ -44,6 +44,7 @@ export default function CreatePostForm() {
     region_code: '',
     province_code: '',
     city_code: '',
+    city_name: '',
     price_php: '',
   });
   const [submitting, setSubmitting] = React.useState(false);
@@ -73,24 +74,27 @@ export default function CreatePostForm() {
                value={form.title} onChange={e=>setForm(f=>({...f, title:e.target.value}))} />
         <textarea name="description" className="border rounded-xl p-2 w-full" placeholder="Description"
                   value={form.description} onChange={e=>setForm(f=>({...f, description:e.target.value}))} />
-        <LocationSelect
+        <GeoSelect
           value={{
-            regionCode: form.region_code || null,
-            provinceCode: form.province_code || null,
-            cityCode: form.city_code || null,
-          } as LocationValue}
+            regionCode: form.region_code || undefined,
+            provinceCode: form.province_code || undefined,
+            cityCode: form.city_code || undefined,
+            cityName: form.city_name || undefined,
+          } as GeoValue}
           onChange={(v) =>
             setForm((f) => ({
               ...f,
               region_code: v.regionCode || '',
               province_code: v.provinceCode || '',
               city_code: v.cityCode || '',
+              city_name: v.cityName || '',
             }))
           }
         />
         <input type="hidden" name="region_code" value={form.region_code} />
         <input type="hidden" name="province_code" value={form.province_code} />
         <input type="hidden" name="city_code" value={form.city_code} />
+        <input type="hidden" name="city_name" value={form.city_name} />
         <input name="price_php" className="border rounded-xl p-2 w-full" placeholder="Budget (optional)" inputMode="numeric"
                value={form.price_php} onChange={e=>setForm(f=>({...f, price_php:e.target.value}))} />
         {err && <p role="alert" className="text-red-500">{err}</p>}

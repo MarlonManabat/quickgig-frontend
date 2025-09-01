@@ -85,7 +85,7 @@
           "warn",
           {
             "selector": "CallExpression[callee.name='fetch'] Literal[value^='/api/locations']",
-            "message": "Do not fetch locations from API; use static PSGC dataset (FEAT-PSGC-STATIC)."
+            "message": "Use static PSGC via @jobuntux/psgc (FEAT-PSGC-STATIC)."
           }
         ],
         "no-restricted-imports": [

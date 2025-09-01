@@ -1,16 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { mutate } from 'swr';
-import LocationSelect, { LocationValue } from '@/components/location/LocationSelect';
+import GeoSelect, { GeoValue } from '@/components/location/GeoSelect';
 import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 
-interface Loc {
-  regionCode?: string | null;
-  provinceCode?: string | null;
-  cityCode?: string | null;
-}
-
-function validate(form: { title: string; description: string; loc: Loc }) {
+function validate(form: { title: string; description: string; loc: GeoValue }) {
   const errors: Record<string, string> = {};
   if (form.title.trim().length < 3 || form.title.trim().length > 120) {
     errors.title = 'Title must be 3-120 characters';
@@ -29,7 +23,7 @@ function validate(form: { title: string; description: string; loc: Loc }) {
 export default function NewJobForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [loc, setLoc] = useState<Loc>({ regionCode: null, provinceCode: null, cityCode: null });
+  const [loc, setLoc] = useState<GeoValue>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -118,7 +112,7 @@ export default function NewJobForm() {
           </p>
         )}
       </div>
-      <LocationSelect value={loc as LocationValue} onChange={(v) => setLoc(v)} />
+      <GeoSelect value={loc} onChange={(v) => setLoc(v)} />
       {errors.region && (
         <p className="text-sm text-red-600" aria-live="polite">
           {errors.region}
