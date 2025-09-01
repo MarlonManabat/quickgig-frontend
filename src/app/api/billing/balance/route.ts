@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const uid = await userIdFromCookie();
-  if (!uid) return NextResponse.json({ tickets: 0 });
+  if (!uid) return NextResponse.json({ balance: 0 });
   const bal = await getTicketBalance(uid);
-  return NextResponse.json({ tickets: bal });
+  return NextResponse.json({ balance: bal });
 }
 

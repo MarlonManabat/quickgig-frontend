@@ -10,12 +10,18 @@ export default function PaymentProofModal({
   pricePHP,
   credits,
   next,
+  onStart,
+  onDone,
+  onError,
 }: {
   open: boolean;
   onClose: () => void;
   pricePHP: number;
   credits: number;
   next?: string;
+  onStart?: () => void;
+  onDone?: () => void;
+  onError?: () => void;
 }) {
   const supabase = createClientComponentClient<Database>();
   const [file, setFile] = React.useState<File | null>(null);
@@ -25,22 +31,25 @@ export default function PaymentProofModal({
   const submit = async () => {
     if (!file) return;
     setBusy(true); setError(null);
+    onStart?.();
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setError('Please sign in first.'); setBusy(false); return; }
+    if (!user) { setError('Please sign in first.'); setBusy(false); onError?.(); return; }
 
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const path = `proofs/${user.id}/${Date.now()}-${nanoid()}.${ext}`;
     const up = await supabase.storage.from('payments').upload(path, file);
-    if (up.error) { setError(up.error.message); setBusy(false); return; }
+    if (up.error) { setError(up.error.message); setBusy(false); onError?.(); return; }
 
     const res = await fetch('/api/orders/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount: pricePHP, credits, proof_path: path, next })
     });
-    if (!res.ok) { setError('Failed to create order'); setBusy(false); return; }
+    if (!res.ok) { setError('Failed to create order'); setBusy(false); onError?.(); return; }
 
+    onDone?.();
+    setBusy(false);
     onClose();
     alert('Thanks! Your payment is under review.');
   };
