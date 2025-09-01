@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { getSupabaseBrowser } from '@/lib/supabase/client';
+import { getBrowserSupabase } from '@/lib/supabase/client';
 import { nanoid } from 'nanoid';
 
 export default function PaymentProofModal({
@@ -22,7 +22,7 @@ export default function PaymentProofModal({
   onDone?: () => void;
   onError?: () => void;
 }) {
-  const supabase = getSupabaseBrowser();
+  const supabase = getBrowserSupabase();
   const [file, setFile] = React.useState<File | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);

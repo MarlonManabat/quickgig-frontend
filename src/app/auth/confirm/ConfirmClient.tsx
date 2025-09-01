@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { getSupabaseBrowser } from '@/lib/supabase/client';
+import { getBrowserSupabase } from '@/lib/supabase/client';
 import { nextOr } from '@/lib/next-redirect';
 
 export default function ConfirmClient() {
@@ -11,7 +11,7 @@ export default function ConfirmClient() {
   const dest = nextOr(searchParams.get('next'), '/');
 
   useEffect(() => {
-    getSupabaseBrowser()
+    getBrowserSupabase()
       .auth.exchangeCodeForSession(window.location.href)
       .then(({ error }) => {
         if (error) { setOk(false); setMsg(error.message); }

@@ -20,11 +20,11 @@ jobs:
       # Enable test endpoints
       CI_ALLOW_TEST_ENDPOINTS: "1"
       # Supabase test project (set in repo Secrets)
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       # Optional: run against an existing deployment
-      BASE_URL: ${{ github.event.inputs.base_url }}
+      BASE_URL: ${{ inputs.base_url || secrets.E2E_BASE_URL || 'http://localhost:3000' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
           cache: 'npm'
 
       - name: Install deps
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Build (only if not using external BASE_URL)
         if: ${{ !inputs.base_url }}
@@ -74,4 +74,4 @@ jobs:
 
       - name: Cleanup data
         if: always()
-        run: npm run e2e:cleanup
+        run: npx tsx scripts/e2e/cleanup.ts

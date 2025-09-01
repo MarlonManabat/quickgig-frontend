@@ -2,10 +2,10 @@
 import useSWR from "swr";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { getBrowserSupabase } from "@/lib/supabase/client";
 
 export default function AppHeaderTickets() {
-  const supabase = getSupabaseBrowser();
+  const supabase = getBrowserSupabase();
   const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {

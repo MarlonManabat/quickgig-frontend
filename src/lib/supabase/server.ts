@@ -1,25 +1,21 @@
-import 'server-only';
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/db";
 
-export function getSupabaseServer() {
+export function getServerSupabase() {
   const cookieStore = cookies();
-
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
+        get: (name: string) => cookieStore.get(name)?.value,
         set(name: string, value: string, options: any) {
           cookieStore.set({ name, value, ...options });
         },
         remove(name: string, options: any) {
-          cookieStore.set({ name, value: "", ...options, expires: new Date(0) });
+          cookieStore.set({ name, value: "", expires: new Date(0), ...options });
         },
       },
     }
@@ -36,7 +32,7 @@ export function adminSupabase() {
 }
 
 export async function userIdFromCookie() {
-  const supa = getSupabaseServer();
+  const supa = getServerSupabase();
   const { data } = await supa.auth.getUser();
   return data.user?.id ?? null;
 }

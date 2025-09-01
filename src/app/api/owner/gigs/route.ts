@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServer } from '@/lib/supabase/server';
+import { getServerSupabase } from '@/lib/supabase/server';
 import type { OwnerGigRow } from '@/types/owner';
 
 export const runtime = 'nodejs';
 
 export async function GET() {
   const uid = 'stub-owner';
-  const supa = getSupabaseServer();
+  const supa = getServerSupabase();
   try {
     const { data, error } = await supa
       .from('gigs')

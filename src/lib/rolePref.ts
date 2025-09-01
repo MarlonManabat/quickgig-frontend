@@ -1,5 +1,5 @@
 "use client";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { getBrowserSupabase } from "@/lib/supabase/client";
 import type { Database, Update } from "@/types/db";
 
 export type RolePref = "worker" | "employer";
@@ -14,7 +14,7 @@ export async function getRolePref(userId?: string): Promise<RolePref | null> {
       }
       return null;
     }
-    const supabase = getSupabaseBrowser();
+    const supabase = getBrowserSupabase();
     // try DB first
     const { data } = await supabase
       .from("profiles")
@@ -39,7 +39,7 @@ export async function setRolePref(value: RolePref, userId?: string) {
       window.localStorage.setItem("role_pref", value);
     }
     if (userId) {
-      const supabase = getSupabaseBrowser();
+      const supabase = getBrowserSupabase();
       await supabase
         .from("profiles")
         .update({ role_pref: value } as Update<"profiles">)

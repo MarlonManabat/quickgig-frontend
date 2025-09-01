@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getSupabaseBrowser } from '@/lib/supabase/client';
+import { getBrowserSupabase } from '@/lib/supabase/client';
 import { safeSelect } from '@/lib/supabase-safe';
 
 type NotificationRow = {
@@ -14,7 +14,7 @@ type NotificationRow = {
 };
 
 export default function AppHeaderNotifications() {
-  const supa = getSupabaseBrowser();
+  const supa = getBrowserSupabase();
   const [items, setItems] = React.useState<NotificationRow[]>([]);
   const [loading, setLoading] = React.useState(true);
 

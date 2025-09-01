@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServer } from '@/lib/supabase/server';
+import { getServerSupabase } from '@/lib/supabase/server';
 import type { ApplicantRow } from '@/types/owner';
 
 export const runtime = 'nodejs';
@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   const gigId = params.id;
-  const supa = getSupabaseServer();
+  const supa = getServerSupabase();
   try {
     const { data, error } = await supa
       .from('gig_applications')

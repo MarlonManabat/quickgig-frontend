@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServer } from '@/lib/supabase/server';
+import { getServerSupabase } from '@/lib/supabase/server';
 import type { GigsResponse, GigSort } from '@/types/gigs';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   const page = Math.max(parseInt(searchParams.get('page') || '1', 10), 1);
   const limit = parseInt(searchParams.get('limit') || '10', 10);
 
-  const supa = getSupabaseServer();
+  const supa = getServerSupabase();
 
   let query = supa
     .from('gigs')
