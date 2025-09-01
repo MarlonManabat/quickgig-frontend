@@ -1,6 +1,6 @@
-import ApplicationList from '@/components/applications/ApplicationList';
 import { getOrigin } from '@/lib/origin';
-import type { Application } from '@/types/applications';
+import ApplicationsPageClient from './ApplicationsPageClient';
+import type { Application } from '@/types/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +13,8 @@ export default async function MyApplications() {
   return (
     <main className="mx-auto max-w-4xl p-6">
       <h1 className="text-2xl font-semibold mb-4">My applications</h1>
-      <ApplicationList items={apps} />
+      <ApplicationsPageClient initialApps={apps} />
     </main>
   );
 }
+

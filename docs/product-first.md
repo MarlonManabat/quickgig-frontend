@@ -23,6 +23,7 @@ in-memory mock store so the flow still works.
 
 `/applications` is dynamic (no SSG) to avoid preview build failures. It falls
 back to mock data when secrets are absent; replace by real DB later.
+Workers can withdraw an application. In previews, the endpoint mutates mock memory state; replace with real DB later.
 
 ## Employer dashboard
 
@@ -40,4 +41,3 @@ and update statuses without hitting the database.
 - Health endpoints `/api/health` and `/api/status` expose basic runtime info without secrets.
 - Dynamic pages use `loading.tsx` skeletons to mask latency while fetching.
 - `robots.txt` and `sitemap.xml` serve canonical URLs and fall back to minimal entries if Supabase is unavailable.
-main
