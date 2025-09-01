@@ -1,7 +1,7 @@
 import TicketsClient from '@/features/billing/TicketsClient';
 import { redirect } from 'next/navigation';
 import { userIdFromCookie } from '@/lib/supabase/server';
-import { getTicketBalance } from '@/lib/tickets';
+import { ensureTicketsRow, getTicketBalance } from '@/lib/tickets';
 import { safeNext } from '@/lib/safe-next';
 
 export const dynamic = 'force-dynamic';
@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export default async function TicketsPage({ searchParams }: { searchParams: { next?: string } }) {
   const uid = await userIdFromCookie();
   if (!uid) redirect('/login?next=/billing/tickets');
-
+  await ensureTicketsRow(uid);
   const balance = await getTicketBalance(uid);
   const next = safeNext(searchParams?.next);
 

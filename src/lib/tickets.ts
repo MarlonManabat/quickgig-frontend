@@ -1,14 +1,38 @@
 import { adminSupabase } from './supabase/server';
 
+const FREE_STARTER = Number(process.env.FREE_TICKETS_ON_FIRST_LOGIN ?? 3) || 0;
+
+export async function ensureTicketsRow(userId: string): Promise<void> {
+  const supa = await adminSupabase();
+  if (!supa) return;
+
+  try {
+    // @ts-ignore: rpc name may not be in typed client
+    await supa.rpc('ensure_tickets_row', { p_user: userId, p_init: FREE_STARTER });
+    return;
+  } catch (_) {
+    // ignore and try upsert
+  }
+
+  // @ts-ignore
+  await supa
+    .from('user_tickets')
+    .upsert(
+      { user_id: userId, balance: FREE_STARTER },
+      { onConflict: 'user_id', ignoreDuplicates: true },
+    );
+}
+
 export async function getTicketBalance(userId: string): Promise<number> {
   const supa = await adminSupabase();
   if (!supa) return 0;
-  const { data } = await supa
-    .from('profiles')
-    .select('tickets')
-    .eq('id', userId)
-    .single();
-  return Number(data?.tickets) || 0;
+  const { data, error } = await supa
+    .from('user_tickets')
+    .select('balance')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) return 0;
+  return data?.balance ?? 0;
 }
 
 export async function ensureTickets(
