@@ -1,21 +1,9 @@
-import * as React from "react";
-
-interface EmptyStateProps {
-  title: string;
-  message?: string;
-  action?: React.ReactNode;
-}
-
-export default function EmptyState({
-  title,
-  message,
-  action,
-}: EmptyStateProps) {
+export default function EmptyState({ title, hint }: { title: string; hint?: string }) {
   return (
-    <div className="text-center py-10">
-      <p className="text-lg font-medium mb-2">{title}</p>
-      {message && <p className="text-brand-muted mb-4">{message}</p>}
-      {action}
+    <div className="text-center border rounded-2xl p-10">
+      <h2 className="text-xl font-medium mb-1">{title}</h2>
+      {hint && <p className="text-slate-600">{hint}</p>}
     </div>
   );
 }
+
