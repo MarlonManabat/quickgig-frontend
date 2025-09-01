@@ -12,3 +12,8 @@ Supabase secrets are missing. Preview builds can browse sample gig details and
 "apply" without hitting a real database. To use real data, provide Supabase
 credentials and swap the mock helpers with actual `gigs` and `applications`
 tables.
+
+## Applications dashboard
+
+`/applications` is dynamic (no SSG) to avoid preview build failures. It falls
+back to mock data when secrets are absent; replace by real DB later.
