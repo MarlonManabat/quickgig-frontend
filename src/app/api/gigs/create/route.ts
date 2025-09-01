@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { adminSupabase } from '@/lib/supabase/server';
+import { deductTicketOnCreate } from '@/lib/tickets';
 import { create as mockCreate } from '@/lib/mock/gigs';
 import type { Gig, GigInsert } from '@/types/gigs';
 
@@ -39,18 +40,24 @@ export async function POST(req: Request) {
 
   const supa = await adminSupabase();
   if (supa) {
-    const created_at = new Date().toISOString();
-    const status = payload.status ?? 'open';
-    const { data, error } = await supa
-      .from('gigs')
-      .insert({ ...payload, status, created_at })
-      .select('id')
-      .single();
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    try {
+      const id = await deductTicketOnCreate(owner, {
+        title,
+        description,
+        region_code: body.region_code?.trim(),
+        city_code: body.city_code?.trim(),
+        price_php:
+          body.budget !== undefined ? Number(body.budget) : undefined,
+      });
+      const created_at = new Date().toISOString();
+      const status = payload.status ?? 'open';
+      const gig: Gig = { id, ...payload, status, created_at };
+      return NextResponse.json({ id, gig });
+    } catch (e: any) {
+      const msg = e.message || 'Could not create gig';
+      const status = /ticket/i.test(msg) ? 402 : 400;
+      return NextResponse.json({ error: msg }, { status });
     }
-    const gig: Gig = { id: String(data.id), ...payload, status, created_at };
-    return NextResponse.json({ id: gig.id, gig });
   }
 
   const gig = mockCreate(payload);
