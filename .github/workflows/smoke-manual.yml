@@ -22,18 +22,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install deps
-        run: |
-          corepack enable
-          pnpm i --frozen-lockfile || npm ci || yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Install Playwright
         run: npx playwright install --with-deps
 
       - name: Build
-        run: |
-          if [ -f pnpm-lock.yaml ]; then pnpm build; elif [ -f yarn.lock ]; then yarn build; else npm run build; fi
+        run: npm run build
 
       - name: Start app (background)
         run: |

@@ -15,11 +15,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '20'
           cache: 'npm'
 
-      - name: Install deps (non-CI)
-        run: npm install --no-audit --no-fund
+      - name: Install deps
+        run: npm ci
 
       - name: Typecheck (best-effort)
         run: npm run -s typecheck || echo "::warning::no typecheck script"
@@ -35,7 +35,7 @@ jobs:
           SUPABASE_SERVICE_ROLE: stub_service_role
           SEED_ADMIN_EMAIL: ci-admin@example.test
           SEED_ADMIN_PASSWORD: Passw0rd1!
-        run: npm run -s build
+        run: npm run build
 
       - name: Start app (background, tee logs)
         if: env.RUN_SMOKE == 'true'
