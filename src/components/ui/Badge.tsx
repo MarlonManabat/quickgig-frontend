@@ -1,12 +1,6 @@
-import * as React from "react";
+import { ReactNode } from "react";
 
-interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {}
-
-export default function Badge({ className = "", ...props }: BadgeProps) {
-  return (
-    <span
-      className={`inline-block rounded-full bg-brand-primary/10 text-brand-foreground text-xs px-2 py-1 ${className}`.trim()}
-      {...props}
-    />
-  );
+export default function Badge({ children }: { children: ReactNode }) {
+  return <span className="inline-block rounded-full px-2.5 py-0.5 text-xs border">{children}</span>;
 }
+
