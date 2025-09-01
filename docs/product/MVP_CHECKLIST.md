@@ -4,9 +4,12 @@
 - [x] Canonical routes: /gigs/create, /gigs (Landing CTAs unified)
 - [x] Applications thread: no spinner, polling, optimistic send
 - [x] Tickets gate + atomic deduct on create
+- [x] Starter ticket freebies (3 on first login)
 - [x] Tickets page: GCash upload, polling, auto-redirect
 - [x] Safe `next` redirects; header ticket badge+link
 - [x] RSC guard (no hooks in server components)
+
+> New users receive 3 free tickets on first login (`FREE_TICKETS_ON_FIRST_LOGIN=3`).
 
 ## Ops ✅
 - [x] PR title guard (non-blocking)
