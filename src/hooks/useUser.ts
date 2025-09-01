@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { getBrowserSupabase } from '@/lib/supabase/client';
 
 export function useUser() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<null | { id: string; email?: string }>(null);
 
   useEffect(() => {
+    const supabase = getBrowserSupabase();
+    if (!supabase) { setLoading(false); return; }
     let mounted = true;
     supabase.auth.getUser().then(({ data }) => {
       if (!mounted) return;
@@ -20,5 +22,5 @@ export function useUser() {
     return () => { mounted = false; sub?.subscription.unsubscribe(); };
   }, []);
 
-  return { user, loading, signOut: () => supabase.auth.signOut() };
+  return { user, loading, signOut: () => getBrowserSupabase()?.auth.signOut() };
 }

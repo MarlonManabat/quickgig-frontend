@@ -10,6 +10,9 @@ jobs:
     name: pr
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -40,8 +43,6 @@ jobs:
 
       - name: Build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: http://localhost:3000/api/mock
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: stub
           NEXT_PUBLIC_APP_ORIGIN: http://localhost:3000
           SUPABASE_SERVICE_ROLE: stub_service_role
           SEED_ADMIN_EMAIL: ci-admin@example.test
