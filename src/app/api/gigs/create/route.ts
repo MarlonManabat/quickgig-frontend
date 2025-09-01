@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { adminSupabase, userIdFromCookie } from '@/lib/supabase/server';
+import { adminSupabase } from '@/lib/supabase/server';
 import { create as mockCreate } from '@/lib/mock/gigs';
 import type { Gig, GigInsert } from '@/types/gigs';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   let body: any;
@@ -20,6 +21,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
+  const owner = body.owner ?? body.user_id;
+  if (!owner) {
+    return NextResponse.json({ error: 'Sign-in required' }, { status: 401 });
+  }
+
   const payload: GigInsert = {
     title,
     company,
@@ -28,10 +34,8 @@ export async function POST(req: Request) {
     pay_min: body.payMin !== undefined ? Number(body.payMin) : undefined,
     pay_max: body.payMax !== undefined ? Number(body.payMax) : undefined,
     remote: body.remote === true,
+    user_id: owner,
   };
-
-  const uid = (await userIdFromCookie()) || 'anon';
-  payload.user_id = uid;
 
   const supa = await adminSupabase();
   if (supa) {
@@ -39,7 +43,7 @@ export async function POST(req: Request) {
     const status = payload.status ?? 'open';
     const { data, error } = await supa
       .from('gigs')
-      .insert({ ...payload, user_id: uid, status, created_at })
+      .insert({ ...payload, status, created_at })
       .select('id')
       .single();
     if (error) {

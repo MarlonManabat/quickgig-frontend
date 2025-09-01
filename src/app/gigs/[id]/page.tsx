@@ -1,5 +1,5 @@
 import GigDetail from '@/components/gigs/GigDetail';
-import ApplyPanel from '@/components/gigs/ApplyPanel';
+import { ApplyPanel } from '@/components/gigs/ApplyPanel';
 import Empty from '@/components/gigs/Empty';
 import { getOrigin } from '@/lib/origin';
 import type { GigDetail } from '@/types/gigs';
