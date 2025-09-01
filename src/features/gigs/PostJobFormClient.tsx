@@ -2,15 +2,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import GeoSelect, { type GeoValue } from '@/components/location/GeoSelect';
 import toast from '@/utils/toast';
 
 type Props = {
-  onSubmitted?: () => void;            // optional callback
-  submitUrl?: string;                  // default '/api/gigs/create' if your app uses that
+  onSubmitted?: () => void; // optional callback
+  submitUrl?: string; // default '/api/gigs/create' if your app uses that
+  balance?: number;
 };
 
-export default function PostJobFormClient({ onSubmitted, submitUrl = '/api/gigs/create' }: Props) {
+export default function PostJobFormClient({
+  onSubmitted,
+  submitUrl = '/api/gigs/create',
+  balance = 0,
+}: Props) {
   const [geo, setGeo] = useState<GeoValue>({});
   const router = useRouter();
 
@@ -43,15 +49,45 @@ export default function PostJobFormClient({ onSubmitted, submitUrl = '/api/gigs/
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      {/* TODO: keep your existing fields; showing minimal core fields */}
-      <input name="title" required placeholder="Job title" className="w-full border rounded-lg p-2" />
-      <textarea name="description" required placeholder="Describe the work" className="w-full border rounded-lg p-2" />
-      <GeoSelect value={geo} onChange={setGeo} className="mt-2" />
-      <div className="flex gap-2">
-        <input name="budget" type="number" min="0" step="1" placeholder="Budget (₱)" className="border rounded-lg p-2 w-40" />
-        <button type="submit" className="rounded-xl px-4 py-2 font-medium border">Post Job</button>
-      </div>
-    </form>
+    <div>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {/* TODO: keep your existing fields; showing minimal core fields */}
+        <input
+          name="title"
+          required
+          placeholder="Job title"
+          className="w-full border rounded-lg p-2"
+        />
+        <textarea
+          name="description"
+          required
+          placeholder="Describe the work"
+          className="w-full border rounded-lg p-2"
+        />
+        <GeoSelect value={geo} onChange={setGeo} className="mt-2" />
+        <div className="flex gap-2">
+          <input
+            name="budget"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="Budget (₱)"
+            className="border rounded-lg p-2 w-40"
+          />
+          <button type="submit" className="rounded-xl px-4 py-2 font-medium border">
+            Post Job
+          </button>
+        </div>
+      </form>
+      {balance === 0 && (
+        <p className="mt-2 text-sm">
+          You need a ticket to post.{' '}
+          <Link href="/billing/tickets?next=/gigs/create" className="underline">
+            Buy ticket
+          </Link>
+          .
+        </p>
+      )}
+    </div>
   );
 }
