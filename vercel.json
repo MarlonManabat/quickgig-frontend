@@ -1,4 +1,6 @@
 {
-  "installCommand": "npm ci",
-  "ignoreCommand": "node scripts/ignore-build.js"
+  "installCommand": "npm install --no-audit --no-fund --prefer-offline",
+  "buildCommand": "next build",
+  "ignoreCommand": "node scripts/ignore-build.js",
+  "framework": "nextjs"
 }

@@ -72,7 +72,7 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=18.17 <23"
+    "node": ">=20 <21"
   },
   "packageManager": "npm@10"
 }
