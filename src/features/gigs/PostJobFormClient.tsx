@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import GeoSelect, { type GeoValue } from '@/components/location/GeoSelect';
 import toast from '@/utils/toast';
 
@@ -11,6 +12,7 @@ type Props = {
 
 export default function PostJobFormClient({ onSubmitted, submitUrl = '/api/gigs/create' }: Props) {
   const [geo, setGeo] = useState<GeoValue>({});
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -24,6 +26,11 @@ export default function PostJobFormClient({ onSubmitted, submitUrl = '/api/gigs/
 
     try {
       const res = await fetch(submitUrl, { method: 'POST', body: fd });
+      if (res.status === 402 || res.status === 403) {
+        toast.info('You need a ticket to post. Redirecting…');
+        router.push('/billing/tickets?next=/gigs/create');
+        return;
+      }
       if (!res.ok) throw new Error('Failed to post job');
       toast.success('Job posted!');
       onSubmitted?.();

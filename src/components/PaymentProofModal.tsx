@@ -5,8 +5,18 @@ import type { Database } from '@/types/db';
 import { nanoid } from 'nanoid';
 
 export default function PaymentProofModal({
-  open, onClose, pricePHP, credits
-}: { open: boolean; onClose: () => void; pricePHP: number; credits: number; }) {
+  open,
+  onClose,
+  pricePHP,
+  credits,
+  next,
+}: {
+  open: boolean;
+  onClose: () => void;
+  pricePHP: number;
+  credits: number;
+  next?: string;
+}) {
   const supabase = createClientComponentClient<Database>();
   const [file, setFile] = React.useState<File | null>(null);
   const [busy, setBusy] = React.useState(false);
@@ -27,7 +37,7 @@ export default function PaymentProofModal({
     const res = await fetch('/api/orders/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: pricePHP, credits, proof_path: path })
+      body: JSON.stringify({ amount: pricePHP, credits, proof_path: path, next })
     });
     if (!res.ok) { setError('Failed to create order'); setBusy(false); return; }
 
