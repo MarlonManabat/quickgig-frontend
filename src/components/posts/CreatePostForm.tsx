@@ -1,15 +1,15 @@
 "use client";
 import * as React from "react";
 import GeoSelect, { GeoValue } from "@/components/location/GeoSelect";
-import { getBrowserSupabase } from "@/lib/supabase/client";
+import { getSupabaseSafe } from "@/lib/supabase/safeClient";
 
-let supabase: ReturnType<typeof getBrowserSupabase> | null = null;
+let supabase: ReturnType<typeof getSupabaseSafe> | null = null;
 export function __setSupabaseClient(client: any) {
   supabase = client;
 }
 
 export async function submit(form: FormData) {
-  const sb = supabase ?? getBrowserSupabase();
+  const sb = supabase ?? getSupabaseSafe();
   if (!sb) throw new Error('No Supabase client');
   const title = form.get('title') as string;
   const description = form.get('description') as string;

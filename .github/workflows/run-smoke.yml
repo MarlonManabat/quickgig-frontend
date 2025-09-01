@@ -44,6 +44,9 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps
 
+      - name: Lint (RSC guard)
+        run: npm run lint --silent || true
+
       - name: Build
         run: npm run build
 

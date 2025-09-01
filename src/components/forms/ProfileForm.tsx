@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { getBrowserSupabase } from "@/lib/supabase/client";
+import { getSupabaseSafe } from "@/lib/supabase/safeClient";
 import { validateAvatarFile, uploadAvatar } from "@/lib/storage/avatars";
 
 export default function ProfileForm() {
-  const supabase = getBrowserSupabase();
+  const supabase = getSupabaseSafe();
   const router = useRouter();
   if (!supabase) return <div className="sr-only">Auth is initializing…</div>;
   const [fullName, setFullName] = useState("");
