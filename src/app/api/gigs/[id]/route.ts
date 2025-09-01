@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { publicSupabase } from '@/lib/supabase/server';
 import { gigById } from '@/lib/mock/gigs';
-import type { Gig } from '@/types/gigs';
+import type { GigDetail } from '@/types/gigs';
 
 export const runtime = 'nodejs';
 
@@ -27,5 +27,5 @@ export async function GET(
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ gig: data as Gig });
+  return NextResponse.json({ gig: data as GigDetail });
 }

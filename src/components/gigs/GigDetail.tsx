@@ -1,4 +1,4 @@
-import type { Gig } from '@/types/gigs';
+import type { GigDetail as Gig } from '@/types/gigs';
 
 export default function GigDetail({ gig }: { gig: Gig }) {
   return (

@@ -13,6 +13,12 @@ Supabase secrets are missing. Preview builds can browse sample gig details and
 credentials and swap the mock helpers with actual `gigs` and `applications`
 tables.
 
+## Post a gig
+
+The `/gigs/create` page and its `/api/gigs/create` endpoint are dynamic and do
+not require Supabase secrets. In previews without secrets, gig creation uses an
+in-memory mock store so the flow still works.
+
 ## Applications dashboard
 
 `/applications` is dynamic (no SSG) to avoid preview build failures. It falls
