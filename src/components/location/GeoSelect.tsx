@@ -1,175 +1,93 @@
-import { useEffect, useState } from 'react';
+'use client';
+
+import { useMemo } from 'react';
 import {
-  fetchRegions,
-  fetchProvinces,
-  fetchCities,
-  type Region,
-  type Province,
-  type City,
-} from '@/lib/geo';
+  getRegions,
+  getProvincesByRegion,
+  getMuncitiesByProvince,
+  type Region, type Province, type CityOrMunicipality
+} from '@/lib/psgc';
 
 export type GeoValue = {
-  region: Region | null;
-  province: Province | null;
-  city: City | null;
+  regionCode?: string;
+  provinceCode?: string;
+  cityCode?: string;
+  cityName?: string;
+};
+
+type Props = {
+  label?: string;
+  value: GeoValue;
+  onChange: (v: GeoValue) => void;
+  requireProvince?: boolean;
+  requireCityOrMunicipality?: boolean;
+  className?: string;
 };
 
 export default function GeoSelect({
-  value,
-  onChange,
-  isOnline,
-  onLoadingChange,
-}: {
-  value: GeoValue;
-  onChange: (v: GeoValue) => void;
-  isOnline: boolean;
-  onLoadingChange?: (loading: boolean) => void;
-}) {
-  const [regions, setRegions] = useState<Region[]>([]);
-  const [provinces, setProvinces] = useState<Province[]>([]);
-  const [cities, setCities] = useState<City[]>([]);
-  const [loadingRegions, setLoadingRegions] = useState(true);
-  const [loadingProvinces, setLoadingProvinces] = useState(false);
-  const [loadingCities, setLoadingCities] = useState(false);
-
-  const regionId = value.region?.id || '';
-  const provinceId = value.province?.id || '';
-  const cityId = value.city?.id || '';
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const data = await fetchRegions();
-        if (!cancelled) setRegions(data);
-      } finally {
-        if (!cancelled) setLoadingRegions(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!regionId) {
-      setProvinces([]);
-      setCities([]);
-      if (value.province || value.city) onChange({ ...value, province: null, city: null });
-      return;
-    }
-    setLoadingProvinces(true);
-    onLoadingChange?.(true);
-    fetchProvinces(regionId)
-      .then((data) => {
-        setProvinces(data);
-        if (!data.find((p) => p.id === provinceId))
-          onChange({ region: value.region, province: null, city: null });
-      })
-      .catch(() => setProvinces([]))
-      .finally(() => {
-        setLoadingProvinces(false);
-      });
-  }, [regionId]);
-
-  useEffect(() => {
-    if (!provinceId) {
-      setCities([]);
-      if (value.city) onChange({ ...value, city: null });
-      return;
-    }
-    setLoadingCities(true);
-    onLoadingChange?.(true);
-    fetchCities(provinceId)
-      .then((data) => {
-        setCities(data);
-        if (!data.find((c) => c.id === cityId))
-          onChange({ region: value.region, province: value.province, city: null });
-      })
-      .catch(() => setCities([]))
-      .finally(() => {
-        setLoadingCities(false);
-      });
-  }, [provinceId]);
-
-  useEffect(() => {
-    const loading = loadingRegions || loadingProvinces || loadingCities;
-    onLoadingChange?.(loading);
-  }, [loadingRegions, loadingProvinces, loadingCities, onLoadingChange]);
+  label = 'Lokasyon',
+  value, onChange,
+  requireProvince = true,
+  requireCityOrMunicipality = true,
+  className,
+}: Props) {
+  const regions: Region[] = useMemo(() => getRegions(), []);
+  const provinces: Province[] = useMemo(
+    () => (value.regionCode ? getProvincesByRegion(value.regionCode) : []),
+    [value.regionCode]
+  );
+  const muncities: CityOrMunicipality[] = useMemo(
+    () => (value.provinceCode ? getMuncitiesByProvince(value.provinceCode) : []),
+    [value.provinceCode]
+  );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+    <div className={className}>
+      <label className="block text-sm font-medium mb-1">{label}</label>
+
+      {/* Region */}
       <select
-        data-testid="region-select"
-        className="border rounded p-2"
-        value={regionId}
-        onChange={(e) => {
-          const r = regions.find((x) => x.id === e.target.value) || null;
-          onChange({ region: r, province: null, city: null });
-        }}
-        disabled={isOnline}
-        required={!isOnline}
+        className="w-full mb-2 border rounded-lg p-2"
+        value={value.regionCode ?? ''}
+        onChange={(e) =>
+          onChange({ regionCode: e.target.value || undefined, provinceCode: undefined, cityCode: undefined, cityName: undefined })
+        }
       >
-        <option value="">
-          {loadingRegions ? 'Loading regions…' : 'Select Region'}
-        </option>
-        {regions.map((r) => (
-          <option key={r.id} value={r.id}>
-            {r.name}
-          </option>
-        ))}
+        <option value="">— Piliin ang Rehiyon —</option>
+        {regions.map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
       </select>
 
-      <select
-        data-testid="province-select"
-        className="border rounded p-2"
-        value={provinceId}
-        onChange={(e) => {
-          const p = provinces.find((x) => x.id === e.target.value) || null;
-          onChange({ region: value.region, province: p, city: null });
-        }}
-        disabled={isOnline || !regionId}
-        required={!isOnline}
-      >
-        <option value="">
-          {!regionId
-            ? 'Select Region first'
-            : loadingProvinces
-            ? 'Loading provinces…'
-            : 'Select Province'}
-        </option>
-        {provinces.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </select>
+      {/* Province */}
+      {requireProvince && (
+        <select
+          className="w-full mb-2 border rounded-lg p-2"
+          disabled={!value.regionCode}
+          value={value.provinceCode ?? ''}
+          onChange={(e) =>
+            onChange({ ...value, provinceCode: e.target.value || undefined, cityCode: undefined, cityName: undefined })
+          }
+        >
+          <option value="">— Piliin ang Probinsya —</option>
+          {provinces.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
+        </select>
+      )}
 
-      <select
-        data-testid="city-select"
-        className="border rounded p-2"
-        value={cityId}
-        onChange={(e) => {
-          const c = cities.find((x) => x.id === e.target.value) || null;
-          onChange({ region: value.region, province: value.province, city: c });
-        }}
-        disabled={isOnline || !provinceId}
-      >
-        <option value="">
-          {!provinceId
-            ? 'Select Province first'
-            : loadingCities
-            ? 'Loading cities…'
-            : cities.length
-            ? 'Select City'
-            : 'No cities'}
-        </option>
-        {cities.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
+      {/* City / Municipality */}
+      {requireCityOrMunicipality && (
+        <select
+          className="w-full border rounded-lg p-2"
+          disabled={!value.provinceCode}
+          value={value.cityCode ?? ''}
+          onChange={(e) => {
+            const cityCode = e.target.value || undefined;
+            const name = muncities.find(x => x.code === cityCode)?.name;
+            onChange({ ...value, cityCode, cityName: name });
+          }}
+        >
+          <option value="">— Piliin ang Lungsod / Bayan —</option>
+          {muncities.map(x => <option key={x.code} value={x.code}>{x.name}</option>)}
+        </select>
+      )}
     </div>
   );
 }
