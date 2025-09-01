@@ -32,6 +32,7 @@
     "test": "echo \"E2E disabled while product is WIP\" && exit 0"
   },
   "dependencies": {
+    "@jobuntux/psgc": "^0.2.1",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/auth-helpers-shared": "^0.7.0",
     "@supabase/supabase-js": "^2.45.0",
@@ -48,8 +49,7 @@
     "set-cookie-parser": "^2.6.0",
     "stripe": "^16.0.0",
     "swr": "^2.2.5",
-    "zod": "^3",
-    "@jobuntux/psgc": "^0.2.1"
+    "zod": "^3"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.5.0",
@@ -72,6 +72,7 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=18.17 <23"
-  }
+    "node": ">=20 <21"
+  },
+  "packageManager": "npm@10"
 }
