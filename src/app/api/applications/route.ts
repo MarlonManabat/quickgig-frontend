@@ -1,12 +1,36 @@
 import { NextResponse } from 'next/server';
 import { adminSupabase, userIdFromCookie } from '@/lib/supabase/server';
 import { apply as mockApply } from '@/lib/mock/gigs';
+import { list as mockList } from '@/lib/mock/applications';
 import type {
+  Application,
   ApplicationRequest,
-  ApplicationResponse,
+  ApplicationCreateResponse,
 } from '@/types/applications';
 
 export const runtime = 'nodejs';
+
+export async function GET(req: Request) {
+  const supa = await adminSupabase();
+  const uid = (await userIdFromCookie()) ?? 'anon';
+
+  if (!supa) {
+    const applications = mockList(uid);
+    return NextResponse.json({ applications });
+  }
+
+  try {
+    const { data, error } = await supa
+      .from('applications')
+      .select('*')
+      .eq('user_id', uid)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return NextResponse.json({ applications: (data as Application[]) ?? [] });
+  } catch {
+    return NextResponse.json({ applications: [] });
+  }
+}
 
 export async function POST(req: Request) {
   let body: ApplicationRequest;
@@ -34,7 +58,7 @@ export async function POST(req: Request) {
       .select('id,status')
       .single();
     if (error) throw error;
-    return NextResponse.json(data as ApplicationResponse);
+    return NextResponse.json(data as ApplicationCreateResponse);
   } catch (err) {
     return NextResponse.json(
       { error: (err as Error).message || 'Unexpected error' },
