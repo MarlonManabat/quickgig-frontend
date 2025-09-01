@@ -29,6 +29,12 @@
     "baseline:backfill": "node scripts/baseline/backfill.js",
     "typecheck:scripts": "tsc -p scripts/tsconfig.json",
     "seed:demo": "tsx scripts/seed-demo.ts",
+    "playwright:install": "npx playwright install --with-deps",
+    "e2e": "playwright test tests/e2e",
+    "e2e:headed": "playwright test tests/e2e --headed",
+    "e2e:report": "playwright show-report",
+    "e2e:seed": "tsx scripts/e2e/seed.ts",
+    "e2e:cleanup": "tsx scripts/e2e/cleanup.ts",
     "test": "echo \"E2E disabled while product is WIP\" && exit 0"
   },
   "dependencies": {
