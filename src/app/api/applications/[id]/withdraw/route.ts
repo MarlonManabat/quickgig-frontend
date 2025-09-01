@@ -2,32 +2,38 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
-import { userIdFromCookie, adminSupabase } from '@/lib/supabase/server';
+import { userIdFromCookie } from '@/lib/supabase/server';
+import {
+  withdrawApplication,
+  NotFoundError,
+  ForbiddenError,
+} from '@/lib/applications/server';
 
 export async function POST(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const uid = await userIdFromCookie();
-  if (!uid) return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 });
+  if (!uid) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
-  const admin = await adminSupabase?.();
-  if (!admin) {
-    // still “successful” UX-wise, just no-op in preview without secrets
-    return NextResponse.json(
-      { ok: false, error: 'write not available in this environment' },
-      { status: 501 }
-    );
+  const appId = params?.id;
+  if (typeof appId !== 'string' || appId.length === 0) {
+    return NextResponse.json({ error: 'invalid_id' }, { status: 400 });
   }
 
-  // Only allow withdrawing user’s own application
-  const { error } = await admin
-    .from('applications')
-    .update({ status: 'withdrawn' })
-    .eq('id', params.id)
-    .eq('user_id', uid)
-    .in('status', ['submitted', 'viewed', 'interviewing']);
-
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 400 });
-  return NextResponse.json({ ok: true });
+  try {
+    await withdrawApplication(uid, appId);
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      return NextResponse.json(
+        { error: 'application_not_found' },
+        { status: 404 },
+      );
+    }
+    if (err instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+    }
+    return NextResponse.json({ error: 'unexpected' }, { status: 500 });
+  }
 }
