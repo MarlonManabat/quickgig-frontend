@@ -2,15 +2,15 @@ import GigDetail from '@/components/gigs/GigDetail';
 import ApplyPanel from '@/components/gigs/ApplyPanel';
 import Empty from '@/components/gigs/Empty';
 import { getOrigin } from '@/lib/origin';
-import type { Gig } from '@/types/gigs';
+import type { GigDetail } from '@/types/gigs';
 
 export const dynamic = 'force-dynamic';
 
-async function fetchGig(id: string): Promise<Gig | null> {
+async function fetchGig(id: string): Promise<GigDetail | null> {
   const res = await fetch(`${getOrigin()}/api/gigs/${id}`, { cache: 'no-store' });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to load gig');
-  const data = (await res.json()) as { gig: Gig };
+  const data = (await res.json()) as { gig: GigDetail };
   return data.gig;
 }
 

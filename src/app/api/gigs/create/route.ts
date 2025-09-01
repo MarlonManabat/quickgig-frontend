@@ -1,49 +1,54 @@
 import { NextResponse } from 'next/server';
 import { adminSupabase, userIdFromCookie } from '@/lib/supabase/server';
-import type { GigInsert } from '@/types/db';
+import { create as mockCreate } from '@/lib/mock/gigs';
+import type { Gig, GigInsert } from '@/types/gigs';
 
-export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
-  const uid = await userIdFromCookie();
-  if (!uid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  let body: any;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
 
-  const supa = await adminSupabase();
-  if (!supa)
-    return NextResponse.json(
-      { ok: false, error: 'service disabled in preview' },
-      { status: 501 }
-    );
-
-  const { data: profile, error: profErr } = await supa
-    .from('profiles')
-    .select('can_post_job')
-    .eq('id', uid)
-    .single();
-  if (profErr) return NextResponse.json({ error: profErr.message }, { status: 500 });
-  if (!profile || !profile.can_post_job)
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-
-  const body = await req.json();
-  if (!body.title || !body.description)
+  const title = body.title?.trim();
+  const company = body.company?.trim();
+  const description = body.description?.trim();
+  if (!title || !company || !description) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
 
   const payload: GigInsert = {
-    owner: uid,
-    title: body.title,
-    description: body.description,
-    budget: body.budget ?? null,
-    city: body.city ?? null,
-    status: 'open',
-    published: true,
+    title,
+    company,
+    description,
+    location: body.location?.trim() || undefined,
+    pay_min: body.payMin !== undefined ? Number(body.payMin) : undefined,
+    pay_max: body.payMax !== undefined ? Number(body.payMax) : undefined,
+    remote: body.remote === true,
   };
 
-  const { data, error } = await supa
-    .from('gigs')
-    .insert(payload)
-    .select('id')
-    .single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json({ id: data.id }, { status: 201 });
+  const uid = (await userIdFromCookie()) || 'anon';
+  payload.user_id = uid;
+
+  const supa = await adminSupabase();
+  if (supa) {
+    const created_at = new Date().toISOString();
+    const status = payload.status ?? 'open';
+    const { data, error } = await supa
+      .from('gigs')
+      .insert({ ...payload, user_id: uid, status, created_at })
+      .select('id')
+      .single();
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    const gig: Gig = { id: String(data.id), ...payload, status, created_at };
+    return NextResponse.json({ id: gig.id, gig });
+  }
+
+  const gig = mockCreate(payload);
+  return NextResponse.json({ id: gig.id, gig });
 }

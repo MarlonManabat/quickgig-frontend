@@ -24,7 +24,7 @@ export interface GigsResponse {
   limit: number;
 }
 
-export interface Gig {
+export interface GigDetail {
   id: number;
   title: string;
   company: string;
@@ -35,5 +35,23 @@ export interface Gig {
 }
 
 export interface GigResponse {
-  gig: Gig;
+  gig: GigDetail;
 }
+
+export type Gig = {
+  id: string;
+  title: string;
+  company: string;
+  location?: string;
+  description: string;
+  status: 'open' | 'closed';
+  created_at: string;
+  user_id?: string;
+  pay_min?: number;
+  pay_max?: number;
+  remote?: boolean;
+};
+
+export type GigInsert = Omit<Gig, 'id' | 'created_at' | 'status'> & {
+  status?: Gig['status'];
+};
