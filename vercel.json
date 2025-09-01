@@ -1,4 +1,5 @@
 {
   "installCommand": "npm install --no-audit --no-fund --registry https://registry.npmjs.org/",
-  "buildCommand": "npm run build"
+  "buildCommand": "npm run build",
+  "ignoreCommand": "node scripts/ignore-build.js"
 }
