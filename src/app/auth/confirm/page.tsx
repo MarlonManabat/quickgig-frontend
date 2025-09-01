@@ -1,20 +1,28 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { nextOr } from '@/lib/next-redirect';
 
 export const dynamic = 'force-dynamic';
 
 export default function Confirm() {
   const [ok, setOk] = useState<boolean | null>(null);
   const [msg, setMsg] = useState('');
+  const searchParams = useSearchParams();
+  const dest = nextOr(searchParams.get('next'), '/');
 
   useEffect(() => {
     supabase.auth.exchangeCodeForSession(window.location.href)
       .then(({ error }) => {
         if (error) { setOk(false); setMsg(error.message); }
-        else { setOk(true); setMsg('Signed in! Redirecting…'); setTimeout(()=>{ location.href = '/'; }, 800); }
+        else {
+          setOk(true);
+          setMsg('Signed in! Redirecting…');
+          setTimeout(() => { location.href = dest; }, 800);
+        }
       });
-  }, []);
+  }, [dest]);
 
   return (
     <main className="mx-auto max-w-md p-6">

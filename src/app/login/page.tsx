@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { safeNext } from '@/lib/safe-next';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,13 +10,18 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const next = safeNext(searchParams.get('next'));
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
+    const dest = `${location.origin}/auth/confirm${
+      next ? `?next=${encodeURIComponent(next)}` : ''
+    }`;
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${location.origin}/auth/confirm` }
+      options: { emailRedirectTo: dest }
     });
     if (error) setErr(error.message); else setSent(true);
   }
