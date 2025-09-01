@@ -34,3 +34,17 @@ export interface Profile {
   created_at: string;
   can_post_job: boolean | null;
 }
+
+export type ApplicationStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'withdrawn';
+
+export interface Application {
+  id: string;
+  title: string;
+  company: string;
+  status: ApplicationStatus;
+  created_at: string;
+}
