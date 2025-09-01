@@ -6,8 +6,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Enable pnpm (corepack)
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm --version
       - name: Install Supabase CLI
-        run: npm i -g supabase@2
+        run: pnpm add -g supabase@2
       - name: Show Supabase CLI version
         run: supabase --version
       - name: Push migrations to remote

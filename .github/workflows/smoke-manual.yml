@@ -23,21 +23,24 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install deps
+      - name: Enable pnpm (corepack)
         run: |
           corepack enable
-          pnpm i --frozen-lockfile || npm ci || yarn install --frozen-lockfile
+          corepack prepare pnpm@9 --activate
+          pnpm --version
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
         run: npx playwright install --with-deps
 
       - name: Build
-        run: |
-          if [ -f pnpm-lock.yaml ]; then pnpm build; elif [ -f yarn.lock ]; then yarn build; else npm run build; fi
+        run: pnpm build
 
       - name: Start app (background)
         run: |
-          (nohup npx next start -p 3000 > .next/serve.log 2>&1 &)
+          (nohup pnpm start > .next/serve.log 2>&1 &)
           echo "Started Next on :3000"
 
       - name: Wait for app
@@ -53,4 +56,4 @@ jobs:
           RUN_SMOKE: "true"
           BASE_URL: ${{ github.event.inputs.baseUrl }}
         run: |
-          npx playwright test tests/smoke.* --reporter=line || npx playwright show-report
+          pnpm exec playwright test tests/smoke.* --reporter=line || pnpm exec playwright show-report
