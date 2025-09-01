@@ -34,9 +34,9 @@ export default function TopNav() {
           QuickGig.ph
         </Link>
         <div className="ml-auto flex items-center gap-4 text-sm">
-          <Link href="/find" data-testid="nav-find">
-            {copy.nav.findWork}
-          </Link>
+            <Link href="/gigs" data-testid="nav-find">
+              {copy.nav.findWork}
+            </Link>
           {loggedIn && <Link href="/dashboard/gigs">{copy.nav.myGigs}</Link>}
           {loggedIn && (
             <Link href="/applications">{copy.nav.applications}</Link>
@@ -49,18 +49,18 @@ export default function TopNav() {
               Buy Ticket
             </Link>
           )}
-          <Link
-            href="/post"
-            data-testid="nav-post"
-            className={`btn-primary ${loggedIn && !eligible ? "opacity-50 pointer-events-none" : ""}`}
-            title={
-              loggedIn && !eligible
-                ? `Please buy a ticket (₱${TICKET_PRICE_PHP})`
-                : undefined
-            }
-          >
-            {copy.nav.postJob}
-          </Link>
+            <Link
+              href="/gigs/create"
+              data-testid="nav-post"
+              className={`btn-primary ${loggedIn && !eligible ? "opacity-50 pointer-events-none" : ""}`}
+              title={
+                loggedIn && !eligible
+                  ? `Please buy a ticket (₱${TICKET_PRICE_PHP})`
+                  : undefined
+              }
+            >
+              {copy.nav.postJob}
+            </Link>
           <Link href="/login" data-testid="nav-login">
             {copy.nav.auth}
           </Link>

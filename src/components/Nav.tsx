@@ -28,13 +28,13 @@ export default function Nav() {
 
   return (
     <nav className="p-4 border-b mb-4 flex gap-4">
-      <Link href="/home">Home</Link>
-      <Link href="/find" data-testid="nav-find">
-        {copy.nav.findWork}
-      </Link>
-      <Link href="/post" data-testid="nav-post">
-        {copy.nav.postJob}
-      </Link>
+        <Link href="/home">Home</Link>
+        <Link href="/gigs" data-testid="nav-find">
+          {copy.nav.findWork}
+        </Link>
+        <Link href="/gigs/create" data-testid="nav-post">
+          {copy.nav.postJob}
+        </Link>
       {session ? (
         <button onClick={logout}>Logout</button>
       ) : (
