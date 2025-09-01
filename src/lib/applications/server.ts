@@ -5,12 +5,30 @@ import {
   mockWithdraw,
   MockNotFoundError,
   MockForbiddenError,
+  mockApplicationStore,
 } from '@/lib/mock/application-store';
 
 export type ApplicationStatus = 'applied' | 'withdrawn' | 'rejected' | 'hired';
 
 export class NotFoundError extends Error {}
 export class ForbiddenError extends Error {}
+
+export async function getApplicationById(id: string) {
+  const supa = await adminSupabase();
+  if (!supa) {
+    return mockApplicationStore.get(id) ?? null;
+  }
+  const { data, error } = await supa
+    .from('applications')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) {
+    if ((error as any).code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
 
 export async function withdrawApplication(
   uid: string,
