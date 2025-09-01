@@ -30,7 +30,7 @@ jobs:
           fi
 
       - name: Install deps
-        run: npm ci
+        run: npm ci || npm install --no-audit --no-fund
 
       - name: Typecheck (best-effort)
         run: npm run -s typecheck || echo "::warning::no typecheck script"
@@ -38,6 +38,11 @@ jobs:
       - name: Lint (RSC guard)
         continue-on-error: true
         run: npm run lint
+
+      - name: prebuild
+        run: |
+          node ./scripts/check-dynamic-route-conflicts.mjs
+          npx --yes tsx ./scripts/assert-valid-revalidate.ts
 
       - name: Build
         env:

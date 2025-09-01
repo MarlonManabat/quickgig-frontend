@@ -1,6 +1,11 @@
 name: E2E (manual or nightly)
 on:
   workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL to test against (leave empty to build locally)'
+        required: false
+        default: ''
   schedule:
     - cron: '0 9 * * *'
 
@@ -15,14 +20,17 @@ jobs:
           node-version-file: .nvmrc
           cache: 'npm'
 
-      - name: Install deps (robust)
-        run: |
-          npm ci || npm install --no-audit --prefer-offline
+      - name: Install deps
+        run: npm install --no-audit --no-fund
 
-      - name: Playwright install
-        run: npx playwright install --with-deps
+      - name: Ensure tsx available for TS scripts
+        run: npm i -D tsx@4
 
-      - name: Build
+      - name: Prebuild guard
+        run: npx tsx scripts/assert-valid-revalidate.ts
+
+      - name: Build app (local only)
+        if: ${{ inputs.base_url == '' }}
         run: npm run build
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -30,13 +38,26 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
-      - name: Start server (background)
+      - name: Start app (background, local only)
+        if: ${{ inputs.base_url == '' }}
+        run: nohup npm run start -- -p 3000 > .next-serve.log 2>&1 &
+
+      - name: Wait for app (local only)
+        if: ${{ inputs.base_url == '' }}
         run: |
-          nohup npm start >/tmp/next.log 2>&1 &
-          npx wait-on http://localhost:3000/health
+          for i in {1..60}; do
+            curl -fsS http://localhost:3000/ && exit 0
+            sleep 1
+          done
+          echo "App did not become healthy" && exit 1
+
+      - name: Playwright install
+        run: npx playwright install --with-deps
 
       - name: Run E2E
-        run: npx playwright test --reporter=line
+        env:
+          BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || 'http://localhost:3000' }}
+        run: npx playwright test --reporter=dot,html
 
       - name: Upload Playwright report
         if: always()
@@ -44,16 +65,15 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
-          if-no-files-found: ignore
 
       - name: Upload Next server log
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: next-log
-          path: /tmp/next.log
+          name: next-serve-log
+          path: .next-serve.log
           if-no-files-found: ignore
 
-      - name: Cleanup test data
+      - name: Cleanup data
         if: always()
         run: npx tsx scripts/e2e/cleanup.ts
