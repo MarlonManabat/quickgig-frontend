@@ -16,30 +16,48 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - name: Install deps
+        with: { node-version: 20 }
+
+      - name: Install deps (ci with fallback)
         run: |
           npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build app
+        run: npm run build
+
       - name: Ensure port 3000 is free
         run: |
-          if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then kill -9 $(lsof -i :3000 -sTCP:LISTEN -t) || true; fi
+          if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+            kill -9 $(lsof -i :3000 -sTCP:LISTEN -t) || true
+          fi
+
       - name: Start server (background, local only)
         run: |
           npm run start & echo $! > .pidfile
-      - name: Wait for app/health or homepage (60s)
+
+      - name: Wait for app/health or homepage (90s)
         run: |
           URL="${BASE_URL:-http://localhost:3000}"
-          for i in {1..60}; do
+          for i in {1..90}; do
             curl -fsS "$URL/health" || curl -fsS "$URL" >/dev/null && { echo UP; exit 0; }
             sleep 1
           done
           echo "App not up"; exit 1
+
       - name: Run E2E
-        run: npx playwright test
+        run: npx playwright test --reporter=html
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
-        with: { name: playwright-report, path: playwright-report, if-no-files-found: ignore }
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: ignore
+
       - name: Stop server
         if: always()
         run: if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi
