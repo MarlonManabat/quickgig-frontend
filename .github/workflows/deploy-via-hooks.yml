@@ -38,32 +38,21 @@ on:
 
 jobs:
   deploy:
+    # Only run on:
+    #  - push to main, OR
+    #  - PRs that carry the 'deploy' label
+    if: >
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Decide target
-        id: decide
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          kind="skip"
+      # Call the proper hook depending on context
+      - name: Trigger Vercel Deploy Hook (main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: curl -sS -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
 
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
-            kind="main"
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # Check PR labels for 'deploy' without needing gh cli
-            labels=$(jq -r '.pull_request.labels[].name // empty' <<< '${{ toJson(github.event) }}')
-            if grep -qi '^deploy$' <<< "$labels"; then
-              kind="pr"
-            fi
-          fi
-
-          echo "kind=$kind" >> "$GITHUB_OUTPUT"
-
-      - name: Trigger Vercel Deploy Hook
-        if: steps.decide.outputs.kind != 'skip'
-        env:
-          VERCEL_DEPLOY_HOOK: ${{ steps.decide.outputs.kind == 'main' && secrets.VERCEL_DEPLOY_HOOK || secrets.VERCEL_PREVIEW_DEPLOY_HOOK }}
-        run: |
-          curl -sS -X POST "$VERCEL_DEPLOY_HOOK"
+      - name: Trigger Vercel Preview Hook (PR with label:deploy)
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy')
+        run: curl -sS -X POST "${{ secrets.VERCEL_PREVIEW_DEPLOY_HOOK }}"

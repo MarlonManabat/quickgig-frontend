@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "ci:verify": "node scripts/ci-verify.mjs",
-    "prebuild": "node ./scripts/check-dynamic-route-conflicts.mjs && tsx ./scripts/assert-valid-revalidate.ts",
+    "prebuild": "node ./scripts/check-dynamic-route-conflicts.mjs && node ./scripts/assert-valid-revalidate.mjs",
     "build": "next build",
     "start": "next start -p 3000",
     "start:preview": "next start -p 3000",

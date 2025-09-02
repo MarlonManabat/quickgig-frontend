@@ -39,8 +39,11 @@ jobs:
         continue-on-error: true
         run: npm run lint
 
-      - name: Prebuild
-        run: npm run prebuild
+      - name: Prebuild (route sanity)
+        run: node ./scripts/check-dynamic-route-conflicts.mjs
+
+      - name: Prebuild (revalidate sanity)
+        run: node ./scripts/assert-valid-revalidate.mjs
 
       - name: Build
         env:
