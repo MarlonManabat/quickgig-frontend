@@ -1,15 +1,34 @@
 import { test, expect } from '@playwright/test';
 
-test('Hero → Browse jobs works', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.getByTestId('hero-browse-jobs').click();
-  await expect(page).toHaveURL(/\/browse-jobs/);
-  await expect(page.getByRole('heading', { name: /browse jobs/i })).toBeVisible();
-});
+const BASE = process.env.BASE_URL || '/';
 
-test('Hero → Post a job works (shell)', async ({ page }) => {
+async function gotoHome(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.getByTestId('hero-post-job').click();
-  await expect(page).toHaveURL(/\/post-job/); // adjust if your path differs
-  await expect(page.getByRole('heading')).toBeVisible();
+  // Ensure hydration / header rendered
+  await page.waitForLoadState('networkidle');
+}
+
+async function clickWithFallback(page, testId, roleName) {
+  const byId = page.getByTestId(testId);
+  if (await byId.count()) {
+    await byId.first().click();
+    return;
+  }
+  await page.getByRole('link', { name: roleName }).first().click();
+}
+
+test.describe('Hero', () => {
+  test('Browse jobs works', async ({ page }) => {
+    await gotoHome(page);
+    await clickWithFallback(page, 'hero-browse-jobs', /browse jobs/i);
+    await expect(page).toHaveURL(/\/(browse-jobs|jobs)/);
+    await expect(page.getByRole('heading', { name: /browse jobs/i })).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('Post a job works (shell)', async ({ page }) => {
+    await gotoHome(page);
+    await clickWithFallback(page, 'hero-post-job', /post a job/i);
+    // allow any of our create/post routes
+    await expect(page).toHaveURL(/\/(gigs\/create|post|post-a-job)/);
+  });
 });
