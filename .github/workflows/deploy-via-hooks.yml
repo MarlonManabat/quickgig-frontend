@@ -44,6 +44,7 @@ jobs:
 
       - name: Decide target
         id: pick
+        shell: bash
         run: |
           KIND="skip"
           HOOK=""

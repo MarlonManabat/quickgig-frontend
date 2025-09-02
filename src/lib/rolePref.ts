@@ -13,7 +13,7 @@ export async function getRolePref(userId?: string): Promise<RolePref | null> {
       }
       return null;
     }
-    const supabase = supabaseBrowser;
+    const supabase = supabaseBrowser();
     // try DB first
     const { data } = await supabase
       .from("profiles")
@@ -38,7 +38,7 @@ export async function setRolePref(value: RolePref, userId?: string) {
       window.localStorage.setItem("role_pref", value);
     }
     if (userId) {
-      const supabase = supabaseBrowser;
+      const supabase = supabaseBrowser();
       await supabase
         .from("profiles")
         .update({ role_pref: value } as Update<"profiles">)

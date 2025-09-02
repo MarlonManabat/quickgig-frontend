@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 
 export default function AppHeaderTickets() {
-  const supabase = supabaseBrowser;
+  const supabase = supabaseBrowser();
   const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {

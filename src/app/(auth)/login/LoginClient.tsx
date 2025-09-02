@@ -17,7 +17,7 @@ export default function LoginClient() {
     const dest = `${location.origin}/auth/confirm${
       next ? `?next=${encodeURIComponent(next)}` : ''
     }`;
-    const { error } = await supabaseBrowser.auth.signInWithOtp({
+    const { error } = await supabaseBrowser().auth.signInWithOtp({
       email,
       options: { emailRedirectTo: dest }
     });

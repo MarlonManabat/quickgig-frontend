@@ -3,10 +3,10 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { redirect } from "next/navigation";
-import { getServerClient } from "@/lib/supabase/server";
+import { supabaseServer } from "@/lib/supabase/server";
 
 export default async function ApplicationsPage() {
-  const supabase = getServerClient();
+  const supabase = supabaseServer();
   const { data: userRes, error: userErr } = await supabase.auth.getUser();
   const user = userRes?.user;
 

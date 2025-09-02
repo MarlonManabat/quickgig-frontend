@@ -12,7 +12,7 @@ export async function sendMagicLink(
   email: string,
   params?: { next?: string; role?: string },
 ) {
-  const supabase = supabaseBrowser;
+  const supabase = supabaseBrowser();
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://app.quickgig.ph";
   const qp = new URLSearchParams();
