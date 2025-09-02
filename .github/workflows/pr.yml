@@ -42,15 +42,34 @@ jobs:
       # Optional: you can remove this if you want max speed; kept for parity.
       - name: Build app (non-blocking)
         run: npm run build || echo "skip build for smoke"
-
-      - name: Smoke tests (run against dev server)
+      - name: Start dev server (background)
         env:
-          PLAYWRIGHT_WEBSERVER_CMD: "next dev -p 3000"
-          BASE_URL: "http://localhost:3000"
-          # safe fallbacks so dev server doesn't crash on missing prod envs
           NEXTAUTH_URL: "http://localhost:3000"
           NEXTAUTH_SECRET: "smoke-test-secret"
           NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
           NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "smoke-test-anon"
-        run: npx playwright test "tests/smoke/**/*.spec.ts"
+        run: |
+          nohup npx next dev -p 3000 >/dev/null 2>&1 &
+          echo $! > .pidfile
+
+      - name: Wait for /api/health (60s)
+        run: |
+          for i in {1..60}; do
+            curl -fsS http://localhost:3000/api/health && exit 0
+            sleep 1
+          done
+          echo "Server didn't respond in time"; exit 1
+
+      - name: Install Playwright (browsers)
+        run: npx playwright install --with-deps
+
+      - name: Smoke tests (no webServer)
+        env:
+          BASE_URL: "http://localhost:3000"
+        run: npx playwright test -c playwright.smoke.ts "tests/smoke/**/*.spec.ts"
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi
