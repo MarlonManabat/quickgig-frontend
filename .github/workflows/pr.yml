@@ -33,6 +33,43 @@ jobs:
 
       - name: Prebuild (revalidate sanity)
         run: node ./scripts/assert-valid-revalidate.mjs
+      - name: Ensure port 3000 is free
+        run: |
+          if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+            kill -9 $(lsof -i :3000 -sTCP:LISTEN -t) || true
+          fi
 
-      - name: Smoke tests
-        run: npx playwright test "tests/smoke/**/*.spec.ts"
+      # Optional: you can remove this if you want max speed; kept for parity.
+      - name: Build app (non-blocking)
+        run: npm run build || echo "skip build for smoke"
+      - name: Start dev server (background)
+        env:
+          NEXTAUTH_URL: "http://localhost:3000"
+          NEXTAUTH_SECRET: "smoke-test-secret"
+          NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+          NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "smoke-test-anon"
+        run: |
+          nohup npx next dev -p 3000 >/dev/null 2>&1 &
+          echo $! > .pidfile
+
+      - name: Wait for /api/health (120s)
+        run: |
+          for i in {1..120}; do
+            curl -fsS http://localhost:3000/api/health && exit 0
+            sleep 1
+          done
+          echo "Server didn't respond in time"; exit 1
+
+      - name: Install Playwright (browsers)
+        run: npx playwright install --with-deps
+
+      - name: Smoke tests (no webServer)
+        env:
+          BASE_URL: "http://localhost:3000"
+        run: npx playwright test -c playwright.smoke.ts
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi

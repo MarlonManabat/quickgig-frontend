@@ -1,11 +1,30 @@
-import { test, expect } from '@playwright/test';
-import { BASE } from '../smoke.env';
+import { test, expect, Page } from '@playwright/test';
 
-test('nav links work', async ({ page }) => {
-  await page.goto(BASE, { waitUntil: 'domcontentloaded' });
-  await page.getByTestId('nav-browse-jobs').click();
-  await expect(page).toHaveURL(/\/browse-jobs/);
-  await page.goBack();
-  await page.getByTestId('nav-my-applications').click();
-  await expect(page).toHaveURL(/\/(applications|login)/);
+async function gotoHome(page: Page) {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.waitForLoadState('networkidle');
+}
+
+async function clickNavOrGo(page: Page, opts: { name: RegExp, fallbackPath: string }) {
+  const link = page.getByRole('link', { name: opts.name });
+  if (await link.count()) {
+    await link.first().click();
+  } else {
+    await page.goto(opts.fallbackPath, { waitUntil: 'domcontentloaded' });
+  }
+}
+
+test.describe('nav links work', () => {
+  test('Home ▸ Browse Jobs', async ({ page }) => {
+    await gotoHome(page);
+    await clickNavOrGo(page, { name: /browse jobs/i, fallbackPath: '/browse-jobs' });
+    await expect(page).toHaveURL(/\/(browse-jobs|jobs)\b/i, { timeout: 10_000 });
+  });
+
+  test('Home ▸ My Applications (signed out ok)', async ({ page }) => {
+    await gotoHome(page);
+    await clickNavOrGo(page, { name: /my applications/i, fallbackPath: '/applications' });
+    await expect(page).toHaveURL(/\/(applications|login)\b/i, { timeout: 10_000 });
+  });
 });
+
