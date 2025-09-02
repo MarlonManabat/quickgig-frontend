@@ -38,36 +38,21 @@ on:
 
 jobs:
   deploy:
+    # Only run on:
+    #  - push to main, OR
+    #  - PRs that carry the 'deploy' label
+    if: >
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Decide target
-        id: pick
-        run: |
-          KIND="skip"
-          HOOK=""
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == "main" ]]; then
-            KIND="production"
-            HOOK="${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # Deploy preview ONLY if the PR has label "deploy"
-            HAS_LABEL=$(jq -r '.pull_request.labels[].name' <<< '${{ toJson(github.event) }}' | grep -i '^deploy$' || true)
-            if [[ -n "$HAS_LABEL" ]]; then
-              KIND="preview"
-              HOOK="${{ secrets.VERCEL_PREVIEW_HOOK_URL }}"
-            fi
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            KIND="${{ github.event.inputs.kind }}"
-            HOOK="${{ github.event.inputs.url }}"
-          fi
-          echo "kind=$KIND" >> $GITHUB_OUTPUT
-          echo "hook=$HOOK" >> $GITHUB_OUTPUT
+      # Call the proper hook depending on context
+      - name: Trigger Vercel Deploy Hook (main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: curl -sS -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
 
-      - name: Skip if not requested
-        if: steps.pick.outputs.kind == 'skip' || steps.pick.outputs.hook == ''
-        run: echo "No deploy requested."
-
-      - name: Trigger Vercel Deploy Hook
-        if: steps.pick.outputs.kind != 'skip' && steps.pick.outputs.hook != ''
-        run: curl -fsSL -X POST "${{ steps.pick.outputs.hook }}"
+      - name: Trigger Vercel Preview Hook (PR with label:deploy)
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy')
+        run: curl -sS -X POST "${{ secrets.VERCEL_PREVIEW_DEPLOY_HOOK }}"

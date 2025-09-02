@@ -11,7 +11,8 @@ export default function ConfirmClient() {
   const dest = nextOr(searchParams.get('next'), '/');
 
   useEffect(() => {
-    supabaseBrowser.auth.exchangeCodeForSession(window.location.href)
+    supabaseBrowser()
+      .auth.exchangeCodeForSession(window.location.href)
       .then(({ error }) => {
         if (error) { setOk(false); setMsg(error.message); }
         else {

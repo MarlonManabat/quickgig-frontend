@@ -14,7 +14,7 @@ type NotificationRow = {
 };
 
 export default function AppHeaderNotifications() {
-  const supa = supabaseBrowser;
+  const supa = supabaseBrowser();
   const [items, setItems] = React.useState<NotificationRow[]>([]);
   const [loading, setLoading] = React.useState(true);
 

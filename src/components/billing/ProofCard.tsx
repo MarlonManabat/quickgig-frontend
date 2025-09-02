@@ -15,7 +15,7 @@ interface Proof {
 }
 
 export default function ProofCard({ proof, children }: { proof: Proof; children?: React.ReactNode }) {
-  const supabase = supabaseBrowser;
+  const supabase = supabaseBrowser();
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {

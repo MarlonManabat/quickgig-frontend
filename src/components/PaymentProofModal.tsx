@@ -22,7 +22,7 @@ export default function PaymentProofModal({
   onDone?: () => void;
   onError?: () => void;
 }) {
-  const supabase = supabaseBrowser;
+  const supabase = supabaseBrowser();
   const [file, setFile] = React.useState<File | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
