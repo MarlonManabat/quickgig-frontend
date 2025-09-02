@@ -28,9 +28,9 @@ export default defineConfig({
   webServer: process.env.BASE_URL
     ? undefined
     : {
-        command: 'npm run start:prod',
-        url: 'http://localhost:3000',
+        command: process.env.PLAYWRIGHT_WEBSERVER_CMD || 'npm run start:prod',
+        url: base(),
+        reuseExistingServer: true,
         timeout: 120_000,
-        reuseExistingServer: false,
       },
 });
