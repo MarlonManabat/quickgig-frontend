@@ -17,9 +17,13 @@ export default function AppHeader({ balance }: Props) {
             QuickGig
           </Link>
           <nav className="flex items-center gap-4">
-            <Link href="/gigs">Browse jobs</Link>
+            <Link data-testid="nav-browse-jobs" href="/browse-jobs" prefetch={false}>
+              Browse jobs
+            </Link>
             <Link href="/gigs/create">Post a job</Link>
-            <Link href="/applications">My Applications</Link>
+            <Link data-testid="nav-my-applications" href="/applications" prefetch={false}>
+              My Applications
+            </Link>
             {user ? (
               <button onClick={() => signOut()} className="underline">
                 Sign out

@@ -3,7 +3,7 @@ import { loginAs } from './helpers';
 
 const SEED_GIG = 'Seeded E2E Gig';
 
-test('worker applies to a gig', async ({ page, baseURL }) => {
+test('worker applies to a gig @auth', async ({ page, baseURL }) => {
   await loginAs(baseURL!, 'worker', page);
 
   await page.goto('/gigs');
