@@ -8,9 +8,9 @@ function resolveBaseURL() {
 
 const baseURL = resolveBaseURL();
 
-// If provided, we will start that command; otherwise default to prod-like start.
+// Only start a local server when targeting localhost.
+const isRemote = /^https?:\/\/(?!localhost|127\.0\.0\.1)/i.test(baseURL);
 const serverCmd = process.env.PLAYWRIGHT_WEBSERVER_CMD || 'npm run start';
-const useWebServer = true; // keep webServer enabled; command & url are now correct.
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -22,14 +22,14 @@ export default defineConfig({
     actionTimeout: 15_000,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  ...(useWebServer
-    ? {
+  ...(isRemote
+    ? {}
+    : {
         webServer: {
           command: serverCmd,
-          url: baseURL,
+          port: 3000,
           reuseExistingServer: true,
           timeout: 120_000,
         },
-      }
-    : {}),
+      }),
 });
