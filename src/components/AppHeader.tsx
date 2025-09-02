@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useUser } from '@/hooks/useUser';
+import { ROUTES } from '../lib/routes';
 
 type Props = {
   balance: number;
@@ -17,11 +18,15 @@ export default function AppHeader({ balance }: Props) {
             QuickGig
           </Link>
           <nav className="flex items-center gap-4">
-            <Link data-testid="nav-browse-jobs" href="/browse-jobs" prefetch={false}>
+            <Link data-testid="nav-browse-jobs" href={ROUTES.browseJobs} prefetch={false}>
               Browse jobs
             </Link>
-            <Link href="/gigs/create">Post a job</Link>
-            <Link data-testid="nav-my-applications" href="/applications" prefetch={false}>
+            <Link href={ROUTES.postJob} prefetch={false}>Post a job</Link>
+            <Link
+              data-testid="nav-my-applications"
+              href={ROUTES.myApplications}
+              prefetch={false}
+            >
               My Applications
             </Link>
             {user ? (
