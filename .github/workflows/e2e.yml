@@ -32,8 +32,7 @@ jobs:
           npm ci --no-audit --no-fund || npm install --no-audit --no-fund
           npx playwright install --with-deps
 
-      - name: Seed data
-        run: npm run e2e:seed
+      # Seed/Cleanup intentionally skipped in CI; tests don’t require preseeded data.
 
       - name: Start server (background, local only)
         if: ${{ env.BASE_URL == '' }}
@@ -68,10 +67,6 @@ jobs:
           name: playwright-report
           path: playwright-report
           if-no-files-found: ignore
-
-      - name: Cleanup data
-        if: always()
-        run: npm run e2e:cleanup
 
       - name: Stop server
         if: always() && env.BASE_URL == ''
