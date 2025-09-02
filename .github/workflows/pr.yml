@@ -40,12 +40,13 @@ jobs:
           fi
 
       # Optional: you can remove this if you want max speed; kept for parity.
-      - name: Build (non-blocking)
-        run: npm run build || echo "Skipping build for smoke"
+      - name: Build app (non-blocking)
+        run: npm run build || echo "skip build for smoke"
 
       - name: Smoke tests (run against dev server)
         env:
           PLAYWRIGHT_WEBSERVER_CMD: "next dev -p 3000"
+          BASE_URL: "http://localhost:3000"
           # safe fallbacks so dev server doesn't crash on missing prod envs
           NEXTAUTH_URL: "http://localhost:3000"
           NEXTAUTH_SECRET: "smoke-test-secret"
