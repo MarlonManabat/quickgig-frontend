@@ -12,5 +12,5 @@ export default defineConfig({
     actionTimeout: 10_000,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  // IMPORTANT: no webServer here; CI manages the server lifecycle.
+  // no webServer; CI starts/stops dev server explicitly
 });

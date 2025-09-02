@@ -53,9 +53,9 @@ jobs:
           nohup npx next dev -p 3000 >/dev/null 2>&1 &
           echo $! > .pidfile
 
-      - name: Wait for /api/health (60s)
+      - name: Wait for /api/health (120s)
         run: |
-          for i in {1..60}; do
+          for i in {1..120}; do
             curl -fsS http://localhost:3000/api/health && exit 0
             sleep 1
           done
@@ -67,7 +67,7 @@ jobs:
       - name: Smoke tests (no webServer)
         env:
           BASE_URL: "http://localhost:3000"
-        run: npx playwright test -c playwright.smoke.ts "tests/smoke/**/*.spec.ts"
+        run: npx playwright test -c playwright.smoke.ts
 
       - name: Stop dev server
         if: always()
