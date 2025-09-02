@@ -38,6 +38,8 @@
     "e2e:cleanup": "node -e \"console.log('E2E CI: skip cleanup')\"",
     "e2e:seed:local": "tsx scripts/e2e/seed.ts",
     "e2e:cleanup:local": "tsx scripts/e2e/cleanup.ts",
+    "smoke:prod": "BASE_URL=https://app.quickgig.ph npx playwright test -c playwright.smoke.ts",
+    "e2e:prod": "BASE_URL=https://app.quickgig.ph npx playwright test",
     "test": "echo \"E2E disabled while product is WIP\" && exit 0"
   },
   "dependencies": {

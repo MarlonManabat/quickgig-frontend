@@ -1,10 +1,15 @@
-name: E2E (manual)
+name: E2E (manual or nightly)
 
 on:
   workflow_dispatch:
     inputs:
+      target:
+        description: "Where to run E2E"
+        type: choice
+        options: [preview, prod]
+        default: preview
       base_url:
-        description: "Target base URL (leave blank to test local build)"
+        description: "Override BASE_URL (optional)"
         required: false
         type: string
       run_auth:
@@ -13,12 +18,15 @@ on:
         default: "false"
         type: choice
         options: ["false", "true"]
+  schedule:
+    - cron: "0 9 * * *"
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
     env:
-      BASE_URL: ${{ inputs.base_url }}
+      TARGET: ${{ inputs.target || 'preview' }}
+      BASE_URL: ${{ inputs.base_url || (inputs.target == 'prod' && 'https://app.quickgig.ph') || '' }}
       E2E_BASIC: ${{ inputs.run_auth == 'true' && '0' || '1' }}
     steps:
       - uses: actions/checkout@v4
@@ -32,50 +40,39 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      # LOCAL PATH (no base_url or localhost-ish base_url)
-      - name: Build app (local)
-        if: ${{ inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0') }}
+      - name: Build app (preview)
+        if: ${{ env.TARGET != 'prod' }}
         run: npm run build
 
-      - name: Ensure port 3000 is free (local)
-        if: ${{ inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0') }}
+      - name: Ensure port 3000 is free (preview)
+        if: ${{ env.TARGET != 'prod' }}
         run: |
           if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
             kill -9 $(lsof -i :3000 -sTCP:LISTEN -t) || true
           fi
 
-      - name: Start server (background, local only)
-        if: ${{ inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0') }}
+      - name: Start server (background, preview)
+        if: ${{ env.TARGET != 'prod' }}
         run: |
-          npm run start & echo $! > .pidfile
+          npm run start -- -p 3000 & echo $! > .pidfile
 
-      - name: Wait for app/health or homepage (local, 90s)
-        if: ${{ inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0') }}
+      - name: Wait for app/health or homepage (preview, 90s)
+        if: ${{ env.TARGET != 'prod' }}
+        env:
+          URL: ${{ env.BASE_URL || 'http://localhost:3000' }}
         run: |
-          URL="${BASE_URL:-http://localhost:3000}"
           for i in {1..90}; do
-            curl -fsS "$URL/health" || curl -fsS "$URL" >/dev/null && { echo "UP (local)"; exit 0; }
+            curl -fsS "$URL/health" || curl -fsS "$URL" >/dev/null && { echo "UP"; exit 0; }
             sleep 1
           done
-          echo "Local app not up"; exit 1
-
-      # REMOTE PATH (non-local base_url)
-      - name: Probe remote (90s)
-        if: ${{ inputs.base_url != '' && !contains(inputs.base_url, 'localhost') && !contains(inputs.base_url, '127.0.0.1') && !contains(inputs.base_url, '0.0.0.0') }}
-        run: |
-          URL="${BASE_URL}"
-          for i in {1..90}; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
-            if [ "$code" -ge 200 ] && [ "$code" -lt 500 ]; then
-              echo "UP (remote, $code)"
-              exit 0
-            fi
-            sleep 1
-          done
-          echo "Remote not reachable: $URL"; exit 1
+          echo "App did not become ready"; exit 1
 
       - name: Run E2E
-        run: npx playwright test --reporter=html
+        env:
+          BASE_URL: ${{ env.BASE_URL != '' && env.BASE_URL || (env.TARGET == 'prod' && 'https://app.quickgig.ph') || 'http://localhost:3000' }}
+        run: |
+          echo "Running against $BASE_URL"
+          npm run e2e -- --reporter=html
 
       - name: Upload Playwright report
         if: always()
@@ -85,7 +82,7 @@ jobs:
           path: playwright-report
           if-no-files-found: ignore
 
-      - name: Stop server
-        if: always() && (inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0'))
+      - name: Stop dev server
+        if: ${{ always() && env.TARGET != 'prod' }}
         run: |
           if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi

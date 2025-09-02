@@ -67,7 +67,9 @@ jobs:
       - name: Smoke tests (no webServer)
         env:
           BASE_URL: "http://localhost:3000"
-        run: npx playwright test -c playwright.smoke.ts
+        run: |
+          echo "Smoke testing against $BASE_URL"
+          npx playwright test -c playwright.smoke.ts
 
       - name: Stop dev server
         if: always()
