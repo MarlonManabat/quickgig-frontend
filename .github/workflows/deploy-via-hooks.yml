@@ -43,32 +43,27 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Decide target
-        id: pick
+        id: decide
         shell: bash
         run: |
-          KIND="skip"
-          HOOK=""
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_name }}" == "main" ]]; then
-            KIND="production"
-            HOOK="${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # Deploy preview ONLY if the PR has label "deploy"
-            HAS_LABEL=$(jq -r '.pull_request.labels[].name' <<< '${{ toJson(github.event) }}' | grep -i '^deploy$' || true)
-            if [[ -n "$HAS_LABEL" ]]; then
-              KIND="preview"
-              HOOK="${{ secrets.VERCEL_PREVIEW_HOOK_URL }}"
-            fi
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            KIND="${{ github.event.inputs.kind }}"
-            HOOK="${{ github.event.inputs.url }}"
-          fi
-          echo "kind=$KIND" >> $GITHUB_OUTPUT
-          echo "hook=$HOOK" >> $GITHUB_OUTPUT
+          set -Eeuo pipefail
+          kind="skip"
 
-      - name: Skip if not requested
-        if: steps.pick.outputs.kind == 'skip' || steps.pick.outputs.hook == ''
-        run: echo "No deploy requested."
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            kind="main"
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # Check PR labels for 'deploy' without needing gh cli
+            labels=$(jq -r '.pull_request.labels[].name // empty' <<< '${{ toJson(github.event) }}')
+            if grep -qi '^deploy$' <<< "$labels"; then
+              kind="pr"
+            fi
+          fi
+
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
 
       - name: Trigger Vercel Deploy Hook
-        if: steps.pick.outputs.kind != 'skip' && steps.pick.outputs.hook != ''
-        run: curl -fsSL -X POST "${{ steps.pick.outputs.hook }}"
+        if: steps.decide.outputs.kind != 'skip'
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ steps.decide.outputs.kind == 'main' && secrets.VERCEL_DEPLOY_HOOK || secrets.VERCEL_PREVIEW_DEPLOY_HOOK }}
+        run: |
+          curl -sS -X POST "$VERCEL_DEPLOY_HOOK"

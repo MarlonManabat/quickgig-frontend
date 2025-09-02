@@ -30,13 +30,7 @@ jobs:
           fi
 
       - name: Install deps
-        shell: bash
-        run: |
-          if [ "${{ steps.lock.outputs.changed }}" = "true" ]; then
-            npm install --no-audit --prefer-offline
-          else
-            npm ci
-          fi
+        run: npm install --no-audit --no-fund
 
       - name: Typecheck (best-effort)
         run: npm run -s typecheck || echo "::warning::no typecheck script"
