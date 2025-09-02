@@ -34,6 +34,13 @@ jobs:
 
       # Seed/Cleanup intentionally skipped in CI; tests don’t require preseeded data.
 
+      - name: Ensure port 3000 is free
+        run: |
+          if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+            echo "Port 3000 busy. Killing existing process..."
+            kill -9 $(lsof -i :3000 -sTCP:LISTEN -t) || true
+          fi
+
       - name: Start server (background, local only)
         if: ${{ env.BASE_URL == '' }}
         run: |
