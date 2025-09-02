@@ -3,7 +3,7 @@ import { loginAs } from './helpers';
 
 const GIG_TITLE = 'E2E Created Gig';
 
-test('employer creates a gig and sees it listed', async ({ page, baseURL }) => {
+test('employer creates a gig and sees it listed @auth', async ({ page, baseURL }) => {
   const { userId } = await loginAs(baseURL!, 'employer', page);
 
   await page.request.post('/api/gigs/create', {

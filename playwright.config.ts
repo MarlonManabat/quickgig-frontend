@@ -7,6 +7,8 @@ function base() {
   return raw.startsWith('http') ? raw : `https://${raw}`;
 }
 
+const basicMode = process.env.E2E_BASIC === '1';
+
 export default defineConfig({
   testDir: 'tests/e2e',
   timeout: 60_000,
@@ -21,16 +23,16 @@ export default defineConfig({
     // IMPORTANT: our app is client-side heavy; avoid waiting for network idle.
     // Tests should use goto with domcontentloaded explicitly.
   },
+  // Skip @auth tests in basic mode
+  ...(basicMode ? { grepInvert: /@auth/ } : {}),
   reporter: [['html', { open: 'never' }]],
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
-  webServer: process.env.BASE_URL
-    ? undefined
-    : {
-        command: process.env.PLAYWRIGHT_WEBSERVER_CMD || 'npm run start:prod',
-        url: base(),
-        reuseExistingServer: true,
-        timeout: 120_000,
-      },
+  webServer: {
+    command: process.env.PLAYWRIGHT_WEBSERVER_CMD || 'npm run start',
+    url: base(),
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
 });

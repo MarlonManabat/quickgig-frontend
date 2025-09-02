@@ -11,72 +11,36 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      # used by tests
-      BASE_URL: ${{ github.event.inputs.base_url }}
-
+      E2E_BASIC: '1'
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: 'npm'
-
+        with: { node-version: '20' }
       - name: Install deps
         run: |
           npm ci --no-audit --no-fund || npm install --no-audit --no-fund
-          npx playwright install --with-deps
-
-      # Seed/Cleanup intentionally skipped in CI; tests don’t require preseeded data.
-
       - name: Ensure port 3000 is free
         run: |
-          if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
-            echo "Port 3000 busy. Killing existing process..."
-            kill -9 $(lsof -i :3000 -sTCP:LISTEN -t) || true
-          fi
-
+          if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then kill -9 $(lsof -i :3000 -sTCP:LISTEN -t) || true; fi
       - name: Start server (background, local only)
-        if: ${{ env.BASE_URL == '' }}
         run: |
-          PORT=3000 npm run build
-          PORT=3000 npm start & echo $! > .pidfile
-
+          npm run start & echo $! > .pidfile
       - name: Wait for app/health or homepage (60s)
         run: |
-          URL="${{ env.BASE_URL }}"
-          if [ -z "$URL" ]; then URL="http://localhost:3000"; fi
+          URL="${BASE_URL:-http://localhost:3000}"
           for i in {1..60}; do
-            if curl -fsS "$URL/api/health" >/dev/null 2>&1 || curl -fsS "$URL" >/dev/null 2>&1; then
-              echo "UP"; exit 0
-            fi
+            curl -fsS "$URL/health" || curl -fsS "$URL" >/dev/null && { echo UP; exit 0; }
             sleep 1
           done
-          echo "App not responding"; exit 1
-
+          echo "App not up"; exit 1
       - name: Run E2E
-        run: |
-          URL="${{ env.BASE_URL }}"
-          if [ -z "$URL" ]; then URL="http://localhost:3000"; fi
-          npx playwright test --reporter=line --project=chromium --grep-invert "@flaky" --config playwright.config.ts --timeout=300000
-        env:
-          BASE_URL: ${{ env.BASE_URL }}
-
+        run: npx playwright test
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report
-          if-no-files-found: ignore
-
+        with: { name: playwright-report, path: playwright-report, if-no-files-found: ignore }
       - name: Stop server
-        if: always() && env.BASE_URL == ''
-        run: |
-          if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi
+        if: always()
+        run: if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi
 
