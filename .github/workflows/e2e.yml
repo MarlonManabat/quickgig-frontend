@@ -1,18 +1,25 @@
-name: E2E (manual or nightly)
+name: E2E (manual)
+
 on:
   workflow_dispatch:
     inputs:
       base_url:
-        description: 'Base URL (leave empty to run local)'
+        description: "Target base URL (leave blank to test local build)"
         required: false
-  schedule:
-    - cron: '0 9 * * *' # optional
+        type: string
+      run_auth:
+        description: "Run @auth tests (requires test login path/secrets)"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
 
 jobs:
   e2e:
     runs-on: ubuntu-latest
     env:
-      E2E_BASIC: '1'
+      BASE_URL: ${{ inputs.base_url }}
+      E2E_BASIC: ${{ inputs.run_auth == 'true' && '0' || '1' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,27 +32,47 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      - name: Build app
+      # LOCAL PATH (no base_url or localhost-ish base_url)
+      - name: Build app (local)
+        if: ${{ inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0') }}
         run: npm run build
 
-      - name: Ensure port 3000 is free
+      - name: Ensure port 3000 is free (local)
+        if: ${{ inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0') }}
         run: |
           if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
             kill -9 $(lsof -i :3000 -sTCP:LISTEN -t) || true
           fi
 
       - name: Start server (background, local only)
+        if: ${{ inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0') }}
         run: |
           npm run start & echo $! > .pidfile
 
-      - name: Wait for app/health or homepage (90s)
+      - name: Wait for app/health or homepage (local, 90s)
+        if: ${{ inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0') }}
         run: |
           URL="${BASE_URL:-http://localhost:3000}"
           for i in {1..90}; do
-            curl -fsS "$URL/health" || curl -fsS "$URL" >/dev/null && { echo UP; exit 0; }
+            curl -fsS "$URL/health" || curl -fsS "$URL" >/dev/null && { echo "UP (local)"; exit 0; }
             sleep 1
           done
-          echo "App not up"; exit 1
+          echo "Local app not up"; exit 1
+
+      # REMOTE PATH (non-local base_url)
+      - name: Probe remote (90s)
+        if: ${{ inputs.base_url != '' && !contains(inputs.base_url, 'localhost') && !contains(inputs.base_url, '127.0.0.1') && !contains(inputs.base_url, '0.0.0.0') }}
+        run: |
+          URL="${BASE_URL}"
+          for i in {1..90}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
+            if [ "$code" -ge 200 ] && [ "$code" -lt 500 ]; then
+              echo "UP (remote, $code)"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Remote not reachable: $URL"; exit 1
 
       - name: Run E2E
         run: npx playwright test --reporter=html
@@ -59,6 +86,6 @@ jobs:
           if-no-files-found: ignore
 
       - name: Stop server
-        if: always()
-        run: if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi
-
+        if: always() && (inputs.base_url == '' || contains(inputs.base_url, 'localhost') || contains(inputs.base_url, '127.0.0.1') || contains(inputs.base_url, '0.0.0.0'))
+        run: |
+          if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi
