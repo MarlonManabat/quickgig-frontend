@@ -25,10 +25,6 @@ async function tryClick(page: Page, nameRegex: RegExp) {
   return false;
 }
 
-function urlMatchesAny(rxList: RegExp[]) {
-  return async ({ url }: { url: string }) => rxList.some(rx => rx.test(url));
-}
-
 test.describe('Hero', () => {
   test('Browse jobs works', async ({ page }) => {
     await gotoHome(page);
@@ -37,8 +33,9 @@ test.describe('Hero', () => {
       // Navigate directly; smoke’s job is route-health, not UX fidelity
       await page.goto(PATHS.browse[0], { waitUntil: 'domcontentloaded' });
     }
-    await expect.poll(() => page.url(), { timeout: 10_000 })
-      .toPass(urlMatchesAny([/\/browse-jobs\b/i, /\/jobs\b/i]));
+    // Accept either /browse-jobs or /jobs
+    await expect(page).toHaveURL(/\/(browse-jobs|jobs)\b/i, { timeout: 10_000 });
+    // Heading assertion is best-effort (don’t fail smoke if copy differs)
     await expect(page.getByRole('heading', { name: /browse jobs/i }))
       .toBeVisible({ timeout: 5_000 })
       .catch(() => {});
@@ -50,8 +47,8 @@ test.describe('Hero', () => {
     if (!clicked) {
       await page.goto(PATHS.post[0], { waitUntil: 'domcontentloaded' });
     }
-    await expect.poll(() => page.url(), { timeout: 10_000 })
-      .toPass(urlMatchesAny([/\/gigs\/create\b/i, /\/post(-a-job)?\b/i]));
+    // Accept /gigs/create, /post, or /post-a-job
+    await expect(page).toHaveURL(/\/(gigs\/create|post(?:-a-job)?)\b/i, { timeout: 10_000 });
   });
 });
 

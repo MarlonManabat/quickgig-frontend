@@ -18,16 +18,13 @@ test.describe('nav links work', () => {
   test('Home ▸ Browse Jobs', async ({ page }) => {
     await gotoHome(page);
     await clickNavOrGo(page, { name: /browse jobs/i, fallbackPath: '/browse-jobs' });
-    await expect.poll(() => page.url(), { timeout: 10_000 })
-      .toContain('/browse-jobs');
+    await expect(page).toHaveURL(/\/(browse-jobs|jobs)\b/i, { timeout: 10_000 });
   });
 
   test('Home ▸ My Applications (signed out ok)', async ({ page }) => {
     await gotoHome(page);
     await clickNavOrGo(page, { name: /my applications/i, fallbackPath: '/applications' });
-    // Unauthed may redirect to login; accept either
-    const url = await page.url();
-    expect(/\/(applications|login)\b/i.test(url)).toBeTruthy();
+    await expect(page).toHaveURL(/\/(applications|login)\b/i, { timeout: 10_000 });
   });
 });
 
