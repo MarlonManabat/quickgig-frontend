@@ -1,5 +1,6 @@
 import React from "react";
 import Link from 'next/link';
+import { appUrl } from '@/lib/urls';
 
 type Props = {
   findClassName?: string;
@@ -19,7 +20,8 @@ export default function LandingCTAs({
         {showFind && (
           <Link
             data-testid="find-work-link"
-            href="/gigs"
+            href={appUrl('/browse-jobs')}
+            prefetch={false}
             className={findClassName}
           >
             Find Work
@@ -28,7 +30,8 @@ export default function LandingCTAs({
         {showPost && (
           <Link
             data-testid="post-job-link"
-            href="/gigs/create"
+            href={appUrl('/gigs/create')}
+            prefetch={false}
             className={postClassName}
           >
             Post Job

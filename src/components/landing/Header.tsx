@@ -1,4 +1,4 @@
-import { withAppOrigin } from '@/lib/url';
+import { appUrl } from '@/lib/urls';
 import LandingCTAs from '@/components/landing/LandingCTAs';
 
 export default function LandingHeader() {
@@ -8,7 +8,7 @@ export default function LandingHeader() {
         findClassName="hover:underline"
         postClassName="btn btn-primary"
       />
-      <a href={withAppOrigin('/login')} className="...">
+      <a href={appUrl('/login')} className="...">
         Login
       </a>
     </nav>
