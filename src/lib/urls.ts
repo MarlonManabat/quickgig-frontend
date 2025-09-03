@@ -1,12 +1,15 @@
-const DEFAULT_APP_ORIGIN = 'https://app.quickgig.ph';
-
-export function appOrigin() {
-  const env = process.env.NEXT_PUBLIC_APP_ORIGIN?.trim();
-  return env && /^https?:\/\//.test(env) ? env.replace(/\/+$/, '') : DEFAULT_APP_ORIGIN;
+export function getAppOrigin() {
+  // Use explicit var in prod; empty string (relative) in preview/dev
+  const env = process.env.VERCEL_ENV || process.env.NODE_ENV;
+  const origin =
+    process.env.NEXT_PUBLIC_APP_ORIGIN ||
+    (env === 'production' ? 'https://app.quickgig.ph' : '');
+  return origin;
 }
 
-export function appUrl(path: string) {
-  const p = path.startsWith('/') ? path : `/${path}`;
-  return `${appOrigin()}${p}`;
+export function toAppPath(path: string) {
+  const base = getAppOrigin();
+  // ensure single slash joining
+  if (!path.startsWith('/')) path = '/' + path;
+  return base ? `${base}${path}` : path;
 }
-

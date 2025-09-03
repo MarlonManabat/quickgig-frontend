@@ -1,5 +1,5 @@
 import React from 'react';
-import { appUrl } from '@/lib/urls';
+import { toAppPath } from '@/lib/urls';
 
 type Props = {
   findClassName?: string;
@@ -17,22 +17,22 @@ export default function LandingCTAs({
   return (
     <div className="flex gap-3">
         {showFind && (
-          <a
-            data-testid="find-work-link"
-            href={appUrl('/browse-jobs')}
-            className={findClassName}
-            rel="noopener noreferrer"
-          >
+            <a
+              data-testid="find-work-link"
+              href={toAppPath('/browse-jobs')}
+              className={findClassName}
+              rel="noopener noreferrer"
+            >
             Browse jobs
           </a>
         )}
         {showPost && (
-          <a
-            data-testid="post-job-link"
-            href={appUrl('/gigs/create')}
-            className={postClassName}
-            rel="noopener noreferrer"
-          >
+            <a
+              data-testid="post-job-link"
+              href={toAppPath('/gigs/create')}
+              className={postClassName}
+              rel="noopener noreferrer"
+            >
             Post a job
           </a>
         )}
