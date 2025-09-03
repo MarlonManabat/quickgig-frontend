@@ -8,8 +8,12 @@ export default function LandingHeader() {
         findClassName="hover:underline"
         postClassName="btn btn-primary"
       />
-      <a href={appUrl('/login')} className="...">
-        Login
+      <a
+        href={appUrl('/login')}
+        className="..."
+        rel="noopener noreferrer"
+      >
+        Sign in
       </a>
     </nav>
   );

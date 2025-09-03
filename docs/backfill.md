@@ -11,3 +11,10 @@
   - Do **not** change or remove app routes/middleware in this repo.
   - Keep landing homepage content and SEO intact.
   - Any future landing CTA that targets an app feature **must** use `appUrl('/path')`.
+
+## 2025-09-04 – Lock landing CTAs to app host
+
+- Added `src/lib/urls.ts` and `NEXT_PUBLIC_APP_ORIGIN` (default `https://app.quickgig.ph`).
+- Updated landing CTAs/nav to link cross-origin to the app (Browse jobs, Post a job, My Applications, Sign in).
+- Purpose: product-first guardrail so marketing buttons always drive into the app; matches smoke.
+- Related: restored MVP baseline earlier this week; kept root redirect and middleware safety intact.

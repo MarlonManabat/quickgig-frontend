@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // Allow overriding in CI if needed
 const BASE = process.env.BASE_URL ?? 'https://quickgig.ph';
-const APP  = process.env.APP_ORIGIN ?? 'https://app.quickgig.ph';
+const APP  = process.env.NEXT_PUBLIC_APP_ORIGIN ?? 'https://app.quickgig.ph';
 
 // Map link text (as visible on the landing) to expected app URL patterns
 const cases: Array<[string, string | RegExp]> = [

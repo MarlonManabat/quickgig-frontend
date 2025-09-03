@@ -1,5 +1,4 @@
-import React from "react";
-import Link from 'next/link';
+import React from 'react';
 import { appUrl } from '@/lib/urls';
 
 type Props = {
@@ -18,24 +17,24 @@ export default function LandingCTAs({
   return (
     <div className="flex gap-3">
         {showFind && (
-          <Link
+          <a
             data-testid="find-work-link"
             href={appUrl('/browse-jobs')}
-            prefetch={false}
             className={findClassName}
+            rel="noopener noreferrer"
           >
-            Find Work
-          </Link>
+            Browse jobs
+          </a>
         )}
         {showPost && (
-          <Link
+          <a
             data-testid="post-job-link"
             href={appUrl('/gigs/create')}
-            prefetch={false}
             className={postClassName}
+            rel="noopener noreferrer"
           >
-            Post Job
-          </Link>
+            Post a job
+          </a>
         )}
       </div>
     );
