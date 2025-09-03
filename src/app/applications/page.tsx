@@ -23,16 +23,16 @@ export default async function ApplicationsPage() {
   if (error) {
     console.error("[applications] load error:", error);
     return (
-      <div className="mx-auto max-w-xl py-16 text-center">
-        <h1 className="text-2xl font-semibold">Unable to load applications</h1>
+      <main className="container mx-auto max-w-full sm:max-w-screen-lg px-4 py-16 text-center">
+        <h1 className="text-xl sm:text-2xl font-semibold">Unable to load applications</h1>
         <p className="mt-2 opacity-70">Please try again.</p>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
-      <h1 className="text-2xl font-semibold mb-4">My Applications</h1>
+    <main className="container mx-auto max-w-full sm:max-w-screen-lg px-4 py-6">
+      <h1 className="text-xl sm:text-2xl font-semibold mb-4">My Applications</h1>
       <ul className="space-y-3">
         {(applications ?? []).map((a) => (
           <li key={a.id} className="rounded-xl border p-4">
@@ -41,6 +41,6 @@ export default async function ApplicationsPage() {
           </li>
         ))}
       </ul>
-    </div>
+    </main>
   );
 }

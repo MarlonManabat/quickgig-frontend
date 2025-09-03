@@ -11,3 +11,7 @@
   - Do **not** change or remove app routes/middleware in this repo.
   - Keep landing homepage content and SEO intact.
   - Any future landing CTA that targets an app feature **must** use `appUrl('/path')`.
+
+## 2025-09-03
+- Mobile pass 1: responsive navbar, full-width forms, no route changes. Verified on 375×812 viewport; no SSR changes.
+- Locking product-first; no auth/middleware changes.

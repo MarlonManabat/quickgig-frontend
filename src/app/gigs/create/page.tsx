@@ -12,9 +12,9 @@ export default async function GigsCreatePage() {
   await ensureTicketsRow(uid);
   const balance = await getTicketBalance(uid);
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-xl font-semibold mb-3">Post a Job</h1>
+    <main className="container mx-auto max-w-full sm:max-w-screen-lg px-4 py-6">
+      <h1 className="text-xl sm:text-2xl font-semibold mb-3">Post a Job</h1>
       <PostJobFormClient balance={balance} />
-    </div>
+    </main>
   );
 }
