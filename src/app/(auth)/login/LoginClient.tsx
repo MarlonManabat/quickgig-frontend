@@ -25,15 +25,22 @@ export default function LoginClient() {
   }
 
   return (
-    <main className="mx-auto max-w-md p-6">
-      <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
+    <main className="mx-auto max-w-screen-md px-4 sm:px-6 py-6">
+      <h1 className="mb-4 text-2xl font-semibold">Sign in</h1>
       {sent ? (
         <p>Check your email for a magic link.</p>
       ) : (
         <form onSubmit={onSubmit} className="grid gap-3">
-          <input className="border rounded p-2" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required />
+          <input
+            className="w-full rounded border text-base h-11 px-3"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            required
+          />
           {err && <p className="text-red-600">{err}</p>}
-          <button className="rounded bg-black text-white px-4 py-2 w-fit">Send magic link</button>
+          <button className="h-11 w-fit rounded-lg bg-black px-4 text-white">Send magic link</button>
         </form>
       )}
     </main>

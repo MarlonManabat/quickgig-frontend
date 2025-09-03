@@ -56,25 +56,28 @@ export default function PostJobFormClient({
           name="title"
           required
           placeholder="Job title"
-          className="w-full border rounded-lg p-2"
+          className="w-full rounded-lg border text-base h-11 px-3"
         />
         <textarea
           name="description"
           required
           placeholder="Describe the work"
-          className="w-full border rounded-lg p-2"
+          className="w-full rounded-lg border text-base px-3 py-3"
         />
         <GeoSelect value={geo} onChange={setGeo} className="mt-2" />
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <input
             name="budget"
             type="number"
             min="0"
             step="1"
             placeholder="Budget (₱)"
-            className="border rounded-lg p-2 w-40"
+            className="w-full rounded-lg border text-base h-11 px-3"
           />
-          <button type="submit" className="rounded-xl px-4 py-2 font-medium border">
+          <button
+            type="submit"
+            className="rounded-lg border px-4 h-11 font-medium"
+          >
             Post Job
           </button>
         </div>

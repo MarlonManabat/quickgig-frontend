@@ -7,6 +7,23 @@ body {
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-top {
+  padding-top: var(--safe-top);
+}
+
+.safe-bottom {
+  padding-bottom: var(--safe-bottom);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 @layer base {
   :root {
     --brand-primary: #0ea5a3;
