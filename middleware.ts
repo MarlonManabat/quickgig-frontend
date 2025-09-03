@@ -1,37 +1,31 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-// Canonical host for production deploys of the app
-const PROD_HOSTS = new Set(['app.quickgig.ph']);
+const APP_ORIGIN = process.env.NEXT_PUBLIC_APP_ORIGIN ?? 'https://app.quickgig.ph';
 
-// Internal assets/endpoints always allowed
-const isInternal = (p: string) =>
-  p.startsWith('/_next') || p === '/favicon.ico' || p.startsWith('/api/health');
+// Static/infra paths that must pass
+const passthrough = (p: string) =>
+  p.startsWith('/_next') || p.startsWith('/favicon') || /\.\w+$/.test(p);
+
+// Only redirect these app paths. Keep '/' as landing homepage.
+const APP_PATHS = new Set<string>([
+  '/browse-jobs',
+  '/gigs/create',
+  '/applications',
+  '/login',
+  '/sign-in',
+]);
 
 export function middleware(req: NextRequest) {
-  const pathname = req.nextUrl.pathname;
-  const host = req.headers.get('host') ?? '';
+  const { pathname, search } = req.nextUrl;
+  if (passthrough(pathname)) return NextResponse.next();
 
-  // In preview/dev (e.g. *.vercel.app), allow everything
-  if (process.env.VERCEL_ENV !== 'production') {
-    return NextResponse.next();
+  if (APP_PATHS.has(pathname)) {
+    const url = new URL(pathname + search, APP_ORIGIN);
+    return NextResponse.redirect(url, 308);
   }
-
-  // In production, only serve from the canonical app host
-  if (!PROD_HOSTS.has(host)) {
-    return new NextResponse(null, { status: 404 });
-  }
-
-  // Always allow framework/static and health checks
-  if (isInternal(pathname)) {
-    return NextResponse.next();
-  }
-
-  // No rewrites here; "/" redirect is handled in src/app/page.tsx
   return NextResponse.next();
 }
 
-// Exclude static/image assets from middleware
-export const config = {
-  matcher: ['/((?!_next/static|_next/image).*)'],
-};
+// Apply to everything except static files for perf
+export const config = { matcher: ['/((?!_next/|.*\\..*).*)'] };
