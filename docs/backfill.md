@@ -12,9 +12,17 @@
   - Keep landing homepage content and SEO intact.
   - Any future landing CTA that targets an app feature **must** use `appUrl('/path')`.
 
-## 2025-09-04 – Lock landing CTAs to app host
+## 2025-09-04 — Lock landing CTAs to app host; product-first guardrails
 
-- Added `src/lib/urls.ts` and `NEXT_PUBLIC_APP_ORIGIN` (default `https://app.quickgig.ph`).
-- Updated landing CTAs/nav to link cross-origin to the app (Browse jobs, Post a job, My Applications, Sign in).
-- Purpose: product-first guardrail so marketing buttons always drive into the app; matches smoke.
-- Related: restored MVP baseline earlier this week; kept root redirect and middleware safety intact.
+- All landing CTAs (desktop + mobile) now link to the canonical app host using `NEXT_PUBLIC_APP_ORIGIN` (defaults to `https://app.quickgig.ph`):  
+  - Browse jobs → `/browse-jobs`  
+  - Post a job → `/gigs/create`  
+  - My Applications → `/applications`  
+  - Sign in → `/login`
+- Rationale: ensure marketing → app flows never regress, in PR previews and production.
+- Guardrails we keep checking:
+  1. App root `/` must resolve to the product (redirect to `/browse-jobs`) — no 404s.
+  2. App routes stay stable (`/browse-jobs`, `/gigs/create`, `/applications`, `/login`).
+  3. Middleware host checks remain unchanged.
+  4. E2E/smoke must pass without test edits for this flow.
+
