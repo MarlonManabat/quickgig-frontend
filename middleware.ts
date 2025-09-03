@@ -1,36 +1,37 @@
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-const ALLOWED_HOSTS = ['app.quickgig.ph', 'quickgig.ph'];
+// Canonical host for production deploys of the app
+const PROD_HOSTS = new Set(['app.quickgig.ph']);
+
+// Internal assets/endpoints always allowed
+const isInternal = (p: string) =>
+  p.startsWith('/_next') || p === '/favicon.ico' || p.startsWith('/api/health');
 
 export function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
+  const host = req.headers.get('host') ?? '';
+
+  // In preview/dev (e.g. *.vercel.app), allow everything
   if (process.env.VERCEL_ENV !== 'production') {
     return NextResponse.next();
   }
 
-  const url = req.nextUrl;
-  const host = req.headers.get('host') ?? '';
-
-  if (!ALLOWED_HOSTS.includes(host)) {
+  // In production, only serve from the canonical app host
+  if (!PROD_HOSTS.has(host)) {
     return new NextResponse(null, { status: 404 });
   }
 
-  const isApp = host.startsWith('app.');
-  const { pathname } = url;
-
-  if (!isApp && pathname === '/') {
-    url.pathname = '/landing';
-    return NextResponse.rewrite(url);
+  // Always allow framework/static and health checks
+  if (isInternal(pathname)) {
+    return NextResponse.next();
   }
 
-  if (isApp && pathname === '/landing') {
-    url.pathname = '/';
-    return NextResponse.redirect(url);
-  }
-
+  // No rewrites here; "/" redirect is handled in src/app/page.tsx
   return NextResponse.next();
 }
 
+// Exclude static/image assets from middleware
 export const config = {
-  matcher: ['/', '/landing'],
+  matcher: ['/((?!_next/static|_next/image).*)'],
 };
