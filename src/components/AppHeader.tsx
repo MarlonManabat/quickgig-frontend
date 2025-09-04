@@ -61,9 +61,9 @@ export default function AppHeader({ balance }: Props) {
             )}
           </nav>
           <button
-            data-testid="navm-menu-button"
+            data-testid="nav-menu-button"
             aria-expanded={open}
-            aria-controls="navm-menu"
+            aria-controls="nav-menu"
             className="md:hidden"
             onClick={() => setOpen(o => !o)}
           >
@@ -84,8 +84,8 @@ export default function AppHeader({ balance }: Props) {
       </div>
       {open ? (
         <div
-          id="navm-menu"
-          data-testid="navm-menu"
+          id="nav-menu"
+          data-testid="nav-menu"
           role="dialog"
           aria-modal="true"
           className="md:hidden border-t bg-white"

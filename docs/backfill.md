@@ -156,3 +156,8 @@
 - Hardened `expectAuthAwareRedirect` helper for smoke/e2e tests (accepts `string | RegExp`).
 - Mobile menu button/panel now `navm-menu-button`/`navm-menu`; smoke tests open the menu deterministically.
 
+## 2025-09-08 — URL-based auth redirects & menu test IDs
+- Rewrote e2e helpers to parse URLs instead of building regexes, fixing `Invalid regular expression flag` errors.
+- Canonicalized mobile menu button/container to `nav-menu-button`/`nav-menu` (tests fall back to legacy `navm-*`).
+- Updated nav and hero smokes to share the new helpers and stabilize menu opening.
+

@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-09-07 -->
+<!-- AGENT CONTRACT v2025-09-08 -->
 
 # Product Acceptance (Good Product Bar)
 
@@ -34,8 +34,10 @@
 - **/login**
 
 ## CTA Test IDs
-**Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`  
-**Header (mobile menu):** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`  
+**Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`
+**Mobile menu button:** `nav-menu-button`
+**Mobile menu container:** `nav-menu`
+**Mobile menu items:** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`
 **Landing hero:** `hero-browse-jobs`, `hero-post-job`
 
 **No duplicates:** each CTA test ID must appear at most once in the DOM.

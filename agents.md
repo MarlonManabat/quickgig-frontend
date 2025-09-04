@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-09-07
+**Version:** 2025-09-08
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -20,6 +20,7 @@
 
 ## Test hooks (smoke/e2e)
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
+- Mobile menu button: `nav-menu-button`; container: `nav-menu`.
 - Mobile menu IDs: `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`.
 - Landing hero IDs: `hero-browse-jobs`, `hero-post-job`.
 - Post Job skeleton test id: `post-job-skeleton`.
@@ -33,7 +34,7 @@
 - `scripts/check-cta-links.mjs` ensures CTAs point only to canonical routes.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-09-06 -->
+<!-- AGENT CONTRACT v2025-09-08 -->
 
 ---
 

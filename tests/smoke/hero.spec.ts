@@ -1,20 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
+import { test } from '@playwright/test';
+import { gotoHome, expectToBeOnRoute, expectAuthAwareRedirect } from '../e2e/_helpers';
 
-test.describe('landing hero CTAs', () => {
-  test('Browse Jobs', async ({ page }) => {
-    await page.goto('/smoke/landing-ctas');
-    const browse = page.getByTestId('hero-browse-jobs');
-    await expect(browse).toBeVisible();
-    await browse.click();
-    await expect(page).toHaveURL(/\/browse-jobs\/?/);
-  });
+test('Landing hero CTAs route to app host', async ({ page }) => {
+  await gotoHome(page);
+  await expect(page.getByTestId('hero-browse-jobs')).toBeVisible();
+  await expect(page.getByTestId('hero-post-job')).toBeVisible();
 
-  test('Post a Job (auth-aware)', async ({ page }) => {
-    await page.goto('/smoke/landing-ctas');
-    const post = page.getByTestId('hero-post-job');
-    await expect(post).toBeVisible();
-    await post.click();
-    await expectAuthAwareRedirect(page, /\/gigs\/create\/?/);
-  });
+  await page.getByTestId('hero-browse-jobs').click();
+  await expectToBeOnRoute(page, /\/browse-jobs\/?$/);
+
+  await gotoHome(page);
+  await page.getByTestId('hero-post-job').click();
+  await expectAuthAwareRedirect(page, '/gigs/create');
 });
