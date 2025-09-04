@@ -106,7 +106,7 @@
 **Summary**
 - Middleware now redirects unsigned users from `/applications` and `/gigs/create` to `/login?next=<dest>` and preserves any query string.
 - Header derives desktop and mobile menus from a single `NAV_ITEMS` source with unique test IDs and no duplicate login link.
-- Menu panel mounts only when open so `nav-menu` is visible for smoke tests.
+ - Menu panel mounts only when open so `navm-menu` is visible for smoke tests.
 - `scripts/check-cta-links.mjs` validates header and hero CTAs against `ROUTES`.
 
 **Rationale**
@@ -151,4 +151,8 @@
 - Centralized `ROUTES` + `toAppPath` in `src/lib/routes.ts` and updated LinkApp & pages.
 - Added GitHub `Smoke (main)` workflow and Playwright browser caching for PRs.
 - `scripts/check-cta-links.mjs` now guards against duplicate CTA test IDs.
+
+## 2025-09-07 — Auth-aware helper & mobile menu IDs
+- Hardened `expectAuthAwareRedirect` helper for smoke/e2e tests (accepts `string | RegExp`).
+- Mobile menu button/panel now `navm-menu-button`/`navm-menu`; smoke tests open the menu deterministically.
 

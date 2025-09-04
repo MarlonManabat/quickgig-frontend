@@ -1,26 +1,32 @@
 import { expect, Page } from '@playwright/test';
 
-export async function openMenu(page: Page) {
-  const btn = page.getByTestId('nav-menu-button');
-  await expect(btn).toBeVisible();
-  await btn.click();
-  const panel = page.getByTestId('nav-menu');
-  try {
-    await expect(panel).toBeAttached({ timeout: 4000 });
-    await expect(panel).toBeVisible({ timeout: 4000 });
-  } catch {
-    await btn.click();
-    await expect(panel).toBeAttached({ timeout: 4000 });
-    await expect(panel).toBeVisible({ timeout: 4000 });
-  }
+export function escapeForRegex(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export async function expectAuthAwareRedirect(page: Page, destRe: RegExp) {
-  try {
-    await page.waitForURL(destRe, { timeout: 8000 });
-  } catch {
-    const escaped = destRe.source.replace(/^\/|\/[a-z]*$/g, '');
-    const nextRe = new RegExp(`/login\\?next=${escaped.replaceAll('/', '\\/')}`);
-    await page.waitForURL(nextRe, { timeout: 8000 });
+function toDestRegex(dest: string | RegExp): RegExp {
+  if (typeof dest === 'string') {
+    const path = dest.endsWith('/') ? dest.slice(0, -1) : dest;
+    return new RegExp(`${escapeForRegex(path)}\\/?$`);
   }
+  return dest;
+}
+
+export async function expectAuthAwareRedirect(page: Page, dest: string | RegExp) {
+  const destRe = toDestRegex(dest);
+
+  try {
+    await expect(page).toHaveURL(destRe, { timeout: 8000 });
+    return;
+  } catch {
+    // fall through to login?next
+  }
+
+  const path = typeof dest === 'string'
+    ? dest
+    : `/${(dest as RegExp).source.replace(/^\\/?/, '').replace(/\\\/?\$$/, '')}`;
+
+  const encoded = encodeURIComponent(path);
+  const loginNext = new RegExp(`/login\\?next=${encoded}`);
+  await expect(page).toHaveURL(loginNext, { timeout: 8000 });
 }
