@@ -63,7 +63,7 @@ export default function AppHeader({ balance }: Props) {
           <button
             data-testid="nav-menu-button"
             aria-expanded={open}
-            aria-controls="mobile-nav"
+            aria-controls="nav-menu"
             className="md:hidden"
             onClick={() => setOpen(o => !o)}
           >
@@ -82,41 +82,44 @@ export default function AppHeader({ balance }: Props) {
           </LinkApp>
         </div>
       </div>
-      {open && (
+      {open ? (
         <div
-          id="mobile-nav"
+          id="nav-menu"
           data-testid="nav-menu"
-          role="menu"
-          className="md:hidden flex flex-col gap-2 p-4 border-t"
+          role="dialog"
+          aria-modal="true"
+          className="md:hidden border-t bg-white"
         >
-          {links.map(link =>
-            link.href ? (
-              <LinkApp
-                key={link.mobileId}
-                data-testid={link.mobileId}
-                href={link.href}
-                prefetch={false}
-                onClick={() => setOpen(false)}
-                className="link"
-              >
-                {link.label}
-              </LinkApp>
-            ) : (
-              <button
-                key={link.mobileId}
-                data-testid={link.mobileId}
-                onClick={() => {
-                  setOpen(false);
-                  link.onClick();
-                }}
-                className="underline text-left"
-              >
-                {link.label}
-              </button>
-            ),
-          )}
+          <div className="flex flex-col gap-2 p-4">
+            {links.map(link =>
+              link.href ? (
+                <LinkApp
+                  key={link.mobileId}
+                  data-testid={link.mobileId}
+                  href={link.href}
+                  prefetch={false}
+                  onClick={() => setOpen(false)}
+                  className="link"
+                >
+                  {link.label}
+                </LinkApp>
+              ) : (
+                <button
+                  key={link.mobileId}
+                  data-testid={link.mobileId}
+                  onClick={() => {
+                    setOpen(false);
+                    link.onClick();
+                  }}
+                  className="underline text-left"
+                >
+                  {link.label}
+                </button>
+              ),
+            )}
+          </div>
         </div>
-      )}
+      ) : null}
     </header>
   );
 }

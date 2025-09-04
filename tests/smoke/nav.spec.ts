@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { expectAuthAwareRedirect } from './_helpers';
 
 async function gotoHome(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -15,13 +16,13 @@ test.describe('desktop header CTAs', () => {
   test('Post a Job (auth-aware)', async ({ page }) => {
     await gotoHome(page);
     await page.getByTestId('nav-post-job').click();
-    await expect(page).toHaveURL(/\/login\?next=\/gigs\/create\/?/);
+    await expectAuthAwareRedirect(page, /\/gigs\/create\/?/);
   });
 
   test('My Applications (auth-aware)', async ({ page }) => {
     await gotoHome(page);
     await page.getByTestId('nav-my-applications').click();
-    await expect(page).toHaveURL(/\/login\?next=\/applications\/?/);
+    await expectAuthAwareRedirect(page, /\/applications\/?/);
   });
 
   test('Login', async ({ page }) => {

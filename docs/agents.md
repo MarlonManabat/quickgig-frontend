@@ -49,6 +49,7 @@ Landing on **/login?next=<dest>** for any auth-gated route **counts as success**
 - [ ] `npx playwright test -c playwright.smoke.ts`
 - [ ] `docs/backfill.md` updated with rationale + changes
 - [ ] Bump this header’s date when any contract item changes
+- [ ] Mobile menu panel renders only when open; `data-testid="nav-menu"` matches the visible container
 
 ## CI Guardrails
 - `scripts/no-legacy.sh` and `scripts/check-cta-links.mjs`
