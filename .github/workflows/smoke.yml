@@ -1,35 +1,46 @@
-name: Smoke (PR) / pr
-
+name: Smoke (PR)
 on:
   pull_request:
     branches: [ main ]
-
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
-  pr:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+  lock-guard:
+    name: Verify lockfile consistency
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install deps (prefer clean, fallback to install)
+        with: { node-version-file: '.nvmrc', cache: 'npm' }
+      - name: Strict lock check
+        run: npm ci --no-audit --fund=false --loglevel=error
+      - name: (Self-heal) sync lock and commit if needed
+        if: failure() && github.event.pull_request.head.repo.full_name == github.repository
         run: |
-          set -e
-          if npm ci --no-audit --fund=false --loglevel=error; then
-            echo "npm ci succeeded"
-          else
-            echo "npm ci failed (likely lock drift); falling back to npm install"
-            npm install --no-audit --fund=false --loglevel=error
-          fi
+          npm run sync-lock
+          git config user.name "ci-lock-bot"
+          git config user.email "ci@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore(ci): sync lockfile" || true
+          git push
 
+  pr:
+    name: Run smoke
+    needs: [lock-guard]
+    if: ${{ always() && needs.lock-guard.result != 'cancelled' }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: '.nvmrc', cache: 'npm' }
+      - name: Install deps (clean)
+        run: npm ci --no-audit --fund=false --loglevel=error
+      - name: Guard build-time deps
+        run: npm run verify-build-deps
       - name: Install Playwright browsers
-        uses: microsoft/playwright-github-action@v1
-
+        run: npx playwright install --with-deps chromium
       - name: Run smoke
-        env:
-          CI: true
+        env: { CI: true }
         run: npx playwright test -c playwright.smoke.ts

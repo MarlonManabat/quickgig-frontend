@@ -176,3 +176,10 @@
 - PR workflow tries `npm ci` then falls back to `npm install` to avoid false-reds from lock drift; `main` remains strict with `npm ci`.
 - Added explicit `browserslist` + `.browserslistrc` to prevent Next/PostCSS build-time module resolution errors on Vercel.
 - Switched to `microsoft/playwright-github-action` for reliable browser installs.
+
+## 2025-09-05 – Root-cause guardrails (env+lock+CSS toolchain)
+- Pinned Node 20 / npm 10 via `.nvmrc` & `packageManager`; Vercel now runs `npm ci`.
+- Enforced build-time CSS deps (`tailwindcss`,`postcss`,`autoprefixer`,`browserslist`) as runtime deps; added `fraction.js` to avoid PostCSS peer holes.
+- Added `scripts/verify-build-deps` to fail CI if those slip to devDeps.
+- Introduced **Lock Guard** job: strict `npm ci`; auto-syncs `package-lock.json` back to PR branch when safe.
+- Standardized runners to `ubuntu-22.04`; Playwright installed via `npx playwright install --with-deps chromium`.

@@ -43,7 +43,8 @@
     "test": "echo \"E2E disabled while product is WIP\" && exit 0",
     "no-legacy": "bash scripts/no-legacy.sh",
     "preinstall": "node -e \"const [maj]=process.versions.node.split('.'); if(maj<20){console.error('Node 20+ required'); process.exit(1)}\"",
-    "sync-lock": "npm install --package-lock-only --no-audit --no-fund"
+    "sync-lock": "npm install --package-lock-only --no-audit --no-fund",
+    "verify-build-deps": "node scripts/verify-build-deps.js"
   },
   "dependencies": {
     "@jobuntux/psgc": "^0.2.1",
@@ -64,23 +65,25 @@
     "swr": "^2.2.5",
     "zod": "^3",
     "browserslist": "^4.23.0",
-    "caniuse-lite": "^1.0.30001600"
+    "caniuse-lite": "^1.0.30001600",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "fraction.js": "^4.3.7"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.5.0",
-    "@playwright/test": "^1.48.0",
+    "@playwright/test": "^1.47.2",
+    "playwright": "^1.47.2",
     "@types/cookie": "^0.6.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@typescript-eslint/parser": "^6.21.0",
-    "autoprefixer": "^10",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.3",
     "fast-glob": "^3.3.2",
-    "postcss": "^8",
     "start-server-and-test": "^2.0.0",
-    "tailwindcss": "^3.4.1",
     "ts-morph": "^24.0.0",
     "globby": "^14.0.2",
     "tsx": "^4.19.0",
@@ -90,5 +93,10 @@
     "node": ">=20 <21",
     "npm": ">=10 <11"
   },
-  "packageManager": "npm@10.7.0"
+  "packageManager": "npm@10.7.0",
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
