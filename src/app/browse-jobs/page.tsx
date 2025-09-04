@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getSeededJobs } from '@/app/lib/seed';
 import { ROUTES } from '@/lib/routes';
-import { toAppPath } from '@/lib/urls';
+import { toAppPath } from '@/lib/routes';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;

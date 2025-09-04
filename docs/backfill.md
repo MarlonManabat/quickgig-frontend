@@ -106,7 +106,7 @@
 **Summary**
 - Middleware now redirects unsigned users from `/applications` and `/gigs/create` to `/login?next=<dest>` and preserves any query string.
 - Header derives desktop and mobile menus from a single `NAV_ITEMS` source with unique test IDs and no duplicate login link.
-- Menu panel mounts only when open so `nav-menu` is visible for smoke tests.
+ - Menu panel mounts only when open so `navm-menu` is visible for smoke tests.
 - `scripts/check-cta-links.mjs` validates header and hero CTAs against `ROUTES`.
 
 **Rationale**
@@ -146,3 +146,23 @@
 
 **Rollback**
 - Revert this commit to remove apply skeleton and seeded browse list.
+
+## 2025-09-07 — Routing helpers & smoke workflow
+- Centralized `ROUTES` + `toAppPath` in `src/lib/routes.ts` and updated LinkApp & pages.
+- Added GitHub `Smoke (main)` workflow and Playwright browser caching for PRs.
+- `scripts/check-cta-links.mjs` now guards against duplicate CTA test IDs.
+
+## 2025-09-07 — Auth-aware helper & mobile menu IDs
+- Hardened `expectAuthAwareRedirect` helper for smoke/e2e tests (accepts `string | RegExp`).
+- Mobile menu button/panel now `navm-menu-button`/`navm-menu`; smoke tests open the menu deterministically.
+
+## 2025-09-08 — URL-based auth redirects & menu test IDs
+- Rewrote e2e helpers to parse URLs instead of building regexes, fixing `Invalid regular expression flag` errors.
+- Canonicalized mobile menu button/container to `nav-menu-button`/`nav-menu` (tests fall back to legacy `navm-*`).
+- Updated nav and hero smokes to share the new helpers and stabilize menu opening.
+
+## 2025-09-09 — Consolidated smoke workflow & regex-safe auth helper
+- Replaced separate PR and main smoke workflows with a unified `smoke.yml` that installs Playwright browsers via `npx playwright install --with-deps`.
+- Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
+- Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
+

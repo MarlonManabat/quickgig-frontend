@@ -4,6 +4,12 @@ export const ROUTES = {
   applications: '/applications',
   login: '/login',
 } as const;
+export type AppPath = (typeof ROUTES)[keyof typeof ROUTES];
+
+export function toAppPath(path: AppPath): string {
+  const origin = process.env.NEXT_PUBLIC_APP_ORIGIN;
+  return origin ? new URL(path, origin).toString() : path;
+}
 
 export const NAV_ITEMS = [
   {

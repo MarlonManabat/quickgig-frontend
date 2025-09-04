@@ -16,6 +16,7 @@ const HERO_IDS = {
   'hero-browse-jobs': 'ROUTES.browseJobs',
   'hero-post-job': 'ROUTES.postJob',
 };
+const ALL_IDS = [...Object.keys(HEADER_IDS), ...Object.keys(HERO_IDS)];
 
 let errors = [];
 
@@ -47,15 +48,21 @@ function* walk(dir) {
 
 for (const file of walk('src')) {
   const txt = readFileSync(file, 'utf8');
-  for (const [id, route] of Object.entries(HERO_IDS)) {
+  for (const id of ALL_IDS) {
     const marker = `data-testid="${id}"`;
-    const idx = txt.indexOf(marker);
-    if (idx !== -1) {
-      const snippet = txt.slice(Math.max(0, idx - 100), idx + 200);
-      if (!snippet.includes(route)) {
-        errors.push(`${file} → ${id}`);
+    let idx = txt.indexOf(marker);
+    let count = 0;
+    while (idx !== -1) {
+      count++;
+      if (HERO_IDS[id]) {
+        const snippet = txt.slice(Math.max(0, idx - 100), idx + 200);
+        if (!snippet.includes(HERO_IDS[id])) {
+          errors.push(`${file} → ${id}`);
+        }
       }
+      idx = txt.indexOf(marker, idx + marker.length);
     }
+    if (count > 1) errors.push(`duplicate data-testid ${id} in ${file}`);
   }
 }
 
