@@ -11,7 +11,7 @@ export default async function ApplicationsPage() {
   const user = userRes?.user;
 
   if (userErr || !user) {
-    redirect("/login");
+    redirect("/login?next=/applications");
   }
 
   const { data: applications, error } = await supabase

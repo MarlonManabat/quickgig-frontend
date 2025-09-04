@@ -1,7 +1,7 @@
-import { test } from '@playwright/test';
-import { expectToBeOnRoute } from '../e2e/helpers';
+import { test, expect } from '@playwright/test';
 
-test('root "/" redirects to /browse-jobs (not 404)', async ({ page }) => {
-  await page.goto('/');
-  await expectToBeOnRoute(page, '/browse-jobs');
+test('root "/" redirects to /browse-jobs', async ({ page }) => {
+  const resp = await page.goto('/', { waitUntil: 'domcontentloaded' });
+  expect(resp?.status()).not.toBe(404);
+  await expect(page).toHaveURL(/\/browse-jobs\/?$/);
 });

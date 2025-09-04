@@ -1,10 +1,17 @@
 # Backfill / Change Log (Landing → App routing)
 
-## 2025-09-04 — Root redirect & mobile nav ids
+## 2025-09-04 — Root redirect & auth-aware middleware
 
 - App root `/` now redirects to `/browse-jobs` server-side.
+- Middleware preserves `?next=` when unauthenticated users visit gated routes (`/applications`, `/gigs/create`).
 - Mobile header links use unique `navm-*` test IDs to avoid duplicates.
 - Smoke helpers accept absolute or relative URLs for stable assertions.
+
+**How to verify**
+
+- `bash scripts/no-legacy.sh`
+- `node scripts/check-cta-links.mjs`
+- `npx playwright test -c playwright.smoke.ts`
 
 ## 2025-09-04 — Unify CTAs & responsive header
 

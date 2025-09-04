@@ -1,3 +1,4 @@
+<!-- AGENT CONTRACT v2025-09-04 -->
 # Agents Contract
 Version: 2025-09-04
 
@@ -18,10 +19,6 @@ Version: 2025-09-04
 - `navm-post-job`
 - `navm-my-applications`
 - `navm-login`
-
-## Hero CTA test IDs
-- `hero-browse-jobs`
-- `hero-post-job`
 
 ## Auth-aware success
 - For auth-gated routes, landing on the destination **or** `/login?next=<dest>` counts as success.

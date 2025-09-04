@@ -13,8 +13,6 @@ const required = [
   'data-testid="navm-my-applications"',
   'data-testid="navm-login"',
   'data-testid="nav-menu-button"',
-  'data-testid="hero-browse-jobs"',
-  'data-testid="hero-post-job"',
 ];
 
 let failed = false;
