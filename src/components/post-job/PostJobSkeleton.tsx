@@ -4,7 +4,10 @@ export default function PostJobSkeleton(
   return (
     <div
       {...props}
-      className={`animate-pulse border rounded p-4 space-y-2 ${props.className ?? ''}`}
+      data-testid="post-job-skeleton"
+      className={`animate-pulse border rounded p-4 space-y-2 ${
+        props.className ?? ""
+      }`}
     >
       <div className="h-6 bg-gray-200 rounded w-1/3" />
       <div className="h-4 bg-gray-200 rounded" />

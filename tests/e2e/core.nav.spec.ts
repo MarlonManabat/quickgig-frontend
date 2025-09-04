@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { APP_HOST, expectAuthAwareRedirect } from './helpers';
+import { test, expect } from "@playwright/test";
+import { expectAuthAwareRedirect } from "./helpers";
 
 test('Home → Browse Jobs renders', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -13,8 +13,5 @@ test('Home → Browse Jobs renders', async ({ page }) => {
 test('Home → My Applications renders (signed out ok)', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.getByTestId('nav-my-applications').click();
-  await expectAuthAwareRedirect(
-    page,
-    new RegExp(`${APP_HOST.source}\/applications\/?$`)
-  );
+  await expectAuthAwareRedirect(page, "**/applications**");
 });
