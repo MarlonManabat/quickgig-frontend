@@ -1,4 +1,5 @@
-import { appUrl } from '@/lib/urls';
+import { toAppPath } from '@/lib/urls';
+import { ROUTES } from '@/app/lib/routes';
 import LandingCTAs from '@/components/landing/LandingCTAs';
 
 export default function LandingHeader() {
@@ -8,8 +9,20 @@ export default function LandingHeader() {
         findClassName="hover:underline"
         postClassName="btn btn-primary"
       />
-      <a href={appUrl('/login')} className="...">
-        Login
+      <a
+        data-testid="cta-my-applications"
+        href={toAppPath(ROUTES.APPLICATIONS)}
+        className="..."
+        rel="noopener noreferrer"
+      >
+        My Applications
+      </a>
+      <a
+        href={toAppPath('/login')}
+        className="..."
+        rel="noopener noreferrer"
+      >
+        Sign in
       </a>
     </nav>
   );

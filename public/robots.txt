@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 
+Disallow: /__smoke__/
+Disallow: /smoke/
+
 Sitemap: https://quickgig.ph/sitemap.xml
 

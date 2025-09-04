@@ -20,6 +20,11 @@ export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   if (passthrough(pathname)) return NextResponse.next();
 
+  // Bypass for smoke test pages
+  if (pathname.startsWith('/smoke') || pathname.startsWith('/__smoke__')) {
+    return NextResponse.next();
+  }
+
   if (APP_PATHS.has(pathname)) {
     const url = new URL(pathname + search, APP_ORIGIN);
     return NextResponse.redirect(url, 308);

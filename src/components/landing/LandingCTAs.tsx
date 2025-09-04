@@ -1,6 +1,6 @@
-import React from "react";
-import Link from 'next/link';
-import { appUrl } from '@/lib/urls';
+import React from 'react';
+import { toAppPath } from '@/lib/urls';
+import { ROUTES } from '@/app/lib/routes';
 
 type Props = {
   findClassName?: string;
@@ -18,24 +18,24 @@ export default function LandingCTAs({
   return (
     <div className="flex gap-3">
         {showFind && (
-          <Link
-            data-testid="find-work-link"
-            href={appUrl('/browse-jobs')}
-            prefetch={false}
+          <a
+            data-testid="cta-browse-jobs"
+            href={toAppPath(ROUTES.GIGS_BROWSE)}
             className={findClassName}
+            rel="noopener noreferrer"
           >
-            Find Work
-          </Link>
+            Browse jobs
+          </a>
         )}
         {showPost && (
-          <Link
-            data-testid="post-job-link"
-            href={appUrl('/gigs/create')}
-            prefetch={false}
+          <a
+            data-testid="cta-post-job"
+            href={toAppPath(ROUTES.GIGS_CREATE)}
             className={postClassName}
+            rel="noopener noreferrer"
           >
-            Post Job
-          </Link>
+            Post a job
+          </a>
         )}
       </div>
     );
