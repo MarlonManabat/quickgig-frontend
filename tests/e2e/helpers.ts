@@ -16,18 +16,11 @@ export const isProdBase = () => {
   return /app\.quickgig\.ph/i.test(u);
 };
 
-// Wait for either the intended destination OR a bounce to /login?next=...
-export async function expectAuthAwareRedirect(
-  page: Page,
-  destPathPattern: RegExp, // e.g. /\/gigs\/create\/?$/
-  timeout = 8000
-) {
-  const host = 'https?:\\/\\/[^/]+'; // match any host (localhost or preview)
-  const dest = new RegExp(`${host}${destPathPattern.source}`);
-  const login = new RegExp(`${host}\/login(\\?.*)?$`);
-
+export async function expectAuthAwareSuccess(page: Page, dest: RegExp) {
+  const destPath = dest.source.replace(/\\/g, '');
+  const login = new RegExp(`/login\?next=${encodeURIComponent(destPath)}`);
   await Promise.race([
-    page.waitForURL(dest, { timeout }),
-    page.waitForURL(login, { timeout }),
+    page.waitForURL(dest, { timeout: 8_000 }),
+    page.waitForURL(login, { timeout: 8_000 }),
   ]);
 }

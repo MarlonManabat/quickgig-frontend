@@ -1,6 +1,9 @@
-// Server component: redirect "/" to the working product shell at "/browse-jobs".
-import { redirect } from 'next/navigation';
+import LandingHero from '@/components/landing/Hero';
 
-export default function Root() {
-  redirect('/browse-jobs');
+export default function Home() {
+  return (
+    <main className="p-4">
+      <LandingHero />
+    </main>
+  );
 }

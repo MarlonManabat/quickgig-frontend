@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from '../e2e/helpers';
+import { expectAuthAwareSuccess } from '../e2e/helpers';
 
 test('Post Job form › renders form, skeleton, or redirects', async ({ page }) => {
   await page.goto('/gigs/create');
@@ -10,7 +10,7 @@ test('Post Job form › renders form, skeleton, or redirects', async ({ page }) 
   await Promise.race([
     heading.waitFor({ timeout: 10000 }),
     skeleton.waitFor({ timeout: 10000 }),
-    expectAuthAwareRedirect(page, /\/gigs\/create\/?$/, 10000),
+    expectAuthAwareSuccess(page, /\/gigs\/create\/?$/),
   ]);
 
   if (await heading.isVisible()) {

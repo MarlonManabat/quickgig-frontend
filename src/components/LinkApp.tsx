@@ -1,8 +1,12 @@
 'use client';
-import Link from 'next/link';
-import type { ComponentProps } from 'react';
+import Link, { LinkProps } from 'next/link';
+import { toAppPath } from '@/app/lib/routes';
 
-export default function LinkApp(props: ComponentProps<typeof Link>) {
-  // Simple passthrough; any cross-host logic stays centralized here if needed later.
-  return <Link {...props} />;
+type Props = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> & LinkProps;
+
+export function LinkApp({ href, ...rest }: Props) {
+  const dest = typeof href === 'string' ? toAppPath(href) : href;
+  return <Link href={dest as any} {...rest} />;
 }
+
+export default LinkApp;

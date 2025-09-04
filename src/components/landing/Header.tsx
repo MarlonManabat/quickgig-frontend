@@ -1,5 +1,5 @@
-import LinkApp from '@/components/LinkApp';
-import { ROUTES } from '@/lib/routes';
+import { LinkApp } from '@/components/LinkApp';
+import { ROUTES } from '@/app/lib/routes';
 
 export default function LandingHeader() {
   return (
@@ -13,7 +13,7 @@ export default function LandingHeader() {
       </LinkApp>
       <LinkApp
         data-testid="nav-post-job"
-        href={ROUTES.gigsCreate}
+        href={ROUTES.postJob}
         className="btn btn-primary"
       >
         Post a job
@@ -25,7 +25,7 @@ export default function LandingHeader() {
       >
         My Applications
       </LinkApp>
-      <LinkApp href={ROUTES.login} className="...">
+      <LinkApp data-testid="nav-login" href={ROUTES.login} className="...">
         Sign in
       </LinkApp>
     </nav>

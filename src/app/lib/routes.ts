@@ -1,8 +1,13 @@
-// central app paths for cross-origin CTAs
 export const ROUTES = {
-  HOME: '/',
-  GIGS_BROWSE: '/browse-jobs',      // keep existing browse path
-  GIGS_CREATE: '/gigs/create',
-  APPLICATIONS: '/applications',
-  LOGIN: '/login',
+  browseJobs: '/browse-jobs',
+  postJob: '/gigs/create',
+  applications: '/applications',
+  login: '/login',
 } as const;
+
+export function toAppPath(path: string): string {
+  const origin = process.env.NEXT_PUBLIC_APP_ORIGIN;
+  if (!origin) return path;
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+  return `${origin}${normalized}`;
+}

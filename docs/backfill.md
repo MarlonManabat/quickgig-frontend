@@ -1,5 +1,15 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-09-04 — Unify CTAs & responsive header
+
+- Centralized app paths in `src/app/lib/routes.ts` with `toAppPath()`.
+- Added `LinkApp` helper to normalize app URLs.
+- AppHeader now reads routes with stable test IDs and a mobile menu without duplicate links.
+- Landing hero buttons expose `hero-browse-jobs` and `hero-post-job` test IDs.
+- Introduced auth-aware smoke helper and new smoke tests for landing hero and header (mobile/desktop).
+- Added `scripts/check-cta-links.mjs` and shell wrapper `scripts/no-legacy.sh` as CI guardrails.
+- Updated docs/agents.md contract and checklist.
+
 ## 2025-09-03
 - Added `NEXT_PUBLIC_APP_ORIGIN` and `src/lib/urls.ts` utility to centralize the app host.
 - Converted all landing CTAs (hero, nav, footer, and cards) to absolute links to the app:

@@ -30,18 +30,25 @@
         <nav>
           <a href="#features">Features</a>
           <a
-              href="/gigs"
-            data-testid="nav-find"
-            aria-label="Maghanap ng trabaho sa QuickGig app"
+            href="/browse-jobs"
+            data-testid="nav-browse-jobs"
+            aria-label="Browse jobs on QuickGig app"
             data-app-root
-            >Maghanap ng Trabaho</a
+            >Browse Jobs</a
           >
           <a
-              href="/gigs/create"
-            data-testid="nav-post"
+            href="/gigs/create"
+            data-testid="nav-post-job"
             aria-label="Post job on QuickGig app"
             data-app-root
-            >Post Job</a
+            >Post a Job</a
+          >
+          <a
+            href="/applications"
+            data-testid="nav-my-applications"
+            aria-label="View My Applications on QuickGig app"
+            data-app-root
+            >My Applications</a
           >
           <a
             href="/login"
@@ -49,14 +56,6 @@
             aria-label="Log in to QuickGig app"
             data-app-root
             >Login</a
-          >
-          <a
-            class="btn btn-primary"
-            href="/start"
-            data-testid="cta-signup"
-            aria-label="Sign up on QuickGig app"
-            data-app-root
-            >Sign Up</a
           >
         </nav>
       </div>
@@ -76,13 +75,12 @@
         </p>
         <div class="actions">
           <a
-            id="cta-start"
             class="qg-btn qg-btn--primary"
-            href="/search?intent=worker"
-            data-testid="cta-start-now"
-            aria-label="Open QuickGig app"
+            href="/browse-jobs"
+            data-testid="hero-browse-jobs"
+            aria-label="Browse jobs on QuickGig app"
             data-app-root
-            >Simulan Na!</a
+            >Browse Jobs</a
           >
           <a
             class="btn btn-ghost"
