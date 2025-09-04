@@ -1,6 +1,41 @@
 export const ROUTES = {
-  gigsCreate: '/gigs/create',
-  applications: '/applications',
   browseJobs: '/browse-jobs',
+  postJob: '/gigs/create',
+  applications: '/applications',
   login: '/login',
 } as const;
+
+export const NAV_ITEMS = [
+  {
+    key: 'browse-jobs',
+    label: 'Browse jobs',
+    to: ROUTES.browseJobs,
+    idDesktop: 'nav-browse-jobs',
+    idMobile: 'navm-browse-jobs',
+    auth: 'none',
+  },
+  {
+    key: 'post-job',
+    label: 'Post a job',
+    to: ROUTES.postJob,
+    idDesktop: 'nav-post-job',
+    idMobile: 'navm-post-job',
+    auth: 'auth-aware',
+  },
+  {
+    key: 'applications',
+    label: 'My Applications',
+    to: ROUTES.applications,
+    idDesktop: 'nav-my-applications',
+    idMobile: 'navm-my-applications',
+    auth: 'auth-aware',
+  },
+  {
+    key: 'login',
+    label: 'Login',
+    to: ROUTES.login,
+    idDesktop: 'nav-login',
+    idMobile: 'navm-login',
+    auth: 'none',
+  },
+] as const;

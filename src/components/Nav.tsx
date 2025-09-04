@@ -34,7 +34,7 @@ export default function Nav() {
         <Link href="/gigs" data-testid="nav-find">
           {copy.nav.findWork}
         </Link>
-        <LinkApp href={ROUTES.gigsCreate} data-testid="nav-post-job">
+        <LinkApp href={ROUTES.postJob} data-testid="nav-post-job">
           {copy.nav.postJob}
         </LinkApp>
       {session ? (

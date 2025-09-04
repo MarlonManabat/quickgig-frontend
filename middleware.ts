@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { LEGACY_MAP } from "@/app/lib/legacy-redirects";
 import { ROUTES } from "@/lib/routes";
 
-const AUTH_GATED = new Set([ROUTES.applications, ROUTES.gigsCreate]);
+const AUTH_GATED = new Set([ROUTES.applications, ROUTES.postJob]);
 
 // Normalize: case-insensitive, trim trailing slash (except root)
 function normalize(pathname: string) {
@@ -13,7 +13,7 @@ function normalize(pathname: string) {
 }
 
 export function middleware(req: NextRequest) {
-  const { pathname, search } = req.nextUrl;
+  const { pathname } = req.nextUrl;
 
   // Allow smoke pages (and Next/static) through untouched
   if (
@@ -40,11 +40,11 @@ export function middleware(req: NextRequest) {
   }
 
   // Auth-gated routes → /login?next=<dest>
-  const dest = pathname + (search || "");
   if (AUTH_GATED.has(pathname) && !req.cookies.get("sb-access-token")) {
-    const url = req.nextUrl.clone();
-    url.pathname = ROUTES.login;
-    url.search = `?next=${encodeURIComponent(dest)}`;
+    const url = new URL(
+      `${ROUTES.login}?next=${encodeURIComponent(pathname)}`,
+      req.url,
+    );
     return NextResponse.redirect(url, 302);
   }
 

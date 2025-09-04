@@ -101,16 +101,19 @@
 **Rollback**
 - Revert the PR if navigation or auth flows break.
 
-## 2025-09-05 — Append `next` query for auth-gated redirects
+## 2025-09-05 — Auth-gated redirects & responsive header
 
 **Summary**
 - Middleware now redirects unsigned users from `/applications` and `/gigs/create` to `/login?next=<dest>`.
+- Header derives desktop and mobile menus from a single `NAV_ITEMS` source with unique test IDs.
+- `scripts/check-cta-links.mjs` validates header and hero CTAs against `ROUTES`.
 
 **Rationale**
-- Preserve the intended destination after sign-in and satisfy smoke tests expecting `?next=`.
+- Preserve destination after sign-in and keep nav CTAs deterministic for smoke tests.
 
 **Impact / Migrations**
-- None; auth gating handled centrally in `middleware.ts`.
+- Use `NAV_ITEMS` + `LinkApp` for header links.
+- Tests rely on stable CTA IDs and treat `/login?next=<dest>` as success for gated links.
 
 **How to verify**
 - Visit `/applications` or `/gigs/create` while signed out → `/login?next=<dest>`.
@@ -119,4 +122,4 @@
 - `npx playwright test -c playwright.smoke.ts`
 
 **Rollback**
-- Revert this commit to restore previous middleware behavior.
+- Revert this commit to restore previous middleware and header behavior.

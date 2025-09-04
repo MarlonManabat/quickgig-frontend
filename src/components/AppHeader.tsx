@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import LinkApp from '@/components/LinkApp';
-import { ROUTES } from '@/lib/routes';
+import { NAV_ITEMS, ROUTES } from '@/lib/routes';
 
 type Props = {
   balance: number;
@@ -13,44 +13,29 @@ export default function AppHeader({ balance }: Props) {
   const { user, signOut } = useUser();
   const [open, setOpen] = useState(false);
 
-  const baseLinks = [
-    {
-      href: ROUTES.browseJobs,
-      label: 'Browse jobs',
-      testId: 'nav-browse-jobs',
-      mobileId: 'navm-browse-jobs',
-    },
-    {
-      href: ROUTES.gigsCreate,
-      label: 'Post a job',
-      testId: 'nav-post-job',
-      mobileId: 'navm-post-job',
-    },
-    {
-      href: ROUTES.applications,
-      label: 'My Applications',
-      testId: 'nav-my-applications',
-      mobileId: 'navm-my-applications',
-    },
-  ];
-  const authLinks = user
-    ? [
-        {
-          label: 'Sign out',
-          onClick: () => signOut(),
-          testId: 'nav-logout',
-          mobileId: 'navm-logout',
-        },
-      ]
-    : [
-        {
-          href: ROUTES.login,
-          label: 'Sign in',
-          testId: 'nav-login',
-          mobileId: 'navm-login',
-        },
-      ];
-  const links = [...baseLinks, ...authLinks];
+  const links = NAV_ITEMS.filter(item => item.key !== 'login' || !user).map(
+    item => ({
+      href: item.to,
+      label: item.label,
+      testId: item.idDesktop,
+      mobileId: item.idMobile,
+    }),
+  );
+  if (user) {
+    links.push({
+      label: 'Sign out',
+      onClick: () => signOut(),
+      testId: 'nav-logout',
+      mobileId: 'navm-logout',
+    });
+  } else {
+    links.push({
+      href: ROUTES.login,
+      label: 'Login',
+      testId: 'nav-login',
+      mobileId: 'navm-login',
+    });
+  }
 
   return (
     <header data-testid="app-header" className="border-b bg-white/60 backdrop-blur">
@@ -83,7 +68,9 @@ export default function AppHeader({ balance }: Props) {
             )}
           </nav>
           <button
-            data-testid="navm-toggle"
+            data-testid="nav-menu-button"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
             className="md:hidden"
             onClick={() => setOpen(o => !o)}
           >
@@ -103,7 +90,10 @@ export default function AppHeader({ balance }: Props) {
         </div>
       </div>
       {open && (
-        <nav className="md:hidden flex flex-col gap-2 p-4 border-t">
+        <nav
+          id="mobile-nav"
+          className="md:hidden flex flex-col gap-2 p-4 border-t"
+        >
           {links.map(link =>
             link.href ? (
               <LinkApp
@@ -112,6 +102,7 @@ export default function AppHeader({ balance }: Props) {
                 href={link.href}
                 prefetch={false}
                 onClick={() => setOpen(false)}
+                className="link"
               >
                 {link.label}
               </LinkApp>

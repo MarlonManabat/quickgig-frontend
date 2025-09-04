@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function GigsCreatePage() {
   const uid = await userIdFromCookie();
-  if (!uid) redirect(`${ROUTES.login}?next=${ROUTES.gigsCreate}`);
+  if (!uid) redirect(`${ROUTES.login}?next=${ROUTES.postJob}`);
   await ensureTicketsRow(uid);
   const balance = await getTicketBalance(uid);
   return (

@@ -15,7 +15,7 @@ export default function SmokeLandingCTAs() {
         <LinkApp data-testid="hero-browse-jobs" href={ROUTES.browseJobs}>
           Browse Jobs
         </LinkApp>
-        <LinkApp data-testid="hero-post-job" href={ROUTES.gigsCreate}>
+        <LinkApp data-testid="hero-post-job" href={ROUTES.postJob}>
           Post a job
         </LinkApp>
       </div>

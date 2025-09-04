@@ -13,7 +13,7 @@ export default function LandingHeader() {
       </LinkApp>
       <LinkApp
         data-testid="nav-post-job"
-        href={ROUTES.gigsCreate}
+        href={ROUTES.postJob}
         className="btn btn-primary"
       >
         Post a job

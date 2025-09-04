@@ -13,7 +13,7 @@ export default function LandingHero() {
           Browse jobs
         </LinkApp>
         <LinkApp
-          href={ROUTES.gigsCreate}
+          href={ROUTES.postJob}
           data-testid="hero-post-job"
           className="px-4 py-2 rounded-md bg-blue-600 text-white"
         >
