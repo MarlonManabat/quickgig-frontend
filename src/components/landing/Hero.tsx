@@ -13,11 +13,11 @@ export default function LandingHero() {
           Browse jobs
         </LinkApp>
         <LinkApp
-          href={ROUTES.postJob}
-          data-testid="hero-post-job"
+          href={ROUTES.login}
+          data-testid="hero-sign-in"
           className="px-4 py-2 rounded-md bg-blue-600 text-white"
         >
-          Post a job
+          Simulan Na!
         </LinkApp>
       </div>
     </section>

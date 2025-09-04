@@ -3,12 +3,37 @@ import { useState } from 'react';
 import LinkApp from '@/components/LinkApp';
 import { ROUTES } from '@/lib/routes';
 
-const NavLinks = () => (
+type NavLinksProps = { prefix: string };
+const NavLinks = ({ prefix }: NavLinksProps) => (
   <nav className="flex flex-col md:flex-row gap-3 md:gap-6">
-    <LinkApp data-testid="nav-browse-jobs" href={ROUTES.browseJobs} className="link">Browse jobs</LinkApp>
-    <LinkApp data-testid="nav-post-job" href={ROUTES.postJob} className="link">Post a job</LinkApp>
-    <LinkApp data-testid="nav-my-applications" href={ROUTES.applications} className="link">My Applications</LinkApp>
-    <LinkApp data-testid="nav-login" href={ROUTES.login} className="link">Sign in</LinkApp>
+    <LinkApp
+      data-testid={`${prefix}browse-jobs`}
+      href={ROUTES.browseJobs}
+      className="link"
+    >
+      Browse jobs
+    </LinkApp>
+    <LinkApp
+      data-testid={`${prefix}post-job`}
+      href={ROUTES.postJob}
+      className="link"
+    >
+      Post a job
+    </LinkApp>
+    <LinkApp
+      data-testid={`${prefix}my-applications`}
+      href={ROUTES.applications}
+      className="link"
+    >
+      My Applications
+    </LinkApp>
+    <LinkApp
+      data-testid={`${prefix}login`}
+      href={ROUTES.login}
+      className="link"
+    >
+      Sign in
+    </LinkApp>
   </nav>
 );
 
@@ -20,7 +45,7 @@ export default function AppHeader() {
         <LinkApp href={ROUTES.browseJobs} className="font-semibold">QuickGig</LinkApp>
         {/* Desktop nav */}
         <div className="hidden md:block">
-          <NavLinks />
+          <NavLinks prefix="nav-" />
         </div>
         {/* Mobile menu button (no duplicate links when closed) */}
         <button
@@ -38,7 +63,7 @@ export default function AppHeader() {
       {open && (
         <div className="md:hidden border-t">
           <div className="px-4 py-3">
-            <NavLinks />
+            <NavLinks prefix="navm-" />
           </div>
         </div>
       )}

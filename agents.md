@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-09-04
+**Version:** 2025-09-05
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -16,9 +16,9 @@
 - Unauthenticated users MAY be redirected to `/login?next=/gigs/create`.
 
 ## Test hooks (smoke/e2e)
-- Stable header test IDs: `nav-post-job`, `nav-my-applications`.
-- Mobile header collapses links behind a menu button with test id `nav-menu-button`.
-- Additional stable IDs: `nav-browse-jobs`, `nav-login`, hero IDs `hero-post-job`, `hero-browse-jobs`.
+- Header desktop: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
+- Header mobile: `nav-menu-button`, `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`.
+- Hero: `hero-browse-jobs`, `hero-sign-in`.
 - Post Job skeleton test id: `post-job-skeleton`.
 - The landing page must not render duplicate CTAs with identical accessible names.
 
@@ -27,7 +27,7 @@
   (bans `/post-job`, `/find`, `/my-applications`, `/applications/login` in anchors).
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-09-04 -->
+<!-- AGENT CONTRACT v2025-09-05 -->
 
 ---
 
