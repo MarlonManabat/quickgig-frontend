@@ -1,46 +1,38 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { LEGACY_MAP } from "@/app/lib/legacy-redirects";
 
-const APP_ORIGIN = process.env.NEXT_PUBLIC_APP_ORIGIN ?? 'https://app.quickgig.ph';
-
-// Static/infra paths that must pass
-const passthrough = (p: string) =>
-  p.startsWith('/_next') || p.startsWith('/favicon') || /\.\w+$/.test(p);
-
-// Only redirect these app paths. Keep '/' as landing homepage.
-const APP_PATHS = new Set<string>([
-  '/browse-jobs',
-  '/gigs/create',
-  '/applications',
-  '/login',
-  '/sign-in',
-]);
-
-// Legacy paths from old landing; map to canonical app routes
-const LEGACY_PATHS = new Map<string, string>([
-  ['/find', '/browse-jobs'],
-  ['/gigs', '/browse-jobs'],
-  ['/browsejobs', '/browse-jobs'],
-  ['/post-job', '/gigs/create'],
-  ['/my-apps', '/applications'],
-]);
+// Normalize: case-insensitive, trim trailing slash (except root)
+function normalize(pathname: string) {
+  let p = pathname.toLowerCase();
+  if (p.length > 1 && p.endsWith("/")) p = p.slice(0, -1);
+  return p;
+}
 
 export function middleware(req: NextRequest) {
-  const { pathname, search } = req.nextUrl;
-  if (passthrough(pathname)) return NextResponse.next();
+  const { pathname } = req.nextUrl;
 
-  // Bypass for smoke test pages
-  if (pathname.startsWith('/smoke') || pathname.startsWith('/__smoke__')) {
+  // Allow smoke pages (and Next/static) through untouched
+  if (
+    pathname.startsWith("/smoke") ||
+    pathname.startsWith("/__smoke__") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/static")
+  ) {
     return NextResponse.next();
   }
 
-  const target = LEGACY_PATHS.get(pathname) || (APP_PATHS.has(pathname) ? pathname : null);
+  // Legacy → modern redirects (belt & suspenders with next.config redirects)
+  const key = normalize(pathname);
+  const target = LEGACY_MAP[key];
   if (target) {
-    const url = new URL(target + search, APP_ORIGIN);
+    const url = new URL(target, req.nextUrl);
     return NextResponse.redirect(url, 308);
   }
+
   return NextResponse.next();
 }
 
-// Apply to everything except static files for perf
-export const config = { matcher: ['/((?!_next/|.*\\..*).*)'] };
+export const config = {
+  matcher: ["/((?!_next|static|favicon.ico|robots.txt|sitemap.xml).*)"],
+};

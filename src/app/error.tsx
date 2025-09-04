@@ -1,32 +1,25 @@
 'use client';
 
-import { useEffect } from 'react';
-
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
-  useEffect(() => {
-    // Log for observability; safe to remove later
-    console.error('App error:', error);
-  }, [error]);
-
+export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
+  // Best-effort client log; the server log will also have the stack
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.error('App error:', { message: error.message, digest: (error as any).digest });
+  }
   return (
-    <main className="mx-auto max-w-xl p-10 text-center">
-      <h1 className="text-3xl font-semibold mb-2">Something went wrong</h1>
-      <p className="text-slate-600 mb-4">
-        Please try again. If the issue persists, try again later.
-      </p>
-      <button
-        onClick={() => reset()}
-        className="border rounded px-4 py-2"
-        aria-label="Retry"
-      >
-        Try again
-      </button>
-    </main>
+    <html>
+      <body className="p-8">
+        <div className="max-w-xl mx-auto space-y-3">
+          <h1 className="text-xl font-semibold">Something went wrong</h1>
+          <p>We hit an unexpected error while loading this page.</p>
+          {'digest' in error && (error as any).digest ? (
+            <p className="text-sm opacity-70">Error digest: {(error as any).digest}</p>
+          ) : null}
+          <a className="underline" href="/">
+            Go Home
+          </a>
+        </div>
+      </body>
+    </html>
   );
 }
