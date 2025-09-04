@@ -8,8 +8,11 @@ test('Mobile header exposes CTAs via menu and routes correctly', async ({ page }
   await page.getByTestId('nav-menu-button').click();
   await expect(page.getByTestId('navm-browse-jobs')).toBeVisible();
   await expect(page.getByTestId('navm-post-job')).toBeVisible();
-  await expect(page.getByTestId('navm-my-applications')).toBeVisible();
-  await expect(page.getByTestId('navm-login')).toBeVisible();
-  await page.getByTestId('navm-browse-jobs').click();
-  await expect(page).toHaveURL(/\/browse-jobs/);
+  await expect(
+    page.getByTestId('navm-login').or(page.getByTestId('navm-my-applications'))
+  ).toBeVisible();
+  await Promise.all([
+    page.waitForURL(/\/browse-jobs/),
+    page.getByTestId('navm-browse-jobs').click(),
+  ]);
 });

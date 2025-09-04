@@ -24,9 +24,43 @@ for (const root of roots) {
   } catch {}
 }
 
-if (bad.length) {
-  console.error('Banned CTA links found in:\n' + bad.map(b => ' - ' + b).join('\n'));
+const errors = [];
+try {
+  const header = readFileSync('src/components/AppHeader.tsx', 'utf8');
+  const tokens = [
+    'nav-',
+    'navm-',
+    'browse-jobs',
+    'post-job',
+    'my-applications',
+    'login',
+  ];
+  const routes = [
+    'ROUTES.browseJobs',
+    'ROUTES.postJob',
+    'ROUTES.applications',
+    'ROUTES.login',
+  ];
+  for (const t of tokens) if (!header.includes(t)) errors.push(`missing ${t} in AppHeader.tsx`);
+  for (const route of routes) if (!header.includes(route)) errors.push(`missing ${route} in AppHeader.tsx`);
+} catch (e) {
+  errors.push('could not read AppHeader.tsx');
+}
+
+try {
+  const hero = readFileSync('src/components/landing/Hero.tsx', 'utf8');
+  const ids = ['hero-browse-jobs', 'hero-post-job'];
+  const routes = ['ROUTES.browseJobs', 'ROUTES.postJob'];
+  for (const id of ids) if (!hero.includes(id)) errors.push(`missing ${id} in Hero.tsx`);
+  for (const route of routes) if (!hero.includes(route)) errors.push(`missing ${route} in Hero.tsx`);
+} catch (e) {
+  errors.push('could not read Hero.tsx');
+}
+
+if (bad.length || errors.length) {
+  if (bad.length) console.error('Banned CTA links found in:\n' + bad.map(b => ' - ' + b).join('\n'));
+  if (errors.length) console.error('CTA link check failed:\n' + errors.map(e => ' - ' + e).join('\n'));
   process.exit(1);
 } else {
-  console.log('✔ No banned CTA links found.');
+  console.log('✔ CTA links map to canonical routes.');
 }

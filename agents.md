@@ -1,11 +1,17 @@
 # Agents Contract
-**Version:** 2025-09-05
+**Version:** 2025-09-06
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
 - Header CTAs:
+  - `data-testid="nav-browse-jobs"` → `/browse-jobs`
   - `data-testid="nav-post-job"` → `/gigs/create`
   - `data-testid="nav-my-applications"` → `/applications`
+  - `data-testid="nav-login"` → `/login`
+- Mobile menu uses `navm-*` equivalents behind `data-testid="nav-menu-button"`.
+- Hero CTAs:
+  - `data-testid="hero-browse-jobs"` → `/browse-jobs`
+  - `data-testid="hero-post-job"` → `/gigs/create`
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
@@ -18,7 +24,7 @@
 ## Test hooks (smoke/e2e)
 - Header desktop: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
 - Header mobile: `nav-menu-button`, `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`.
-- Hero: `hero-browse-jobs`, `hero-sign-in`.
+- Hero: `hero-browse-jobs`, `hero-post-job`.
 - Post Job skeleton test id: `post-job-skeleton`.
 - The landing page must not render duplicate CTAs with identical accessible names.
 
@@ -27,7 +33,7 @@
   (bans `/post-job`, `/find`, `/my-applications`, `/applications/login` in anchors).
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-09-05 -->
+<!-- AGENT CONTRACT v2025-09-06 -->
 
 ---
 

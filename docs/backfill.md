@@ -84,4 +84,10 @@
 
 ### 2025-09-05 — Header and hero test IDs
 - Split header test IDs into desktop (`nav-*`) and mobile (`navm-*`) variants to avoid DOM duplicates.
-- Added `hero-browse-jobs` and `hero-sign-in` IDs on landing hero and updated smokes.
+- Added `hero-browse-jobs` and `hero-post-job` IDs on landing hero and updated smokes.
+
+### 2025-09-04 — Responsive header & mobile smoke
+- Added mobile menu with `navm-*` test IDs; de-duplicated desktop vs mobile IDs.
+- Hero CTAs standardized to `hero-browse-jobs` and `hero-post-job`.
+- All CTAs route via `LinkApp` + `ROUTES`.
+- Smokes updated; link-health script now checks mobile + hero links.
