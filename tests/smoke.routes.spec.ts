@@ -6,8 +6,8 @@ test('Landing loads and CTAs target canonical routes', async ({ page }) => {
   expect(res?.ok(), 'landing should load').toBeTruthy();
 
   const post = page.locator('a[href="/gigs/create"]');
-  const find = page.locator('a[href="/gigs"]');
+  const browse = page.locator('a[href="/browse-jobs"]');
 
   await expect(post, 'Post Job CTA should exist').toHaveCount(1);
-  await expect(find, 'Find Work CTA should exist').toHaveCount(1);
+  await expect(browse, 'Browse Jobs CTA should exist').toHaveCount(1);
 });

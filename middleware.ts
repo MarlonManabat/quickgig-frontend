@@ -16,6 +16,15 @@ const APP_PATHS = new Set<string>([
   '/sign-in',
 ]);
 
+// Legacy paths from old landing; map to canonical app routes
+const LEGACY_PATHS = new Map<string, string>([
+  ['/find', '/browse-jobs'],
+  ['/gigs', '/browse-jobs'],
+  ['/browsejobs', '/browse-jobs'],
+  ['/post-job', '/gigs/create'],
+  ['/my-apps', '/applications'],
+]);
+
 export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   if (passthrough(pathname)) return NextResponse.next();
@@ -25,8 +34,9 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (APP_PATHS.has(pathname)) {
-    const url = new URL(pathname + search, APP_ORIGIN);
+  const target = LEGACY_PATHS.get(pathname) || (APP_PATHS.has(pathname) ? pathname : null);
+  if (target) {
+    const url = new URL(target + search, APP_ORIGIN);
     return NextResponse.redirect(url, 308);
   }
   return NextResponse.next();
