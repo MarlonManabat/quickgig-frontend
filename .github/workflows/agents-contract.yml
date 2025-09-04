@@ -1,0 +1,20 @@
+name: agents-contract
+on:
+  pull_request:
+    paths:
+      - "agents.md"
+      - "scripts/verify-agents-md.mjs"
+      - "app/lib/routes.ts"
+      - "middleware.ts"
+      - "next.config.*"
+      - "tests/smoke/**"
+      - "components/**/PostJobSkeleton.tsx"
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify agents.md contract
+        run: node scripts/verify-agents-md.mjs
