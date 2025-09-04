@@ -137,7 +137,7 @@
 - Provide deterministic flows for applying to jobs and viewing applications while backend is WIP.
 
 **Impact / Migrations**
-- Use `jobs-list`, `job-card`, `apply-button`, `applications-list`, `application-row`, `applications-empty` test IDs in tests.
+  - Use `job-list`, `job-card`, `apply-button`, `applications-list`, `application-row`, `applications-empty` test IDs in tests.
 
 **How to verify**
 - `npm run no-legacy`
@@ -165,4 +165,13 @@
 - Replaced separate PR and main smoke workflows with a unified `smoke.yml` that installs Playwright browsers via `npx playwright install --with-deps`.
 - Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
 - Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
+
+## 2025-09-10 — Applications store & auth-aware Apply flow
+
+- Stubbed `isSignedIn()` via localStorage key `DEV_AUTH` for dev/CI.
+- Added `applicationsStore` persisting applied jobs to `localStorage`.
+- Browse list uses `<LinkApp toPath(routes.browseJob(id))>` and test IDs `job-list` / `job-card`.
+- Job detail Apply CTA stores the job then routes to `/applications` or redirects unauth users to `/login?next=/applications`.
+- Applications page reads from the client store and shows empty state "No applications yet.".
+- Smoke tests cover unauth redirect and signed-in application creation.
 

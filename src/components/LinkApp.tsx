@@ -3,7 +3,10 @@ import Link from 'next/link';
 import type { ComponentProps } from 'react';
 import { toAppPath } from '@/lib/routes';
 
-export default function LinkApp({ href, ...props }: ComponentProps<typeof Link>) {
-  const dest = typeof href === 'string' ? toAppPath(href) : href;
-  return <Link {...props} href={dest} />;
+type Props = ComponentProps<typeof Link> & { toPath?: string };
+
+export default function LinkApp({ href, toPath, ...props }: Props) {
+  const dest = toPath ?? href;
+  const final = typeof dest === 'string' ? toAppPath(dest) : dest;
+  return <Link {...props} href={final} />;
 }

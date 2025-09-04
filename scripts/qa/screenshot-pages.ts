@@ -7,7 +7,7 @@ type PageSpec = { path: string; waitFor: string; file: string };
 const pages: PageSpec[] = [
   { path: "/", waitFor: "[data-testid=app-header]", file: "home.png" },
   { path: "/jobs/new", waitFor: "[data-testid=job-form]", file: "jobs-new.png" },
-  { path: "/jobs", waitFor: "[data-testid=jobs-list]", file: "jobs-list.png" },
+  { path: "/jobs", waitFor: "[data-testid=job-list]", file: "job-list.png" },
   {
     path: "/applications",
     waitFor: "[data-testid=applications-page]",

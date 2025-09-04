@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-09-04 -->
+<!-- AGENT CONTRACT v2025-09-10 -->
 
 # Product Acceptance (Good Product Bar)
 
@@ -43,7 +43,7 @@
 **No duplicates:** each CTA test ID must appear at most once in the DOM.
 
 ## Page Test IDs
-- Browse list: `jobs-list`, `job-card`
+- Browse list: `job-list`, `job-card`
 - Job detail: `apply-button`
 - Applications: `applications-list`, `application-row`, `applications-empty`
 
