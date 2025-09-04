@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useUser } from '@/hooks/useUser';
-import { ROUTES } from '@/app/lib/routes';
+import LinkApp from '@/components/LinkApp';
+import { ROUTES } from '@/lib/routes';
 
 type Props = {
   balance: number;
@@ -18,19 +19,19 @@ export default function AppHeader({ balance }: Props) {
             QuickGig
           </Link>
           <nav className="flex items-center gap-4">
-            <Link data-testid="nav-browse-jobs" href={ROUTES.GIGS_BROWSE} prefetch={false}>
+            <LinkApp data-testid="nav-browse-jobs" href={ROUTES.browseJobs} prefetch={false}>
               Browse jobs
-            </Link>
-            <Link data-testid="post-job" href={ROUTES.GIGS_CREATE} prefetch={false}>
+            </LinkApp>
+            <LinkApp href={ROUTES.gigsCreate} data-testid="nav-post-job" prefetch={false}>
               Post a job
-            </Link>
-            <Link
-              data-testid="my-applications"
-              href={ROUTES.APPLICATIONS}
+            </LinkApp>
+            <LinkApp
+              href={ROUTES.applications}
+              data-testid="nav-my-applications"
               prefetch={false}
             >
               My Applications
-            </Link>
+            </LinkApp>
             {user ? (
               <button onClick={() => signOut()} className="underline">
                 Sign out

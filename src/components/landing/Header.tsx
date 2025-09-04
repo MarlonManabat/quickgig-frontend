@@ -1,29 +1,33 @@
-import { toAppPath } from '@/lib/urls';
-import { ROUTES } from '@/app/lib/routes';
-import LandingCTAs from '@/components/landing/LandingCTAs';
+import LinkApp from '@/components/LinkApp';
+import { ROUTES } from '@/lib/routes';
 
 export default function LandingHeader() {
   return (
     <nav className="...">
-      <LandingCTAs
-        findClassName="hover:underline"
-        postClassName="btn btn-primary"
-      />
-      <a
-        data-testid="cta-my-applications"
-        href={toAppPath(ROUTES.APPLICATIONS)}
+      <LinkApp
+        data-testid="nav-browse-jobs"
+        href={ROUTES.browseJobs}
+        className="hover:underline"
+      >
+        Browse jobs
+      </LinkApp>
+      <LinkApp
+        data-testid="nav-post-job"
+        href={ROUTES.gigsCreate}
+        className="btn btn-primary"
+      >
+        Post a job
+      </LinkApp>
+      <LinkApp
+        data-testid="nav-my-applications"
+        href={ROUTES.applications}
         className="..."
-        rel="noopener noreferrer"
       >
         My Applications
-      </a>
-      <a
-        href={toAppPath('/login')}
-        className="..."
-        rel="noopener noreferrer"
-      >
+      </LinkApp>
+      <LinkApp href={ROUTES.login} className="...">
         Sign in
-      </a>
+      </LinkApp>
     </nav>
   );
 }
