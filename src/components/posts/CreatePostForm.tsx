@@ -2,6 +2,7 @@
 import * as React from "react";
 import GeoSelect, { GeoValue } from "@/components/location/GeoSelect";
 import { getBrowserSupabase } from "@/lib/supabase-browser";
+import { ROUTES } from "@/lib/routes";
 
 let supabase = getBrowserSupabase();
 export function __setSupabaseClient(client: any) {
@@ -58,7 +59,7 @@ export default function CreatePostForm() {
     try {
       await submit(new FormData(e.currentTarget));
       setForm({ title:'', description:'', region_code:'', province_code:'', city_code:'', price_php:'' });
-      window.location.href = `/find`;
+      window.location.href = ROUTES.browseJobs;
     } catch (e: any) {
       setErr(e.message || 'Create failed');
     } finally {

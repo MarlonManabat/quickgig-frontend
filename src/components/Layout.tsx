@@ -1,4 +1,6 @@
 import Link from "next/link";
+import LinkApp from "@/components/LinkApp";
+import { ROUTES } from "@/lib/routes";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Banner from "@/components/ui/Banner";
@@ -139,9 +141,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 Profile
               </Link>
             ) : (
-              <Link href="/login" data-testid="nav-login" app-nav="/login">
+              <LinkApp href={ROUTES.login} data-testid="nav-login">
                 {copy.nav.auth}
-              </Link>
+              </LinkApp>
             )}
           </nav>
           {user && <AppHeaderTickets />}

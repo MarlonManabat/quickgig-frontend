@@ -3,12 +3,13 @@ import { redirect } from 'next/navigation';
 import PostJobFormClient from '@/features/gigs/PostJobFormClient';
 import { userIdFromCookie } from '@/lib/supabase/server';
 import { ensureTicketsRow, getTicketBalance } from '@/lib/tickets';
+import { ROUTES } from '@/lib/routes';
 
 export const dynamic = 'force-dynamic';
 
 export default async function GigsCreatePage() {
   const uid = await userIdFromCookie();
-  if (!uid) redirect('/login?next=/gigs/create');
+  if (!uid) redirect(`${ROUTES.login}?next=${ROUTES.gigsCreate}`);
   await ensureTicketsRow(uid);
   const balance = await getTicketBalance(uid);
   return (

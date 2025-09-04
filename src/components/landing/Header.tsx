@@ -25,7 +25,7 @@ export default function LandingHeader() {
       >
         My Applications
       </LinkApp>
-      <LinkApp href={ROUTES.login} className="...">
+      <LinkApp data-testid="nav-login" href={ROUTES.login} className="...">
         Sign in
       </LinkApp>
     </nav>

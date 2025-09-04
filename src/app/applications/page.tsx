@@ -4,6 +4,7 @@ export const revalidate = 0;
 
 import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
+import { ROUTES } from "@/lib/routes";
 
 export default async function ApplicationsPage() {
   const supabase = supabaseServer();
@@ -11,7 +12,7 @@ export default async function ApplicationsPage() {
   const user = userRes?.user;
 
   if (userErr || !user) {
-    redirect("/login");
+    redirect(`${ROUTES.login}?next=${ROUTES.applications}`);
   }
 
   const { data: applications, error } = await supabase

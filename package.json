@@ -41,7 +41,7 @@
     "smoke:prod": "BASE_URL=https://app.quickgig.ph npx playwright test -c playwright.smoke.ts",
     "e2e:prod": "BASE_URL=https://app.quickgig.ph npx playwright test",
     "test": "echo \"E2E disabled while product is WIP\" && exit 0",
-    "no-legacy": "node scripts/no-legacy.mjs"
+    "no-legacy": "bash scripts/no-legacy.sh"
   },
   "dependencies": {
     "@jobuntux/psgc": "^0.2.1",
