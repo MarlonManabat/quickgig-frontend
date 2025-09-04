@@ -12,3 +12,12 @@ export function withAppOrigin(path: string): string {
   const origin = getAppOrigin();
   return `${origin}${p}`.replace(/([^:]\/)\/+/g, "$1");
 }
+
+export function apiUrl(path: string): string {
+  const base = process.env.NEXT_PUBLIC_APP_ORIGIN || process.env.APP_ORIGIN || "";
+  if (!base) {
+    throw new Error("API base URL is not configured");
+  }
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${p}`.replace(/([^:]\/)\/+/g, "$1");
+}

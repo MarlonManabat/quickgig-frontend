@@ -13,7 +13,7 @@ test('Home → Browse Jobs renders', async ({ page }) => {
 
 test('Home → My Applications renders (signed out ok)', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.getByTestId('my-applications').click();
+  await page.getByTestId('nav-my-applications').click();
   await expect(page).toHaveURL(
     new RegExp(`${APP_HOST.source}\\/(applications\\/login|login)\\/?$`)
   );
