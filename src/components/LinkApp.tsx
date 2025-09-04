@@ -1,8 +1,6 @@
-'use client';
 import Link from 'next/link';
-import type { ComponentProps } from 'react';
-
-export default function LinkApp(props: ComponentProps<typeof Link>) {
-  // Simple passthrough; any cross-host logic stays centralized here if needed later.
-  return <Link {...props} />;
+import { toAppPath } from '@/lib/urls';
+type Props = React.ComponentProps<typeof Link> & { href: string };
+export default function LinkApp({ href, ...rest }: Props) {
+  return <Link href={toAppPath(href)} {...rest} />;
 }

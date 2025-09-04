@@ -1,21 +1,16 @@
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import AppHeader from '@/components/AppHeader';
-import { ensureTicketsRow, getTicketBalance } from '@/lib/tickets';
-import { userIdFromCookie } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'QuickGig App',
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const uid = await userIdFromCookie();
-  if (uid) await ensureTicketsRow(uid);
-  const balance = uid ? await getTicketBalance(uid) : 0;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <AppHeader balance={balance} />
+        <AppHeader />
         {children}
       </body>
     </html>

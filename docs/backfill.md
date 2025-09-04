@@ -76,3 +76,8 @@
 
 **Rollback**
 - Revert the PR(s) that introduced the contract & guardrails if a critical issue appears; routes fall back to previous behavior.
+
+### 2025-09-04 — Mobile app header fix
+- Collapsed app header CTAs into a responsive menu on small screens; prevents duplicate CTAs and cramped layout.
+- All header links now use `LinkApp` + `ROUTES`; no raw paths.
+- Added smoke `tests/smoke/app-header-mobile.spec.ts` to assert menu behavior and routing on mobile.

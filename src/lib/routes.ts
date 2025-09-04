@@ -1,6 +1,7 @@
 export const ROUTES = {
-  gigsCreate: '/gigs/create',
-  applications: '/applications',
   browseJobs: '/browse-jobs',
+  postJob: '/gigs/create',
+  applications: '/applications',
   login: '/login',
 } as const;
+export type AppRoute = typeof ROUTES[keyof typeof ROUTES];
