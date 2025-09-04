@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { loginAs } from './helpers';
+import { loginAs, isProdBase } from './helpers';
+
+test.skip(isProdBase(), 'Auth helper (/api/test/login-as) is disabled on production host.');
 
 const SEED_GIG = 'Seeded E2E Gig';
 

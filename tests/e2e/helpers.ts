@@ -10,3 +10,8 @@ export async function loginAs(baseURL: string, role: 'employer' | 'worker' | 'ad
   await page.goto('/auth/confirm?token=' + encodeURIComponent(access_token));
   return { accessToken: access_token, email, userId };
 }
+
+export const isProdBase = () => {
+  const u = process.env.BASE_URL || '';
+  return /app\.quickgig\.ph/i.test(u);
+};

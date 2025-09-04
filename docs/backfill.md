@@ -37,3 +37,9 @@
   3) Any change that modifies routes/nav must update smoke tests in the same PR.
 - Ops note: Ensure `NEXT_PUBLIC_APP_ORIGIN=https://app.quickgig.ph` is set for the production project in Vercel. Leave it unset for preview.
 
+## 2025-09-04 — E2E policy & nav fix
+
+- Fixed app header “My Applications” href → `/applications` via ROUTES.
+- E2E: Skips @auth suites when `BASE_URL` targets production (`app.quickgig.ph`) since `/api/test/login-as` is disabled in prod.
+- E2E: “My Applications (signed-out)” now accepts `/login` or `/applications/login`.
+- Outcome: PR/preview runs full suite; prod E2E runs only safe, signed-out flows.
