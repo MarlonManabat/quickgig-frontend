@@ -124,3 +124,25 @@
 
 **Rollback**
 - Revert this commit to restore previous middleware and header behavior.
+
+## 2025-09-06 — Apply skeleton & seeded browse
+
+**Summary**
+- Seeded jobs list ensures `/browse-jobs` is non-empty in dev/CI.
+- Added job detail page with auth-aware Apply CTA.
+- Stubbed `/applications` page with empty state and stable test IDs.
+- Introduced smoke tests for browse list, apply flow, and applications empty state.
+
+**Rationale**
+- Provide deterministic flows for applying to jobs and viewing applications while backend is WIP.
+
+**Impact / Migrations**
+- Use `jobs-list`, `job-card`, `apply-button`, `applications-list`, `application-row`, `applications-empty` test IDs in tests.
+
+**How to verify**
+- `npm run no-legacy`
+- `node scripts/check-cta-links.mjs`
+- `npx playwright test -c playwright.smoke.ts`
+
+**Rollback**
+- Revert this commit to remove apply skeleton and seeded browse list.
