@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import { ROUTES } from '@/lib/routes';
@@ -30,7 +31,16 @@ export default async function ApplicationsPage() {
         ))}
       </ul>
       {applications.length === 0 && (
-        <p data-testid="applications-empty" className="opacity-70">No applications yet</p>
+        <div data-testid="applications-empty" className="mt-4 text-center space-y-4">
+          <p className="opacity-70">You have not applied to any jobs yet.</p>
+          <Link
+            href={ROUTES.browseJobs}
+            data-testid="hero-browse-jobs"
+            className="inline-block rounded bg-blue-600 px-4 py-2 text-white"
+          >
+            Browse jobs
+          </Link>
+        </div>
       )}
     </div>
   );

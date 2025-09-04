@@ -2,7 +2,7 @@
   "name": "quickgig-frontend",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/seed-on-boot.mjs && next dev",
     "ci:verify": "node scripts/ci-verify.mjs",
     "prebuild": "node ./scripts/check-dynamic-route-conflicts.mjs && node ./scripts/assert-valid-revalidate.mjs",
     "build": "node scripts/check-required-env.mjs && next build",
@@ -49,7 +49,6 @@
     "@supabase/auth-helpers-shared": "^0.7.0",
     "@supabase/supabase-js": "^2.45.0",
     "@supabase/ssr": "^0.5.0",
-    "autoprefixer": "^10",
     "cookie": "^0.6.0",
     "nanoid": "^3.3.11",
     "next": "^14 || ^15",

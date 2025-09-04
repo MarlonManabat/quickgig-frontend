@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-09-10 — Seed on boot & auth-aware helpers
+- Added `scripts/seed-on-boot.mjs` gated by `SEED_ON_BOOT` and wired into `npm run dev` to seed sample gigs for dev/CI.
+- Applications page shows a friendly empty state with a CTA back to Browse Jobs (`hero-browse-jobs`).
+- Consolidated smoke helpers (`tests/smoke/_helpers.ts`) with `gotoHome`, `openMenu`, and regex-safe `expectAuthAwareRedirect` shared across specs.
+
 ## 2025-09-03
 - Added `NEXT_PUBLIC_APP_ORIGIN` and `src/lib/urls.ts` utility to centralize the app host.
 - Converted all landing CTAs (hero, nav, footer, and cards) to absolute links to the app:

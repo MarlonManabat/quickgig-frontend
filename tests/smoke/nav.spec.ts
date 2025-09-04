@@ -1,6 +1,5 @@
 import { test } from '@playwright/test';
-import { gotoHome, expectToBeOnRoute } from '../e2e/_helpers';
-import { expectAuthAwareRedirect } from './_helpers';
+import { gotoHome, expectToBeOnRoute, expectAuthAwareRedirect } from './_helpers';
 
 test.describe('desktop header CTAs', () => {
   test('Login', async ({ page }) => {
