@@ -1,5 +1,6 @@
 import { test } from '@playwright/test';
-import { gotoHome, expectToBeOnRoute, expectAuthAwareRedirect } from '../e2e/_helpers';
+import { gotoHome, expectToBeOnRoute } from '../e2e/_helpers';
+import { expectAuthAwareRedirect } from './_helpers';
 
 test('Landing hero CTAs route to app host', async ({ page }) => {
   await gotoHome(page);

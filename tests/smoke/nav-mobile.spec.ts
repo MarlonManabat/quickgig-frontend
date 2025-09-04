@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { gotoHome, expectAuthAwareRedirect, expectToBeOnRoute } from '../e2e/_helpers';
+import { gotoHome, expectToBeOnRoute } from '../e2e/_helpers';
+import { expectAuthAwareRedirect } from './_helpers';
 
 test.use({ viewport: { width: 360, height: 740 } });
 

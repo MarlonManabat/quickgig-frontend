@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from '../e2e/helpers';
+import { expectAuthAwareRedirect } from './_helpers';
 
 test('Landing → App CTAs » "Post a job" opens on app host', async ({ page }) => {
   await page.goto('/');

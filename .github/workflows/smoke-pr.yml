@@ -1,0 +1,56 @@
+name: Smoke (PR)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+jobs:
+  pr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Verify lock sync
+        run: npm run ci:lock
+
+      - name: Install deps
+        run: npm run ci:install
+
+      # Robust Playwright browser install (works even after cache busts)
+      - name: Install Playwright browsers
+        uses: microsoft/playwright-github-action@v1
+        with:
+          # only chromium is needed for our smokes
+          with-deps: true
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
+
+      - name: Start dev server
+        run: |
+          nohup npm run dev >/dev/null 2>&1 &
+          echo $! > .pidfile
+
+      - name: Wait for dev server
+        run: |
+          for i in {1..60}; do
+            curl -fsS http://localhost:3000 >/dev/null && exit 0
+            sleep 1
+          done
+          echo "Dev server failed to start" && exit 1
+
+      - name: Run smoke tests (no webServer)
+        run: npx playwright test -c playwright.smoke.ts
+        env:
+          BASE_URL: http://localhost:3000
+
+      - name: Stop dev server
+        if: always()
+        run: if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi

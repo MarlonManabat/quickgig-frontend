@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { gotoHome, expectAuthAwareRedirect } from '../e2e/_helpers';
+import { gotoHome } from '../e2e/_helpers';
+import { expectAuthAwareRedirect } from './_helpers';
 
 test('Landing → Browse → open job → Apply (auth-aware)', async ({ page }) => {
   await gotoHome(page);
