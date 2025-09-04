@@ -161,3 +161,8 @@
 - Canonicalized mobile menu button/container to `nav-menu-button`/`nav-menu` (tests fall back to legacy `navm-*`).
 - Updated nav and hero smokes to share the new helpers and stabilize menu opening.
 
+## 2025-09-09 — Consolidated smoke workflow & regex-safe auth helper
+- Replaced separate PR and main smoke workflows with a unified `smoke.yml` that installs Playwright browsers via `npx playwright install --with-deps`.
+- Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
+- Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
+

@@ -1,0 +1,47 @@
+name: Smoke
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+      BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Start dev server
+        run: |
+          nohup npm run dev -- --port 3000 > /tmp/dev.log 2>&1 &
+          echo $! > .pidfile
+      - name: Wait for dev server
+        run: npx wait-on http-get://localhost:3000
+
+      - name: Smoke tests (no webServer)
+        run: npx playwright test -c playwright.smoke.ts --reporter=line
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi

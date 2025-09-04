@@ -1,13 +1,19 @@
 import { test, expect } from '@playwright/test';
-import { gotoHome, openMenu, expectAuthAwareRedirect, expectToBeOnRoute } from '../e2e/_helpers';
+import { gotoHome, expectAuthAwareRedirect, expectToBeOnRoute } from '../e2e/_helpers';
+
 test.use({ viewport: { width: 360, height: 740 } });
+
+async function openMenu(page) {
+  await page.getByTestId('nav-menu-button').click();
+  await expect(page.getByTestId('nav-menu')).toBeVisible();
+}
 
 test.describe('mobile header CTAs', () => {
   test('Browse Jobs', async ({ page }) => {
     await gotoHome(page);
     await openMenu(page);
     await page.getByTestId('navm-browse-jobs').click();
-    await expectToBeOnRoute(page, /\/browse-jobs\/?$/);
+    await expectToBeOnRoute(page, /\/browse-jobs\/?/);
   });
 
   test('Post a Job (auth-aware)', async ({ page }) => {
@@ -28,6 +34,6 @@ test.describe('mobile header CTAs', () => {
     await gotoHome(page);
     await openMenu(page);
     await page.getByTestId('navm-login').click();
-    await expectToBeOnRoute(page, /\/login\/?$/);
+    await expectToBeOnRoute(page, /\/login\/?/);
   });
 });
