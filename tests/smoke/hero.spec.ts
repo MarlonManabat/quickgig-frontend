@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 
 const PATHS = {
   browse: ['/browse-jobs', '/jobs'],
-  post: ['/gigs/create', '/post', '/post-a-job'],
+  post: ['/gigs/create'],
 };
 
 async function gotoHome(page: Page) {
@@ -47,8 +47,7 @@ test.describe('Hero', () => {
     if (!clicked) {
       await page.goto(PATHS.post[0], { waitUntil: 'domcontentloaded' });
     }
-    // Accept /gigs/create, /post, or /post-a-job
-    await expect(page).toHaveURL(/\/(gigs\/create|post(?:-a-job)?)\b/i, { timeout: 10_000 });
+    await expect(page).toHaveURL(/\/gigs\/create\/?$/i, { timeout: 10_000 });
   });
 });
 
