@@ -14,7 +14,7 @@ export default function SmokeLandingCTAs() {
       <div className="flex flex-col gap-3">
         <LinkApp data-testid="cta-find-work" href={ROUTES.browseJobs}>Find Work</LinkApp>
         <LinkApp data-testid="cta-browse-jobs" href={ROUTES.browseJobs}>Browse Jobs</LinkApp>
-        <LinkApp data-testid="nav-post-job" href={ROUTES.gigsCreate}>Post a job</LinkApp>
+        <LinkApp data-testid="nav-post-job" href={ROUTES.postJob}>Post a job</LinkApp>
         <LinkApp data-testid="nav-my-applications" href={ROUTES.applications}>My Applications</LinkApp>
       </div>
     </main>

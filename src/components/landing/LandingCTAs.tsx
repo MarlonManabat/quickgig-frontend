@@ -27,7 +27,7 @@ export default function LandingCTAs({
           </LinkApp>
         )}
         {showPost && (
-          <LinkApp href={ROUTES.gigsCreate} className={postClassName}>
+          <LinkApp href={ROUTES.postJob} className={postClassName}>
             Post a job
           </LinkApp>
         )}

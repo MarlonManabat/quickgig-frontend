@@ -76,3 +76,18 @@
 
 **Rollback**
 - Revert the PR(s) that introduced the contract & guardrails if a critical issue appears; routes fall back to previous behavior.
+
+### 2025-09-04 — Mobile app header fix
+- Collapsed app header CTAs into a responsive menu on small screens; prevents duplicate CTAs and cramped layout.
+- All header links now use `LinkApp` + `ROUTES`; no raw paths.
+- Added smoke `tests/smoke/app-header-mobile.spec.ts` to assert menu behavior and routing on mobile.
+
+### 2025-09-05 — Header and hero test IDs
+- Split header test IDs into desktop (`nav-*`) and mobile (`navm-*`) variants to avoid DOM duplicates.
+- Added `hero-browse-jobs` and `hero-post-job` IDs on landing hero and updated smokes.
+
+### 2025-09-04 — Responsive header & mobile smoke
+- Added mobile menu with `navm-*` test IDs; de-duplicated desktop vs mobile IDs.
+- Hero CTAs standardized to `hero-browse-jobs` and `hero-post-job`.
+- All CTAs route via `LinkApp` + `ROUTES`.
+- Smokes updated; link-health script now checks mobile + hero links.
