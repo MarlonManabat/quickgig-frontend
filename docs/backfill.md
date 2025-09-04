@@ -43,3 +43,31 @@
 - E2E: Skips @auth suites when `BASE_URL` targets production (`app.quickgig.ph`) since `/api/test/login-as` is disabled in prod.
 - E2E: “My Applications (signed-out)” now accepts `/login` or `/applications/login`.
 - Outcome: PR/preview runs full suite; prod E2E runs only safe, signed-out flows.
+
+## 2025-09-04 — Navigation/Auth Stabilization
+
+### Contracts
+- CTAs come from a single source of truth: `app/lib/routes.ts`.
+- Auth-gated flows (e.g., Post a Job, My Applications) may redirect to `/login?next=…` when unauthenticated. Tests treat this as success.
+- Error boundaries (global + page) prevent white-screen failures and show a friendly message.
+
+### Legacy compatibility
+- Normalized redirects at:
+  1) `middleware.ts` (case-insensitive; trims trailing slash)
+  2) `next.config` `redirects()` (build-time/CDN safety)
+  3) Route fallback for any legacy `app/**/find/page.tsx`
+- Map:
+  `/find`, `/gigs`, `/browsejobs`, `/post-job`, `/my-apps` → modern equivalents.
+
+### CI guardrails
+- **Smoke (auth-aware)**: accepts `/login` for gated flows; otherwise checks heading or skeleton.
+- **Health checks**: HEAD/GET `/login`, `/browse-jobs`, `/gigs/create`, `/applications` must be 200/30x.
+- **No-legacy gate**: CI fails if any anchor uses banned legacy paths.
+- **Prod E2E policy**: suites that require `/api/test/login-as` are skipped on `BASE_URL=app.quickgig.ph`.
+
+### Regression checklist
+- [ ] Smoke green (preview + PR).
+- [ ] Legacy paths redirect correctly (manual spot-check OK).
+- [ ] Health workflow green.
+- [ ] No legacy anchors (`scripts/no-legacy.sh`).
+- [ ] Error boundaries render (no white blank screens) on forced errors.

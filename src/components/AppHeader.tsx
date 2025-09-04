@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import LinkApp from '@/components/LinkApp';
 import { useUser } from '@/hooks/useUser';
 import { ROUTES } from '@/app/lib/routes';
 
@@ -14,31 +14,31 @@ export default function AppHeader({ balance }: Props) {
     <header data-testid="app-header" className="border-b bg-white/60 backdrop-blur">
       <div className="mx-auto max-w-5xl flex items-center justify-between p-4">
         <div className="flex items-center gap-4">
-          <Link href="/" className="font-semibold">
+          <LinkApp href="/" className="font-semibold">
             QuickGig
-          </Link>
+          </LinkApp>
           <nav className="flex items-center gap-4">
-            <Link data-testid="nav-browse-jobs" href={ROUTES.GIGS_BROWSE} prefetch={false}>
+            <LinkApp data-testid="nav-browse-jobs" href={ROUTES.BROWSE_JOBS} prefetch={false}>
               Browse jobs
-            </Link>
-            <Link data-testid="post-job" href={ROUTES.GIGS_CREATE} prefetch={false}>
+            </LinkApp>
+            <LinkApp data-testid="nav-post-job" href={ROUTES.GIGS_CREATE} prefetch={false}>
               Post a job
-            </Link>
-            <Link
-              data-testid="my-applications"
+            </LinkApp>
+            <LinkApp
+              data-testid="nav-my-applications"
               href={ROUTES.APPLICATIONS}
               prefetch={false}
             >
               My Applications
-            </Link>
+            </LinkApp>
             {user ? (
               <button onClick={() => signOut()} className="underline">
                 Sign out
               </button>
             ) : (
-              <Link href="/login" className="underline">
+              <LinkApp href={ROUTES.LOGIN} className="underline">
                 Sign in
-              </Link>
+              </LinkApp>
             )}
           </nav>
         </div>
@@ -46,12 +46,12 @@ export default function AppHeader({ balance }: Props) {
           <span className="rounded-xl border px-2 py-1 text-sm" title="Tickets">
             🎟️ {balance}
           </span>
-          <Link
+          <LinkApp
             href="/billing/tickets?next=/gigs/create"
             className="border rounded-xl px-3 py-1 text-sm"
           >
             Buy ticket
-          </Link>
+          </LinkApp>
         </div>
       </div>
     </header>

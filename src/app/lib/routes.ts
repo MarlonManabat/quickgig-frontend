@@ -1,8 +1,9 @@
-// central app paths for cross-origin CTAs
+// Canonical app routes for cross-origin CTAs
 export const ROUTES = {
-  HOME: '/',
-  GIGS_BROWSE: '/browse-jobs',      // keep existing browse path
+  BROWSE_JOBS: '/browse-jobs',
   GIGS_CREATE: '/gigs/create',
   APPLICATIONS: '/applications',
   LOGIN: '/login',
 } as const;
+
+export type AppRoute = typeof ROUTES[keyof typeof ROUTES];

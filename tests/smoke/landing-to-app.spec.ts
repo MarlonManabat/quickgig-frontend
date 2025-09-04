@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const APP_HOST = /(https?:\/\/(app\.quickgig\.ph|localhost:3000))/;
+import { APP_HOST, expectAuthAwareRedirect } from '../e2e/helpers';
 
 test.describe('Landing → App CTAs', () => {
   test('“Post a job” opens on app host', async ({ page }) => {
@@ -10,11 +9,9 @@ test.describe('Landing → App CTAs', () => {
     ).toBeVisible();
     const link = page.locator('[data-testid="cta-post-job"]');
     await expect(link).toBeVisible();
-    await Promise.all([
-      page.waitForLoadState('domcontentloaded'),
-      link.click(),
-    ]);
-    await expect(page).toHaveURL(
+    await link.click();
+    await expectAuthAwareRedirect(
+      page,
       new RegExp(`${APP_HOST.source}\/gigs\/create\/?$`)
     );
   });
@@ -26,12 +23,10 @@ test.describe('Landing → App CTAs', () => {
     ).toBeVisible();
     const link = page.locator('[data-testid="cta-my-applications"]');
     await expect(link).toBeVisible();
-    await Promise.all([
-      page.waitForLoadState('domcontentloaded'),
-      link.click(),
-    ]);
-    await expect(page).toHaveURL(
-      new RegExp(`${APP_HOST.source}\/(applications|login)\/?$`)
+    await link.click();
+    await expectAuthAwareRedirect(
+      page,
+      new RegExp(`${APP_HOST.source}\/applications\/?$`)
     );
   });
 });

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import LinkApp from "@/components/LinkApp";
+import { ROUTES } from "@/app/lib/routes";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "@/utils/supabaseClient";
@@ -28,19 +29,19 @@ export default function Nav() {
 
   return (
     <nav className="p-4 border-b mb-4 flex gap-4">
-        <Link href="/home">Home</Link>
-        <Link href="/gigs" data-testid="nav-find">
+        <LinkApp href="/home">Home</LinkApp>
+        <LinkApp href={ROUTES.BROWSE_JOBS} data-testid="nav-browse-jobs">
           {copy.nav.findWork}
-        </Link>
-        <Link href="/gigs/create" data-testid="nav-post">
+        </LinkApp>
+        <LinkApp href={ROUTES.GIGS_CREATE} data-testid="nav-post-job">
           {copy.nav.postJob}
-        </Link>
+        </LinkApp>
       {session ? (
         <button onClick={logout}>Logout</button>
       ) : (
-        <Link href="/login" data-testid="nav-login">
+        <LinkApp href={ROUTES.LOGIN} data-testid="nav-login">
           {copy.nav.auth}
-        </Link>
+        </LinkApp>
       )}
     </nav>
   );

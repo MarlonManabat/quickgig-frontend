@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-const APP_HOST = /(https?:\/\/(app\.quickgig\.ph|localhost:3000))/;
+import { APP_HOST, expectAuthAwareRedirect } from './helpers';
 
 test('Home → Browse Jobs renders', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -13,13 +12,9 @@ test('Home → Browse Jobs renders', async ({ page }) => {
 
 test('Home → My Applications renders (signed out ok)', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.getByTestId('my-applications').click();
-  await expect(page).toHaveURL(
-    new RegExp(`${APP_HOST.source}\\/(applications\\/login|login)\\/?$`)
+  await page.getByTestId('nav-my-applications').click();
+  await expectAuthAwareRedirect(
+    page,
+    new RegExp(`${APP_HOST.source}\/applications\/?$`)
   );
-  if ((await page.url()).includes('/login')) {
-    await expect(page.getByRole('heading', { name: /sign in/i })).toBeVisible();
-  } else {
-    await expect(page.getByRole('heading', { name: /my applications/i })).toBeVisible();
-  }
 });
