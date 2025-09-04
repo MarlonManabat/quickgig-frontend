@@ -5,23 +5,33 @@ const APP_HOST = /(https?:\/\/(app\.quickgig\.ph|localhost:3000))/;
 test.describe('Landing → App CTAs', () => {
   test('“Post a job” opens on app host', async ({ page }) => {
     await page.goto('/smoke/landing-ctas');
-    await page.waitForSelector('[data-testid="cta-post-job"]', { state: 'visible' });
+    await expect(
+      page.getByRole('heading', { name: 'Smoke: Landing CTAs' })
+    ).toBeVisible();
     const link = page.locator('[data-testid="cta-post-job"]');
+    await expect(link).toBeVisible();
     await Promise.all([
       page.waitForLoadState('domcontentloaded'),
       link.click(),
     ]);
-    await expect(page).toHaveURL(new RegExp(`${APP_HOST.source}\/gigs\/create\/?$`));
+    await expect(page).toHaveURL(
+      new RegExp(`${APP_HOST.source}\/gigs\/create\/?$`)
+    );
   });
 
   test('“My Applications” opens on app host', async ({ page }) => {
     await page.goto('/smoke/landing-ctas');
-    await page.waitForSelector('[data-testid="cta-my-applications"]', { state: 'visible' });
+    await expect(
+      page.getByRole('heading', { name: 'Smoke: Landing CTAs' })
+    ).toBeVisible();
     const link = page.locator('[data-testid="cta-my-applications"]');
+    await expect(link).toBeVisible();
     await Promise.all([
       page.waitForLoadState('domcontentloaded'),
       link.click(),
     ]);
-    await expect(page).toHaveURL(new RegExp(`${APP_HOST.source}\/(applications|login)\/?$`));
+    await expect(page).toHaveURL(
+      new RegExp(`${APP_HOST.source}\/(applications|login)\/?$`)
+    );
   });
 });
