@@ -1,0 +1,35 @@
+name: Smoke (PR) / pr
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  pr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install deps (prefer clean, fallback to install)
+        run: |
+          set -e
+          if npm ci --no-audit --fund=false --loglevel=error; then
+            echo "npm ci succeeded"
+          else
+            echo "npm ci failed (likely lock drift); falling back to npm install"
+            npm install --no-audit --fund=false --loglevel=error
+          fi
+
+      - name: Install Playwright browsers
+        uses: microsoft/playwright-github-action@v1
+
+      - name: Run smoke
+        env:
+          CI: true
+        run: npx playwright test -c playwright.smoke.ts

@@ -1,0 +1,19 @@
+name: Smoke (main)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci --no-audit --fund=false --loglevel=error
+      - uses: microsoft/playwright-github-action@v1
+      - run: npx playwright test -c playwright.smoke.ts

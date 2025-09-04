@@ -171,3 +171,8 @@
 - Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
 - Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
 
+## 2025-09-05 – CI/Vercel unblocked (lock sync & browserslist)
+- Pinned Node to 20 via `.nvmrc` and enforced engines in `package.json`.
+- PR workflow tries `npm ci` then falls back to `npm install` to avoid false-reds from lock drift; `main` remains strict with `npm ci`.
+- Added explicit `browserslist` + `.browserslistrc` to prevent Next/PostCSS build-time module resolution errors on Vercel.
+- Switched to `microsoft/playwright-github-action` for reliable browser installs.
