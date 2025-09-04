@@ -6,6 +6,10 @@ export const ROUTES = {
 } as const;
 export type AppPath = (typeof ROUTES)[keyof typeof ROUTES];
 
+export const routes = {
+  browseJob: (id: string) => `${ROUTES.browseJobs}/${id}`,
+};
+
 export function toAppPath(path: AppPath): string {
   const origin = process.env.NEXT_PUBLIC_APP_ORIGIN;
   return origin ? new URL(path, origin).toString() : path;

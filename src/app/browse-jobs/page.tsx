@@ -1,7 +1,6 @@
-import Link from 'next/link';
+import LinkApp from '@/components/LinkApp';
 import { getSeededJobs } from '@/app/lib/seed';
-import { ROUTES } from '@/lib/routes';
-import { toAppPath } from '@/lib/routes';
+import { routes } from '@/lib/routes';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -21,10 +20,10 @@ export default async function BrowseJobsPage() {
   return (
     <div className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-semibold mb-4">Browse jobs</h1>
-      <ul data-testid="jobs-list" className="space-y-3">
+      <ul data-testid="job-list" className="space-y-3">
         {jobs.map((j) => (
           <li key={j.id} data-testid="job-card" className="rounded-xl border p-4">
-            <Link href={`${toAppPath(ROUTES.browseJobs)}/${j.id}`}>{j.title}</Link>
+            <LinkApp toPath={routes.browseJob(j.id)}>{j.title}</LinkApp>
           </li>
         ))}
       </ul>
