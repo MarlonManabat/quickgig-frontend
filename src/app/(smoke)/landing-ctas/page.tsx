@@ -1,7 +1,11 @@
 import Link from "next/link";
-import { ROUTES } from "../../lib/routes";
+import type { Metadata } from "next";
+import { ROUTES } from "@/app/lib/routes";
 
-export const metadata = { robots: { index: false, follow: false } };
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+  title: "Smoke: Landing CTAs",
+};
 
 export default function SmokeLandingCTAs() {
   return (

@@ -4,9 +4,9 @@ const APP_HOST = /(https?:\/\/(app\.quickgig\.ph|localhost:3000))/;
 
 test.describe('Landing → App CTAs', () => {
   test('“Post a job” opens on app host', async ({ page }) => {
-    await page.goto('/__smoke__/landing-ctas');
+    await page.goto('/smoke/landing-ctas');
+    await page.waitForSelector('[data-testid="cta-post-job"]', { state: 'visible' });
     const link = page.locator('[data-testid="cta-post-job"]');
-    await expect(link).toBeVisible();
     await Promise.all([
       page.waitForLoadState('domcontentloaded'),
       link.click(),
@@ -15,9 +15,9 @@ test.describe('Landing → App CTAs', () => {
   });
 
   test('“My Applications” opens on app host', async ({ page }) => {
-    await page.goto('/__smoke__/landing-ctas');
+    await page.goto('/smoke/landing-ctas');
+    await page.waitForSelector('[data-testid="cta-my-applications"]', { state: 'visible' });
     const link = page.locator('[data-testid="cta-my-applications"]');
-    await expect(link).toBeVisible();
     await Promise.all([
       page.waitForLoadState('domcontentloaded'),
       link.click(),
