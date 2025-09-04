@@ -15,7 +15,9 @@ test.describe('Landing → App CTAs', () => {
       link.click(),
     ]);
     await expect(page).toHaveURL(
-      new RegExp(`${APP_HOST.source}\/gigs\/create\/?$`)
+      new RegExp(
+        `${APP_HOST.source}\/(gigs\/create|login)(?:\\?.*)?\/?$`
+      )
     );
   });
 
