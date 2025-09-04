@@ -40,20 +40,20 @@ diff --git a/agents.md b/agents.md
 +# QuickGig Agent Playbook (READ ME FIRST)
 +
 +## DO FIRST (hard rules)
-+- Use the canonical routes from `app/lib/routes.ts`. **Never** hardcode paths.
+- Use the canonical routes from `src/lib/routes.ts`. **Never** hardcode paths.
 +- Treat auth-gated flows as **auth-aware**: redirects to `/login?next=` are a *success* condition in PR smoke.
 +- Prefer stable selectors: `data-testid` over headings/text.
 +- Do not introduce or resurrect legacy paths in UI (e.g., `/find`, `/browse-jobs`, `/post-job`) except where explicitly redirected by middleware.
 +- If you modify routes, middleware, or smoke tests, update **this file** and `BACKFILL.md` with rationale.
 +
 +## Repository invariants
-+- **Routes:** `app/lib/routes.ts` is the single source of truth. CTAs import from there.
+- **Routes:** `src/lib/routes.ts` is the single source of truth. CTAs import from there.
 +- **Redirects:** legacy paths normalize in `middleware.ts` and `next.config` `redirects()`.
 +- **Auth-aware smoke:** specs accept `/login` for gated flows; otherwise assert the form (or skeleton) renders.
 +- **Error handling:** global `app/error.tsx` + page-level boundaries (e.g., Post Job) prevent white screens.
 +
 +## When you change these, you must also update this file
-+- `app/lib/routes.ts`, `middleware/**`, `next.config.*`
+- `src/lib/routes.ts`, `middleware/**`, `next.config.*`
 +- `tests/smoke/**`
 +- Components that alter Post Job skeleton or header CTAs (ensure test IDs stay stable)
 +- Any docs that alter smoke expectations

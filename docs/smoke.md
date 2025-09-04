@@ -13,9 +13,9 @@ npx playwright test -c playwright.smoke.ts tests/smoke/post-job-form-render.spec
 
 ## Rules (important)
 
-* **Selectors**: Smokes must target **header CTAs only** via stable IDs:
+* **Selectors**: Smokes target header CTAs via `data-testid`:
 
-  * `data-testid="nav-post-job"`, `data-testid="nav-my-applications"`
-  * Hero CTAs use `hero-*` and are for landing-only tests, not smokes.
-* **Auth-aware**: For auth-gated pages, treat either the destination **or** `/login?next=…` as passing. Use `expectAuthAwareRedirect(page, /<dest-path>$/)`.
+  * `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`
+  * Hero CTAs use `hero-*` and are for landing-only tests.
+* **Auth-aware**: For auth-gated pages, treat either the destination **or** `/login?next=…` as passing. Use `expectAuthAwareSuccess(page, /<dest-path>$/)`.
 * **Post Job form**: The smoke test passes if the form renders, the `post-job-skeleton` renders, or the request is redirected to login.

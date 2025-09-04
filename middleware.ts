@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { LEGACY_MAP } from "@/app/lib/legacy-redirects";
+import { ROUTES, toAppPath } from "@/lib/routes";
 
 // Normalize: case-insensitive, trim trailing slash (except root)
 function normalize(pathname: string) {
@@ -28,6 +29,12 @@ export function middleware(req: NextRequest) {
   if (target) {
     const url = new URL(target, req.nextUrl);
     return NextResponse.redirect(url, 308);
+  }
+  const GATED = new Set([ROUTES.applications, ROUTES.postJob].map(normalize));
+  if (GATED.has(key) && !req.cookies.get('sb-access-token')) {
+    const dest = `${ROUTES.login}?next=${encodeURIComponent(pathname + req.nextUrl.search)}`;
+    const url = new URL(toAppPath(dest), req.url);
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();

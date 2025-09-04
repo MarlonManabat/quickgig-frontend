@@ -1,6 +1,9 @@
 <!-- AGENT CONTRACT v2025-09-04 -->
 
-# Product Acceptance (Good Product Bar)
+# Agents Contract
+Version: 2025-09-04
+
+## Product Acceptance (Good Product Bar)
 
 **Mobile (seeker)**
 - Open → **/browse-jobs** (non-empty)
@@ -34,9 +37,9 @@
 - **/login**
 
 ## CTA Test IDs
-**Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`  
-**Header (mobile menu):** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`  
-**Landing hero:** `hero-browse-jobs`, `hero-post-job`
+**Header (desktop)**: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`  
+**Header (mobile menu)**: `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`  
+**Landing hero**: `hero-browse-jobs`, `hero-post-job`
 
 ## Unauth Success Rule
 Landing on **/login?next=<dest>** for any auth-gated route **counts as success** in tests.
@@ -46,16 +49,16 @@ Landing on **/login?next=<dest>** for any auth-gated route **counts as success**
 - [ ] `node scripts/check-cta-links.mjs` (CTAs point to canonical routes)
 - [ ] `npx playwright test -c playwright.smoke.ts`
 - [ ] `docs/backfill.md` updated with rationale + changes
-- [ ] Bump this header’s date when any contract item changes
+- [ ] **Bump this header’s date** when any contract item changes
 
 ## CI Guardrails
 - `scripts/no-legacy.sh` and `scripts/check-cta-links.mjs`
 - Agents contract verifier (checks this header + sections)
+
 ## PR Smoke Guardrails (read me first)
 - Do **not** use `cta-post-job` / `cta-my-applications` testIds. Use `nav-post-job` / `nav-my-applications`.
-- For auth-gated routes, accept `/login?next=…` as valid using `expectAuthAwareRedirect`.
+- For auth-gated routes, accept **/login?next=…** as valid using `expectAuthAwareRedirect`.
 - Ensure `post-job-skeleton` remains available for client-side checks.
 - Before opening a PR, run:
   ```bash
   npm run no-legacy
-  ```

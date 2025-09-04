@@ -16,18 +16,18 @@ export const isProdBase = () => {
   return /app\.quickgig\.ph/i.test(u);
 };
 
-// Wait for either the intended destination OR a bounce to /login?next=...
-export async function expectAuthAwareRedirect(
-  page: Page,
-  destPathPattern: RegExp, // e.g. /\/gigs\/create\/?$/
-  timeout = 8000
-) {
-  const host = 'https?:\\/\\/[^/]+'; // match any host (localhost or preview)
-  const dest = new RegExp(`${host}${destPathPattern.source}`);
-  const login = new RegExp(`${host}\/login(\\?.*)?$`);
+export async function expectToBeOnRoute(page: Page, path: string) {
+  await expect(page).toHaveURL(
+    new RegExp(`(^|https?:\\/\\/[^\\s]+)${path.replaceAll('/', '\\/')}(\\/?$)`)
+  );
+}
 
-  await Promise.race([
-    page.waitForURL(dest, { timeout }),
-    page.waitForURL(login, { timeout }),
-  ]);
+export async function expectAuthAwareRedirect(page: Page, destPath: string) {
+  try {
+    await expectToBeOnRoute(page, destPath);
+  } catch {
+    await expect(page).toHaveURL(
+      new RegExp(`/login\\?next=${destPath.replaceAll('/', '\\/')}`)
+    );
+  }
 }

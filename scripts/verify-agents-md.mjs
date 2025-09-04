@@ -11,25 +11,25 @@ const changed = execSync(`git diff --name-only origin/${baseRef}...HEAD`, { stdi
   .filter(Boolean);
 
 const mustTouchAgents = changed.some(p =>
-  /^(app\/lib\/routes\.ts|middleware\.ts|next\.config\.\w+|tests\/smoke\/|components\/.*PostJobSkeleton\.tsx)/.test(p)
+  /^(src\/app\/lib\/routes\.ts|middleware\.ts|next\.config\.\w+|tests\/smoke\/|components\/.*PostJobSkeleton\.tsx)/.test(p)
 );
 
-const agents = readFileSync("agents.md", "utf8");
+const agents = readFileSync("docs/agents.md", "utf8");
 const hasContract = agents.includes("AGENT CONTRACT");
-const hasVersion = /AGENT CONTRACT v\d{4}-\d{2}-\d{2}/.test(agents);
+const hasVersion = /Version:\s*\d{4}-\d{2}-\d{2}/.test(agents);
 
 let failed = false;
 
 if (!hasContract || !hasVersion) {
-  console.error("❌ `agents.md` is missing the AGENT CONTRACT header with a version stamp.");
+  console.error("❌ `docs/agents.md` is missing the AGENT CONTRACT header with a version stamp.");
   failed = true;
 }
 
-if (mustTouchAgents && !changed.includes("agents.md")) {
-  console.error("❌ You changed routes/middleware/smoke but didn’t update `agents.md`.");
-  console.error("   Please reflect the new contract at the top of `agents.md` and bump the version date.");
+if (mustTouchAgents && !changed.includes("docs/agents.md")) {
+  console.error("❌ You changed routes/middleware/smoke but didn’t update `docs/agents.md`.");
+  console.error("   Please reflect the new contract at the top of `docs/agents.md` and bump the version date.");
   failed = true;
 }
 
 if (failed) process.exit(1);
-console.log("✅ agents.md contract present and consistent.");
+console.log("✅ docs/agents.md contract present and consistent.");
