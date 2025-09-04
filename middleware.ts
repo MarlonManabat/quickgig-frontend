@@ -13,7 +13,7 @@ function normalize(pathname: string) {
 }
 
 export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const { pathname, search } = req.nextUrl;
 
   // Allow smoke pages (and Next/static) through untouched
   if (
@@ -40,11 +40,14 @@ export function middleware(req: NextRequest) {
   }
 
   // Auth-gated routes → /login?next=<dest>
-  if (AUTH_GATED.has(pathname) && !req.cookies.get("sb-access-token")) {
-    const url = new URL(
-      `${ROUTES.login}?next=${encodeURIComponent(pathname)}`,
-      req.url,
-    );
+  const path = pathname.length > 1 && pathname.endsWith("/")
+    ? pathname.slice(0, -1)
+    : pathname;
+  if (AUTH_GATED.has(path) && !req.cookies.get("sb-access-token")) {
+    const dest = path + (search || "");
+    const url = req.nextUrl.clone();
+    url.pathname = ROUTES.login;
+    url.search = `?next=${encodeURIComponent(dest)}`;
     return NextResponse.redirect(url, 302);
   }
 

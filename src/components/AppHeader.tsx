@@ -13,7 +13,7 @@ export default function AppHeader({ balance }: Props) {
   const { user, signOut } = useUser();
   const [open, setOpen] = useState(false);
 
-  const links = NAV_ITEMS.filter(item => item.key !== 'login' || !user).map(
+  const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(
     item => ({
       href: item.to,
       label: item.label,
@@ -27,13 +27,6 @@ export default function AppHeader({ balance }: Props) {
       onClick: () => signOut(),
       testId: 'nav-logout',
       mobileId: 'navm-logout',
-    });
-  } else {
-    links.push({
-      href: ROUTES.login,
-      label: 'Login',
-      testId: 'nav-login',
-      mobileId: 'navm-login',
     });
   }
 
@@ -90,8 +83,10 @@ export default function AppHeader({ balance }: Props) {
         </div>
       </div>
       {open && (
-        <nav
+        <div
           id="mobile-nav"
+          data-testid="nav-menu"
+          role="menu"
           className="md:hidden flex flex-col gap-2 p-4 border-t"
         >
           {links.map(link =>
@@ -120,7 +115,7 @@ export default function AppHeader({ balance }: Props) {
               </button>
             ),
           )}
-        </nav>
+        </div>
       )}
     </header>
   );

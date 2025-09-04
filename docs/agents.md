@@ -38,6 +38,8 @@
 **Header (mobile menu):** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`  
 **Landing hero:** `hero-browse-jobs`, `hero-post-job`
 
+**No duplicates:** each CTA test ID must appear at most once in the DOM.
+
 ## Unauth Success Rule
 Landing on **/login?next=<dest>** for any auth-gated route **counts as success** in tests.
 

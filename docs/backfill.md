@@ -104,8 +104,9 @@
 ## 2025-09-05 — Auth-gated redirects & responsive header
 
 **Summary**
-- Middleware now redirects unsigned users from `/applications` and `/gigs/create` to `/login?next=<dest>`.
-- Header derives desktop and mobile menus from a single `NAV_ITEMS` source with unique test IDs.
+- Middleware now redirects unsigned users from `/applications` and `/gigs/create` to `/login?next=<dest>` and preserves any query string.
+- Header derives desktop and mobile menus from a single `NAV_ITEMS` source with unique test IDs and no duplicate login link.
+- Mobile menu toggles a `nav-menu` container so `navm-*` links render only when open.
 - `scripts/check-cta-links.mjs` validates header and hero CTAs against `ROUTES`.
 
 **Rationale**
