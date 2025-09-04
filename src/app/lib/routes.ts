@@ -4,4 +4,5 @@ export const ROUTES = {
   GIGS_BROWSE: '/browse-jobs',      // keep existing browse path
   GIGS_CREATE: '/gigs/create',
   APPLICATIONS: '/applications',
+  LOGIN: '/login',
 } as const;
