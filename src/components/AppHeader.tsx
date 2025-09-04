@@ -21,11 +21,11 @@ export default function AppHeader({ balance }: Props) {
             <Link data-testid="nav-browse-jobs" href={ROUTES.GIGS_BROWSE} prefetch={false}>
               Browse jobs
             </Link>
-            <Link data-testid="post-job" href={ROUTES.GIGS_CREATE} prefetch={false}>
+            <Link data-testid="nav-post-job" href={ROUTES.GIGS_CREATE} prefetch={false}>
               Post a job
             </Link>
             <Link
-              data-testid="my-applications"
+              data-testid="nav-my-applications"
               href={ROUTES.APPLICATIONS}
               prefetch={false}
             >
