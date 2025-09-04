@@ -13,7 +13,9 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: 20
+          cache: npm
 
       - name: Check lockfile drift (non-blocking)
         id: lock
@@ -24,6 +26,14 @@ jobs:
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            pw-${{ runner.os }}-
 
       - name: Install deps (lenient for PRs)
         run: npm install --no-audit --no-fund
@@ -61,8 +71,10 @@ jobs:
           done
           echo "Server didn't respond in time"; exit 1
 
-      - name: Install Playwright (browsers)
-        run: npx playwright install --with-deps
+      - name: Install Playwright (Chromium)
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
+        run: npx playwright install --with-deps chromium
 
       - name: Smoke tests (no webServer)
         env:

@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-09-06 -->
+<!-- AGENT CONTRACT v2025-09-07 -->
 
 # Product Acceptance (Good Product Bar)
 
@@ -50,10 +50,10 @@ Landing on **/login?next=<dest>** for any auth-gated route **counts as success**
 - Clicking **Apply** while signed out should redirect to `/login?next=/applications`.
 
 ## PR Acceptance Checklist
-- [ ] `npm run no-legacy` (no legacy anchors/paths)
-- [ ] `node scripts/check-cta-links.mjs` (CTAs point to canonical routes)
+- [ ] `bash scripts/no-legacy.sh`
+- [ ] `node scripts/check-cta-links.mjs`
 - [ ] `npx playwright test -c playwright.smoke.ts`
-- [ ] `docs/backfill.md` updated with rationale + changes
+- [ ] `docs/backfill.md` updated with rationale
 - [ ] Bump this header’s date when any contract item changes
 - [ ] Mobile menu panel renders only when open; `data-testid="nav-menu"` matches the visible container
 

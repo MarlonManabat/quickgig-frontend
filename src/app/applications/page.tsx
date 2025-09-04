@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { supabaseServer } from '@/lib/supabase/server';
 import { ROUTES } from '@/lib/routes';
-import { toAppPath } from '@/lib/urls';
+import { toAppPath } from '@/lib/routes';
 import { loginNext } from '@/app/lib/authAware';
 
 export const dynamic = 'force-dynamic';

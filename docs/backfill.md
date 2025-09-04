@@ -146,3 +146,9 @@
 
 **Rollback**
 - Revert this commit to remove apply skeleton and seeded browse list.
+
+## 2025-09-07 — Routing helpers & smoke workflow
+- Centralized `ROUTES` + `toAppPath` in `src/lib/routes.ts` and updated LinkApp & pages.
+- Added GitHub `Smoke (main)` workflow and Playwright browser caching for PRs.
+- `scripts/check-cta-links.mjs` now guards against duplicate CTA test IDs.
+
