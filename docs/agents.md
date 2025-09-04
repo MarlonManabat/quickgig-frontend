@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-09-04 -->
+<!-- AGENT CONTRACT v2025-09-06 -->
 
 # Product Acceptance (Good Product Bar)
 
@@ -40,8 +40,14 @@
 
 **No duplicates:** each CTA test ID must appear at most once in the DOM.
 
+## Page Test IDs
+- Browse list: `jobs-list`, `job-card`
+- Job detail: `apply-button`
+- Applications: `applications-list`, `application-row`, `applications-empty`
+
 ## Unauth Success Rule
 Landing on **/login?next=<dest>** for any auth-gated route **counts as success** in tests.
+- Clicking **Apply** while signed out should redirect to `/login?next=/applications`.
 
 ## PR Acceptance Checklist
 - [ ] `npm run no-legacy` (no legacy anchors/paths)
