@@ -1,4 +1,4 @@
 {
-  "installCommand": "npm ci --no-audit --no-fund",
+  "installCommand": "npm ci --no-audit --no-fund || npm install --no-audit --no-fund",
   "buildCommand": "npm run build"
 }

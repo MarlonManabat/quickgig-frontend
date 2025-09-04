@@ -183,3 +183,9 @@
 - Added `scripts/verify-build-deps` to fail CI if those slip to devDeps.
 - Introduced **Lock Guard** job: strict `npm ci`; auto-syncs `package-lock.json` back to PR branch when safe.
 - Standardized runners to `ubuntu-22.04`; Playwright installed via `npx playwright install --with-deps chromium`.
+
+## 2025-09-05 – Lockfile self-heal (branch push) + Vercel fallback
+- **Lock Guard** now checks out the **PR head branch**, not the merge SHA, and pushes `package-lock.json` back to the same branch when `npm ci` fails.
+- Downstream **Smoke** also checks out the PR head branch to pick up the self-healed lock.
+- Vercel `installCommand` now tries `npm ci` then falls back to `npm install`—prevents EUSAGE during the first self-heal cycle.
+- **Action item (one-time):** In Vercel → *Project Settings → Node.js Version*, set **20.x** to match `.nvmrc` and `engines` and remove the Node mismatch warning.
