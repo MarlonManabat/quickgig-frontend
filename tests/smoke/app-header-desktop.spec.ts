@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareSuccess } from '../e2e/helpers';
+import { expectAuthAwareRedirect, expectToBeOnRoute } from '../e2e/helpers';
 
 test.use({ viewport: { width: 1200, height: 900 } });
 
 test('Desktop header exposes CTAs and routes correctly', async ({ page }) => {
   await page.goto('/');
+  await expectToBeOnRoute(page, '/browse-jobs');
   await expect(page.getByTestId('nav-browse-jobs')).toBeVisible();
   await expect(page.getByTestId('nav-post-job')).toBeVisible();
   await expect(page.getByTestId('nav-my-applications')).toBeVisible();
@@ -14,12 +15,13 @@ test('Desktop header exposes CTAs and routes correctly', async ({ page }) => {
     page.waitForNavigation(),
     page.getByTestId('nav-browse-jobs').click(),
   ]);
-  await expect(page).toHaveURL(/\/browse-jobs/);
+  await expectToBeOnRoute(page, '/browse-jobs');
 
   await page.goto('/');
+  await expectToBeOnRoute(page, '/browse-jobs');
   await Promise.all([
     page.waitForNavigation(),
     page.getByTestId('nav-post-job').click(),
   ]);
-  await expectAuthAwareSuccess(page, /\/gigs\/create/);
+  await expectAuthAwareRedirect(page, '/gigs/create');
 });

@@ -1,6 +1,6 @@
 import { LinkApp } from "@/components/LinkApp";
 import type { Metadata } from "next";
-import { ROUTES } from "@/app/lib/routes";
+import { ROUTES } from "@/lib/routes";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

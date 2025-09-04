@@ -1,5 +1,5 @@
 import { LinkApp } from '@/components/LinkApp';
-import { ROUTES } from '@/app/lib/routes';
+import { ROUTES } from '@/lib/routes';
 
 export default function LandingHero() {
   return (

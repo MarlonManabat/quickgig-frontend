@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-09-04 — Root redirect & mobile nav ids
+
+- App root `/` now redirects to `/browse-jobs` server-side.
+- Mobile header links use unique `navm-*` test IDs to avoid duplicates.
+- Smoke helpers accept absolute or relative URLs for stable assertions.
+
 ## 2025-09-04 — Unify CTAs & responsive header
 
 - Centralized app paths in `src/app/lib/routes.ts` with `toAppPath()`.

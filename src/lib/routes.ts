@@ -5,9 +5,7 @@ export const ROUTES = {
   login: '/login',
 } as const;
 
-export function toAppPath(path: string): string {
+export function toAppPath(p: string) {
   const origin = process.env.NEXT_PUBLIC_APP_ORIGIN;
-  if (!origin) return path;
-  const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `${origin}${normalized}`;
+  return origin ? new URL(p, origin).toString() : p;
 }

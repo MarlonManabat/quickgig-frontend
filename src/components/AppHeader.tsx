@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useUser } from '@/hooks/useUser';
 import { LinkApp } from '@/components/LinkApp';
-import { ROUTES } from '@/app/lib/routes';
+import { ROUTES } from '@/lib/routes';
 
 type Props = { balance: number };
 
@@ -24,26 +24,53 @@ export default function AppHeader({ balance }: Props) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useIsDesktop();
 
-  const Links = () => (
+  const CTAS = [
+    { id: 'nav-browse-jobs', label: 'Browse jobs', to: ROUTES.browseJobs },
+    { id: 'nav-post-job', label: 'Post a job', to: ROUTES.postJob },
+    { id: 'nav-my-applications', label: 'My Applications', to: ROUTES.applications },
+    { id: 'nav-login', label: 'Sign in', to: ROUTES.login },
+  ] as const;
+
+  const DesktopLinks = () => (
     <>
-      <LinkApp data-testid="nav-browse-jobs" href={ROUTES.browseJobs} prefetch={false}>
-        Browse jobs
-      </LinkApp>
-      <LinkApp data-testid="nav-post-job" href={ROUTES.postJob} prefetch={false}>
-        Post a job
-      </LinkApp>
-      <LinkApp data-testid="nav-my-applications" href={ROUTES.applications} prefetch={false}>
-        My Applications
-      </LinkApp>
-      {user ? (
-        <button onClick={() => signOut()} className="underline">
-          Sign out
-        </button>
-      ) : (
-        <LinkApp data-testid="nav-login" href={ROUTES.login} prefetch={false}>
-          Sign in
-        </LinkApp>
-      )}
+      {CTAS.map((c) => {
+        if (c.id === 'nav-login' && user) {
+          return (
+            <button key="signout" onClick={() => signOut()} className="underline">
+              Sign out
+            </button>
+          );
+        }
+        return (
+          <LinkApp key={c.id} data-testid={c.id} href={c.to} prefetch={false}>
+            {c.label}
+          </LinkApp>
+        );
+      })}
+    </>
+  );
+
+  const MobileLinks = () => (
+    <>
+      {CTAS.map((c) => {
+        if (c.id === 'nav-login' && user) {
+          return (
+            <button key="signout" onClick={() => signOut()} className="underline">
+              Sign out
+            </button>
+          );
+        }
+        return (
+          <LinkApp
+            key={c.id}
+            data-testid={c.id.replace('nav-', 'navm-')}
+            href={c.to}
+            prefetch={false}
+          >
+            {c.label}
+          </LinkApp>
+        );
+      })}
     </>
   );
 
@@ -55,7 +82,7 @@ export default function AppHeader({ balance }: Props) {
         </Link>
         {isDesktop ? (
           <nav className="flex items-center gap-4">
-            <Links />
+            <DesktopLinks />
           </nav>
         ) : (
           <button
@@ -76,7 +103,7 @@ export default function AppHeader({ balance }: Props) {
       {!isDesktop && open && (
         <div className="md:hidden absolute top-full left-0 w-full shadow bg-white">
           <nav className="flex flex-col p-3 gap-3">
-            <Links />
+            <MobileLinks />
           </nav>
         </div>
       )}

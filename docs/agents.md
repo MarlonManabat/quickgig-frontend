@@ -13,6 +13,12 @@ Version: 2025-09-04
 - `nav-my-applications`
 - `nav-login`
 
+## Mobile header CTA test IDs
+- `navm-browse-jobs`
+- `navm-post-job`
+- `navm-my-applications`
+- `navm-login`
+
 ## Hero CTA test IDs
 - `hero-browse-jobs`
 - `hero-post-job`

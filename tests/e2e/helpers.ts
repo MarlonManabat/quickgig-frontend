@@ -16,11 +16,18 @@ export const isProdBase = () => {
   return /app\.quickgig\.ph/i.test(u);
 };
 
-export async function expectAuthAwareSuccess(page: Page, dest: RegExp) {
-  const destPath = dest.source.replace(/\\/g, '');
-  const login = new RegExp(`/login\?next=${encodeURIComponent(destPath)}`);
-  await Promise.race([
-    page.waitForURL(dest, { timeout: 8_000 }),
-    page.waitForURL(login, { timeout: 8_000 }),
-  ]);
+export async function expectToBeOnRoute(page: Page, path: string) {
+  await expect(page).toHaveURL(
+    new RegExp(`(^|https?:\\/\\/[^\\s]+)${path.replaceAll('/', '\\/')}(\\/?$)`)
+  );
+}
+
+export async function expectAuthAwareRedirect(page: Page, destPath: string) {
+  try {
+    await expectToBeOnRoute(page, destPath);
+  } catch {
+    await expect(page).toHaveURL(
+      new RegExp(`/login\\?next=${destPath.replaceAll('/', '\\/')}`)
+    );
+  }
 }

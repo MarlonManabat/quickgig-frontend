@@ -1,6 +1,6 @@
 'use client';
 import Link, { LinkProps } from 'next/link';
-import { toAppPath } from '@/app/lib/routes';
+import { toAppPath } from '@/lib/routes';
 
 type Props = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> & LinkProps;
 

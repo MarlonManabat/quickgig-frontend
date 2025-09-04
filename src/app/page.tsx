@@ -1,9 +1,6 @@
-import LandingHero from '@/components/landing/Hero';
+import { redirect } from 'next/navigation';
+import { ROUTES } from '@/lib/routes';
 
 export default function Home() {
-  return (
-    <main className="p-4">
-      <LandingHero />
-    </main>
-  );
+  redirect(ROUTES.browseJobs);
 }

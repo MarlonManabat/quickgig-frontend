@@ -8,6 +8,11 @@ const required = [
   'data-testid="nav-post-job"',
   'data-testid="nav-my-applications"',
   'data-testid="nav-login"',
+  'data-testid="navm-browse-jobs"',
+  'data-testid="navm-post-job"',
+  'data-testid="navm-my-applications"',
+  'data-testid="navm-login"',
+  'data-testid="nav-menu-button"',
   'data-testid="hero-browse-jobs"',
   'data-testid="hero-post-job"',
 ];
