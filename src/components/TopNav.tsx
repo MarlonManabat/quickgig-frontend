@@ -1,4 +1,5 @@
-import Link from "next/link";
+import LinkApp from "@/components/LinkApp";
+import { ROUTES } from "@/app/lib/routes";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
@@ -30,28 +31,28 @@ export default function TopNav() {
       data-testid="app-header"
     >
       <div className="mx-auto max-w-5xl px-4 py-3 flex items-center gap-4">
-        <Link href="/home" className="font-semibold">
+        <LinkApp href="/home" className="font-semibold">
           QuickGig.ph
-        </Link>
+        </LinkApp>
         <div className="ml-auto flex items-center gap-4 text-sm">
-            <Link href="/gigs" data-testid="nav-find">
+            <LinkApp href={ROUTES.BROWSE_JOBS} data-testid="nav-browse-jobs">
               {copy.nav.findWork}
-            </Link>
-          {loggedIn && <Link href="/dashboard/gigs">{copy.nav.myGigs}</Link>}
+            </LinkApp>
+          {loggedIn && <LinkApp href="/dashboard/gigs">{copy.nav.myGigs}</LinkApp>}
           {loggedIn && (
-            <Link href="/applications">{copy.nav.applications}</Link>
+            <LinkApp href={ROUTES.APPLICATIONS}>{copy.nav.applications}</LinkApp>
           )}
-          {loggedIn && <Link href="/saved">{copy.nav.saved}</Link>}
+          {loggedIn && <LinkApp href="/saved">{copy.nav.saved}</LinkApp>}
           {loggedIn && <AppHeaderTickets />}
           {loggedIn && <AppHeaderNotifications />}
           {loggedIn && !eligible && (
-            <Link href="/checkout" className="btn-primary">
+            <LinkApp href="/checkout" className="btn-primary">
               Buy Ticket
-            </Link>
+            </LinkApp>
           )}
-            <Link
-              href="/gigs/create"
-              data-testid="nav-post"
+            <LinkApp
+              href={ROUTES.GIGS_CREATE}
+              data-testid="nav-post-job"
               className={`btn-primary ${loggedIn && !eligible ? "opacity-50 pointer-events-none" : ""}`}
               title={
                 loggedIn && !eligible
@@ -60,10 +61,10 @@ export default function TopNav() {
               }
             >
               {copy.nav.postJob}
-            </Link>
-          <Link href="/login" data-testid="nav-login">
+            </LinkApp>
+          <LinkApp href={ROUTES.LOGIN} data-testid="nav-login">
             {copy.nav.auth}
-          </Link>
+          </LinkApp>
         </div>
       </div>
     </nav>

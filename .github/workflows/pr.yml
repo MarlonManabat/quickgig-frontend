@@ -33,6 +33,8 @@ jobs:
 
       - name: Prebuild (revalidate sanity)
         run: node ./scripts/assert-valid-revalidate.mjs
+      - name: Legacy path guard
+        run: bash scripts/no-legacy.sh
       - name: Ensure port 3000 is free
         run: |
           if lsof -i :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then

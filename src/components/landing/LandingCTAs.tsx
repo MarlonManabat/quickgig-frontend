@@ -20,7 +20,7 @@ export default function LandingCTAs({
         {showFind && (
           <a
             data-testid="cta-browse-jobs"
-            href={toAppPath(ROUTES.GIGS_BROWSE)}
+            href={toAppPath(ROUTES.BROWSE_JOBS)}
             className={findClassName}
             rel="noopener noreferrer"
           >

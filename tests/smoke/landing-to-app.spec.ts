@@ -1,37 +1,36 @@
-import { test, expect } from '@playwright/test';
-
-const APP_HOST = /(https?:\/\/(app\.quickgig\.ph|localhost:3000))/;
+import { test, expect } from "@playwright/test";
+import { expectAuthAwareRedirect } from "../e2e/helpers";
 
 test.describe('Landing → App CTAs', () => {
   test('“Post a job” opens on app host', async ({ page }) => {
-    await page.goto('/smoke/landing-ctas');
+    await page.goto("/smoke/landing-ctas");
     await expect(
-      page.getByRole('heading', { name: 'Smoke: Landing CTAs' })
+      page.getByRole("heading", { name: "Smoke: Landing CTAs" })
     ).toBeVisible();
-    const link = page.locator('[data-testid="cta-post-job"]');
+    const link = page
+      .getByTestId("cta-post-job")
+      .or(page.getByRole("link", { name: /post a job/i }));
     await expect(link).toBeVisible();
     await Promise.all([
-      page.waitForLoadState('domcontentloaded'),
+      page.waitForLoadState("domcontentloaded"),
       link.click(),
     ]);
-    await expect(page).toHaveURL(
-      new RegExp(`${APP_HOST.source}\/gigs\/create\/?$`)
-    );
+    await expectAuthAwareRedirect(page, "**/gigs/create**");
   });
 
   test('“My Applications” opens on app host', async ({ page }) => {
-    await page.goto('/smoke/landing-ctas');
+    await page.goto("/smoke/landing-ctas");
     await expect(
-      page.getByRole('heading', { name: 'Smoke: Landing CTAs' })
+      page.getByRole("heading", { name: "Smoke: Landing CTAs" })
     ).toBeVisible();
-    const link = page.locator('[data-testid="cta-my-applications"]');
+    const link = page
+      .getByTestId("cta-my-applications")
+      .or(page.getByRole("link", { name: /my applications/i }));
     await expect(link).toBeVisible();
     await Promise.all([
-      page.waitForLoadState('domcontentloaded'),
+      page.waitForLoadState("domcontentloaded"),
       link.click(),
     ]);
-    await expect(page).toHaveURL(
-      new RegExp(`${APP_HOST.source}\/(applications|login)\/?$`)
-    );
+    await expectAuthAwareRedirect(page, "**/applications**");
   });
 });

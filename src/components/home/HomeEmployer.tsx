@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import LinkApp from "@/components/LinkApp";
+import { ROUTES } from "@/app/lib/routes";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import { uploadAvatar } from "@/lib/avatar";
@@ -145,9 +146,9 @@ export default function HomeEmployer() {
           >
             Change photo
           </button>
-          <Link href="/profile" className="qg-btn qg-btn--outline px-3 py-2">
+          <LinkApp href="/profile" className="qg-btn qg-btn--outline px-3 py-2">
             Edit Profile
-          </Link>
+          </LinkApp>
         </div>
       </div>
 
@@ -157,9 +158,9 @@ export default function HomeEmployer() {
             ? "Your account is scheduled for deletion."
             : "Your account is currently suspended."}{" "}
           Need help?{" "}
-          <Link href="/support" className="underline">
+          <LinkApp href="/support" className="underline">
             Contact support
-          </Link>
+          </LinkApp>
           .
         </div>
       )}
@@ -169,51 +170,51 @@ export default function HomeEmployer() {
         <Card title="Tickets">
           <div data-testid="ticket-balance" className="text-3xl font-semibold mb-3">{balance}</div>
           <div className="flex gap-2">
-            <Link href="/wallet" className="qg-btn qg-btn--primary px-3 py-2">
+            <LinkApp href="/wallet" className="qg-btn qg-btn--primary px-3 py-2">
               Buy Tickets
-            </Link>
-            <Link href="/wallet" className="qg-btn qg-btn--outline px-3 py-2">
+            </LinkApp>
+            <LinkApp href="/wallet" className="qg-btn qg-btn--outline px-3 py-2">
               View History
-            </Link>
+            </LinkApp>
           </div>
         </Card>
 
         <Card title="Quick Actions">
           {role === "employer" || role === "admin" ? (
             <div className="flex flex-wrap gap-2">
-                <Link href="/gigs/create" className="qg-btn qg-btn--primary px-3 py-2">
-                  Post Job
-                </Link>
-              <Link
+            <LinkApp href={ROUTES.GIGS_CREATE} className="qg-btn qg-btn--primary px-3 py-2">
+              Post Job
+            </LinkApp>
+              <LinkApp
                 href="/admin/payments"
                 className="qg-btn qg-btn--outline px-3 py-2"
               >
                 Review Payments
-              </Link>
-              <Link
+              </LinkApp>
+              <LinkApp
                 href="/admin/reviews"
                 className="qg-btn qg-btn--outline px-3 py-2"
               >
                 Moderate Reviews
-              </Link>
+              </LinkApp>
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-                <Link href="/gigs?focus=search" className="qg-btn qg-btn--primary px-3 py-2">
+                <LinkApp href={`${ROUTES.BROWSE_JOBS}?focus=search`} className="qg-btn qg-btn--primary px-3 py-2">
                   Browse Jobs
-                </Link>
-              <Link
+                </LinkApp>
+              <LinkApp
                 href="/messages"
                 className="qg-btn qg-btn--outline px-3 py-2"
               >
                 Messages
-              </Link>
-              <Link
+              </LinkApp>
+              <LinkApp
                 href="/profile"
                 className="qg-btn qg-btn--outline px-3 py-2"
               >
                 Edit Profile
-              </Link>
+              </LinkApp>
             </div>
           )}
         </Card>
@@ -222,12 +223,12 @@ export default function HomeEmployer() {
           <div className="text-sm text-gray-500">
             Open your inbox to continue chatting.
           </div>
-          <Link
+          <LinkApp
             href="/messages"
             className="mt-3 inline-block qg-btn qg-btn--white px-3 py-2"
           >
             Open Messages
-          </Link>
+          </LinkApp>
         </Card>
       </section>
 
@@ -236,7 +237,7 @@ export default function HomeEmployer() {
         <>
           <Section
             title="Your job posts"
-            actionHref="/gigs/create"
+            actionHref={ROUTES.GIGS_CREATE}
             actionLabel="Post new"
           />
           <Grid>
@@ -257,18 +258,18 @@ export default function HomeEmployer() {
                   meta={new Date(j.created_at).toLocaleString()}
                 >
                   <div className="flex gap-2">
-                    <Link
+                    <LinkApp
                       className="qg-btn qg-btn--outline px-3 py-1.5"
                       href={`/jobs/${j.id}`}
                     >
                       View
-                    </Link>
-                    <Link
+                    </LinkApp>
+                    <LinkApp
                       className="qg-btn qg-btn--white px-3 py-1.5"
                       href={`/jobs/${j.id}/edit`}
                     >
                       Edit
-                    </Link>
+                    </LinkApp>
                     <span className="ml-auto text-xs text-gray-600">
                       {pendingCounts[j.id]
                         ? `${pendingCounts[j.id]} pending apps`
@@ -284,7 +285,7 @@ export default function HomeEmployer() {
         <>
           <Section
             title="Your applications"
-            actionHref="/gigs"
+            actionHref={ROUTES.BROWSE_JOBS}
             actionLabel="Find jobs"
           />
           <Grid>
@@ -298,12 +299,12 @@ export default function HomeEmployer() {
                   subtitle={`Status: ${a.status}`}
                   meta={new Date(a.updated_at).toLocaleString()}
                 >
-                  <Link
+                  <LinkApp
                     className="qg-btn qg-btn--outline px-3 py-1.5"
                     href={`/jobs/${a.job_id}`}
                   >
                     View job
-                  </Link>
+                  </LinkApp>
                 </ListCard>
               ))
             )}
@@ -321,12 +322,12 @@ export default function HomeEmployer() {
                   subtitle={`Status: ${m.status}`}
                   meta={new Date(m.updated_at).toLocaleString()}
                 >
-                  <Link
+                  <LinkApp
                     className="qg-btn qg-btn--outline px-3 py-1.5"
                     href={`/jobs/${m.job_id}`}
                   >
                     Open chat
-                  </Link>
+                  </LinkApp>
                 </ListCard>
               ))
             )}
@@ -358,9 +359,9 @@ function Section({
     <div className="flex items-center justify-between mt-4 mb-2">
       <h2 className="text-lg font-semibold">{title}</h2>
       {actionHref && actionLabel && (
-        <Link href={actionHref} className="qg-btn qg-btn--white px-3 py-1.5">
+        <LinkApp href={actionHref} className="qg-btn qg-btn--white px-3 py-1.5">
           {actionLabel}
-        </Link>
+        </LinkApp>
       )}
     </div>
   );

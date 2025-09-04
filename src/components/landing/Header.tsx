@@ -18,7 +18,7 @@ export default function LandingHeader() {
         My Applications
       </a>
       <a
-        href={toAppPath('/login')}
+        href={toAppPath(ROUTES.LOGIN)}
         className="..."
         rel="noopener noreferrer"
       >

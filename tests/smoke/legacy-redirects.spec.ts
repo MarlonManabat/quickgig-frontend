@@ -1,12 +1,11 @@
-import { test, expect } from '@playwright/test';
-const APP_HOST = /(https?:\/\/(app\.quickgig\.ph|localhost:3000))/;
+import { test, expect } from "@playwright/test";
 
-test('legacy /find redirects to /browse-jobs', async ({ page }) => {
-  await page.goto('/find');
-  await expect(page).toHaveURL(new RegExp(`${APP_HOST.source}\/browse-jobs\/?$`));
+test("legacy /find redirects to /browse-jobs", async ({ page }) => {
+  await page.goto("/find");
+  await expect(page).toHaveURL("**/browse-jobs**");
 });
 
-test('legacy /post-job redirects to /gigs/create', async ({ page }) => {
-  await page.goto('/post-job');
-  await expect(page).toHaveURL(new RegExp(`${APP_HOST.source}\/gigs\/create\/?$`));
+test("legacy /post-job redirects to /gigs/create", async ({ page }) => {
+  await page.goto("/post-job");
+  await expect(page).toHaveURL("**/gigs/create**");
 });

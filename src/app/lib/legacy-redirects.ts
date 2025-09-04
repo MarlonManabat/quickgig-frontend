@@ -1,4 +1,4 @@
-export const LEGACY_REDIRECTS: Record<string, string> = {
+export const LEGACY_MAP: Record<string, string> = {
   '/find': '/browse-jobs',
   '/gigs': '/browse-jobs',
   '/browsejobs': '/browse-jobs',
