@@ -1,4 +1,5 @@
 import { toAppPath } from '@/lib/urls';
+import { ROUTES } from '@/app/lib/routes';
 import LandingCTAs from '@/components/landing/LandingCTAs';
 
 export default function LandingHeader() {
@@ -9,7 +10,8 @@ export default function LandingHeader() {
         postClassName="btn btn-primary"
       />
       <a
-        href={toAppPath('/applications')}
+        data-testid="cta-my-applications"
+        href={toAppPath(ROUTES.APPLICATIONS)}
         className="..."
         rel="noopener noreferrer"
       >
