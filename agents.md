@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-09-09
+**Version:** 2025-09-10
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -34,7 +34,7 @@
 - `scripts/check-cta-links.mjs` ensures CTAs point only to canonical routes.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-09-09 -->
+<!-- AGENT CONTRACT v2025-09-10 -->
 
 ---
 

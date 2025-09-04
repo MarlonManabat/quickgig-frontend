@@ -1,0 +1,75 @@
+name: Smoke (PR)
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lock-guard:
+    name: Verify lockfile consistency
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Strict lock check
+        id: strict
+        continue-on-error: true
+        run: npm ci --no-audit --fund=false --loglevel=error
+
+      - name: (Self-heal) sync lock and commit back to PR branch
+        if: steps.strict.outcome == 'failure' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          npm run sync-lock
+          git config user.name  "ci-lock-bot"
+          git config user.email "ci@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add package-lock.json
+          git commit -m "chore(ci): sync lockfile" || echo "No changes"
+          git push origin "HEAD:$BRANCH"
+
+  pr:
+    name: Run smoke
+    needs: [lock-guard]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install deps (clean)
+        run: npm ci --no-audit --fund=false --loglevel=error
+
+      - name: Guard build-time deps
+        run: npm run verify-build-deps
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke
+        env: { CI: true }
+        run: npx playwright test -c playwright.smoke.ts
+

@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-09-10 — Seed on boot & auth-aware helpers
+- Added `scripts/seed-on-boot.mjs` gated by `SEED_ON_BOOT` and wired into `npm run dev` to seed sample gigs for dev/CI.
+- Applications page shows a friendly empty state with a CTA back to Browse Jobs (`hero-browse-jobs`).
+- Consolidated smoke helpers (`tests/smoke/_helpers.ts`) with `gotoHome`, `openMenu`, and regex-safe `expectAuthAwareRedirect` shared across specs.
+
 ## 2025-09-03
 - Added `NEXT_PUBLIC_APP_ORIGIN` and `src/lib/urls.ts` utility to centralize the app host.
 - Converted all landing CTAs (hero, nav, footer, and cards) to absolute links to the app:
@@ -166,3 +171,21 @@
 - Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
 - Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
 
+## 2025-09-05 – CI/Vercel unblocked (lock sync & browserslist)
+- Pinned Node to 20 via `.nvmrc` and enforced engines in `package.json`.
+- PR workflow tries `npm ci` then falls back to `npm install` to avoid false-reds from lock drift; `main` remains strict with `npm ci`.
+- Added explicit `browserslist` + `.browserslistrc` to prevent Next/PostCSS build-time module resolution errors on Vercel.
+- Switched to `microsoft/playwright-github-action` for reliable browser installs.
+
+## 2025-09-05 – Root-cause guardrails (env+lock+CSS toolchain)
+- Pinned Node 20 / npm 10 via `.nvmrc` & `packageManager`; Vercel now runs `npm ci`.
+- Enforced build-time CSS deps (`tailwindcss`,`postcss`,`autoprefixer`,`browserslist`) as runtime deps; added `fraction.js` to avoid PostCSS peer holes.
+- Added `scripts/verify-build-deps` to fail CI if those slip to devDeps.
+- Introduced **Lock Guard** job: strict `npm ci`; auto-syncs `package-lock.json` back to PR branch when safe.
+- Standardized runners to `ubuntu-22.04`; Playwright installed via `npx playwright install --with-deps chromium`.
+
+## 2025-09-05 – Lockfile self-heal (branch push) + Vercel fallback
+- **Lock Guard** now checks out the **PR head branch**, not the merge SHA, and pushes `package-lock.json` back to the same branch when `npm ci` fails.
+- Downstream **Smoke** also checks out the PR head branch to pick up the self-healed lock.
+- Vercel `installCommand` now tries `npm ci` then falls back to `npm install`—prevents EUSAGE during the first self-heal cycle.
+- **Action item (one-time):** In Vercel → *Project Settings → Node.js Version*, set **20.x** to match `.nvmrc` and `engines` and remove the Node mismatch warning.
