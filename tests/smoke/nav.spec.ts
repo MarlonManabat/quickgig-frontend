@@ -1,30 +1,33 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { expectAuthAwareRedirect } from './_helpers';
 
-async function gotoHome(page: Page) {
+async function gotoHome(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.waitForLoadState('networkidle');
 }
 
-async function clickNavOrGo(page: Page, opts: { name: RegExp, fallbackPath: string }) {
-  const link = page.getByRole('link', { name: opts.name });
-  if (await link.count()) {
-    await link.first().click();
-  } else {
-    await page.goto(opts.fallbackPath, { waitUntil: 'domcontentloaded' });
-  }
-}
-
-test.describe('nav links work', () => {
-  test('Home ▸ Browse Jobs', async ({ page }) => {
+test.describe('desktop header CTAs', () => {
+  test('Browse Jobs', async ({ page }) => {
     await gotoHome(page);
-    await clickNavOrGo(page, { name: /browse jobs/i, fallbackPath: '/browse-jobs' });
-    await expect(page).toHaveURL(/\/(browse-jobs|jobs)\b/i, { timeout: 10_000 });
+    await page.getByTestId('nav-browse-jobs').click();
+    await expect(page).toHaveURL(/\/browse-jobs\/?/);
   });
 
-  test('Home ▸ My Applications (signed out ok)', async ({ page }) => {
+  test('Post a Job (auth-aware)', async ({ page }) => {
     await gotoHome(page);
-    await clickNavOrGo(page, { name: /my applications/i, fallbackPath: '/applications' });
-    await expect(page).toHaveURL(/\/(applications|login)\b/i, { timeout: 10_000 });
+    await page.getByTestId('nav-post-job').click();
+    await expectAuthAwareRedirect(page, /\/gigs\/create\/?/);
+  });
+
+  test('My Applications (auth-aware)', async ({ page }) => {
+    await gotoHome(page);
+    await page.getByTestId('nav-my-applications').click();
+    await expectAuthAwareRedirect(page, /\/applications\/?/);
+  });
+
+  test('Login', async ({ page }) => {
+    await gotoHome(page);
+    await page.getByTestId('nav-login').click();
+    await expect(page).toHaveURL(/\/login\/?/);
   });
 });
-

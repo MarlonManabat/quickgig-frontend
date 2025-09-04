@@ -76,3 +76,51 @@
 
 **Rollback**
 - Revert the PR(s) that introduced the contract & guardrails if a critical issue appears; routes fall back to previous behavior.
+
+## 2025-09-04 — Canonical routes & responsive header
+
+**Summary**
+- Root `/` and legacy paths normalize to `/browse-jobs`.
+- `LinkApp` + `toAppPath` ensure CTAs hit the app host in prod.
+- Single source header drives desktop and mobile menus with stable IDs:
+  - `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`
+  - `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`
+
+**Rationale**
+- Prevent link drift and keep auth-aware flows consistent across devices.
+
+**Impact / Migrations**
+- Use `LinkApp` with `ROUTES` constants for new CTAs.
+- Tests must treat `/login?next=<dest>` redirects as success for gated links.
+
+**How to verify**
+- `npm run no-legacy`
+- `node scripts/check-cta-links.mjs`
+- `npx playwright test -c playwright.smoke.ts`
+
+**Rollback**
+- Revert the PR if navigation or auth flows break.
+
+## 2025-09-05 — Auth-gated redirects & responsive header
+
+**Summary**
+- Middleware now redirects unsigned users from `/applications` and `/gigs/create` to `/login?next=<dest>` and preserves any query string.
+- Header derives desktop and mobile menus from a single `NAV_ITEMS` source with unique test IDs and no duplicate login link.
+- Menu panel mounts only when open so `nav-menu` is visible for smoke tests.
+- `scripts/check-cta-links.mjs` validates header and hero CTAs against `ROUTES`.
+
+**Rationale**
+- Preserve destination after sign-in and keep nav CTAs deterministic for smoke tests.
+
+**Impact / Migrations**
+- Use `NAV_ITEMS` + `LinkApp` for header links.
+- Tests rely on stable CTA IDs and treat `/login?next=<dest>` as success for gated links.
+
+**How to verify**
+- Visit `/applications` or `/gigs/create` while signed out → `/login?next=<dest>`.
+- `npm run no-legacy`
+- `node scripts/check-cta-links.mjs`
+- `npx playwright test -c playwright.smoke.ts`
+
+**Rollback**
+- Revert this commit to restore previous middleware and header behavior.

@@ -19,7 +19,7 @@ export default function LandingCTAs({
       <div className="flex gap-3">
         {showFind && (
           <LinkApp
-            data-testid="cta-browse-jobs"
+            data-testid="hero-browse-jobs"
             href={ROUTES.browseJobs}
             className={findClassName}
           >
@@ -27,7 +27,7 @@ export default function LandingCTAs({
           </LinkApp>
         )}
         {showPost && (
-          <LinkApp href={ROUTES.gigsCreate} className={postClassName}>
+          <LinkApp data-testid="hero-post-job" href={ROUTES.postJob} className={postClassName}>
             Post a job
           </LinkApp>
         )}

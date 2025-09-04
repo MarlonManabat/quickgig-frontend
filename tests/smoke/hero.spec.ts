@@ -1,53 +1,20 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { expectAuthAwareRedirect } from './_helpers';
 
-const PATHS = {
-  browse: ['/browse-jobs', '/jobs'],
-  post: ['/gigs/create'],
-};
-
-async function gotoHome(page: Page) {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.waitForLoadState('networkidle');
-}
-
-async function tryClick(page: Page, nameRegex: RegExp) {
-  const candidates = [
-    page.getByRole('link', { name: nameRegex }),
-    page.getByRole('button', { name: nameRegex }),
-    page.getByText(nameRegex).filter({ hasNot: page.locator('[aria-hidden="true"]') }),
-  ];
-  for (const loc of candidates) {
-    if (await loc.count()) {
-      await loc.first().click();
-      return true;
-    }
-  }
-  return false;
-}
-
-test.describe('Hero', () => {
-  test('Browse jobs works', async ({ page }) => {
-    await gotoHome(page);
-    const clicked = await tryClick(page, /browse jobs/i);
-    if (!clicked) {
-      // Navigate directly; smoke’s job is route-health, not UX fidelity
-      await page.goto(PATHS.browse[0], { waitUntil: 'domcontentloaded' });
-    }
-    // Accept either /browse-jobs or /jobs
-    await expect(page).toHaveURL(/\/(browse-jobs|jobs)\b/i, { timeout: 10_000 });
-    // Heading assertion is best-effort (don’t fail smoke if copy differs)
-    await expect(page.getByRole('heading', { name: /browse jobs/i }))
-      .toBeVisible({ timeout: 5_000 })
-      .catch(() => {});
+test.describe('landing hero CTAs', () => {
+  test('Browse Jobs', async ({ page }) => {
+    await page.goto('/smoke/landing-ctas');
+    const browse = page.getByTestId('hero-browse-jobs');
+    await expect(browse).toBeVisible();
+    await browse.click();
+    await expect(page).toHaveURL(/\/browse-jobs\/?/);
   });
 
-  test('Post a job works (shell)', async ({ page }) => {
-    await gotoHome(page);
-    const clicked = await tryClick(page, /post a job/i);
-    if (!clicked) {
-      await page.goto(PATHS.post[0], { waitUntil: 'domcontentloaded' });
-    }
-    await expect(page).toHaveURL(/\/gigs\/create\/?$/i, { timeout: 10_000 });
+  test('Post a Job (auth-aware)', async ({ page }) => {
+    await page.goto('/smoke/landing-ctas');
+    const post = page.getByTestId('hero-post-job');
+    await expect(post).toBeVisible();
+    await post.click();
+    await expectAuthAwareRedirect(page, /\/gigs\/create\/?/);
   });
 });
-

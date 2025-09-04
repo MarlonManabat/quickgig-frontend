@@ -1,4 +1,6 @@
 import Link from "next/link";
+import LinkApp from "@/components/LinkApp";
+import { ROUTES } from "@/lib/routes";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -50,12 +52,12 @@ export default function HomeSeeker() {
             online.
           </p>
           <div className="flex flex-wrap gap-2">
-            <Link
-              href="/find?focus=search"
+            <LinkApp
+              href={`${ROUTES.browseJobs}?focus=search`}
               className="qg-btn qg-btn--primary px-4 py-2 rounded-xl"
             >
               Browse jobs
-            </Link>
+            </LinkApp>
             <Link
               href="/profile"
               className="qg-btn qg-btn--outline px-4 py-2 rounded-xl"
@@ -97,9 +99,12 @@ export default function HomeSeeker() {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-medium">Suggested jobs for you</h2>
-          <Link href="/find?focus=search" className="text-sm text-blue-600 underline">
+          <LinkApp
+            href={`${ROUTES.browseJobs}?focus=search`}
+            className="text-sm text-blue-600 underline"
+          >
             See all
-          </Link>
+          </LinkApp>
         </div>
         {loadingJobs ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -137,9 +142,12 @@ export default function HomeSeeker() {
       <section>
         <h2 className="text-lg font-medium mb-3">Quick actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <Link href="/find?focus=search" className="border rounded-xl p-4 hover:shadow-sm">
+          <LinkApp
+            href={`${ROUTES.browseJobs}?focus=search`}
+            className="border rounded-xl p-4 hover:shadow-sm"
+          >
             Browse jobs
-          </Link>
+          </LinkApp>
           <Link
             href="/messages"
             className="border rounded-xl p-4 hover:shadow-sm"

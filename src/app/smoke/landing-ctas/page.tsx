@@ -12,10 +12,12 @@ export default function SmokeLandingCTAs() {
     <main className="p-8 space-y-4">
       <h1 className="text-xl font-semibold">Smoke: Landing CTAs</h1>
       <div className="flex flex-col gap-3">
-        <LinkApp data-testid="cta-find-work" href={ROUTES.browseJobs}>Find Work</LinkApp>
-        <LinkApp data-testid="cta-browse-jobs" href={ROUTES.browseJobs}>Browse Jobs</LinkApp>
-        <LinkApp data-testid="nav-post-job" href={ROUTES.gigsCreate}>Post a job</LinkApp>
-        <LinkApp data-testid="nav-my-applications" href={ROUTES.applications}>My Applications</LinkApp>
+        <LinkApp data-testid="hero-browse-jobs" href={ROUTES.browseJobs}>
+          Browse Jobs
+        </LinkApp>
+        <LinkApp data-testid="hero-post-job" href={ROUTES.postJob}>
+          Post a job
+        </LinkApp>
       </div>
     </main>
   );

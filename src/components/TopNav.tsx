@@ -1,4 +1,6 @@
 import Link from "next/link";
+import LinkApp from "@/components/LinkApp";
+import { ROUTES } from "@/lib/routes";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import AppHeaderNotifications from "@/components/AppHeaderNotifications";
@@ -61,9 +63,9 @@ export default function TopNav() {
             >
               {copy.nav.postJob}
             </Link>
-          <Link href="/login" data-testid="nav-login">
+          <LinkApp href={ROUTES.login} data-testid="nav-login">
             {copy.nav.auth}
-          </Link>
+          </LinkApp>
         </div>
       </div>
     </nav>
