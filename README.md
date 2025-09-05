@@ -36,6 +36,14 @@ git apply autofix.patch
 - **v14** API: `import globby from 'globby'` (default export)
 - Action: We'll revisit upgrading to v14 when registry/yank issues stop causing noise.
 
+## Contributing
+
+### Installs
+
+- Use Node 20 (see `.nvmrc`).
+- Commit `package-lock.json` whenever dependencies change.
+- GitHub CI runs `npm ci` and fails if the lockfile and manifest diverge.
+
 ## Testing
 
 ```bash
