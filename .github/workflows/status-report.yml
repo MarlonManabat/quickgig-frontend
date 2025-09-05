@@ -1,0 +1,63 @@
+name: Status report
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: Days to look back
+        required: false
+        default: '30'
+  schedule:
+    - cron: '0 0 * * 0'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  report:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # keep ci strictness you already use, but make it resilient to noisy logs
+      - name: Install deps
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+
+      - name: Generate status report
+        run: npm run report:status
+
+      # expose today's date for branch/PR naming
+      - id: meta
+        name: Compute date slug (UTC)
+        shell: bash
+        run: echo "today=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      # always upload the report so we can download it from the run, even if PR push fails
+      - name: Upload status report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: status-report-${{ steps.meta.outputs.today }}
+          path: |
+            docs/status/status-*.md
+            docs/status/*.md
+
+      # create or update a PR with the new report using the default GITHUB_TOKEN
+      - name: Create PR with report
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "docs(status): add status report for ${{ steps.meta.outputs.today }}"
+          title: "Status report – ${{ steps.meta.outputs.today }}"
+          branch: status/${{ steps.meta.outputs.today }}
+          add-paths: |
+            docs/status/**
+          delete-branch: true
