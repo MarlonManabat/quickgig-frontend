@@ -166,3 +166,5 @@
 - Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
 - Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
 
+
+- 2025-09-05: CI lockfile self-heal added; workflows updated with `permissions: contents: write`; required checks now run (eslint/tsc/smoke). Root-cause: `npm ci` EUSAGE due to lockfile drift blocking ruleset checks.

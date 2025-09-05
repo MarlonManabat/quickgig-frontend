@@ -84,7 +84,8 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": ">=20 <21"
+    "node": ">=20 <21",
+    "npm": ">=10 <11"
   },
   "packageManager": "npm@10"
 }
