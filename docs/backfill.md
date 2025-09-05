@@ -212,3 +212,8 @@
 - Replaced legacy `<img>` tags with Next.js `<Image>`.
 - Lint workflow now runs `npx eslint . --max-warnings=0`.
 - Check name preserved: `Lint / eslint (pull_request)`.
+
+### 2025-09-05 — CI: TypeScript error-baseline guard
+- Added a TypeScript baseline guard that counts `tsc` errors and compares to a repo baseline (`ci/tsc-baseline.json`).
+- The guard is *informational* by default (does not fail the PR). Set `TSC_STRICT_GUARD=1` in the workflow to enforce “no regressions.”
+- `ci/tsc-output.txt` is uploaded as a CI artifact for debugging. We will gradually reduce the baseline as we pay down tech debt.
