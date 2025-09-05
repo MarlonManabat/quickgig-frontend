@@ -1,8 +1,0 @@
-name: Final QA (full) (disabled while product is WIP)
-on:
-  workflow_dispatch:
-jobs:
-  noop:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "E2E temporarily disabled. Re-enable after product stabilizes."

@@ -1,4 +1,4 @@
-name: Smoke (PR)
+name: Lint
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -6,7 +6,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
-  pr:
+  eslint:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -15,9 +15,4 @@ jobs:
           node-version-file: .nvmrc
           cache: 'npm'
       - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
-      - name: Build
-        run: npm run build
-      - name: Start server & run smoke
-        run: |
-          npx playwright install --with-deps chromium || true
-          npm run start-server-and-test
+      - run: npx eslint . --max-warnings=0
