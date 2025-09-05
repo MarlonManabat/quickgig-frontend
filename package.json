@@ -6,7 +6,7 @@
     "ci:verify": "node scripts/ci-verify.mjs",
     "prebuild": "node ./scripts/check-dynamic-route-conflicts.mjs && node ./scripts/assert-valid-revalidate.mjs",
     "build": "next build",
-    "start": "next start -p 3000",
+    "start": "PORT=${PORT:-3000} next start -p $PORT",
     "start:e2e": "next build && next start -p 3000",
     "start:preview": "next start -p 3000",
     "typecheck": "tsc --noEmit",
@@ -82,7 +82,7 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.7",
     "fast-glob": "^3.3.2",
-    "start-server-and-test": "^2.0.0",
+    "start-server-and-test": "^2.0.3",
     "ts-morph": "^24.0.0",
     "globby": "^14.0.2",
     "tsx": "^4.19.0",
@@ -93,10 +93,5 @@
     "node": ">=20 <21",
     "npm": ">=10 <11"
   },
-  "packageManager": "npm@10.7.0",
-  "browserslist": [
-    "> 0.5%",
-    "last 2 versions",
-    "not dead"
-  ]
+  "packageManager": "npm@10.7.0"
 }

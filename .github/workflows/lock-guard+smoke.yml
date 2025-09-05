@@ -58,5 +58,10 @@ jobs:
       - run: npm ci --no-audit --fund=false --loglevel=error
       - run: npm run verify-build-deps
       - run: npx playwright install --with-deps chromium
-      - env: { CI: true }
-        run: npx playwright test -c playwright.smoke.ts
+      - name: Build
+        run: npm run build
+      - name: Start server and run smoke
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          PORT: "3000"
+        run: npx start-server-and-test "npm run start" http://localhost:3000 "npx playwright test -c playwright.smoke.ts"

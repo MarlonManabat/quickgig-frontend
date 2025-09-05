@@ -1,3 +1,9 @@
 {
-  "extends": ["next/core-web-vitals"]
+  "extends": ["next/core-web-vitals"],
+  "ignorePatterns": [
+    "legacy_pages_disabled/**",
+    "landing_public_html/**",
+    "public_html/**",
+    "stubs/**"
+  ]
 }
