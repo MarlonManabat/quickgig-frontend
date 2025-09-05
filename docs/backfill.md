@@ -205,3 +205,10 @@
 - Softened ESLint (allow warnings) to prevent non-actionable failures.
 - Made Type Check informational (non-blocking) while type errors are triaged.
 - Check names preserved: `Lint / eslint (pull_request)`, `Type Check / tsc (pull_request)`, `Smoke (PR) / pr (pull_request)`.
+
+## 2025-09-05 — Harden ESLint warnings and restore strict gate
+
+- Fixed React hook deps warnings (`supabase.auth`, `ready`).
+- Replaced legacy `<img>` tags with Next.js `<Image>`.
+- Lint workflow now runs `npx eslint . --max-warnings=0`.
+- Check name preserved: `Lint / eslint (pull_request)`.

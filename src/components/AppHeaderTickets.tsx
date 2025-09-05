@@ -15,7 +15,7 @@ export default function AppHeaderTickets() {
       } = await supabase.auth.getUser();
       setUid(user?.id ?? null);
     })();
-  }, []);
+  }, [supabase.auth]);
 
   const { data } = useSWR(uid ? ["tickets", uid] : null, async () => {
     const { data } = await supabase

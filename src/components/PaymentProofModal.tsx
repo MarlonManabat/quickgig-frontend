@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Image from 'next/image';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 import { nanoid } from 'nanoid';
 
@@ -60,7 +61,13 @@ export default function PaymentProofModal({
         <h2 className="text-xl font-semibold">Buy posting credits</h2>
         <p>Send <b>₱{pricePHP}</b> via GCash and upload the receipt.</p>
         {process.env.NEXT_PUBLIC_GCASH_QR_URL && (
-          <img src={process.env.NEXT_PUBLIC_GCASH_QR_URL} alt="GCash QR" className="w-48 h-48 mx-auto rounded" />
+          <Image
+            src={process.env.NEXT_PUBLIC_GCASH_QR_URL}
+            alt="GCash QR"
+            width={192}
+            height={192}
+            className="w-48 h-48 mx-auto rounded"
+          />
         )}
         <input type="file" accept="image/*" onChange={(e)=>setFile(e.target.files?.[0] || null)} />
         {error && <p className="text-sm text-red-600">{error}</p>}
