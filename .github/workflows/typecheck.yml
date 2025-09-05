@@ -1,20 +1,31 @@
-name: Type Check / tsc (pull_request)
+name: Type Check
 on:
   pull_request:
-    branches: [ main ]
-permissions:
-  contents: read
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write
+
 jobs:
-  tsc:
+  lock_guard:
+    name: Lock Guard
     runs-on: ubuntu-22.04
     steps:
+      - uses: ./.github/actions/lock-guard
+
+  tsc:
+    name: Type Check / tsc (pull_request)
+    runs-on: ubuntu-22.04
+    needs: lock_guard
+    steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: 'npm'
-      - run: npm ci --no-audit --fund=false --loglevel=error
-      - run: npx tsc --noEmit
+      - uses: ./.github/actions/setup
+      - name: Install deps
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+      - name: TypeScript check
+        run: npx tsc --noEmit

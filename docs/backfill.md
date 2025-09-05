@@ -176,3 +176,10 @@
 - Renamed push variants to include “(push)” to avoid sidebar duplication.
 - Added concurrency to prevent overlapping runs on the same ref.
 - Outcome: Actions list is clean; branch protection gates align with actual PR jobs.
+
+### [CI] Lock Guard + Deduped workflows (2025-09-05)
+- Auto-repair npm lockfile on PRs when `npm ci` fails; commit `package-lock.json` back to the PR branch.
+- Deduplicated Lint/Type Check/Smoke workflows; stabilized check names to match ruleset.
+- Added concurrency to avoid duplicate runs.
+- Pinned Node 20 / npm 10; quiet installs.
+**Acceptance:** All three required checks pass on the PR after lock repair; deploy preview succeeds.

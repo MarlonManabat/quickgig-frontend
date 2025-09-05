@@ -1,0 +1,41 @@
+name: Lock Guard
+description: If npm ci fails, run npm install, commit package-lock.json, and push to PR branch
+inputs: {}
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref || github.ref_name }}
+        persist-credentials: true
+    - name: Try clean install (ci)
+      id: try_ci
+      shell: bash
+      run: |
+        set +e
+        npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+        echo "status=$?" >> $GITHUB_OUTPUT
+    - name: Repair lockfile on failure
+      if: steps.try_ci.outputs.status != '0'
+      shell: bash
+      run: |
+        set -e
+        echo "Lock drift detected. Running npm install to resync lockfile..."
+        npm install --no-audit --fund=false --loglevel=error
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add package-lock.json
+        if git diff --cached --quiet; then
+          echo "No lockfile changes to commit."
+        else
+          git commit -m "ci(lockfile): sync package-lock.json via Lock Guard"
+          git push
+          echo "pushed=true" >> $GITHUB_OUTPUT
+        fi
+    - name: Exit early to let PR re-trigger (if we pushed a fix)
+      if: steps.try_ci.outputs.status != '0'
+      shell: bash
+      run: |
+        echo "Lock Guard pushed a fixed lockfile. Current job will exit 1 to re-trigger checks."
+        exit 1

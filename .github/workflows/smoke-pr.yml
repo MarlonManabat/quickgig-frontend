@@ -1,25 +1,39 @@
-name: Smoke (PR) / Run smoke (pull_request)
+name: Smoke (PR)
 on:
   pull_request:
-    branches: [ main ]
-permissions:
-  contents: read
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write
+
 jobs:
-  pr:
+  lock_guard:
+    name: Lock Guard
     runs-on: ubuntu-22.04
-    timeout-minutes: 20
+    steps:
+      - uses: ./.github/actions/lock-guard
+
+  smoke:
+    name: Run smoke (pull_request)
+    runs-on: ubuntu-22.04
+    needs: lock_guard
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: 'npm'
-      - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
-      - run: npx playwright install --with-deps chromium
-      # Build, start live server, then run smoke tests
-      - run: npm run build
-      - run: npm run start-server-and-test
-      - run: npm run smoke
+      - uses: ./.github/actions/setup
+      - name: Install deps
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+      - name: Install Playwright browsers (first run caches)
+        run: npx playwright install --with-deps chromium
+      - name: Build Next.js
+        run: npm run build
+      - name: Start server and run smoke
+        env:
+          NODE_ENV: production
+        run: |
+          npx wait-on --version || npm i -D wait-on
+          npm run start-server-and-test
