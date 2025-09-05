@@ -19,7 +19,7 @@ export function useUser() {
       setUser(u);
     });
     return () => { mounted = false; sub?.subscription.unsubscribe(); };
-  }, []);
+  }, [supabase.auth]);
 
   return { user, loading, signOut: () => supabase.auth.signOut() };
 }

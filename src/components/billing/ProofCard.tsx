@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 
 interface Proof {
@@ -29,7 +30,7 @@ export default function ProofCard({ proof, children }: { proof: Proof; children?
     <div className="border rounded p-4 space-y-2">
       {url && (
         isImage ? (
-          <img src={url} alt="proof" className="h-32 object-contain" />
+          <Image src={url} alt="proof" width={128} height={128} className="h-32 object-contain" />
         ) : (
           <a href={url} target="_blank" rel="noreferrer" className="underline">
             View file

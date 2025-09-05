@@ -31,7 +31,7 @@ export function useRequireUser() {
       active = false;
       clearTimeout(timer);
     };
-  }, [router]);
+  }, [router, ready]);
 
   return { ready, userId, timedOut };
 }
