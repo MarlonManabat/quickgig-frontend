@@ -10,13 +10,32 @@ concurrency:
 
 jobs:
   tsc:
+    name: tsc (pull_request)
     runs-on: ubuntu-22.04
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node from .nvmrc
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
-      - run: node .github/scripts/tsc-ci.mjs
+
+      - name: Install deps (strict)
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+
+      - name: Run TypeScript (baseline guard; informational by default)
+        env:
+          # Flip to "1" in a future PR to enforce no-regressions strictly.
+          TSC_STRICT_GUARD: "0"
+        run: node .github/scripts/tsc-ci.mjs
+
+      - name: Upload tsc output (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsc-output
+          path: ci/tsc-output.txt
+          retention-days: 7

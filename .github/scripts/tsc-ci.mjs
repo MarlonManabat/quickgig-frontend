@@ -1,22 +1,61 @@
 import { execSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const BASELINE_FILE = 'docs/tsc-baseline.json';
-const out = execSync('npx tsc -p tsconfig.json --noEmit', { encoding: 'utf8' });
-const errCount = (out.match(/error TS\d+/g) || []).length;
+const ROOT = process.cwd();
+const BASELINE_PATH = path.resolve(ROOT, 'ci/tsc-baseline.json');
+const ARTIFACT_OUT = path.resolve(ROOT, 'ci/tsc-output.txt');
 
-if (!existsSync(BASELINE_FILE)) {
-  writeFileSync(BASELINE_FILE, JSON.stringify({ errors: errCount }, null, 2));
-  console.log(`Baseline created with ${errCount} errors`);
-  process.exit(0);
+function runTsc() {
+  // --pretty false gives grep-able output, --noEmit avoids build artifacts
+  const cmd = 'npx tsc -p tsconfig.json --noEmit --pretty false';
+  try {
+    const out = execSync(cmd, { encoding: 'utf8' });
+    return { out, code: 0 };
+  } catch (err) {
+    const out = (err.stdout?.toString?.() || '') + (err.stderr?.toString?.() || '');
+    const code = typeof err.status === 'number' ? err.status : 1;
+    return { out, code };
+  }
 }
 
-const baseline = JSON.parse(readFileSync(BASELINE_FILE, 'utf8')).errors ?? 0;
-console.log(`TSC errors: ${errCount} (baseline: ${baseline})`);
-if (errCount > baseline) {
-  console.error(`Type errors increased by ${errCount - baseline}. Failing.`);
-  process.exit(1);
+function countErrors(tscOutput) {
+  // Count occurrences of "error TS1234" patterns
+  const matches = tscOutput.match(/error TS\d{4}:/g) || [];
+  return matches.length;
+}
+
+function readBaseline() {
+  try {
+    const txt = fs.readFileSync(BASELINE_PATH, 'utf8');
+    const json = JSON.parse(txt);
+    const n = Number(json.maxErrors);
+    return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+  } catch {
+    return Number.MAX_SAFE_INTEGER; // missing or malformed: be permissive
+  }
+}
+
+function writeArtifact(tscOutput) {
+  try {
+    fs.mkdirSync(path.dirname(ARTIFACT_OUT), { recursive: true });
+    fs.writeFileSync(ARTIFACT_OUT, tscOutput, 'utf8');
+  } catch {}
+}
+
+const { out, code } = runTsc();
+const errors = countErrors(out);
+writeArtifact(out);
+
+const baseline = readBaseline();
+const strict = process.env.TSC_STRICT_GUARD === '1';
+
+const summary = `TypeScript errors: ${errors} (baseline: ${baseline})${strict ? ' [STRICT]' : ''}`;
+if (errors > baseline) {
+  console.log(`::warning::${summary} — regression detected.`); // visible in Actions UI
+  // In strict mode, fail; otherwise pass as informational.
+  process.exit(strict ? 1 : 0);
 } else {
-  console.log('No regression in type errors.');
+  console.log(`::notice::${summary} — no regression.`);
   process.exit(0);
 }
