@@ -2,10 +2,10 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { supabaseServer } from "@/lib/supabase/server";
+import { createServerClientSafe } from "@/lib/supabase/server";
 
 export default async function JobsPage() {
-  const supabase = supabaseServer();
+  const supabase = createServerClientSafe();
 
   const { data: jobs, error } = await supabase
     .from("jobs")
