@@ -4,7 +4,7 @@ function read(key: string, fallback?: string) {
   return v;
 }
 
-export const ENV = {
+const baseEnv = {
   NODE_ENV: read('NODE_ENV', 'development')!,
   APP_ORIGIN: read('NEXT_PUBLIC_APP_ORIGIN', 'http://localhost:3000')!,
   SUPABASE_URL: read('NEXT_PUBLIC_SUPABASE_URL', ''),
@@ -13,4 +13,6 @@ export const ENV = {
   // SUPABASE_SERVICE_ROLE: read('SUPABASE_SERVICE_ROLE', ''),
 };
 
-export const IS_PROD = ENV.NODE_ENV === 'production';
+export const env = baseEnv;
+export const ENV = env;
+export const IS_PROD = env.NODE_ENV === 'production';

@@ -15,6 +15,8 @@ export interface GigCardData {
   region: string | null;
   rate: number | null;
   created_at: string;
+  city_name?: string;
+  province_code?: string;
 }
 
 export interface GigsResponse {

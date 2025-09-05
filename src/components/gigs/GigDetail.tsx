@@ -1,6 +1,6 @@
 import type { GigDetail as Gig } from '@/types/gigs';
 
-export default function GigDetail({ gig }: { gig: Gig }) {
+export default function GigDetailComponent({ gig }: { gig: Gig }) {
   return (
     <div className="space-y-2">
       <h1 className="text-2xl font-semibold">{gig.title}</h1>

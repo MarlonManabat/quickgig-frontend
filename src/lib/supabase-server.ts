@@ -1,11 +1,12 @@
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies, headers } from 'next/headers';
 
 export function getServerSupabase() {
-  const { cookies, headers } = require('next/headers') as typeof import('next/headers');
   const cookieStore = cookies();
+  const h = headers();
   // headers is referenced for auth-helpers context; no need to pass explicitly with pages client
   return createPagesServerClient(
-    { cookies: () => cookieStore, headers } as any,
+    { cookies: () => cookieStore, headers: () => h } as any,
     {
       supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
       supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

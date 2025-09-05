@@ -212,3 +212,10 @@
 - Replaced legacy `<img>` tags with Next.js `<Image>`.
 - Lint workflow now runs `npx eslint . --max-warnings=0`.
 - Check name preserved: `Lint / eslint (pull_request)`.
+
+## 2025-09-09 — TypeScript Fix Pass 1
+
+- Added ambient shims for legacy modules and ensured `tsconfig.json` includes them.
+- Corrected `next/headers` and `env` usage.
+- Narrowed DTOs for gig cards.
+- Type Check remains informational for this pass.

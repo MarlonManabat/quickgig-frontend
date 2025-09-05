@@ -1,4 +1,4 @@
-import GigDetail from '@/components/gigs/GigDetail';
+import GigDetailComponent from '@/components/gigs/GigDetail';
 import { ApplyPanel } from '@/components/gigs/ApplyPanel';
 import Empty from '@/components/gigs/Empty';
 import { getOrigin } from '@/lib/origin';
@@ -25,7 +25,7 @@ export default async function GigPage({ params }: { params: { id: string } }) {
   }
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-4">
-      <GigDetail gig={gig} />
+      <GigDetailComponent gig={gig} />
       <ApplyPanel gigId={params.id} />
     </main>
   );
