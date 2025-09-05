@@ -1,5 +1,12 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-09-05 — CI harden: strict Smoke, stable checks
+
+- Switched **Smoke (PR)** to `npm ci` (strict) now that **Lock Guard** syncs `package-lock.json` on PRs.
+- Smoke builds Next, boots on port 3000, and verifies readiness via **/api/healthz**.
+- Kept check names stable: **Lint**, **Type Check**, **Smoke (PR)** (recognized by branch protection).
+- Leaves `.nvmrc` (Node 20) and `.npmrc` (`audit=false`, `fund=false`) as-is.
+
 ## 2025-09-03
 - Added `NEXT_PUBLIC_APP_ORIGIN` and `src/lib/urls.ts` utility to centralize the app host.
 - Converted all landing CTAs (hero, nav, footer, and cards) to absolute links to the app:
