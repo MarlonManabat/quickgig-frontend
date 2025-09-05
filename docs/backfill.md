@@ -183,3 +183,12 @@
 - Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
 - Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
 
+## 2025-09-05 — Allow CI smoke without secrets
+- Lazily initialize Supabase clients so the server boots even when env vars are missing.
+- Ensured `start-server-and-test` dev dependency is available for the smoke runner.
+- Simplified `Smoke (PR)` workflow to build, start, and ping `/api/healthz`.
+- Acceptance criteria:
+  - ✔ Lint / eslint (pull_request)
+  - ✔ Type Check / tsc (pull_request)
+  - ✔ Smoke (PR) / pr (pull_request)
+
