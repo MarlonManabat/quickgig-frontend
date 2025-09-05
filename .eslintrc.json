@@ -9,8 +9,10 @@
     "ecmaFeatures": { "jsx": true }
   },
   "ignorePatterns": [
+    "legacy_pages_disabled/**",
     "landing_public_html/**",
     "public_html/**",
+    "stubs/**",
     "node_modules/**"
   ],
   "rules": {
