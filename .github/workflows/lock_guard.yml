@@ -1,0 +1,60 @@
+name: Lock Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '**/*.md'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  lock_guard:
+    runs-on: ubuntu-22.04
+    if: ${{ !github.event.pull_request.draft }}
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          # checkout the contributor's branch, not a detached SHA
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      # IMPORTANT: npm install (not ci) so lockfile can be updated
+      - name: Update lockfile
+        run: |
+          npm install --no-audit --fund=false --loglevel=error
+
+      - name: Commit & push lockfile if changed
+        run: |
+          git config user.name "CI Lock Guard"
+          git config user.email "ci-lock-guard@users.noreply.github.com"
+
+          if [[ -n "$(git status --porcelain package-lock.json)" ]]; then
+            git add package-lock.json
+            git commit -m "chore(lockfile): sync package-lock.json (CI self-heal)"
+            git push origin "HEAD:${{ github.head_ref }}"
+            echo "LOCK_UPDATED=true" >> $GITHUB_ENV
+          else
+            echo "LOCK_UPDATED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Summary
+        run: |
+          if [[ "${{ env.LOCK_UPDATED }}" == "true" ]]; then
+            echo "Lock Guard updated and pushed **package-lock.json** to \`${{ github.head_ref }}\`." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Lock Guard: no lockfile changes." >> $GITHUB_STEP_SUMMARY
+          fi
