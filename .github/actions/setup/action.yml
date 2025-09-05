@@ -1,0 +1,15 @@
+name: Setup Node and npm cache
+description: Sets up Node 20, npm 10, restores npm cache
+inputs: {}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+        cache: 'npm'
+    - name: Print versions
+      shell: bash
+      run: |
+        node -v
+        npm -v

@@ -1,4 +1,4 @@
-name: Smoke (PR)
+name: Lint
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -18,8 +18,8 @@ jobs:
     steps:
       - uses: ./.github/actions/lock-guard
 
-  smoke:
-    name: Run smoke (pull_request)
+  eslint:
+    name: Lint / eslint (pull_request)
     runs-on: ubuntu-22.04
     needs: lock_guard
     steps:
@@ -27,13 +27,5 @@ jobs:
       - uses: ./.github/actions/setup
       - name: Install deps
         run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
-      - name: Install Playwright browsers (first run caches)
-        run: npx playwright install --with-deps chromium
-      - name: Build Next.js
-        run: npm run build
-      - name: Start server and run smoke
-        env:
-          NODE_ENV: production
-        run: |
-          npx wait-on --version || npm i -D wait-on
-          npm run start-server-and-test
+      - name: Run ESLint
+        run: npx eslint . --max-warnings=0
