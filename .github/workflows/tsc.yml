@@ -1,7 +1,12 @@
 name: Type Check
+
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   tsc:
@@ -10,8 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
-          cache: "npm"
-      - run: npm install --ignore-scripts --no-audit --fund=false --loglevel=error
-      - run: npx tsc --noEmit --skipLibCheck
-        continue-on-error: true
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+      - run: npm run typecheck
