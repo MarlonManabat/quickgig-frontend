@@ -1,0 +1,16 @@
+name: Lint
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  eslint:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+      - run: npm install --ignore-scripts --no-audit --fund=false --loglevel=error
+      - run: npx eslint .
