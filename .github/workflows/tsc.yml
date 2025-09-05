@@ -1,4 +1,4 @@
-name: Smoke (PR)
+name: Type Check
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -6,9 +6,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  pr:
+  tsc:
     runs-on: ubuntu-22.04
-    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,5 +15,4 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
-      - run: npm run build
-      - run: npm run start-server-and-test  # uses our package.json script to start Next then run PW smoke
+      - run: npx tsc --noEmit

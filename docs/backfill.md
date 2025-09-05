@@ -166,3 +166,5 @@
 - Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
 - Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
 
+- 2025-09-05: CI fix — ensure PR checks run (Lint/Type/Smoke), Lock Guard pushes to PR branch, added CI concurrency, and kicked CI on PR to clear “Expected” pending state.
+
