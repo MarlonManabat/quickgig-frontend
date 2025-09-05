@@ -1,16 +1,17 @@
-name: Smoke (PR)
+name: Type Check
 
 on:
   pull_request:
     branches: [ main ]
+  push:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  run-smoke:
-    name: Run smoke
+  tsc:
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Bootstrap smoke (no-op)
-        run: echo "Smoke bootstrap OK"
+      - name: Bootstrap type check (no-op)
+        run: echo "TS bootstrap OK"
