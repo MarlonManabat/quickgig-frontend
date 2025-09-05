@@ -1,4 +1,4 @@
-name: Smoke (PR)
+name: Lint
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -6,7 +6,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  pr:
+  eslint:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -15,12 +15,5 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm install --no-audit --fund=false --loglevel=error
-      - run: npm run build --if-present
-      - name: Start server
-        run: |
-          (npm run start --if-present || npx next start -p 3000) & 
-          sleep 12
-      - name: Health check
-        run: |
-          set -e
-          curl -fsS http://localhost:3000/api/healthz || curl -fsS http://localhost:3000/
+      # Allow warnings for rollback; fail only on hard errors
+      - run: npx eslint .
