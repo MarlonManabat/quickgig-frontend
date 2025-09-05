@@ -1,0 +1,35 @@
+name: Status report
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: Days to look back
+        required: false
+        default: '30'
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run report:status
+        env:
+          DAYS: ${{ github.event.inputs.days || 30 }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: date
+        run: echo "today=$(date -u +%F)" >> $GITHUB_OUTPUT
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: status report ${{ steps.date.outputs.today }}"
+          branch: status/${{ steps.date.outputs.today }}
+          title: "chore: status report ${{ steps.date.outputs.today }}"
+          body: "Automated status report"
+          add-paths: docs/status/status-${{ steps.date.outputs.today }}.md
