@@ -2,9 +2,8 @@ import { supabaseBrowser } from "@/lib/supabase/browser";
 import type { Gig } from "@/lib/db/types";
 import type { Insert, Update } from "@/types/db";
 
-const supabase = supabaseBrowser();
-
 export function listGigs() {
+  const supabase = supabaseBrowser();
   return supabase
     .from("gigs")
     .select("*")
@@ -12,10 +11,12 @@ export function listGigs() {
 }
 
 export function getGig(id: number) {
+  const supabase = supabaseBrowser();
   return supabase.from("gigs").select("*").eq("id", id).single();
 }
 
 export function createGig(gig: Partial<Gig>) {
+  const supabase = supabaseBrowser();
   return supabase
     .from("gigs")
     .insert([{ ...(gig as any) } satisfies Insert<"gigs">])
@@ -24,6 +25,7 @@ export function createGig(gig: Partial<Gig>) {
 }
 
 export function updateGig(id: number, gig: Partial<Gig>) {
+  const supabase = supabaseBrowser();
   return supabase
     .from("gigs")
     .update((gig as Update<"gigs">))
@@ -33,6 +35,7 @@ export function updateGig(id: number, gig: Partial<Gig>) {
 }
 
 export async function toggleSave(id: number, saved: boolean) {
+  const supabase = supabaseBrowser();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -52,6 +55,7 @@ export async function toggleSave(id: number, saved: boolean) {
 }
 
 export async function applyToGig(id: number, message: string) {
+  const supabase = supabaseBrowser();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -64,6 +68,7 @@ export async function applyToGig(id: number, message: string) {
 }
 
 export async function listMyApplications() {
+  const supabase = supabaseBrowser();
   const {
     data: { user },
   } = await supabase.auth.getUser();
