@@ -22,9 +22,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      # Tolerant install for smoke to avoid lockfile strictness (EUSAGE)
-      - name: Install dependencies (tolerant)
-        run: npm install --no-audit --fund=false --loglevel=error
+      - name: Install dependencies (strict)
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
 
       - name: Build
         env:
@@ -32,22 +31,8 @@ jobs:
           NEXT_TELEMETRY_DISABLED: '1'
         run: npm run build
 
-      - name: Start Next server
+      - name: Start server & verify /api/healthz
         env:
           NODE_ENV: production
-          NEXT_TELEMETRY_DISABLED: '1'
-          PORT: 3000
         run: |
-          nohup npm run start >/dev/null 2>&1 &
-
-      - name: Wait for /api/healthz
-        run: |
-          for i in {1..30}; do
-            if curl -fsS http://localhost:3000/api/healthz >/dev/null; then
-              echo "healthz is up"
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "::error::healthz endpoint did not become ready"
-          exit 1
+          npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000/api/healthz" "node -e 'process.exit(0)'"
