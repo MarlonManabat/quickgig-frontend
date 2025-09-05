@@ -192,3 +192,11 @@
   - ✔ Type Check / tsc (pull_request)
   - ✔ Smoke (PR) / pr (pull_request)
 
+
+## 2025-09-05 — CI: Add Lock Guard to auto-sync package-lock.json on PRs
+
+- Adds `.github/workflows/lock_guard.yml` to refresh and push lockfile to PR branches when drift is detected.
+- Prevents `npm ci` EUSAGE/missing deps flakes by keeping lockfile in sync.
+- No changes to `lint`, `tsc`, or `smoke` semantics introduced in the previous PR.
+- Acceptance: open a test PR with a deliberate lockfile drift and confirm Lock Guard pushes a fix commit back to that PR.
+
