@@ -166,3 +166,9 @@
 - Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
 - Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
 
+## 2025-09-05 — Root-cause CI & deploy guardrails
+- Pin Node 20/npm 10 across local/CI/Vercel; Vercel falls back to npm install on first run.
+- Make CSS toolchain runtime deps; add browserslist + fraction.js; verify script blocks regressions.
+- Decouple lint/type from Vercel builds (Next ignores during build); CI enforces via **Type Check** + **Lint** jobs.
+- PR workflow adds **Lock Guard** that auto-syncs `package-lock.json` back to the PR branch if `npm ci` fails.
+- Playwright runs on ubuntu-22.04 with `--with-deps chromium`.
