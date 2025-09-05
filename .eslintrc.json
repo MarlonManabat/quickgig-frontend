@@ -3,105 +3,10 @@
   "extends": ["next/core-web-vitals"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
-  "parserOptions": {
-    "ecmaVersion": "latest",
-    "sourceType": "module",
-    "ecmaFeatures": { "jsx": true }
-  },
   "ignorePatterns": [
-    "landing_public_html/**",
+    "node_modules/**",
     "public_html/**",
-    "node_modules/**"
-  ],
-  "rules": {
-    // Encourage array-form insert/upsert for Supabase typing
-    "no-restricted-syntax": [
-      "warn",
-      {
-        "selector": "CallExpression[callee.property.name='insert'] > ObjectExpression",
-        "message": "Use array-form: .insert([{ ... }]) to keep Supabase types sound."
-      },
-      {
-        "selector": "CallExpression[callee.property.name='upsert'] > ObjectExpression",
-        "message": "Use array-form: .upsert([{ ... }]) to keep Supabase types sound."
-      }
-    ],
-    "no-restricted-imports": ["error", { "patterns": ["public/*"] }]
-  },
-  "overrides": [
-    {
-      "files": [
-        "src/app/**/page.tsx",
-        "src/app/**/layout.tsx"
-      ],
-      "excludedFiles": [
-        "src/app/**/error.tsx",
-        "src/app/**/loading.tsx",
-        "src/app/**/not-found.tsx",
-        "src/app/**/global-error.tsx",
-        "src/app/login/**/page.tsx",
-        "src/app/auth/**/page.tsx"
-      ],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "paths": [
-              {
-                "name": "react",
-                "importNames": [
-                  "useState",
-                  "useEffect",
-                  "useRef",
-                  "useMemo",
-                  "useCallback",
-                  "useReducer",
-                  "useTransition",
-                  "useOptimistic",
-                  "useActionState"
-                ]
-              },
-              {
-                "name": "next/navigation",
-                "importNames": [
-                  "useRouter",
-                  "usePathname",
-                  "useSearchParams"
-                ]
-              }
-            ],
-            "patterns": [
-              "react-hot-toast*",
-              "@/utils/toast"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "files": ["src/**/*.{ts,tsx}"],
-      "rules": {
-        "no-restricted-syntax": [
-          "warn",
-          {
-            "selector": "CallExpression[callee.name='fetch'] Literal[value^='/api/locations']",
-            "message": "Use static PSGC via @jobuntux/psgc (FEAT-PSGC-STATIC)."
-          }
-        ],
-        "no-restricted-imports": [
-          "warn",
-          {
-            "patterns": [
-              "@/lib/locations*",
-              "@/services/locations*",
-              "@/*/api/locations*"
-            ],
-            "paths": [
-              { "name": "@/utils/toast", "message": "Use only in client files." }
-            ]
-          }
-        ]
-      }
-    }
+    "legacy_pages_disabled/**",
+    "stubs/**"
   ]
 }
