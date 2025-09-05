@@ -212,3 +212,8 @@
 - Replaced legacy `<img>` tags with Next.js `<Image>`.
 - Lint workflow now runs `npx eslint . --max-warnings=0`.
 - Check name preserved: `Lint / eslint (pull_request)`.
+
+## 2025-09-10 — Guard TypeScript errors with baseline
+
+- Type Check workflow now fails only when type error count increases beyond `docs/tsc-baseline.json`.
+- To reduce the baseline after fixing errors, update `docs/tsc-baseline.json` with the new count in your PR.

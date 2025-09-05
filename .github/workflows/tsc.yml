@@ -19,8 +19,4 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
-      - name: Run npm run typecheck (non-blocking)
-        run: npm run typecheck
-        continue-on-error: true
-      - name: Mark informational
-        run: echo "::notice title=Typecheck::Ran tsc non-blocking; see logs for errors."
+      - run: node .github/scripts/tsc-ci.mjs
