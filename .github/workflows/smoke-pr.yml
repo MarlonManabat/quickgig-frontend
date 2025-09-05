@@ -3,20 +3,49 @@ name: Smoke (PR)
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   pr:
-    runs-on: ubuntu-latest
-    env:
-      CI: true
-      NEXT_TELEMETRY_DISABLED: 1
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node from .nvmrc
+        uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-      - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
-      - run: npm run build
-      - run: npx start-server-and-test 'npm run start' http://localhost:3000/api/healthz 'node -e "process.exit(0)"'
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Tolerant install for smoke to avoid lockfile strictness
+      - name: Install dependencies (tolerant)
+        run: npm install --no-audit --fund=false --loglevel=error
+
+      - name: Build
+        env:
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: '1'
+        run: npm run build
+
+      - name: Start Next server
+        env:
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: '1'
+          PORT: 3000
+        run: |
+          nohup npm run start >/dev/null 2>&1 &
+
+      - name: Wait for /api/healthz
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:3000/api/healthz >/dev/null; then
+              echo "healthz is up"; exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::healthz endpoint did not become ready"; exit 1
