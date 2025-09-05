@@ -10,7 +10,6 @@ on:
   schedule:
     - cron: '0 0 * * 0' # weekly, UTC
 
-# Needed so the workflow can push a branch + open a PR
 permissions:
   contents: write
   pull-requests: write
@@ -22,6 +21,11 @@ concurrency:
 jobs:
   report:
     runs-on: ubuntu-22.04
+    env:
+      # make token available to Node/Octokit/gh and scripts
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
