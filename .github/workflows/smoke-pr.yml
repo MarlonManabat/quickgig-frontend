@@ -2,55 +2,36 @@ name: Smoke (PR)
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   pr:
-    runs-on: ubuntu-latest
+    name: Run smoke
+    runs-on: ubuntu-22.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
-      - name: Use Node 20
-        uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
           cache: 'npm'
-
-      - name: Verify lock sync
-        run: npm run ci:lock
-
-      - name: Install deps
-        run: npm run ci:install
-
-      # Robust Playwright browser install (works even after cache busts)
-      - name: Install Playwright browsers
-        uses: microsoft/playwright-github-action@v1
-        with:
-          # only chromium is needed for our smokes
-          with-deps: true
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+      - run: npx playwright install --with-deps chromium
+      - name: Build
+        run: npm run build
+      - name: Start server and run smoke
         env:
-          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
-
-      - name: Start dev server
-        run: |
-          nohup npm run dev >/dev/null 2>&1 &
-          echo $! > .pidfile
-
-      - name: Wait for dev server
-        run: |
-          for i in {1..60}; do
-            curl -fsS http://localhost:3000 >/dev/null && exit 0
-            sleep 1
-          done
-          echo "Dev server failed to start" && exit 1
-
-      - name: Run smoke tests (no webServer)
-        run: npx playwright test -c playwright.smoke.ts
-        env:
-          BASE_URL: http://localhost:3000
-
-      - name: Stop dev server
-        if: always()
-        run: if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi
+          NEXT_TELEMETRY_DISABLED: "1"
+          PORT: "3000"
+          NEXT_PUBLIC_SUPABASE_URL: "http://localhost:54321"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "test_anon_key"
+          SUPABASE_URL: "http://localhost:54321"
+          SUPABASE_ANON_KEY: "test_anon_key"
+          SUPABASE_SERVICE_ROLE_KEY: "test_service_role"
+          SMOKE: "1"
+        run: npx start-server-and-test \
+             "npm run start" http-get://localhost:3000/api/healthz \
+             "npx playwright test -c playwright.smoke.ts"

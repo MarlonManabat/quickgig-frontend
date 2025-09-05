@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { supabaseServer } from '@/lib/supabase/server';
+import { createServerClientSafe } from '@/lib/supabase/server';
 import { ROUTES } from '@/lib/routes';
 import { toAppPath } from '@/lib/routes';
 import { loginNext } from '@/app/lib/authAware';
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function ApplicationsPage() {
-  const supabase = supabaseServer();
+  const supabase = createServerClientSafe();
   const { data } = await supabase.auth.getUser();
   const user = data?.user;
 
