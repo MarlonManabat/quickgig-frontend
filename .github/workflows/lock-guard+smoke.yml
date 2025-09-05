@@ -1,0 +1,73 @@
+name: Smoke (PR)
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lock_guard:
+    name: Verify lockfile consistency
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write   # allow committing back to PR branch
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # Re-resolve lockfile deterministically without running scripts
+      - name: Sync lockfile (no scripts)
+        run: npm install --package-lock-only --no-audit --no-fund --loglevel=error
+
+      - name: Commit lockfile if changed
+        run: |
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "chore(ci): sync lockfile"
+            git push
+            echo "LOCKFILE_SYNCED=true" >> $GITHUB_ENV
+          fi
+
+  smoke_pr:
+    name: Run smoke (pull_request)
+    needs: lock_guard
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    env:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      # Provide harmless placeholders so the app can boot even if Supabase env isn’t set
+      NEXT_PUBLIC_SUPABASE_URL: "http://localhost/placeholder"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # STRICT install: fail fast if lock is still out of sync
+      - name: Install deps (strict)
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+
+      - name: Install Playwright (Chromium only)
+        run: npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Start server and run smokes
+        run: npm run smoke
