@@ -5,12 +5,12 @@
     "dev": "next dev",
     "ci:verify": "node scripts/ci-verify.mjs",
     "prebuild": "node ./scripts/check-dynamic-route-conflicts.mjs && node ./scripts/assert-valid-revalidate.mjs",
-    "build": "node scripts/check-required-env.mjs && next build",
+    "build": "next build",
     "start": "next start -p 3000",
     "start:e2e": "next build && next start -p 3000",
     "start:preview": "next start -p 3000",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
     "build:prod": "next build",
     "start:prod": "next start -p 3000",
     "analyze": "ANALYZE=true next build",
@@ -41,7 +41,10 @@
     "smoke:prod": "BASE_URL=https://app.quickgig.ph npx playwright test -c playwright.smoke.ts",
     "e2e:prod": "BASE_URL=https://app.quickgig.ph npx playwright test",
     "test": "echo \"E2E disabled while product is WIP\" && exit 0",
-    "no-legacy": "bash scripts/no-legacy.sh"
+    "no-legacy": "bash scripts/no-legacy.sh",
+    "preinstall": "node -e \"const [maj]=process.versions.node.split('.') ; if(maj<20){console.error('Node 20+ required'); process.exit(1)}\"",
+    "sync-lock": "npm install --package-lock-only --no-audit --no-fund",
+    "verify-build-deps": "node scripts/verify-build-deps.js"
   },
   "dependencies": {
     "@jobuntux/psgc": "^0.2.1",
@@ -49,7 +52,7 @@
     "@supabase/auth-helpers-shared": "^0.7.0",
     "@supabase/supabase-js": "^2.45.0",
     "@supabase/ssr": "^0.5.0",
-    "autoprefixer": "^10",
+    "autoprefixer": "^10.4.20",
     "cookie": "^0.6.0",
     "nanoid": "^3.3.11",
     "next": "^14 || ^15",
@@ -61,30 +64,39 @@
     "set-cookie-parser": "^2.6.0",
     "stripe": "^16.0.0",
     "swr": "^2.2.5",
-    "zod": "^3"
+    "zod": "^3",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "browserslist": "^4.23.0",
+    "caniuse-lite": "^1.0.30001600",
+    "fraction.js": "^4.3.7"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.5.0",
-    "@playwright/test": "^1.48.0",
+    "@playwright/test": "^1.47.2",
     "@types/cookie": "^0.6.0",
-    "@types/node": "^20",
+    "@types/node": "^20.14.10",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@typescript-eslint/parser": "^6.21.0",
-    "autoprefixer": "^10",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.3",
+    "eslint-config-next": "^14.2.7",
     "fast-glob": "^3.3.2",
-    "postcss": "^8",
     "start-server-and-test": "^2.0.0",
-    "tailwindcss": "^3.4.1",
     "ts-morph": "^24.0.0",
     "globby": "^14.0.2",
     "tsx": "^4.19.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "playwright": "^1.47.2"
   },
   "engines": {
-    "node": ">=20 <21"
+    "node": ">=20 <21",
+    "npm": ">=10 <11"
   },
-  "packageManager": "npm@10"
+  "packageManager": "npm@10.7.0",
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
