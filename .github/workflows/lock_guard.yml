@@ -1,0 +1,50 @@
+name: Lock Guard
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lock_guard:
+    name: lock_guard
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Try strict install (report-only)
+        id: strict
+        continue-on-error: true
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+
+      - name: Sync lockfile on mismatch
+        if: steps.strict.outcome == 'failure'
+        run: |
+          npm install --ignore-scripts --no-audit --fund=false --package-lock-only
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "No lockfile changes."
+            exit 0
+          fi
+          git commit -m "chore(lockfile): sync package-lock.json (CI self-heal)"
+          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:${{ github.head_ref }}

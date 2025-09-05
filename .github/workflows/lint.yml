@@ -1,0 +1,17 @@
+name: Lint
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      - run: npm run ci:lock
+      - run: npm run ci:install
+      - run: npm run lint
