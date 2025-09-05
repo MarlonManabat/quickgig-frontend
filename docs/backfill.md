@@ -166,3 +166,13 @@
 - Simplified auth-aware redirect helper to build regexes safely and dropped legacy `navm-*` menu fallbacks.
 - Mobile nav smokes now open `nav-menu` explicitly and rely on unique `navm-*` link IDs.
 
+
+## 2025-09-05 — CI cleanup: dedupe workflows & finalize required checks
+- Removed duplicate/obsolete workflow files and bootstrap jobs.
+- Canonicalized PR checks to match ruleset:
+  - Lint / eslint (pull_request)
+  - Type Check / tsc (pull_request)
+  - Smoke (PR) / Run smoke (pull_request)
+- Renamed push variants to include “(push)” to avoid sidebar duplication.
+- Added concurrency to prevent overlapping runs on the same ref.
+- Outcome: Actions list is clean; branch protection gates align with actual PR jobs.

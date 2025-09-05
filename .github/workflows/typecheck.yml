@@ -1,6 +1,6 @@
-name: Smoke (push) / Run smoke on push
+name: Type Check / tsc (pull_request)
 on:
-  push:
+  pull_request:
     branches: [ main ]
 permissions:
   contents: read
@@ -8,17 +8,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  push:
+  tsc:
     runs-on: ubuntu-22.04
-    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: 'npm'
-      - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
-      - run: npx playwright install --with-deps chromium
-      - run: npm run build
-      - run: npm run start-server-and-test
-      - run: npm run smoke
+      - run: npm ci --no-audit --fund=false --loglevel=error
+      - run: npx tsc --noEmit
