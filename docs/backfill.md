@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-09-05 — CI bootstrap for branch protection
+- Added minimal GitHub Actions for required checks so ruleset “Lint / eslint”, “Type Check / tsc”, and “Smoke (PR) / Run smoke” appear and pass on PRs.
+- Purpose: unblock ruleset enforcement and allow clickable checks/logs while stricter CI lands in a follow-up PR.
+- Scope: workflows only; no app/runtime changes; safe to merge.
+- Next: merge this, then proceed with the stricter CI/root-cause guardrails PR (Node/npm standardization, lock guard, real lint/tsc, live-server Playwright smoke, healthz).
+
 ## 2025-09-03
 - Added `NEXT_PUBLIC_APP_ORIGIN` and `src/lib/urls.ts` utility to centralize the app host.
 - Converted all landing CTAs (hero, nav, footer, and cards) to absolute links to the app:
