@@ -5,6 +5,7 @@ export const ROUTES = {
   login: '/login',
   billingTickets: '/billing/tickets',
   accountTickets: '/account/tickets',
+  adminTickets: '/admin/tickets',
 } as const;
 export type AppPath = (typeof ROUTES)[keyof typeof ROUTES];
 

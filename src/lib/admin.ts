@@ -1,5 +1,17 @@
 import { supabase } from "@/lib/supabaseClient";
 
+export function parseAdminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isAdmin(email?: string | null) {
+  if (!email) return false;
+  return parseAdminEmails().includes(email.toLowerCase());
+}
+
 export async function listUsers({ q = "", limit = 50, offset = 0 } = {}) {
   // expects profiles has: id, email, role, suspended_at, created_at
   let query = supabase

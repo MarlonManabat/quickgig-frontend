@@ -237,3 +237,10 @@
 - Added server endpoint to confirm agreements and atomically spend 1 ticket via spend_one_ticket('agreement_burn').
 - Blocks confirmation with 402 when balance is 0; client shows a disabled button with tooltip.
 - Balance shown near CTA; auto-updates on success.
+
+## 2025-09-06 — Admin ticket grants
+- Added enum value `admin_grant` to ticket_entry_type and RPC `admin_grant_tickets(user, amount, note)`.
+- New API POST /api/tickets/grant guarded by ADMIN_EMAILS; uses service role after server-side admin check.
+- Admin UI at /admin/tickets to grant tickets by email; shows own balance.
+- Balance function/view updated to treat `admin_grant` as credit.
+- Env: ADMIN_EMAILS (comma-separated).
