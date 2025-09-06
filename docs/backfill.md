@@ -26,6 +26,11 @@
 - Moved middleware to `src/middleware.ts` with explicit matchers for only the routes tested in smoke.
 - `/api/tickets/balance` lazily initializes Supabase and returns `{ balance: 0 }` when credentials are missing or in `MOCK_MODE`.
 
+## 2025-11-19 — Finalize CI middleware mocks
+- Middleware now redirects `/` to `/browse-jobs` and ensures elements are always visible.
+- Added stubs for `/tickets-topup` and `/tickets/topup` with `pending order` status.
+- Removed `metadataBase` from `next.config.js` (unused top-level key).
+
 ## 2025-11-03 — Apply + My Applications E2E
 - Supabase migration for `applications` table with RLS policies.
 - API routes `/api/applications/create` and `/api/applications/me`.

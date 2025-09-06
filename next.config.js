@@ -4,7 +4,6 @@ const path = require('path');
 const baseConfig = {
   reactStrictMode: true,
   images: { formats: ["image/avif", "image/webp"] },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_ORIGIN || 'http://localhost:3000'),
   // Keep CI green while product is WIP; ts errors in test helpers won’t block builds.
   typescript: {
     ignoreBuildErrors: true

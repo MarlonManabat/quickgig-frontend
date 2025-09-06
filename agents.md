@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-11-18
+**Version:** 2025-11-19
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -20,6 +20,7 @@
 - In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
 
 ## Legacy redirects (middleware)
+- `/`      → `/browse-jobs`
 - `/find`      → `/browse-jobs`
 - `/gigs/create`  → `/post-job` (CI mock bypasses auth)
 - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
@@ -38,7 +39,7 @@
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
 - `scripts/check-cta-links.mjs` ensures CTAs point only to canonical routes.
-- Middleware (`src/middleware.ts`) serves stub pages in `MOCK_MODE` for `/, /browse-jobs, /jobs/:id, /applications, /tickets, /tickets/buy, /gigs/create`.
+- Middleware (`src/middleware.ts`) serves stub pages in `MOCK_MODE` for `/, /browse-jobs, /jobs/:id, /applications, /tickets, /tickets/buy, /tickets-topup, /tickets/topup, /gigs/create` and redirects `/` to `/browse-jobs`.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-09-09 -->
