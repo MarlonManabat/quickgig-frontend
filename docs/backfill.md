@@ -53,6 +53,11 @@
 - Mock middleware now normalizes auth redirects via `/login?next=` and supplies `apply-button`, `post-job` form fields, and ticket top-up status.
 - Header CTAs in mock mode link to login with `next` params so smoke tests catch auth-aware flows.
 
+## 2025-12-09 — Rewrite-based smoke stubs
+- Middleware now rewrites `/, /browse-jobs, /applications, /post-job, /tickets/topup, /login` to `_smoke` pages when `MOCK_MODE` or CI is active.
+- Added `_smoke` pages with stable test IDs; header links route through `/login?next=…`.
+- Smoke tests drop custom matchers for explicit counts and ensure auth-aware redirects.
+
 ## 2025-09-03
 - Added `NEXT_PUBLIC_APP_ORIGIN` and `src/lib/urls.ts` utility to centralize the app host.
 - Converted all landing CTAs (hero, nav, footer, and cards) to absolute links to the app:

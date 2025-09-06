@@ -1,5 +1,5 @@
 const base = (process.env.CTA_BASE || 'http://localhost:3000').replace(/\/$/, '');
-const pages = ['/', '/browse-jobs', '/tickets'];
+const pages = ['/', '/browse-jobs', '/tickets/topup'];
 
 const results = [];
 

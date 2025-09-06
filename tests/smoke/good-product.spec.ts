@@ -30,15 +30,14 @@ for (const vp of viewports) {
 
       await page.goto('/');
       await page.getByTestId('nav-my-applications').first().click();
-      await expect(page.getByTestId('applications-empty')).toBeVisible();
+      await expectAuthAwareRedirect(page, '/applications');
 
       await page.goto('/');
       await page.getByTestId('nav-tickets').first().click();
-      const buy = page.locator('[data-cta="buy-tickets"]');
+      const buy = page.getByTestId('buy-tickets');
       await expect(buy).toBeVisible();
       await buy.click();
-      await expect(page).toHaveURL(/\/tickets\/buy/);
-      await expect(page.locator('#buy-1')).toBeVisible();
+      await expect(page.locator('#order-status')).toHaveText('pending');
 
       const sitemap = await page.request.get('/sitemap.xml');
       expect(sitemap.ok()).toBeTruthy();

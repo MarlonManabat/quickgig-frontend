@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-11-05 -->
+<!-- AGENT CONTRACT v2025-12-09 -->
 
 # Product Acceptance (Good Product Bar)
 
