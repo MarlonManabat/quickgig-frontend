@@ -3,6 +3,8 @@ export const ROUTES = {
   postJob: '/gigs/create',
   applications: '/applications',
   login: '/login',
+  billingTickets: '/billing/tickets',
+  accountTickets: '/account/tickets',
 } as const;
 export type AppPath = (typeof ROUTES)[keyof typeof ROUTES];
 

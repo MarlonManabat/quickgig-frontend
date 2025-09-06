@@ -224,3 +224,11 @@
 - Created `tickets_burn_on_agreement(employer, jobseeker, agreement_id)` RPC to atomically debit both parties and log transactions.
 - Enabled RLS for read-your-own on both tables; writes occur via service-role RPC only.
 - Backfilled existing users with an account and a one-time signup bonus if missing.
+
+## 2025-10-15 — Tickets: RLS + RPC + Balance UI
+- Enable RLS for ticket_ledger; owners can read their rows.
+- Block direct writes; expose SECURITY DEFINER RPCs:
+  - award_signup_bonus() — idempotent, grants 3 on first call
+  - spend_one_ticket(reason text, meta jsonb) — debits 1 if balance > 0
+  - ticket_balance(user_id uuid = auth.uid()) — returns int
+- Added /api/tickets/balance and a TicketBadge used in header + /account/tickets page.
