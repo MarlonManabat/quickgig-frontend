@@ -232,3 +232,8 @@
   - spend_one_ticket(reason text, meta jsonb) — debits 1 if balance > 0
   - ticket_balance(user_id uuid = auth.uid()) — returns int
 - Added /api/tickets/balance and a TicketBadge used in header + /account/tickets page.
+
+## 2025-09-06 — Ticket spend on agreement
+- Added server endpoint to confirm agreements and atomically spend 1 ticket via spend_one_ticket('agreement_burn').
+- Blocks confirmation with 402 when balance is 0; client shows a disabled button with tooltip.
+- Balance shown near CTA; auto-updates on success.
