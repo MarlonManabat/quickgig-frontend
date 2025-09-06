@@ -5,6 +5,7 @@ import { useUser } from '@/hooks/useUser';
 import LinkApp from '@/components/LinkApp';
 import { NAV_ITEMS, ROUTES } from '@/lib/routes';
 import TicketBadge from '@/components/TicketBadge';
+import { isAdmin } from '@/lib/admin';
 
 export default function AppHeader() {
   const { user, signOut } = useUser();
@@ -19,6 +20,14 @@ export default function AppHeader() {
     }),
   );
   if (user) {
+    if (isAdmin(user.email)) {
+      links.push({
+        href: ROUTES.adminTickets,
+        label: 'Admin · Tickets',
+        testId: 'nav-admin-tickets',
+        mobileId: 'navm-admin-tickets',
+      });
+    }
     links.push({
       label: 'Sign out',
       onClick: () => signOut(),
