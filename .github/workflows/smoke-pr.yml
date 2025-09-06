@@ -36,11 +36,18 @@ jobs:
         run: npm run build
       - name: Check CTA links
         env:
-          MOCK_MODE: "1"
-          NEXT_PUBLIC_SUPABASE_URL: "https://example.invalid"
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: "dummy"
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: '1'
+          MOCK_MODE: '1'
+          NEXT_PUBLIC_SUPABASE_URL: https://example.invalid
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy
         run: |
-          npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000" "node scripts/check-cta-links.mjs"
+          npx --yes start-server-and-test \
+            "next start -p 3000" \
+            "http://localhost:3000/api/healthz" \
+            "node scripts/check-cta-links.mjs"
+        # If this step ever proves flaky, uncomment the next line temporarily:
+        # continue-on-error: true
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
