@@ -244,3 +244,6 @@
 - Admin UI at /admin/tickets to grant tickets by email; shows own balance.
 - Balance function/view updated to treat `admin_grant` as credit.
 - Env: ADMIN_EMAILS (comma-separated).
+### 2025-09-06
+- Fix preview build by making ticket API routes dynamic and deferring Supabase env reads to runtime.
+- Added `getAdminClient()` helper that never throws at import-time; routes return 503 when server env is missing.
