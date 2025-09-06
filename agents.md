@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-09
+**Version:** 2025-12-10
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -8,10 +8,8 @@
   - `data-testid="nav-browse-jobs"` → `/browse-jobs`
   - `data-testid="nav-post-job"` → `/post-job`
   - `data-testid="nav-my-applications"` → `/applications`
-- `data-testid="nav-tickets"` → `/tickets`
+  - `data-testid="nav-tickets"` → `/tickets`
   - `data-testid="nav-login"` → `/login`
-  - Tickets page CTA `data-cta="buy-tickets"` → `/tickets/topup`
-  - Tickets top-up stub exposes `#order-status` with a pending state
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
@@ -39,8 +37,8 @@
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
-- `scripts/check-cta-links.mjs` ensures CTAs point only to canonical routes.
-- Middleware (`src/middleware.ts`) rewrites `/, /browse-jobs, /applications, /post-job, /tickets/topup, /login` to `_smoke` pages when `MOCK_MODE` or CI is active and still redirects `/` to `/browse-jobs`.
+- `scripts/check-cta-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
+- Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-job`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-09-09 -->

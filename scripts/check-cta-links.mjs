@@ -1,13 +1,9 @@
 const base = (process.env.CTA_BASE || 'http://localhost:3000').replace(/\/$/, '');
-const pages = ['/', '/browse-jobs', '/tickets/topup'];
+const pages = ['/browse-jobs'];
 
 const results = [];
 
 const CTA_RE = /<a[^>]*data-cta="([^"]+)"[^>]*href="([^"]+)"/g;
-
-function isAuthRoute(path) {
-  return ['/post-job', '/applications'].includes(path);
-}
 
 for (const pagePath of pages) {
   const res = await fetch(base + pagePath);
@@ -18,18 +14,18 @@ for (const pagePath of pages) {
     const url = base + href;
     const resp = await fetch(url, { redirect: 'manual' });
     const status = resp.status;
-    if (status >= 400) {
-      results.push([id, href, status, 'FAIL']);
+    if (status === 200) {
+      results.push([id, href, status, 'OK']);
       continue;
     }
-    if (status >= 300 && isAuthRoute(href)) {
+    if (status === 302) {
       const loc = resp.headers.get('location') || '';
-      if (!loc.includes('/login?next=')) {
-        results.push([id, href, status, 'MISSING next']);
+      if (/^\/login\?next=/.test(loc)) {
+        results.push([id, href, status, 'OK']);
         continue;
       }
     }
-    results.push([id, href, status, 'OK']);
+    results.push([id, href, status, 'FAIL']);
   }
 }
 

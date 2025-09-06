@@ -39,8 +39,8 @@ jobs:
           NODE_ENV: production
           NEXT_TELEMETRY_DISABLED: '1'
           MOCK_MODE: '1'
-          NEXT_PUBLIC_SUPABASE_URL: https://example.invalid
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy
+          NEXT_PUBLIC_SUPABASE_URL: 'https://example.invalid'
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'dummy'
         run: |
           npx --yes start-server-and-test \
             "next start -p 3000" \
@@ -52,9 +52,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-ms-playwright-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-ms-playwright-
+            ${{ runner.os }}-playwright-
 
       - name: Setup Playwright browsers
         uses: microsoft/playwright-github-action@v1

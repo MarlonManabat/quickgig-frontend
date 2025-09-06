@@ -1,35 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import { isSmoke } from './lib/smoke';
 
-const inSmoke = process.env.MOCK_MODE === '1' || process.env.CI === 'true';
+export const config = {
+  matcher: [
+    '/((?!_next/|api/|_smoke/|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:js|css|png|jpg|jpeg|gif|svg|webp|ico)).*)',
+  ],
+};
 
-// exact-path rewrites only; avoids double path bugs
-const SMOKE_REWRITES: Record<string, string> = {
-  '/': '/_smoke/browse-jobs',
-  '/browse-jobs': '/_smoke/browse-jobs',
-  '/applications': '/_smoke/applications',
-  '/post-job': '/_smoke/post-job',
-  '/tickets/topup': '/_smoke/tickets-topup',
-  '/login': '/_smoke/login',
+const MAP: Record<string, string> = {
+  '/browse-jobs': '/smoke/browse-jobs',
+  '/post-job': '/smoke/post-job',
+  '/applications': '/smoke/applications',
+  '/tickets': '/smoke/tickets',
 };
 
 export function middleware(req: NextRequest) {
-  if (inSmoke) {
-    const dest = SMOKE_REWRITES[req.nextUrl.pathname as keyof typeof SMOKE_REWRITES];
-    if (dest) {
-      const url = req.nextUrl.clone();
-      url.pathname = dest; // no join => no double paths
-      return NextResponse.rewrite(url);
-    }
-  }
+  if (!isSmoke) return NextResponse.next();
 
-  // legacy redirect for root
-  if (req.nextUrl.pathname === '/' || req.nextUrl.pathname === '/index.html') {
-    return NextResponse.redirect(new URL('/browse-jobs', req.url), 308);
+  const url = new URL(req.url);
+  const dest = MAP[url.pathname];
+  if (dest) {
+    const to = new URL(dest, url.origin);
+    return NextResponse.rewrite(to);
   }
-
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: ['/', '/browse-jobs', '/applications', '/post-job', '/tickets/topup', '/login'],
-};
