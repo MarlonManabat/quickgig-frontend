@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-09-09
+**Version:** 2025-10-15
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).

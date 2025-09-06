@@ -4,12 +4,9 @@ import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import LinkApp from '@/components/LinkApp';
 import { NAV_ITEMS, ROUTES } from '@/lib/routes';
+import TicketBadge from '@/components/TicketBadge';
 
-type Props = {
-  balance: number;
-};
-
-export default function AppHeader({ balance }: Props) {
+export default function AppHeader() {
   const { user, signOut } = useUser();
   const [open, setOpen] = useState(false);
 
@@ -71,11 +68,9 @@ export default function AppHeader({ balance }: Props) {
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <span className="rounded-xl border px-2 py-1 text-sm" title="Tickets">
-            🎟️ {balance}
-          </span>
+          <TicketBadge />
           <LinkApp
-            href="/billing/tickets?next=/gigs/create"
+            href={`${ROUTES.billingTickets}?next=${encodeURIComponent(ROUTES.postJob)}`}
             className="border rounded-xl px-3 py-1 text-sm"
           >
             Buy ticket

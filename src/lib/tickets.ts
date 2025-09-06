@@ -1,6 +1,12 @@
-import { adminSupabase } from './supabase/server';
+import { adminSupabase, supabaseServer } from './supabase/server';
 
 const FREE_STARTER = Number(process.env.FREE_TICKETS_ON_FIRST_LOGIN ?? 3) || 0;
+
+function serverSupabase() {
+  const supa = supabaseServer();
+  if (!supa) throw new Error('Server not configured');
+  return supa;
+}
 
 export async function ensureTicketsRow(userId: string): Promise<void> {
   const supa = await adminSupabase();
@@ -23,16 +29,20 @@ export async function ensureTicketsRow(userId: string): Promise<void> {
     );
 }
 
-export async function getTicketBalance(userId: string): Promise<number> {
-  const supa = await adminSupabase();
-  if (!supa) return 0;
-  const { data, error } = await supa
-    .from('user_tickets')
-    .select('balance')
-    .eq('user_id', userId)
-    .maybeSingle();
-  if (error) return 0;
-  return data?.balance ?? 0;
+export async function getTicketBalance(userId?: string): Promise<number> {
+  if (userId) {
+    const supa = await adminSupabase();
+    if (!supa) return 0;
+    const { data, error } = await supa.rpc('ticket_balance', {
+      p_user: userId,
+    });
+    if (error) throw error;
+    return (data as number) ?? 0;
+  }
+  const supa = serverSupabase();
+  const { data, error } = await supa.rpc('ticket_balance');
+  if (error) throw error;
+  return (data as number) ?? 0;
 }
 
 export async function ensureTickets(
@@ -71,5 +81,25 @@ export async function deductTicketOnCreate(
 
   if (error) throw new Error(error.message);
   return String(data);
+}
+
+export async function ensureSignupBonus(): Promise<number> {
+  const supa = serverSupabase();
+  const { data, error } = await supa.rpc('award_signup_bonus');
+  if (error) throw error;
+  return (data as number) ?? 0;
+}
+
+export async function spendOneTicket(
+  reason = 'spend',
+  meta: Record<string, unknown> = {},
+): Promise<number> {
+  const supa = serverSupabase();
+  const { data, error } = await supa.rpc('spend_one_ticket', {
+    p_reason: reason,
+    p_meta: meta,
+  });
+  if (error) throw error;
+  return (data as number) ?? 0;
 }
 
