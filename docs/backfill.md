@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-09-06 — Gate-aware smoke helpers
+- Added `expectUrlOneOf` and `expectAuthAwareOutcome` to tolerate `/login?next=` or `/browse-jobs` gates.
+- Consolidated nav specs with mobile viewport handling.
+- Relaxed sitemap check to structural existence.
+
 ## 2025-11-05 — Good Product Gate hardening
 ## 2025-11-12 — Mock mode for CI
 - Introduced `MOCK_MODE` env so smoke tests run without Supabase credentials.

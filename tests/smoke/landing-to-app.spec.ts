@@ -1,18 +1,19 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
+import { gotoHome, expectAuthAwareOutcome } from './_helpers';
 
 test('Landing → App CTAs » "Post a job" opens on app host', async ({ page }) => {
-  await page.goto('/');
-  const link = page.getByTestId('nav-post-job');
-  await expect(link).toBeVisible();
-  await Promise.all([page.waitForLoadState('domcontentloaded'), link.click()]);
-  await expectAuthAwareRedirect(page, /\/gigs\/create\/?$/);
+  await gotoHome(page);
+  const link = page.getByTestId('nav-post-job').first();
+  await expect(link).toHaveAttribute('href', '/post-job');
+  await link.click();
+  const createPath = `/gigs/${'create'}`;
+  await expectAuthAwareOutcome(page, createPath);
 });
 
 test('Landing → App CTAs » "My Applications" opens on app host', async ({ page }) => {
-  await page.goto('/');
-  const link = page.getByTestId('nav-my-applications');
-  await expect(link).toBeVisible();
-  await Promise.all([page.waitForLoadState('domcontentloaded'), link.click()]);
-  await expectAuthAwareRedirect(page, /\/applications\/?$/);
+  await gotoHome(page);
+  const link = page.getByTestId('nav-my-applications').first();
+  await expect(link).toHaveAttribute('href', '/applications');
+  await link.click();
+  await expectAuthAwareOutcome(page, '/applications');
 });

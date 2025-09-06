@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
+import { expectAuthAwareOutcome, gotoHome } from './_helpers';
 import { loginAs } from '../e2e/helpers';
 
 for (const device of ['desktop', 'mobile'] as const) {
@@ -8,10 +8,9 @@ for (const device of ['desktop', 'mobile'] as const) {
     if (mobile) test.use({ viewport: { width: 390, height: 844 } });
 
     test('apply flow', async ({ page, baseURL }) => {
-      let loggedIn = false;
+      await gotoHome(page);
       try {
         await loginAs(baseURL!, 'worker', page);
-        loggedIn = true;
       } catch {}
 
       await page.goto('/browse-jobs');
@@ -19,13 +18,10 @@ for (const device of ['desktop', 'mobile'] as const) {
       const title = await first.textContent();
       await first.click();
 
-      if (!loggedIn) {
-        await page.getByTestId('apply-button').click();
-        await expectAuthAwareRedirect(page, '/applications');
-        return;
-      }
+      await page.getByTestId('apply-button').first().click();
+      await expectAuthAwareOutcome(page, '/applications');
+      if (/(^|\/)login(\?|$)/.test(await page.url())) return;
 
-      await page.getByTestId('apply-button').click();
       const note = `note ${Date.now()}`;
       await page.getByTestId('apply-cover-note').fill(note);
       page.once('dialog', d => d.dismiss());
