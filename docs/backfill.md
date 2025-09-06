@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-11-05 — Good Product Gate hardening
+- Root path permanently redirects to `/browse-jobs`.
+- Header CTAs include data-cta audit hooks and Tickets nav item.
+- Added `/sitemap.xml` with recent jobs and `/robots.txt` reference.
+- Optional analytics script and Sentry docs; smoke spec covers unauth flows.
+
 ## 2025-11-03 — Apply + My Applications E2E
 - Supabase migration for `applications` table with RLS policies.
 - API routes `/api/applications/create` and `/api/applications/me`.

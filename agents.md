@@ -1,14 +1,15 @@
 # Agents Contract
-**Version:** 2025-11-04
+**Version:** 2025-11-05
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
+- All CTAs must include `data-cta` matching their test ID.
 - Header CTAs:
   - `data-testid="nav-browse-jobs"` → `/browse-jobs`
   - `data-testid="nav-post-job"` → `/post-job`
   - `data-testid="nav-my-applications"` → `/applications`
+  - `data-testid="nav-tickets"` → `/tickets`
   - `data-testid="nav-login"` → `/login`
-  - Tickets link → `/tickets`
 - Tickets page CTA `data-cta="buy-tickets"` → `/tickets/buy`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
@@ -23,7 +24,7 @@
 - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
 ## Test hooks (smoke/e2e)
-- Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
+- Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile menu button: `nav-menu-button`; container: `nav-menu`.
 - Mobile menu IDs: `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`.
 - Landing hero IDs: `hero-browse-jobs`, `hero-post-job`.

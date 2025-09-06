@@ -42,7 +42,11 @@ export default function AppHeader() {
     <header data-testid="app-header" className="border-b bg-white/60 backdrop-blur">
       <div className="mx-auto max-w-5xl flex items-center justify-between p-4">
         <div className="flex items-center gap-4">
-          <LinkApp href={ROUTES.browseJobs} className="font-semibold">
+          <LinkApp
+            href={ROUTES.browseJobs}
+            className="font-semibold"
+            data-cta="nav-browse-jobs"
+          >
             QuickGig
           </LinkApp>
           <nav className="hidden md:flex items-center gap-4">
@@ -51,6 +55,7 @@ export default function AppHeader() {
                 <LinkApp
                   key={link.testId}
                   data-testid={link.testId}
+                  data-cta={link.testId}
                   href={link.href}
                   prefetch={false}
                 >
@@ -60,6 +65,7 @@ export default function AppHeader() {
                 <button
                   key={link.testId}
                   data-testid={link.testId}
+                  data-cta={link.testId}
                   onClick={link.onClick}
                   className="underline"
                 >
@@ -79,12 +85,6 @@ export default function AppHeader() {
           </button>
         </div>
         <div className="flex items-center gap-3">
-          <LinkApp
-            href={ROUTES.tickets}
-            className="hidden md:inline-block hover:underline"
-          >
-            Tickets
-          </LinkApp>
           <TicketBalanceChip />
           <LinkApp
             href={`${ROUTES.billingTickets}?next=${encodeURIComponent(ROUTES.postJob)}`}
@@ -108,6 +108,7 @@ export default function AppHeader() {
                 <LinkApp
                   key={link.mobileId}
                   data-testid={link.mobileId}
+                  data-cta={link.mobileId}
                   href={link.href}
                   prefetch={false}
                   onClick={() => setOpen(false)}
@@ -119,6 +120,7 @@ export default function AppHeader() {
                 <button
                   key={link.mobileId}
                   data-testid={link.mobileId}
+                  data-cta={link.mobileId}
                   onClick={() => {
                     setOpen(false);
                     link.onClick();
