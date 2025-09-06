@@ -266,3 +266,10 @@
 - Surfaced Tickets in the header (nav link + live balance chip).
 - Added info panel on agreement detail page showing “Ticket cost: 1” and disabling Accept when balance is 0 (client-side only; respects existing backend rules).
 - Added /api/tickets/balance (dynamic, SSR anon).
+
+## 2025-10-18 — GCash ticket top-up orders & smoke resilience
+- Added manual ticket top-up flow: `/tickets/buy` with packages 1/5/10.
+- New `/api/tickets/orders` endpoint creates pending orders in `ticket_orders`.
+- `/tickets` shows balance chip and Buy Tickets CTA.
+- Smoke spec `tickets-topup.spec.ts` covers basic pending order.
+- Applications smoke now passes when list is empty or unauthenticated.

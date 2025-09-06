@@ -5,4 +5,7 @@ export const ROUTES = {
   GIGS_CREATE: '/gigs/create',
   APPLICATIONS: '/applications',
   LOGIN: '/login',
+  TICKETS: '/tickets',
+  TICKETS_BUY: '/tickets/buy',
+  ADMIN_TICKETS: '/admin/tickets',
 } as const;
