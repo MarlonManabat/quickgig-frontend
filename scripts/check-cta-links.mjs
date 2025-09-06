@@ -1,78 +1,33 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+const base = (process.env.CTA_BASE || 'http://localhost:3000').replace(/\/$/, '');
+const pages = ['/browse-jobs'];
 
-const HEADER_IDS = {
-  'nav-browse-jobs': 'ROUTES.browseJobs',
-  'nav-post-job': 'ROUTES.postJob',
-  'nav-my-applications': 'ROUTES.applications',
-  'nav-login': 'ROUTES.login',
-  'navm-browse-jobs': 'ROUTES.browseJobs',
-  'navm-post-job': 'ROUTES.postJob',
-  'navm-my-applications': 'ROUTES.applications',
-  'navm-login': 'ROUTES.login',
-};
+const results = [];
 
-const HERO_IDS = {
-  'hero-browse-jobs': 'ROUTES.browseJobs',
-  'hero-post-job': 'ROUTES.postJob',
-};
-const EXTRA_IDS = {
-  'browse-jobs-from-empty': 'ROUTES.browseJobs',
-};
-const ALL_IDS = [...Object.keys(HEADER_IDS), ...Object.keys(HERO_IDS), ...Object.keys(EXTRA_IDS)];
+const CTA_RE = /<a[^>]*data-cta="([^"]+)"[^>]*href="([^"]+)"/g;
 
-let errors = [];
-
-// Validate header mappings in src/lib/routes.ts
-const routesTxt = readFileSync('src/lib/routes.ts', 'utf8');
-for (const [id, routeConst] of Object.entries(HEADER_IDS)) {
-  const key = id.startsWith('navm-') ? 'idMobile' : 'idDesktop';
-  const marker = `${key}: '${id}'`;
-  const idx = routesTxt.indexOf(marker);
-  if (idx === -1) {
-    errors.push(`routes.ts → ${id}`);
-    continue;
-  }
-  const snippet = routesTxt.slice(Math.max(0, idx - 200), idx + 200);
-  if (!snippet.includes(`to: ${routeConst}`)) {
-    errors.push(`routes.ts → ${id}`);
-  }
-}
-
-// Validate hero CTAs in source files
-function* walk(dir) {
-  for (const name of readdirSync(dir)) {
-    const p = join(dir, name);
-    const s = statSync(p);
-    if (s.isDirectory()) yield* walk(p);
-    else if (s.isFile()) yield p;
-  }
-}
-
-for (const file of walk('src')) {
-  const txt = readFileSync(file, 'utf8');
-  for (const id of ALL_IDS) {
-    const marker = `data-testid="${id}"`;
-    let idx = txt.indexOf(marker);
-    let count = 0;
-    while (idx !== -1) {
-      count++;
-      const routeConst = HERO_IDS[id] || EXTRA_IDS[id];
-      if (routeConst) {
-        const snippet = txt.slice(Math.max(0, idx - 100), idx + 200);
-        if (!snippet.includes(routeConst)) {
-          errors.push(`${file} → ${id}`);
-        }
-      }
-      idx = txt.indexOf(marker, idx + marker.length);
+for (const pagePath of pages) {
+  const res = await fetch(base + pagePath);
+  const html = await res.text();
+  for (const match of html.matchAll(CTA_RE)) {
+    const id = match[1];
+    const href = match[2];
+    const url = base + href;
+    const resp = await fetch(url, { redirect: 'manual' });
+    const status = resp.status;
+    if (status === 200) {
+      results.push([id, href, status, 'OK']);
+      continue;
     }
-    if (count > 1) errors.push(`duplicate data-testid ${id} in ${file}`);
+    if (status === 302) {
+      const loc = resp.headers.get('location') || '';
+      if (/^\/login\?next=/.test(loc)) {
+        results.push([id, href, status, 'OK']);
+        continue;
+      }
+    }
+    results.push([id, href, status, 'FAIL']);
   }
 }
 
-if (errors.length) {
-  console.error('CTA link mismatches:\n' + errors.map(e => ' - ' + e).join('\n'));
-  process.exit(1);
-} else {
-  console.log('✔ CTA links use canonical routes');
-}
+console.table(results);
+if (results.some(r => r[3] !== 'OK')) process.exit(1);

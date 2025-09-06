@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Find raw legacy paths
 bad=$(rg -l '/find|/gigs/create' src tests || true)
-bad=$(echo "$bad" | grep -v 'src/app/lib/legacy-redirects.ts' | grep -v 'tests/smoke/legacy-redirects.spec.ts' || true)
+bad=$(echo "$bad" | grep -v 'src/app/lib/legacy-redirects.ts' | grep -v 'tests/smoke/legacy-redirects.spec.ts' | grep -v 'src/middleware.ts' || true)
 if [[ -n "$bad" ]]; then
   echo 'Legacy path strings found in:'
   echo "$bad"

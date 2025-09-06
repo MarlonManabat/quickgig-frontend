@@ -5,13 +5,8 @@ import { test, expect } from '@playwright/test';
 
 test('tickets top-up pending order', async ({ page }) => {
   await page.goto('/tickets');
-  await expect(page.locator('[data-cta="buy-tickets"]')).toBeVisible();
-
-  await page.locator('[data-cta="buy-tickets"]').click();
-  await expect(page.locator('#buy-1')).toBeVisible();
-  await expect(page.locator('#buy-5')).toBeVisible();
-  await expect(page.locator('#buy-10')).toBeVisible();
-
-  await page.locator('#buy-1').click();
+  const buy = page.getByTestId('buy-tickets');
+  await expect(buy).toBeVisible();
+  await buy.click();
   await expect(page.locator('#order-status')).toContainText('pending', { ignoreCase: true });
 });

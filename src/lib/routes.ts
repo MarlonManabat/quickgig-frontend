@@ -42,6 +42,14 @@ export const NAV_ITEMS = [
     auth: 'auth-aware',
   },
   {
+    key: 'tickets',
+    label: 'Tickets',
+    to: ROUTES.tickets,
+    idDesktop: 'nav-tickets',
+    idMobile: 'navm-tickets',
+    auth: 'none',
+  },
+  {
     key: 'login',
     label: 'Login',
     to: ROUTES.login,

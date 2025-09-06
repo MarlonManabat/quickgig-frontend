@@ -6,6 +6,7 @@ export default function LandingHeader() {
     <nav className="...">
       <LinkApp
         data-testid="nav-browse-jobs"
+        data-cta="nav-browse-jobs"
         href={ROUTES.browseJobs}
         className="hover:underline"
       >
@@ -13,6 +14,7 @@ export default function LandingHeader() {
       </LinkApp>
       <LinkApp
         data-testid="nav-post-job"
+        data-cta="nav-post-job"
         href={ROUTES.postJob}
         className="btn btn-primary"
       >
@@ -20,12 +22,13 @@ export default function LandingHeader() {
       </LinkApp>
       <LinkApp
         data-testid="nav-my-applications"
+        data-cta="nav-my-applications"
         href={ROUTES.applications}
         className="..."
       >
         My Applications
       </LinkApp>
-      <LinkApp data-testid="nav-login" href={ROUTES.login} className="...">
+      <LinkApp data-testid="nav-login" data-cta="nav-login" href={ROUTES.login} className="...">
         Sign in
       </LinkApp>
     </nav>

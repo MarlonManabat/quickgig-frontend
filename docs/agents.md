@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-11-04 -->
+<!-- AGENT CONTRACT v2025-12-09 -->
 
 # Product Acceptance (Good Product Bar)
 
@@ -13,6 +13,7 @@
 **No dead ends**
 - Root “/” **must** 302/308 → **/browse-jobs**
 - CTAs use canonical routes (no raw hrefs, no legacy paths)
+- CTAs include `data-cta` matching their test ID
 - Unauth flows: redirect to **/login?next=<dest>** counts as success
 - No white screens (page-level error/skeleton boundaries in gated flows)
 
@@ -34,10 +35,10 @@
 - **/login**
 
 ## CTA Test IDs
-**Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`
+**Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
 **Mobile menu button:** `nav-menu-button`
 **Mobile menu container:** `nav-menu`
-**Mobile menu items:** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`
+**Mobile menu items:** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-tickets`, `navm-login`
 **Landing hero:** `hero-browse-jobs`, `hero-post-job`
 **Applications empty CTA:** `browse-jobs-from-empty`
 

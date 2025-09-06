@@ -29,22 +29,51 @@ jobs:
         env:
           NODE_ENV: production
           NEXT_TELEMETRY_DISABLED: '1'
+          # compile with CI mock rewrites enabled
+          MOCK_MODE: '1'
+          NEXT_PUBLIC_SUPABASE_URL: 'https://example.invalid'
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'dummy'
         run: npm run build
-
-      - name: Start server & verify /api/healthz
+      - name: Check CTA links
         env:
           NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: '1'
+          MOCK_MODE: '1'
+          NEXT_PUBLIC_SUPABASE_URL: 'https://example.invalid'
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'dummy'
         run: |
-          npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000/api/healthz" "node -e 'process.exit(0)'"
+          npx --yes start-server-and-test \
+            "next start -p 3000" \
+            "http://localhost:3000/api/healthz" \
+            "node scripts/check-cta-links.mjs"
+        # If this step ever proves flaky, uncomment the next line temporarily:
+        # continue-on-error: true
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
 
-      - name: Smoke - tickets pages render
+      - name: Setup Playwright browsers
+        uses: microsoft/playwright-github-action@v1
+        with:
+          install-deps: true
+
+      - name: Verify browsers installed (and force install if needed)
         run: |
-          set -e
-          curl -fsS http://localhost:3000/tickets >/dev/null || true
-          curl -fsS http://localhost:3000/admin/tickets >/dev/null || true
+          npx playwright --version || true
+          npx playwright install --with-deps chromium
+          ls -la ~/.cache/ms-playwright || true
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: ""
 
-      - name: Smoke - confirm & cancel agreement (API quick sanity)
+      - name: Run smoke tests
         env:
           NODE_ENV: production
+          MOCK_MODE: "1"
+          NEXT_PUBLIC_SUPABASE_URL: "https://example.invalid"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "dummy"
         run: |
-          npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000/api/healthz" "node -e \"(async () => { const id='00000000-0000-0000-0000-000000000001'; const confirm = await fetch('http://localhost:3000/api/agreements/'+id+'/confirm', {method:'POST'}); console.log('confirm', confirm.status); const cancel = await fetch('http://localhost:3000/api/agreements/'+id+'/cancel', {method:'POST'}); console.log('cancel', cancel.status); process.exit(0); })().catch(()=>process.exit(0));\""
+          npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000" "npx playwright test -c playwright.smoke.ts"
