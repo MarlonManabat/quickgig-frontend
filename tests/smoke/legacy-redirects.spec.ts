@@ -6,7 +6,7 @@ test('legacy /find redirects to /browse-jobs', async ({ page }) => {
   await expect(page).toHaveURL(/\/browse-jobs\/?$/);
 });
 
-test('legacy /post-job redirects to create (auth-aware)', async ({ page }) => {
-  await page.goto('/post-job');
-  await expectAuthAwareRedirect(page, /\/gigs\/create\/?$/);
+test('legacy /gigs/create redirects to /post-job', async ({ page }) => {
+  await page.goto('/gigs/create');
+  await expect(page).toHaveURL(/\/post-job\/?$/);
 });

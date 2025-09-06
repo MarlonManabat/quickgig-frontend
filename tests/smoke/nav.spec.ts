@@ -18,6 +18,6 @@ test.describe('desktop header CTAs', () => {
   test('Post a Job (auth-aware)', async ({ page }) => {
     await gotoHome(page);
     await page.getByTestId('nav-post-job').first().click();
-    await expectAuthAwareRedirect(page, '/gigs/create');
+    await expectAuthAwareRedirect(page, '/post-job');
   });
 });

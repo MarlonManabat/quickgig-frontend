@@ -21,7 +21,7 @@ const links = [
     id: "app-nav-applications",
   },
   { href: "/saved", label: copy.nav.saved, id: "app-nav-saved" },
-  { href: "/gigs/create", label: copy.nav.postJob, id: "nav-post" },
+  { href: ROUTES.postJob, label: copy.nav.postJob, id: "nav-post" },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {

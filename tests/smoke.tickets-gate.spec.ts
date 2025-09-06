@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { BASE } from './smoke.env';
 
-test('Gate: /gigs/create redirects when user not eligible', async ({ page }) => {
-  const res = await page.goto(`${BASE}/gigs/create`, { waitUntil: 'domcontentloaded' });
+test('Gate: /post-job redirects when user not eligible', async ({ page }) => {
+  const res = await page.goto(`${BASE}/post-job`, { waitUntil: 'domcontentloaded' });
 
   // Accept either login redirect or billing gate page (when session exists but balance<1)
   const url = page.url();

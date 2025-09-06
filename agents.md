@@ -1,11 +1,11 @@
 # Agents Contract
-**Version:** 2025-10-18
+**Version:** 2025-11-03
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
 - Header CTAs:
   - `data-testid="nav-browse-jobs"` → `/browse-jobs`
-  - `data-testid="nav-post-job"` → `/gigs/create`
+  - `data-testid="nav-post-job"` → `/post-job`
   - `data-testid="nav-my-applications"` → `/applications`
   - `data-testid="nav-login"` → `/login`
   - Tickets link → `/tickets`
@@ -14,12 +14,12 @@
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
-- Auth-gated routes: `/applications`, `/gigs/create`.
+- Auth-gated routes: `/applications`, `/post-job`.
 
 ## Legacy redirects (middleware)
 - `/find`      → `/browse-jobs`
-- `/post-job`  → `/gigs/create`
-- Unauthenticated users MAY be redirected to `/login?next=/gigs/create`.
+- `/gigs/create`  → `/post-job`
+- Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
 ## Test hooks (smoke/e2e)
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.

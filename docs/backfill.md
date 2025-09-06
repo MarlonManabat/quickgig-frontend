@@ -1,5 +1,13 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-11-03 — Post Job E2E
+- Added `/post-job` canonical route replacing `/gigs/create`.
+- Added Supabase migration for job status & location fields plus RLS policies.
+- Implemented dataset helper `lib/ph/locations.ts` for region/city selects.
+- New API routes to create and publish/unpublish jobs.
+- Browse Jobs now loads published jobs from Supabase.
+- Smoke test covers posting flow (auth-aware).
+
 ## 2025-09-03
 - Added `NEXT_PUBLIC_APP_ORIGIN` and `src/lib/urls.ts` utility to centralize the app host.
 - Converted all landing CTAs (hero, nav, footer, and cards) to absolute links to the app:
@@ -273,3 +281,11 @@
 - `/tickets` shows balance chip and Buy Tickets CTA.
 - Smoke spec `tickets-topup.spec.ts` covers basic pending order.
 - Applications smoke now passes when list is empty or unauthenticated.
+## 2025-11-03 — Post Job E2E
+- Added `/post-job` canonical route replacing `/gigs/create`.
+- Added Supabase migration for job status & location fields plus RLS policies.
+- Implemented dataset helper `lib/ph/locations.ts` for region/city selects.
+- New API routes to create and publish/unpublish jobs.
+- Browse Jobs now loads published jobs from Supabase.
+- Smoke test covers posting flow (auth-aware).
+
