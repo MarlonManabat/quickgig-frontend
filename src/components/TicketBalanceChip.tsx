@@ -1,16 +1,35 @@
-'use client';
+"use client";
 
-import useSWR from 'swr';
-
-const fetcher = (url: string) => fetch(url, { cache: 'no-store' }).then(r => r.json());
+import { useEffect, useState } from "react";
+import LinkApp from "@/components/LinkApp";
+import { ROUTES } from "@/lib/routes";
 
 export default function TicketBalanceChip() {
-  const { data } = useSWR<{ balance?: number; ok?: boolean }>('/api/tickets/balance', fetcher, { refreshInterval: 30_000 });
+  const [balance, setBalance] = useState<number | null>(null);
 
-  const b = typeof data?.balance === 'number' ? data.balance : undefined;
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/tickets/balance")
+      .then((r) => r.json())
+      .then((j) => {
+        if (alive) setBalance(typeof j?.balance === "number" ? j.balance : 0);
+      })
+      .catch(() => {
+        if (alive) setBalance(null);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (balance === null) return null;
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs">
-      🎟️ <strong>{b ?? '—'}</strong>
-    </span>
+    <LinkApp
+      href={ROUTES.tickets}
+      className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-sm bg-gray-100 hover:bg-gray-200"
+    >
+      <span>Tickets</span>
+      <span className="font-semibold">{balance}</span>
+    </LinkApp>
   );
 }

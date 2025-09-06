@@ -32,4 +32,12 @@ function showHead(url, label = url) {
 
   // Show headers for base
   showHead(base + "/", base);
+
+  try {
+    const html = get(`${base}/tickets`);
+    const count = (html.match(/Tickets/g) || []).length;
+    console.log(`# /tickets contains 'Tickets' x${count}`);
+  } catch {
+    // non-blocking
+  }
 })();

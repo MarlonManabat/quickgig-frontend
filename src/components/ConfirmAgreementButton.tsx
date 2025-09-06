@@ -13,6 +13,7 @@ export function ConfirmAgreementButton({ agreementId }: { agreementId: string })
     <RequireTickets need={1}>
       {(ok) => (
         <button
+          id="agree-accept"
           className="rounded-md px-4 py-2 border disabled:opacity-50"
           disabled={!ok}
           onClick={() =>

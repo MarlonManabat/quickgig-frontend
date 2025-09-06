@@ -78,7 +78,13 @@ export default function AppHeader() {
             Menu
           </button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <LinkApp
+            href={ROUTES.tickets}
+            className="hidden md:inline-block hover:underline"
+          >
+            Tickets
+          </LinkApp>
           <TicketBalanceChip />
           <LinkApp
             href={`${ROUTES.billingTickets}?next=${encodeURIComponent(ROUTES.postJob)}`}

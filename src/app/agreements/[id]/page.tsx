@@ -1,5 +1,6 @@
 import { CancelAgreementButton } from '@/components/CancelAgreementButton';
 import { ConfirmAgreementButton } from '@/components/ConfirmAgreementButton';
+import AgreementTicketPanel from '@/components/AgreementTicketPanel';
 import supabaseServer from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +21,10 @@ export default async function AgreementPage({ params }: { params: { id: string }
   return (
     <div className="p-4 space-y-4">
       {agreement.status === 'pending' && (
-        <ConfirmAgreementButton agreementId={agreement.id} />
+        <div className="space-y-3">
+          <AgreementTicketPanel acceptButtonId="agree-accept" />
+          <ConfirmAgreementButton agreementId={agreement.id} />
+        </div>
       )}
       {agreement.status === 'agreed' && <CancelAgreementButton id={agreement.id} />}
     </div>
