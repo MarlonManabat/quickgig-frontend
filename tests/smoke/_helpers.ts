@@ -43,3 +43,21 @@ export async function gotoHome(page: Page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page).toHaveURL(/\/browse-jobs\/?$/);
 }
+
+export async function expectAuthAwareRedirectOrLand(
+  page: Page,
+  path: string,
+  timeout = 8000
+): Promise<'redirect' | 'landed'> {
+  const loginRe = new RegExp(
+    `/login\\?next=${encodeURIComponent(path).replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`
+  );
+  try {
+    await expect(page).toHaveURL(loginRe, { timeout });
+    return 'redirect';
+  } catch {
+    await expect(page).toHaveURL(new RegExp(`${path}$`), { timeout });
+    return 'landed';
+  }
+}
+
