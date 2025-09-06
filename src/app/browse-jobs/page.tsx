@@ -1,13 +1,21 @@
 import Link from 'next/link';
-import { getSeededJobs } from '@/app/lib/seed';
-import { ROUTES } from '@/lib/routes';
-import { toAppPath } from '@/lib/routes';
+import { supabaseServer } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function BrowseJobsPage() {
-  const jobs = await getSeededJobs();
+  const supabase = supabaseServer();
+  let jobs: { id: string; title: string }[] = [];
+  if (supabase) {
+    const { data } = await supabase
+      .from('jobs')
+      .select('id,title')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    jobs = data ?? [];
+  }
 
   if (jobs.length === 0) {
     return (
@@ -24,7 +32,7 @@ export default async function BrowseJobsPage() {
       <ul data-testid="jobs-list" className="space-y-3">
         {jobs.map((j) => (
           <li key={j.id} data-testid="job-card" className="rounded-xl border p-4">
-            <Link href={`${toAppPath(ROUTES.browseJobs)}/${j.id}`}>{j.title}</Link>
+            <Link href={`/jobs/${j.id}`}>{j.title}</Link>
           </li>
         ))}
       </ul>

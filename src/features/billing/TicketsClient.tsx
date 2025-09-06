@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import toast from '@/utils/toast';
 import PaymentProofModal from '@/components/PaymentProofModal';
 import { TICKET_PRICE_PHP } from '@/lib/payments';
+import { ROUTES } from '@/lib/routes';
 
 type Props = {
   initialBalance: number;
@@ -29,7 +30,7 @@ export default function TicketsClient({ initialBalance, next }: Props) {
           if (balance >= 1) {
             toast.success('Tickets credited!');
             if (next) location.replace(next);
-            else location.replace('/gigs/create');
+            else location.replace(ROUTES.postJob);
           }
         }
       } catch {}

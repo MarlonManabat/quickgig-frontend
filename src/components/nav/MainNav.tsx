@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ROUTES } from '@/lib/routes';
 
 export default function MainNav() {
   return (
@@ -6,7 +7,7 @@ export default function MainNav() {
       <Link href="/gigs" className="hover:underline">
         Find Work
       </Link>
-      <Link href="/gigs/create" className="hover:underline">
+      <Link href={ROUTES.postJob} className="hover:underline">
         Post a Gig
       </Link>
       <Link href="/owner/gigs" className="hover:underline">

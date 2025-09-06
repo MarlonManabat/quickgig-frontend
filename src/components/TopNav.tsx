@@ -52,7 +52,7 @@ export default function TopNav() {
             </Link>
           )}
             <Link
-              href="/gigs/create"
+              href={ROUTES.postJob}
               data-testid="nav-post"
               className={`btn-primary ${loggedIn && !eligible ? "opacity-50 pointer-events-none" : ""}`}
               title={

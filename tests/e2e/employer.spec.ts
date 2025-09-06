@@ -3,23 +3,21 @@ import { loginAs, isProdBase } from './helpers';
 
 test.skip(isProdBase(), 'Auth helper (/api/test/login-as) is disabled on production host.');
 
-const GIG_TITLE = 'E2E Created Gig';
+const JOB_TITLE = 'E2E Created Job';
 
-test('employer creates a gig and sees it listed @auth', async ({ page, baseURL }) => {
+test('employer creates a job and sees it listed @auth', async ({ page, baseURL }) => {
   const { userId } = await loginAs(baseURL!, 'employer', page);
 
-  await page.request.post('/api/gigs/create', {
+  await page.request.post('/api/jobs/create', {
     data: {
-      title: GIG_TITLE,
-      company: 'Test Co',
-      description: 'E2E gig created via API',
-      user_id: userId,
-      region_code: '130000000',
-      city_code: '137401000',
-      budget: 123,
+      title: JOB_TITLE,
+      description: 'E2E job created via API',
+      created_by: userId,
+      region: '130000000',
+      city: 'Manila',
     },
   });
 
-  await page.goto('/gigs');
-  await expect(page.getByText(GIG_TITLE)).toBeVisible();
+  await page.goto('/browse-jobs');
+  await expect(page.getByText(JOB_TITLE)).toBeVisible();
 });

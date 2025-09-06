@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-09-04 -->
+<!-- AGENT CONTRACT v2025-11-03 -->
 
 # Product Acceptance (Good Product Bar)
 
@@ -29,7 +29,7 @@
 
 ## Canonical Routes
 - **/browse-jobs**
-- **/gigs/create**  (Post Job)
+- **/post-job**  (Post Job)
 - **/applications**
 - **/login**
 

@@ -12,5 +12,5 @@ test('Landing hero CTAs route to app host', async ({ page }) => {
 
   await gotoHome(page);
   await page.getByTestId('hero-post-job').click();
-  await expectAuthAwareRedirect(page, '/gigs/create');
+  await expectAuthAwareRedirect(page, '/post-job');
 });

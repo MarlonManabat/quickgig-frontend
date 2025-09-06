@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { uploadAvatar } from "@/lib/avatar";
 import { asNumber, asRole, asString, toBool } from "@/lib/normalize";
 import type { Role, WalletRow } from "@/lib/types";
+import { ROUTES } from "@/lib/routes";
 
 export default function HomeEmployer() {
   const [role, setRole] = useState<Role>("seeker");
@@ -181,7 +182,7 @@ export default function HomeEmployer() {
         <Card title="Quick Actions">
           {role === "employer" || role === "admin" ? (
             <div className="flex flex-wrap gap-2">
-                <Link href="/gigs/create" className="qg-btn qg-btn--primary px-3 py-2">
+                <Link href={ROUTES.postJob} className="qg-btn qg-btn--primary px-3 py-2">
                   Post Job
                 </Link>
               <Link
@@ -236,7 +237,7 @@ export default function HomeEmployer() {
         <>
           <Section
             title="Your job posts"
-            actionHref="/gigs/create"
+            actionHref={ROUTES.postJob}
             actionLabel="Post new"
           />
           <Grid>

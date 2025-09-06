@@ -21,7 +21,7 @@ test.describe('mobile header CTAs', () => {
     await gotoHome(page);
     await openMenu(page);
     await page.getByTestId('navm-post-job').click();
-    await expectAuthAwareRedirect(page, '/gigs/create');
+    await expectAuthAwareRedirect(page, '/post-job');
   });
 
   test('My Applications (auth-aware)', async ({ page }) => {

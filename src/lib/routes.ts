@@ -1,6 +1,6 @@
 export const ROUTES = {
   browseJobs: '/browse-jobs',
-  postJob: '/gigs/create',
+  postJob: '/post-job',
   applications: '/applications',
   login: '/login',
   tickets: '/tickets',
