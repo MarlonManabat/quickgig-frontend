@@ -10,7 +10,7 @@ test('Applications page renders or redirects', async ({ page }) => {
   await expect(page.getByTestId('applications-list')).toBeVisible();
   const rows = await page.getByTestId('application-row').count();
   if (rows === 0) {
-    const empty = page.locator('[data-state="empty"], [data-testid="applications-empty"]');
+    const empty = page.locator('[data-qa="applications-empty"], [data-testid="applications-empty"]');
     await expect(empty.first()).toBeVisible();
   }
 });

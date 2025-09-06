@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-11-03 -->
+<!-- AGENT CONTRACT v2025-11-04 -->
 
 # Product Acceptance (Good Product Bar)
 
@@ -39,6 +39,7 @@
 **Mobile menu container:** `nav-menu`
 **Mobile menu items:** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`
 **Landing hero:** `hero-browse-jobs`, `hero-post-job`
+**Applications empty CTA:** `browse-jobs-from-empty`
 
 **No duplicates:** each CTA test ID must appear at most once in the DOM.
 
