@@ -3,6 +3,7 @@ import { expectAuthAwareRedirect } from './_helpers';
 
 test('Post Job › auth-aware publish flow', async ({ page }) => {
   await page.goto('/post-job');
+  await page.waitForLoadState('domcontentloaded');
 
   if (page.url().includes('/login')) {
     await expectAuthAwareRedirect(page, '/post-job');
@@ -19,5 +20,6 @@ test('Post Job › auth-aware publish flow', async ({ page }) => {
   await page.getByTestId('post-job-submit').click();
   await page.getByTestId('post-job-success', { timeout: 10000 });
   await page.goto('/browse-jobs');
+  await page.waitForLoadState('domcontentloaded');
   await expect(page.getByTestId('jobs-list')).toContainText(title);
 });

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,27 +14,28 @@ const MOCK_MODE =
   process.env.CI === 'true' ||
   !hasSupabaseEnv;
 
+export function createSb() {
+  const cookieStore = cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get: (name) => cookieStore.get(name)?.value,
+        set: (name, value, opts) => cookieStore.set({ name, value, ...opts }),
+        remove: (name, opts) =>
+          cookieStore.set({ name, value: '', ...opts, maxAge: 0 }),
+      },
+    }
+  );
+}
+
 export async function GET() {
   if (MOCK_MODE) {
     return NextResponse.json({ balance: 0, source: 'ci-mock' });
   }
 
-  const { createServerClient } = await import('@supabase/ssr');
-  const cookieStore = cookies();
-  const supa = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
+  const supa = createSb();
 
   try {
     const { data: auth } = await supa.auth.getUser();

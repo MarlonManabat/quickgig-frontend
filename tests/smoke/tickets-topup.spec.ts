@@ -5,6 +5,7 @@ import { test, expect } from '@playwright/test';
 
 test('tickets top-up pending order', async ({ page }) => {
   await page.goto('/tickets');
+  await page.waitForLoadState('domcontentloaded');
   const buy = page.getByTestId('buy-tickets');
   await expect(buy).toBeVisible();
   await buy.click();
