@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-11-03
+**Version:** 2025-11-04
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -11,6 +11,7 @@
   - Tickets link → `/tickets`
 - Tickets page CTA `data-cta="buy-tickets"` → `/tickets/buy`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
+- `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.

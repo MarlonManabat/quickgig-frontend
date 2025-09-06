@@ -16,7 +16,10 @@ const HERO_IDS = {
   'hero-browse-jobs': 'ROUTES.browseJobs',
   'hero-post-job': 'ROUTES.postJob',
 };
-const ALL_IDS = [...Object.keys(HEADER_IDS), ...Object.keys(HERO_IDS)];
+const EXTRA_IDS = {
+  'browse-jobs-from-empty': 'ROUTES.browseJobs',
+};
+const ALL_IDS = [...Object.keys(HEADER_IDS), ...Object.keys(HERO_IDS), ...Object.keys(EXTRA_IDS)];
 
 let errors = [];
 
@@ -54,9 +57,10 @@ for (const file of walk('src')) {
     let count = 0;
     while (idx !== -1) {
       count++;
-      if (HERO_IDS[id]) {
+      const routeConst = HERO_IDS[id] || EXTRA_IDS[id];
+      if (routeConst) {
         const snippet = txt.slice(Math.max(0, idx - 100), idx + 200);
-        if (!snippet.includes(HERO_IDS[id])) {
+        if (!snippet.includes(routeConst)) {
           errors.push(`${file} → ${id}`);
         }
       }

@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-11-03 — Apply + My Applications E2E
+- Supabase migration for `applications` table with RLS policies.
+- API routes `/api/applications/create` and `/api/applications/me`.
+- Job detail Apply button (`apply-open`) and Applications page with empty state CTA `browse-jobs-from-empty`.
+- Smoke test exercises apply flow (auth-aware) and applications list.
+
 ## 2025-11-03 — Post Job E2E
 - Added `/post-job` canonical route replacing `/gigs/create`.
 - Added Supabase migration for job status & location fields plus RLS policies.
