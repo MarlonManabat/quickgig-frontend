@@ -12,7 +12,6 @@ for (const vp of viewports) {
 
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
-      await expect(page).toHaveURL(/\/browse-jobs/);
 
       const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
       for (const id of ctas) {
@@ -22,6 +21,7 @@ for (const vp of viewports) {
       }
 
       await page.getByTestId('nav-browse-jobs').first().click();
+      await expect(page).toHaveURL(/\/browse-jobs/);
       await expect(page.getByTestId('jobs-list')).toBeVisible();
       await expect(page.getByTestId('job-card').first()).toBeVisible();
 

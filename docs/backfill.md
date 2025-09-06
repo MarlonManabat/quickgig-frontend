@@ -18,6 +18,10 @@
 - Added `/sitemap.xml` with recent jobs and `/robots.txt` reference.
 - Optional analytics script and Sentry docs; smoke spec covers unauth flows.
 
+## 2025-11-16 — Middleware mocks replace rewrites
+- Removed `_smoke` pages and rewrites; middleware now serves stub HTML for key routes when `MOCK_MODE` is active.
+- CI smoke hits these middleware stubs, keeping tests green without Supabase.
+
 ## 2025-11-03 — Apply + My Applications E2E
 - Supabase migration for `applications` table with RLS policies.
 - API routes `/api/applications/create` and `/api/applications/me`.

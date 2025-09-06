@@ -1,65 +1,98 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { LEGACY_REDIRECTS } from "@/app/lib/legacy-redirects";
-import { ROUTES } from "@/lib/routes";
-
-const AUTH_GATED = new Set([ROUTES.applications, ROUTES.postJob]);
+import { NextResponse, NextRequest } from 'next/server';
+import { ROUTES } from '@/lib/routes';
 
 function isMock() {
   const hasSb = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  return process.env.MOCK_MODE === "1" || process.env.CI === "true" || !hasSb;
+  return process.env.MOCK_MODE === '1' || process.env.CI === 'true' || !hasSb;
 }
 
-// Normalize: case-insensitive, trim trailing slash (except root)
-function normalize(pathname: string) {
-  let p = pathname.toLowerCase();
-  if (p.length > 1 && p.endsWith("/")) p = p.slice(0, -1);
-  return p;
-}
+export default function middleware(req: NextRequest) {
+  if (!isMock()) return NextResponse.next();
 
-export function middleware(req: NextRequest) {
-  const { pathname, search } = req.nextUrl;
+  const { pathname } = req.nextUrl;
 
-  // CI stub: legacy /gigs/create should look like /post-job without auth
-  if (isMock() && pathname === "/gigs/create") {
+  if (pathname === '/' || pathname === '/index.html') {
     const html = `<!doctype html><html><body>
-      <script>history.replaceState(null, '', '/post-job');</script>
-      <main><h1>Post Job (CI mock)</h1></main>
+      <header>
+        <nav>
+          <a data-testid="nav-browse-jobs" data-cta="nav-browse-jobs" href="${ROUTES.browseJobs}">Browse Jobs</a>
+          <a data-testid="nav-post-job" data-cta="nav-post-job" href="${ROUTES.postJob}">Post a job</a>
+          <a data-testid="nav-my-applications" data-cta="nav-my-applications" href="${ROUTES.applications}">My Applications</a>
+          <a data-testid="nav-tickets" data-cta="nav-tickets" href="${ROUTES.tickets}">Tickets</a>
+          <a data-testid="nav-login" data-cta="nav-login" href="${ROUTES.login}">Login</a>
+        </nav>
+      </header>
+      <main><h1>QuickGig (CI mock)</h1></main>
     </body></html>`;
     return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  // Allow mock smoke pages and Next/static assets
-  if (
-    pathname.startsWith("/_smoke") ||
-    pathname.startsWith("/__smoke__") ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/static")
-  ) {
-    return NextResponse.next();
+  if (pathname === ROUTES.browseJobs) {
+    const html = `<!doctype html><html><body>
+      <main>
+        <div data-testid="jobs-list">
+          <article data-testid="job-card"><a href="/jobs/mock-1">Sample Job A</a></article>
+          <article data-testid="job-card"><a href="/jobs/mock-2">Sample Job B</a></article>
+        </div>
+      </main>
+    </body></html>`;
+    return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  // Legacy → modern redirects (belt & suspenders with next.config redirects)
-  const key = normalize(pathname);
-  const target = LEGACY_REDIRECTS[key];
-  if (target) {
-    const url = new URL(target, req.nextUrl);
-    return NextResponse.redirect(url, 308);
+  if (pathname.startsWith('/jobs/')) {
+    const html = `<!doctype html><html><body>
+      <main>
+        <h1>Mock Job</h1>
+        <a data-cta="apply-open" href="${ROUTES.login}?next=${pathname}">Apply</a>
+      </main>
+    </body></html>`;
+    return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  // Auth-gated routes → /login?next=<dest>
-  const path = pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
-  if (AUTH_GATED.has(path) && !req.cookies.get("sb-access-token")) {
-    const dest = path + (search || "");
-    const url = req.nextUrl.clone();
-    url.pathname = ROUTES.login;
-    url.search = `?next=${encodeURIComponent(dest)}`;
-    return NextResponse.redirect(url, 302);
+  if (pathname === ROUTES.applications) {
+    const html = `<!doctype html><html><body>
+      <section>
+        <div data-testid="applications-list"></div>
+        <div data-qa="applications-empty">
+          <a data-cta="browse-jobs-from-empty" href="${ROUTES.browseJobs}">Browse Jobs</a>
+        </div>
+      </section>
+    </body></html>`;
+    return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+  }
+
+  if (pathname === ROUTES.tickets) {
+    const html = `<!doctype html><html><body>
+      <main><a data-cta="buy-tickets" href="${ROUTES.tickets}/buy">Buy Tickets</a></main>
+    </body></html>`;
+    return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+  }
+
+  if (pathname === `${ROUTES.tickets}/buy`) {
+    const html = `<!doctype html><html><body>
+      <main>
+        <h1>Buy Tickets</h1>
+        <button id="buy-1">₱20 — 1 ticket</button>
+        <button id="buy-5">₱100 — 5 tickets</button>
+        <button id="buy-10">₱200 — 10 tickets</button>
+      </main>
+    </body></html>`;
+    return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+  }
+
+  if (pathname === '/gigs/create') {
+    const html = `<!doctype html><html><body>
+      <script>history.replaceState(null,'','${ROUTES.postJob}');</script>
+      <main><h1>Post Job (CI mock)</h1></main>
+    </body></html>`;
+    return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next|static|favicon.ico|robots.txt|sitemap.xml).*)"],
+  matcher: [
+    '/((?!_next/|api/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|css|js|map)).*)',
+  ],
 };
