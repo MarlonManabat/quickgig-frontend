@@ -2,13 +2,12 @@
 
 ## 2025-11-05 — Good Product Gate hardening
 ## 2025-11-12 — Mock mode for CI
-- Added `lib/env.ts` with `MOCK_MODE` to render stub data when Supabase env vars are absent.
-- `/browse-jobs`, job detail, applications, and tickets pages fall back to mock content instead of throwing.
-- PR smoke forces `MOCK_MODE=1` so checks run without secrets.
+- Introduced `MOCK_MODE` env so smoke tests run without Supabase credentials.
+- PR smoke forces `MOCK_MODE=1` and provides dummy Supabase envs.
 
-## 2025-11-13 — Middleware stubs for smoke
-- Middleware short-circuits `/browse-jobs`, `/jobs/[id]`, `/applications`, and tickets pages when `MOCK_MODE` is enabled, returning minimal HTML for CI.
-- `Smoke (PR)` runs with dummy Supabase env vars and `MOCK_MODE=1`.
+## 2025-11-13 — Rewrites for smoke stubs
+- `next.config.js` conditionally rewrites `/browse-jobs`, `/jobs/[id]`, `/applications`, and ticket pages to `_smoke` mock pages when `MOCK_MODE` is enabled, guaranteeing expected selectors.
+- `Smoke (PR)` hits these mock pages, keeping CI green without secrets.
 
 - Root path permanently redirects to `/browse-jobs`.
 - Header CTAs include data-cta audit hooks and Tickets nav item.

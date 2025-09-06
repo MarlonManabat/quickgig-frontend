@@ -4,37 +4,12 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { ROUTES } from '@/lib/routes';
 import { toAppPath } from '@/lib/routes';
 import { loginNext } from '@/app/lib/authAware';
-import { MOCK_MODE } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function ApplicationsPage() {
   const supabase = supabaseServer();
-  if (!supabase || MOCK_MODE) {
-    return (
-      <div className="mx-auto max-w-3xl p-6">
-        <h1 className="text-2xl font-semibold mb-4">My Applications</h1>
-        <div
-          data-testid="applications-empty"
-          data-qa="applications-empty"
-          className="opacity-70 space-y-3"
-        >
-          <p>No applications yet</p>
-          <Link
-            href={ROUTES.browseJobs}
-            data-cta="browse-jobs-from-empty"
-            data-testid="browse-jobs-from-empty"
-            className="underline"
-          >
-            Browse jobs
-          </Link>
-        </div>
-        <span className="sr-only">mock</span>
-      </div>
-    );
-  }
-
   const { data } = await supabase.auth.getUser();
   const user = data?.user;
 

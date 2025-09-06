@@ -3,12 +3,11 @@ import { cookies, headers } from 'next/headers'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/db'
-import { MOCK_MODE, hasSupabaseEnv } from '@/lib/env'
 
 export function supabaseServer() {
-  if (!hasSupabaseEnv() || MOCK_MODE) return null
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !anon) return null
   const c = cookies()
   const h = headers()
   return createServerClient<Database>(url, anon, {

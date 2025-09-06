@@ -14,11 +14,3 @@ export const ENV = {
 };
 
 export const IS_PROD = ENV.NODE_ENV === 'production';
-
-export function hasSupabaseEnv() {
-  return Boolean(ENV.SUPABASE_URL && ENV.SUPABASE_ANON);
-}
-export const MOCK_MODE =
-  process.env.MOCK_MODE === '1' ||
-  process.env.CI === 'true' ||
-  !hasSupabaseEnv();

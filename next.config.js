@@ -89,10 +89,20 @@ const baseConfig = {
       ];
     },
     async rewrites() {
-      return [
+      const base = [
         { source: "/employer/post", destination: "/post-job" },
         { source: "/jobs/post", destination: "/post-job" },
       ];
+      if (process.env.MOCK_MODE === '1' || process.env.CI === 'true') {
+        base.push(
+          { source: "/browse-jobs", destination: "/_smoke/browse-jobs" },
+          { source: "/jobs/:id", destination: "/_smoke/jobs/:id" },
+          { source: "/applications", destination: "/_smoke/applications" },
+          { source: "/tickets", destination: "/_smoke/tickets" },
+          { source: "/tickets/buy", destination: "/_smoke/tickets/buy" },
+        );
+      }
+      return base;
     },
 };
 
