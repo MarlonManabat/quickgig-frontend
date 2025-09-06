@@ -33,13 +33,26 @@ jobs:
       - name: Check CTA links
         run: |
           npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000" "node scripts/check-cta-links.mjs"
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-ms-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-ms-playwright-
 
-      - name: Install Playwright browsers
+      - name: Setup Playwright browsers
         uses: microsoft/playwright-github-action@v1
         with:
-          with-deps: true
+          install-deps: true
+
+      - name: Verify browsers installed (and force install if needed)
+        run: |
+          npx playwright --version || true
+          npx playwright install --with-deps chromium
+          ls -la ~/.cache/ms-playwright || true
         env:
-          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: ""
 
       - name: Run smoke tests
         env:
