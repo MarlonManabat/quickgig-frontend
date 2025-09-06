@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-11-19
+**Version:** 2025-11-20
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -10,7 +10,8 @@
   - `data-testid="nav-my-applications"` → `/applications`
   - `data-testid="nav-tickets"` → `/tickets`
   - `data-testid="nav-login"` → `/login`
-- Tickets page CTA `data-cta="buy-tickets"` → `/tickets/buy`
+  - Tickets page CTA `data-cta="buy-tickets"` → `/tickets/buy`
+  - Tickets top-up stub exposes `#order-status` with a pending state
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 

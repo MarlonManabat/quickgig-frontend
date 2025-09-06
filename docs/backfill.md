@@ -31,6 +31,10 @@
 - Added stubs for `/tickets-topup` and `/tickets/topup` with `pending order` status.
 - Removed `metadataBase` from `next.config.js` (unused top-level key).
 
+## 2025-11-20 — CI middleware covers tickets & apply flow
+- Middleware header now includes `nav-tickets` link and job detail exposes `apply-button`.
+- Tickets buy buttons navigate to a top-up page with `#order-status`.
+
 ## 2025-11-03 — Apply + My Applications E2E
 - Supabase migration for `applications` table with RLS policies.
 - API routes `/api/applications/create` and `/api/applications/me`.

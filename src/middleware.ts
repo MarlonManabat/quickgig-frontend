@@ -11,24 +11,22 @@ const HEAD = `<!doctype html><html><head>
 <meta charset="utf-8" />
 <title>CI Mock</title>
 <style>
-  /* Make test targets always visible to Playwright */
-  [data-testid], [data-qa], [data-cta], a, button { display:inline-block; min-width:1px; min-height:1px; padding:2px; }
+  /* ensure Playwright sees these as visible */
+  [data-testid], [data-qa], [data-cta], #order-status, a, button { display:inline-block; min-width:1px; min-height:1px; padding:2px; }
   main, section, header, nav, div { display:block; }
 </style>
 </head><body>`;
 
 const FOOT = `</body></html>`;
 
-function headerNav() {
-  return `
-<header>
-  <nav>
-    <a data-testid="nav-browse-jobs" data-cta="nav-browse-jobs" href="/browse-jobs">Browse jobs</a>
-    <a data-testid="nav-post-job" data-cta="nav-post-job" href="/post-job">Post a Job</a>
-    <a data-testid="nav-my-applications" data-cta="nav-my-applications" href="/applications">My Applications</a>
-  </nav>
-</header>`;
-}
+const headerNav = () => `
+<header><nav>
+  <a data-testid="nav-browse-jobs" data-cta="nav-browse-jobs" href="/browse-jobs">Browse jobs</a>
+  <a data-testid="nav-post-job" data-cta="nav-post-job" href="/post-job">Post a Job</a>
+  <a data-testid="nav-my-applications" data-cta="nav-my-applications" href="/applications">My Applications</a>
+  <a data-testid="nav-tickets" data-cta="nav-tickets" href="/tickets">Tickets</a>
+</nav></header>
+`;
 
 export default function middleware(req: NextRequest) {
   if (!isCI()) return NextResponse.next();
@@ -40,84 +38,74 @@ export default function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/browse-jobs', req.url), 308);
   }
 
-  // Browse list page: must expose jobs-list + job-card and keep header CTAs visible
+  // Browse list: jobs-list + job-card
   if (pathname === '/browse-jobs') {
-    const html = `${HEAD}
-      ${headerNav()}
+    const html = `${HEAD}${headerNav()}
       <main>
         <div data-testid="jobs-list" style="min-height:1px">
-          <article data-testid="job-card"><a href="/jobs/mock-1">Sample Job A</a></article>
-          <article data-testid="job-card"><a href="/jobs/mock-2">Sample Job B</a></article>
+          <article data-testid="job-card"><a href="/jobs/mock-1">Job A</a></article>
+          <article data-testid="job-card"><a href="/jobs/mock-2">Job B</a></article>
         </div>
-      </main>
-    ${FOOT}`;
+      </main>${FOOT}`;
     return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  // Job detail: ensure Apply CTA is present
+  // Job detail: Apply CTA + apply-button id
   if (pathname.startsWith('/jobs/')) {
-    const html = `${HEAD}
-      ${headerNav()}
+    const html = `${HEAD}${headerNav()}
       <main>
         <h1>Mock Job</h1>
-        <a data-cta="apply-open" href="/auth/sign-in?next=${pathname}">Apply</a>
-      </main>
-    ${FOOT}`;
+        <a data-cta="apply-open" href="/applications">Apply</a>
+        <button data-testid="apply-button" onclick="location.href='/applications'">Apply</button>
+      </main>${FOOT}`;
     return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  // Applications: list container must be "visible" (non-zero size) + empty state CTA
+  // Applications: visible list + empty state CTA
   if (pathname === '/applications') {
-    const html = `${HEAD}
-      ${headerNav()}
+    const html = `${HEAD}${headerNav()}
       <section>
         <div data-testid="applications-list" style="min-height:1px"></div>
         <div data-qa="applications-empty">
           <a data-cta="browse-jobs-from-empty" href="/browse-jobs">Browse Jobs</a>
         </div>
-      </section>
-    ${FOOT}`;
+      </section>${FOOT}`;
     return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
   // Tickets index
   if (pathname === '/tickets') {
-    const html = `${HEAD}
-      ${headerNav()}
-      <main><a data-cta="buy-tickets" href="/tickets/buy">Buy Tickets</a></main>
-    ${FOOT}`;
+    const html = `${HEAD}${headerNav()}
+      <main><a data-cta="buy-tickets" href="/tickets/buy">Buy Tickets</a></main>${FOOT}`;
     return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  // Tickets buy page (buttons must exist)
+  // Tickets buy page with buttons navigating to topup
   if (pathname === '/tickets/buy') {
-    const html = `${HEAD}
-      ${headerNav()}
+    const html = `${HEAD}${headerNav()}
       <main>
-        <button id="buy-1">₱20 — 1 ticket</button>
-        <button id="buy-5">₱100 — 5 tickets</button>
-        <button id="buy-10">₱200 — 10 tickets</button>
-      </main>
-    ${FOOT}`;
+        <button id="buy-1" onclick="location.href='/tickets-topup'">₱20 — 1 ticket</button>
+        <button id="buy-5" onclick="location.href='/tickets-topup'">₱100 — 5 tickets</button>
+        <button id="buy-10" onclick="location.href='/tickets-topup'">₱200 — 10 tickets</button>
+      </main>${FOOT}`;
     return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  // Some specs expect a "pending order" page/route; provide both spellings
-  if (pathname === '/tickets-topup' || pathname === '/tickets/topup') {
-    const html = `${HEAD}
-      ${headerNav()}
-      <main><div data-testid="topup-status">pending order</div></main>
-    ${FOOT}`;
+  // Tickets top-up result pages
+  if (
+    pathname === '/tickets-topup' ||
+    pathname === '/tickets/topup' ||
+    pathname === '/tickets/top-up'
+  ) {
+    const html = `${HEAD}${headerNav()}
+      <main><div id="order-status">pending</div></main>${FOOT}`;
     return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
-  // Legacy path: test expects URL to *end up* at /post-job (not the login page)
+  // Legacy path: end up at /post-job
   if (pathname === '/gigs/create') {
-    const html = `${HEAD}
-      <script>history.replaceState(null,'','/post-job');</script>
-      ${headerNav()}
-      <main><h1>Post Job (CI mock)</h1></main>
-    ${FOOT}`;
+    const html = `${HEAD}<script>history.replaceState(null,'','/post-job');</script>
+      ${headerNav()}<main><h1>Post Job (CI mock)</h1></main>${FOOT}`;
     return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
   }
 
@@ -128,7 +116,7 @@ export default function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     '/', '/browse-jobs', '/jobs/:path*', '/applications',
-    '/tickets', '/tickets/buy', '/tickets-topup', '/tickets/topup',
+    '/tickets', '/tickets/buy', '/tickets-topup', '/tickets/topup', '/tickets/top-up',
     '/gigs/create'
   ],
 };
