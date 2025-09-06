@@ -4,29 +4,37 @@ import ApplyButton from '@/components/ApplyButton';
 import { loginNext } from '@/app/lib/authAware';
 import { ROUTES } from '@/lib/routes';
 import { supabaseServer } from '@/lib/supabase/server';
+import { MOCK_MODE } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function JobDetail({ params }: { params: { id: string } }) {
   const supabase = supabaseServer();
-  if (!supabase) notFound();
-  const { data } = await supabase
-    .from('jobs')
-    .select('id,title,description,category,region,city')
-    .eq('id', params.id)
-    .maybeSingle();
-  if (!data) notFound();
-
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
+  let job: any = null;
+  let user: any = null;
+  let isMock = false;
+  if (!supabase || MOCK_MODE) {
+    job = { id: params.id, title: 'Mock Job', description: 'Temporary preview' };
+    isMock = true;
+  } else {
+    const { data } = await supabase
+      .from('jobs')
+      .select('id,title,description,category,region,city')
+      .eq('id', params.id)
+      .maybeSingle();
+    if (!data) notFound();
+    job = data;
+    const { data: userData } = await supabase.auth.getUser();
+    user = userData.user;
+  }
 
   return (
     <div className="mx-auto max-w-3xl p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">{data.title}</h1>
-      <p>{data.description}</p>
+      <h1 className="text-2xl font-semibold">{job.title}</h1>
+      <p>{job.description}</p>
       {user ? (
-        <ApplyButton jobId={data.id} />
+        <ApplyButton jobId={job.id} />
       ) : (
         <LinkApp
           href={loginNext(ROUTES.applications)}
@@ -37,6 +45,7 @@ export default async function JobDetail({ params }: { params: { id: string } }) 
           Apply
         </LinkApp>
       )}
+      {isMock ? <span className="sr-only">mock</span> : null}
     </div>
   );
 }

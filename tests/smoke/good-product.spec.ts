@@ -23,13 +23,22 @@ for (const vp of viewports) {
 
       await page.getByTestId('nav-browse-jobs').first().click();
       await expect(page.getByTestId('jobs-list')).toBeVisible();
+      await expect(page.getByTestId('job-card').first()).toBeVisible();
 
       await page.getByTestId('nav-post-job').first().click();
       await expectAuthAwareRedirect(page, '/post-job');
 
       await page.goto('/');
       await page.getByTestId('nav-my-applications').first().click();
-      await expectAuthAwareRedirect(page, '/applications');
+      await expect(page.getByTestId('applications-empty')).toBeVisible();
+
+      await page.goto('/');
+      await page.getByTestId('nav-tickets').first().click();
+      const buy = page.locator('[data-cta="buy-tickets"]');
+      await expect(buy).toBeVisible();
+      await buy.click();
+      await expect(page).toHaveURL(/\/tickets\/buy/);
+      await expect(page.locator('#buy-1')).toBeVisible();
 
       const sitemap = await page.request.get('/sitemap.xml');
       expect(sitemap.ok()).toBeTruthy();

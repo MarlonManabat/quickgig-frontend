@@ -1,6 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
 ## 2025-11-05 — Good Product Gate hardening
+## 2025-11-12 — Mock mode for CI
+- Added `lib/env.ts` with `MOCK_MODE` to render stub data when Supabase env vars are absent.
+- `/browse-jobs`, job detail, applications, and tickets pages fall back to mock content instead of throwing.
+- PR smoke forces `MOCK_MODE=1` so checks run without secrets.
+
 - Root path permanently redirects to `/browse-jobs`.
 - Header CTAs include data-cta audit hooks and Tickets nav item.
 - Added `/sitemap.xml` with recent jobs and `/robots.txt` reference.

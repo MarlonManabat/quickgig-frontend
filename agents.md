@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-11-05
+**Version:** 2025-11-12
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -17,6 +17,7 @@
 ## Auth behavior
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
 - Auth-gated routes: `/applications`, `/post-job`.
+- In `MOCK_MODE` (CI or missing env), auth-gated pages render stub content instead of redirecting.
 
 ## Legacy redirects (middleware)
 - `/find`      → `/browse-jobs`
