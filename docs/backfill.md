@@ -217,3 +217,10 @@
 - Added a TypeScript baseline guard that counts `tsc` errors and compares to a repo baseline (`ci/tsc-baseline.json`).
 - The guard is *informational* by default (does not fail the PR). Set `TSC_STRICT_GUARD=1` in the workflow to enforce “no regressions.”
 - `ci/tsc-output.txt` is uploaded as a CI artifact for debugging. We will gradually reduce the baseline as we pay down tech debt.
+## 2025-09-05 — Ticketing bootstrap
+
+- Added `ticket_accounts` and `ticket_transactions`.
+- New users automatically receive **3 tickets** via `tickets_grant_initial()` trigger.
+- Created `tickets_burn_on_agreement(employer, jobseeker, agreement_id)` RPC to atomically debit both parties and log transactions.
+- Enabled RLS for read-your-own on both tables; writes occur via service-role RPC only.
+- Backfilled existing users with an account and a one-time signup bonus if missing.
