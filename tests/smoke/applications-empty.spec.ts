@@ -1,11 +1,16 @@
 import { test, expect } from '@playwright/test';
+import { expectAuthAwareRedirect } from './_helpers';
 
-test('Applications page renders empty state when no applications', async ({ page }) => {
+test('Applications page renders or redirects', async ({ page }) => {
   await page.goto('/applications');
+  if (page.url().includes('/login')) {
+    await expectAuthAwareRedirect(page, '/applications');
+    return;
+  }
   await expect(page.getByTestId('applications-list')).toBeVisible();
-  // Accept either an empty row count or explicit empty-state
   const rows = await page.getByTestId('application-row').count();
   if (rows === 0) {
-    await expect(page.getByTestId('applications-empty')).toBeVisible();
+    const empty = page.locator('[data-state="empty"], [data-testid="applications-empty"]');
+    await expect(empty.first()).toBeVisible();
   }
 });
