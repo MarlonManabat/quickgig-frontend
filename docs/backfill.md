@@ -22,6 +22,10 @@
 - Removed `_smoke` pages and rewrites; middleware now serves stub HTML for key routes when `MOCK_MODE` is active.
 - CI smoke hits these middleware stubs, keeping tests green without Supabase.
 
+## 2025-11-18 — Narrow middleware matcher & CI-safe ticket balance API
+- Moved middleware to `src/middleware.ts` with explicit matchers for only the routes tested in smoke.
+- `/api/tickets/balance` lazily initializes Supabase and returns `{ balance: 0 }` when credentials are missing or in `MOCK_MODE`.
+
 ## 2025-11-03 — Apply + My Applications E2E
 - Supabase migration for `applications` table with RLS policies.
 - API routes `/api/applications/create` and `/api/applications/me`.

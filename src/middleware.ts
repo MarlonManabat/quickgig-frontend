@@ -1,13 +1,13 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { ROUTES } from '@/lib/routes';
 
-function isMock() {
+function isCI() {
   const hasSb = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   return process.env.MOCK_MODE === '1' || process.env.CI === 'true' || !hasSb;
 }
 
 export default function middleware(req: NextRequest) {
-  if (!isMock()) return NextResponse.next();
+  if (!isCI()) return NextResponse.next();
 
   const { pathname } = req.nextUrl;
 
@@ -93,6 +93,12 @@ export default function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/|api/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|css|js|map)).*)',
+    '/',
+    '/browse-jobs',
+    '/jobs/:path*',
+    '/applications',
+    '/tickets',
+    '/tickets/buy',
+    '/gigs/create',
   ],
 };
