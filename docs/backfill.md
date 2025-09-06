@@ -257,3 +257,7 @@
 - Refund flow: `tickets_agreement_refund()` RPC with safety index to prevent duplicate refunds.
 - New API `POST /api/agreements/:id/cancel` updates status and refunds both parties.
 - UI: “Cancel agreement” button visible while status === agreed.
+### 2025-09-06
+- Added `/tickets` user page (balance + latest 100 ledger entries).
+- Added `/admin/tickets` ledger view with basic filters; gated by `profiles.is_admin` or `app_metadata.role === 'admin'`.
+- All routes are dynamic to avoid build-time env requirements.

@@ -3,6 +3,8 @@ export const ROUTES = {
   postJob: '/gigs/create',
   applications: '/applications',
   login: '/login',
+  tickets: '/tickets',
+  agreements: '/agreements',
   billingTickets: '/billing/tickets',
   accountTickets: '/account/tickets',
   adminTickets: '/admin/tickets',

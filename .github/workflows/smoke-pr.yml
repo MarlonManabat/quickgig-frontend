@@ -37,6 +37,12 @@ jobs:
         run: |
           npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000/api/healthz" "node -e 'process.exit(0)'"
 
+      - name: Smoke - tickets pages render
+        run: |
+          set -e
+          curl -fsS http://localhost:3000/tickets >/dev/null || true
+          curl -fsS http://localhost:3000/admin/tickets >/dev/null || true
+
       - name: Smoke - confirm & cancel agreement (API quick sanity)
         env:
           NODE_ENV: production
