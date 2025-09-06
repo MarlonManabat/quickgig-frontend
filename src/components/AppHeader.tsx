@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import LinkApp from '@/components/LinkApp';
 import { NAV_ITEMS, ROUTES } from '@/lib/routes';
-import TicketBadge from '@/components/TicketBadge';
+import dynamic from 'next/dynamic';
 import { isAdmin } from '@/lib/admin';
+
+const TicketBalanceChip = dynamic(() => import('@/components/TicketBalanceChip'), { ssr: false });
 
 export default function AppHeader() {
   const { user, signOut } = useUser();
@@ -77,7 +79,7 @@ export default function AppHeader() {
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <TicketBadge />
+          <TicketBalanceChip />
           <LinkApp
             href={`${ROUTES.billingTickets}?next=${encodeURIComponent(ROUTES.postJob)}`}
             className="border rounded-xl px-3 py-1 text-sm"

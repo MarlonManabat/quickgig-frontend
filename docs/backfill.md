@@ -247,3 +247,8 @@
 ### 2025-09-06
 - Fix preview build by making ticket API routes dynamic and deferring Supabase env reads to runtime.
 - Added `getAdminClient()` helper that never throws at import-time; routes return 503 when server env is missing.
+### 2025-09-06
+- Atomic ticket burn: added `tickets_agreement_spend(employer, seeker, agreement)` RPC.
+- New `/api/agreements/[id]/confirm` calls the atomic burn and returns updated balances.
+- UI: balance chip in header + guards on Apply/Confirm when balance < 1.
+
