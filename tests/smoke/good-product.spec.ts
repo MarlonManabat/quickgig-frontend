@@ -12,6 +12,7 @@ for (const vp of viewports) {
 
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
+      await page.waitForLoadState('domcontentloaded');
 
       const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
       for (const id of ctas) {
@@ -29,10 +30,12 @@ for (const vp of viewports) {
       await expectAuthAwareRedirect(page, '/post-job');
 
       await page.goto('/');
+      await page.waitForLoadState('domcontentloaded');
       await page.getByTestId('nav-my-applications').first().click();
       await expectAuthAwareRedirect(page, '/applications');
 
       await page.goto('/');
+      await page.waitForLoadState('domcontentloaded');
       await page.getByTestId('nav-tickets').first().click();
       const buy = page.getByTestId('buy-tickets');
       await expect(buy).toBeVisible();

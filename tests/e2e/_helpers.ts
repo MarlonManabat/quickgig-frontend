@@ -2,6 +2,7 @@ import { expect, Page } from '@playwright/test';
 
 export async function gotoHome(page: Page) {
   await page.goto('/');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 /**

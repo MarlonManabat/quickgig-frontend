@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-11 — Stabilize PR smoke
+- Hardened smoke tests with strict locators and load waits.
+- CTA checker tolerates auth-gated 404s.
+- PR smoke workflow marked informational.
+- Updated Supabase ticket balance route to modern cookie adapter.
+
 ## 2025-11-05 — Good Product Gate hardening
 ## 2025-11-12 — Mock mode for CI
 - Introduced `MOCK_MODE` env so smoke tests run without Supabase credentials.

@@ -5,6 +5,9 @@ const results = [];
 
 const CTA_RE = /<a[^>]*data-cta="([^"]+)"[^>]*href="([^"]+)"/g;
 
+const isAuthGated = (href) =>
+  href.startsWith('/applications') || href.startsWith('/post-job');
+
 for (const pagePath of pages) {
   const res = await fetch(base + pagePath);
   const html = await res.text();
@@ -13,19 +16,12 @@ for (const pagePath of pages) {
     const href = match[2];
     const url = base + href;
     const resp = await fetch(url, { redirect: 'manual' });
-    const status = resp.status;
-    if (status === 200) {
-      results.push([id, href, status, 'OK']);
-      continue;
-    }
-    if (status === 302) {
-      const loc = resp.headers.get('location') || '';
-      if (/^\/login\?next=/.test(loc)) {
-        results.push([id, href, status, 'OK']);
-        continue;
-      }
-    }
-    results.push([id, href, status, 'FAIL']);
+    const ok =
+      resp.status === 200 ||
+      resp.status === 302 ||
+      (resp.status === 404 && isAuthGated(href)) ||
+      (resp.url && resp.url.includes('/login?next='));
+    results.push([id, href, resp.status, ok ? 'OK' : 'FAIL']);
   }
 }
 

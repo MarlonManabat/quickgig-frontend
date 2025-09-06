@@ -3,10 +3,12 @@ import { expectAuthAwareRedirect } from './_helpers';
 
 test('legacy /find redirects to /browse-jobs', async ({ page }) => {
   await page.goto('/find');
+  await page.waitForLoadState('domcontentloaded');
   await expect(page).toHaveURL(/\/browse-jobs\/?$/);
 });
 
 test('legacy /gigs/create redirects to /post-job', async ({ page }) => {
   await page.goto('/gigs/create');
+  await page.waitForLoadState('domcontentloaded');
   await expect(page).toHaveURL(/\/post-job\/?$/);
 });

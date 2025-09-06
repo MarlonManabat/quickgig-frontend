@@ -15,17 +15,18 @@ for (const device of ['desktop', 'mobile'] as const) {
       } catch {}
 
       await page.goto('/browse-jobs');
+      await page.waitForLoadState('domcontentloaded');
       const first = page.getByTestId('job-card').first();
       const title = await first.textContent();
       await first.click();
 
       if (!loggedIn) {
-        await page.getByTestId('apply-button').click();
+        await page.getByTestId('apply-button').first().click();
         await expectAuthAwareRedirect(page, '/applications');
         return;
       }
 
-      await page.getByTestId('apply-button').click();
+      await page.getByTestId('apply-button').first().click();
       const note = `note ${Date.now()}`;
       await page.getByTestId('apply-cover-note').fill(note);
       page.once('dialog', d => d.dismiss());

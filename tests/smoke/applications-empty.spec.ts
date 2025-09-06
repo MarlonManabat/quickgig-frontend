@@ -3,6 +3,7 @@ import { expectAuthAwareRedirect } from './_helpers';
 
 test('Applications page renders or redirects', async ({ page }) => {
   await page.goto('/applications');
+  await page.waitForLoadState('domcontentloaded');
   if (page.url().includes('/login')) {
     await expectAuthAwareRedirect(page, '/applications');
     return;
