@@ -9,6 +9,10 @@
 - `next.config.js` conditionally rewrites `/browse-jobs`, `/jobs/[id]`, `/applications`, and ticket pages to `_smoke` mock pages when `MOCK_MODE` is enabled, guaranteeing expected selectors.
 - `Smoke (PR)` hits these mock pages, keeping CI green without secrets.
 
+## 2025-11-15 — Build-time mock rewrites & /gigs/create CI shim
+- PR workflow builds with `MOCK_MODE=1` so rewrites are baked into the production build.
+- Middleware short-circuits legacy `/gigs/create` to a stub that replaces the URL with `/post-job`, avoiding auth during smoke.
+
 - Root path permanently redirects to `/browse-jobs`.
 - Header CTAs include data-cta audit hooks and Tickets nav item.
 - Added `/sitemap.xml` with recent jobs and `/robots.txt` reference.

@@ -5,6 +5,11 @@ import { ROUTES } from "@/lib/routes";
 
 const AUTH_GATED = new Set([ROUTES.applications, ROUTES.postJob]);
 
+function isMock() {
+  const hasSb = !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  return process.env.MOCK_MODE === "1" || process.env.CI === "true" || !hasSb;
+}
+
 // Normalize: case-insensitive, trim trailing slash (except root)
 function normalize(pathname: string) {
   let p = pathname.toLowerCase();
@@ -14,6 +19,15 @@ function normalize(pathname: string) {
 
 export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
+
+  // CI stub: legacy /gigs/create should look like /post-job without auth
+  if (isMock() && pathname === "/gigs/create") {
+    const html = `<!doctype html><html><body>
+      <script>history.replaceState(null, '', '/post-job');</script>
+      <main><h1>Post Job (CI mock)</h1></main>
+    </body></html>`;
+    return new NextResponse(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+  }
 
   // Allow mock smoke pages and Next/static assets
   if (

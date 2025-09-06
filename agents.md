@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-11-14
+**Version:** 2025-11-15
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -21,7 +21,7 @@
 
 ## Legacy redirects (middleware)
 - `/find`      → `/browse-jobs`
-- `/gigs/create`  → `/post-job`
+- `/gigs/create`  → `/post-job` (CI mock bypasses auth)
 - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
 ## Test hooks (smoke/e2e)

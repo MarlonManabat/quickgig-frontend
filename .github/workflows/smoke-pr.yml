@@ -29,6 +29,10 @@ jobs:
         env:
           NODE_ENV: production
           NEXT_TELEMETRY_DISABLED: '1'
+          # compile with CI mock rewrites enabled
+          MOCK_MODE: '1'
+          NEXT_PUBLIC_SUPABASE_URL: 'https://example.invalid'
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'dummy'
         run: npm run build
       - name: Check CTA links
         env:
