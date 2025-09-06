@@ -252,3 +252,8 @@
 - New `/api/agreements/[id]/confirm` calls the atomic burn and returns updated balances.
 - UI: balance chip in header + guards on Apply/Confirm when balance < 1.
 
+
+### 2025-09-06 (later)
+- Refund flow: `tickets_agreement_refund()` RPC with safety index to prevent duplicate refunds.
+- New API `POST /api/agreements/:id/cancel` updates status and refunds both parties.
+- UI: “Cancel agreement” button visible while status === agreed.
