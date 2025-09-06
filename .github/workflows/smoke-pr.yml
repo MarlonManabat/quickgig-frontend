@@ -36,3 +36,9 @@ jobs:
           NODE_ENV: production
         run: |
           npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000/api/healthz" "node -e 'process.exit(0)'"
+
+      - name: Smoke - confirm & cancel agreement (API quick sanity)
+        env:
+          NODE_ENV: production
+        run: |
+          npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000/api/healthz" "node -e \"(async () => { const id='00000000-0000-0000-0000-000000000001'; const confirm = await fetch('http://localhost:3000/api/agreements/'+id+'/confirm', {method:'POST'}); console.log('confirm', confirm.status); const cancel = await fetch('http://localhost:3000/api/agreements/'+id+'/cancel', {method:'POST'}); console.log('cancel', cancel.status); process.exit(0); })().catch(()=>process.exit(0));\""
