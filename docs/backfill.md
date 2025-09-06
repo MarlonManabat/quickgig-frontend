@@ -49,6 +49,10 @@
 - Browse Jobs now loads published jobs from Supabase.
 - Smoke test covers posting flow (auth-aware).
 
+## 2025-11-24 — CI auth-aware middleware fixes
+- Mock middleware now normalizes auth redirects via `/login?next=` and supplies `apply-button`, `post-job` form fields, and ticket top-up status.
+- Header CTAs in mock mode link to login with `next` params so smoke tests catch auth-aware flows.
+
 ## 2025-09-03
 - Added `NEXT_PUBLIC_APP_ORIGIN` and `src/lib/urls.ts` utility to centralize the app host.
 - Converted all landing CTAs (hero, nav, footer, and cards) to absolute links to the app:
