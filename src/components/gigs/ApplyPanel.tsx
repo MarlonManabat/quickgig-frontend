@@ -1,6 +1,8 @@
 'use client';
 import { useUser } from '@/hooks/useUser';
 import { useState } from 'react';
+import { RequireTickets } from '@/components/RequireTickets';
+import { ROUTES } from '@/lib/routes';
 
 export function ApplyPanel({ gigId }: { gigId: string }) {
   const { user } = useUser();
@@ -20,12 +22,35 @@ export function ApplyPanel({ gigId }: { gigId: string }) {
     setDone(true); setSubmitting(false);
   }
 
-  if (!user) return <p className="text-slate-600">Please <a className="underline" href="/login">sign in</a> to apply.</p>;
+  if (!user)
+    return (
+      <p className="text-slate-600">
+        Please{' '}
+        <a className="underline" href={ROUTES.login}>
+          sign in
+        </a>{' '}
+        to apply.
+      </p>
+    );
   if (done) return <p className="text-green-700">Application submitted.</p>;
   return (
     <div className="space-y-2">
       {err && <p className="text-red-600">{err}</p>}
-      <button disabled={submitting} onClick={onApply} className="rounded bg-black text-white px-4 py-2">Apply</button>
+      <RequireTickets need={1}>
+        {(ok) => (
+          <button
+            disabled={!ok || submitting}
+            onClick={() =>
+              ok
+                ? onApply()
+                : alert('You need 1 ticket to apply. Check your balance or earn more.')
+            }
+            className="rounded bg-black text-white px-4 py-2"
+          >
+            Apply
+          </button>
+        )}
+      </RequireTickets>
     </div>
   );
 }
