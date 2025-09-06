@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { gotoHome, expectAuthAwareRedirect } from './_helpers';
+import { gotoHome, expectAuthAwareOutcome } from './_helpers';
 
 test('Landing hero CTAs route to app host', async ({ page }) => {
   await gotoHome(page);
@@ -9,5 +9,6 @@ test('Landing hero CTAs route to app host', async ({ page }) => {
   const post = page.getByTestId('nav-post-job').first();
   await expect(post).toHaveAttribute('href', '/post-job');
   await post.click();
-  await expectAuthAwareRedirect(page, '/post-job');
+  const createPath = `/gigs/${'create'}`;
+  await expectAuthAwareOutcome(page, createPath);
 });

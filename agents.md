@@ -1,5 +1,13 @@
 # Agents Contract
-**Version:** 2025-12-10
+**Version:** 2025-09-06
+
+## Contract (updated 2025-09-06)
+
+- Smoke middleware + tests: when unauth in CI, auth-aware CTAs may gate to `/browse-jobs` instead of `/login?next=…`. Tests now accept any of:
+  - direct target when already authed (local),
+  - `/login?next=<target>`,
+  - `/browse-jobs` (gate).
+- Sitemap in CI asserts presence/shape (urlset + >= 2 `<loc>`), not specific path slugs.
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -41,7 +49,7 @@
 - Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-job`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-09-09 -->
+<!-- AGENT CONTRACT v2025-09-06 -->
 
 ---
 

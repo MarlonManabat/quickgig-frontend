@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
 
 test('legacy /find redirects to /browse-jobs', async ({ page }) => {
   await page.goto('/find');

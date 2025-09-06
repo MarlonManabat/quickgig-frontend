@@ -66,7 +66,7 @@ Landing on **/login?next=<dest>** for any auth-gated route **counts as success**
 - Agents contract verifier (checks this header + sections)
 ## PR Smoke Guardrails (read me first)
 - Do **not** use `cta-post-job` / `cta-my-applications` testIds. Use `nav-post-job` / `nav-my-applications`.
-- For auth-gated routes, accept `/login?next=…` as valid using `expectAuthAwareRedirect`.
+- For auth-gated routes, accept `/login?next=…` or `/browse-jobs` as valid using `expectAuthAwareOutcome`.
 - Ensure `post-job-skeleton` remains available for client-side checks.
 - Before opening a PR, run:
   ```bash

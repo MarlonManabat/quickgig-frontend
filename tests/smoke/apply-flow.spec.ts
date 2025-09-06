@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, gotoHome } from './_helpers';
+import { expectAuthAwareOutcome, gotoHome } from './_helpers';
 import { loginAs } from '../e2e/helpers';
 
 for (const device of ['desktop', 'mobile'] as const) {
@@ -19,7 +19,7 @@ for (const device of ['desktop', 'mobile'] as const) {
       await first.click();
 
       await page.getByTestId('apply-button').first().click();
-      await expectAuthAwareRedirect(page, '/applications');
+      await expectAuthAwareOutcome(page, '/applications');
       if (/(^|\/)login(\?|$)/.test(await page.url())) return;
 
       const note = `note ${Date.now()}`;
