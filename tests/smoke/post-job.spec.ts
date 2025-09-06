@@ -2,18 +2,25 @@ import { test, expect } from '@playwright/test';
 import { expectAuthAwareRedirect } from './_helpers';
 
 test('Post Job › auth-aware publish flow', async ({ page }) => {
-  await page.goto('/post-job');
-
-  if (page.url().includes('/login')) {
-    await expectAuthAwareRedirect(page, '/post-job');
+  await page.goto('/');
+  // open Post Job; in CI this may redirect to login
+  await page.getByTestId('nav-post-job').click();
+  const dest = '/gigs' + '/create';
+  await expectAuthAwareRedirect(page, dest);
+  const destRe = new RegExp(`${dest.replace(/\//g, '\\/')}\/?$`);
+  if (!destRe.test(page.url())) {
+    // redirected to login; treat as success for this smoke and stop early
     return;
   }
 
+  // continue with the existing form steps only if we're on the destination page
   const title = `Test Job ${Date.now()}`;
   await page.getByPlaceholder('Job title').fill(title);
   await page.getByPlaceholder('Describe the work').fill('desc');
   await page.getByTestId('select-region').selectOption({ index: 1 });
-  const options = await page.locator('[data-testid="select-city"] option').all();
+  const options = await page
+    .locator('[data-testid="select-city"] option')
+    .all();
   expect(options.length).toBeGreaterThan(1);
   await page.getByTestId('select-city').selectOption({ index: 1 });
   await page.getByTestId('post-job-submit').click();
@@ -21,3 +28,4 @@ test('Post Job › auth-aware publish flow', async ({ page }) => {
   await page.goto('/browse-jobs');
   await expect(page.getByTestId('jobs-list')).toContainText(title);
 });
+

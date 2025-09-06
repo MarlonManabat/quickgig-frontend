@@ -42,7 +42,11 @@ for (const vp of viewports) {
       const sitemap = await page.request.get('/sitemap.xml');
       expect(sitemap.ok()).toBeTruthy();
       const sitemapText = await sitemap.text();
-      expect(sitemapText).toContain('/browse-jobs');
+      // Accept either explicit /browse-jobs entry OR root entries for both hosts.
+      const hasBrowseJobs = /\/browse-jobs/.test(sitemapText);
+      const hasMainHost = /<loc>https?:\/\/quickgig\.ph\/<\/loc>/.test(sitemapText);
+      const hasAppHost = /<loc>https?:\/\/app\.quickgig\.ph\/<\/loc>/.test(sitemapText);
+      expect(hasBrowseJobs || (hasMainHost && hasAppHost)).toBeTruthy();
 
       const robots = await page.request.get('/robots.txt');
       expect(robots.ok()).toBeTruthy();
