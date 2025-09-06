@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-11-12
+**Version:** 2025-11-13
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -38,6 +38,7 @@
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
 - `scripts/check-cta-links.mjs` ensures CTAs point only to canonical routes.
+- Middleware serves stub pages in `MOCK_MODE` for CI smoke.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-09-09 -->

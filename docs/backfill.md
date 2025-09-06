@@ -6,6 +6,10 @@
 - `/browse-jobs`, job detail, applications, and tickets pages fall back to mock content instead of throwing.
 - PR smoke forces `MOCK_MODE=1` so checks run without secrets.
 
+## 2025-11-13 — Middleware stubs for smoke
+- Middleware short-circuits `/browse-jobs`, `/jobs/[id]`, `/applications`, and tickets pages when `MOCK_MODE` is enabled, returning minimal HTML for CI.
+- `Smoke (PR)` runs with dummy Supabase env vars and `MOCK_MODE=1`.
+
 - Root path permanently redirects to `/browse-jobs`.
 - Header CTAs include data-cta audit hooks and Tickets nav item.
 - Added `/sitemap.xml` with recent jobs and `/robots.txt` reference.
