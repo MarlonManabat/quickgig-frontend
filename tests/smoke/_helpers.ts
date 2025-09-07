@@ -1,27 +1,37 @@
-import { Page, expect } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
-// In CI some routes land on their destination without auth, while prod redirects to /login?next=…
-// Treat either outcome as OK to avoid flakes.
+export async function gotoHome(page: Page) {
+  await page.goto('/');
+  await page.waitForLoadState('domcontentloaded');
+}
+
+export async function openMenu(page: Page) {
+  // Mobile: open the hamburger before selecting header CTAs
+  await page.getByTestId('nav-menu-button').click();
+}
+
+/**
+ * Waits for either a login redirect with ?next=<path> OR landing directly on the dest.
+ * Returns 'redirect' when /login?next=... wins, or 'visible' when destination wins.
+ */
 export async function expectAuthAwareRedirect(
   page: Page,
   path: string | RegExp,
   timeout = 8000
-) {
-  const escape = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  const toRe = (p: string | RegExp) =>
-    p instanceof RegExp ? p : new RegExp(`${escape(p)}$`);
+): Promise<'redirect' | 'visible'> {
+  const destRe =
+    typeof path === 'string'
+      ? new RegExp(path.replace(/\//g, '\\/') + '\\/?$')
+      : path;
 
-  const destRe = toRe(path);
-  const pathStr = path instanceof RegExp ? null : path;
-  const loginRe = pathStr
-    ? new RegExp(`/login\\?next=${encodeURIComponent(pathStr)}$`)
-    : /\/login\?next=.*/;
+  const encoded = typeof path === 'string' ? encodeURIComponent(path) : null;
+  const loginRe = encoded ? new RegExp(`/login\\?next=${encoded}$`) : /\/login\?next=/;
 
   const winner = await Promise.race([
-    page.waitForURL(loginRe, { timeout }).then(() => 'login'),
-    page.waitForURL(destRe, { timeout }).then(() => 'dest'),
+    page.waitForURL(loginRe, { timeout }).then(() => 'redirect' as const),
+    page.waitForURL(destRe, { timeout }).then(() => 'visible' as const),
   ]);
 
-  expect(winner).toMatch(/^(login|dest)$/);
+  expect(winner).toBeTruthy();
+  return winner;
 }
-
