@@ -6,11 +6,10 @@ function escapeRe(s: string) {
 
 function makeLoginRe(dest: string | RegExp) {
   if (typeof dest === 'string') {
-    // exact encoded "next" for string destinations
     return new RegExp(`/login\\?next=${escapeRe(encodeURIComponent(dest))}$`);
   }
-  // For RegExp destinations, derive a literal-ish path, encode it,
-  // and match it as a substring inside the next= query.
+  // Derive a literal-ish path fragment from the regex, encode it,
+  // and allow it anywhere in the next= value.
   const literal = dest.source
     .replace(/^\^?/, '')
     .replace(/\$?\/?$/, '')
@@ -28,13 +27,12 @@ export async function expectAuthAwareRedirect(page: Page, dest: string | RegExp,
       ? new RegExp(`${escapeRe(dest).replace(/\\\//g, '\\/')}\\/?$`)
       : dest;
 
-  // Accept either reaching the destination or being redirected to login with ?next=<dest>
   await expect
     .poll(async () => page.url(), { timeout })
     .toMatch(new RegExp(`${loginRe.source}|${destRe.source}`));
 }
 
-// Safer mobile menu opener (keeps if identical)
+// Safer mobile menu opener
 export async function openMenu(page: Page) {
   const btn = page.getByTestId('nav-menu-button');
   await btn.waitFor({ state: 'visible', timeout: 2000 });

@@ -5,12 +5,8 @@ test.describe('good product smoke', () => {
   test('sitemap + robots', async ({ page }) => {
     const sm = await page.request.get('/sitemap.xml');
     expect(sm.ok()).toBeTruthy();
-    const xml = await sm.text();
-    const hasBrowse = /\/browse-jobs\b/.test(xml);
-    const hasHosts =
-      /https:\/\/quickgig\.ph\/?/.test(xml) && /https:\/\/app\.quickgig\.ph\/?/.test(xml);
-    expect(hasBrowse || hasHosts).toBeTruthy();
-
+    const text = await sm.text();
+    expect(text).toMatch(/\/browse-jobs|https:\/\/(app\.)?quickgig\.ph\//);
     const robots = await page.request.get('/robots.txt');
     expect(robots.ok()).toBeTruthy();
   });

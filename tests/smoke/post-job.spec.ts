@@ -5,8 +5,8 @@ test('Post Job > auth-aware publish flow', async ({ page }) => {
   await page.goto('/');
   await page.getByTestId('nav-post-job').click();
   await expectAuthAwareRedirect(page, /\/gigs\/create\/?$/);
+  const onCreate = /\/gigs\/create\/?$/.test(await page.url());
+  if (!onCreate) return;
 
-  if (/\/gigs\/create\/?$/.test(page.url())) {
-    await expect(page.getByTestId('post-job-submit')).toBeVisible({ timeout: 10000 });
-  }
+  await expect(page.getByTestId('post-job-submit')).toBeVisible({ timeout: 10000 });
 });
