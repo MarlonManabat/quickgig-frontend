@@ -20,7 +20,7 @@ for (const device of ['desktop', 'mobile'] as const) {
       await first.click();
 
       if (!loggedIn) {
-        await page.getByTestId('apply-button').click();
+        await page.getByTestId('apply-button').first().click();
         await expectAuthAwareRedirect(page, '/applications');
         return;
       }
