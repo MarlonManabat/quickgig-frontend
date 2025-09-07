@@ -1,17 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-// Inline minimal auth-aware checker to avoid coupling to smoke helpers
-async function expectAuthAwareRedirect(page: any, dest: string | RegExp, timeout = 8000) {
-  const enc = typeof dest === 'string' ? encodeURIComponent(dest) : '__regex__';
-  const loginRe = new RegExp(`/login\\?next=${enc}$`);
-  const destRe = typeof dest === 'string'
-    ? new RegExp(`${dest.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')}$`)
-    : dest;
-
-  await expect
-    .poll(async () => page.url(), { timeout })
-    .toMatch(new RegExp(`${loginRe.source}|${destRe.source}`));
-}
+import { expectAuthAwareRedirect } from '../smoke/_helpers';
 
 const CTAS = [
   { id: 'nav-browse-jobs', dest: '/browse-jobs', gated: false },
