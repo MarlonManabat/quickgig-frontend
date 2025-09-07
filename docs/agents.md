@@ -5,7 +5,14 @@
 - Header nav testids used by smoke: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
 - Mobile menu button testid: `nav-menu-button` (open menu before asserting mobile links).
 - Sitemap expectations: include `/browse-jobs` on the main host; also allow/expect base entries for `https://quickgig.ph/` and `https://app.quickgig.ph/`.
-- Helpers referenced by tests: `expectAuthAwareRedirect(page, destPath, timeout=8000)`.
+
+## 2025-09-06
+- Auth-aware redirects in CI: unauthenticated CTA clicks redirect to `/login?next=<path>`.
+- Header nav testids used by smoke: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
+- Mobile menu button testid: `nav-menu-button` (open menu before asserting mobile links).
+- Sitemap expectations: include `/browse-jobs` on the main host; also allow/expect base entries for `https://quickgig.ph/` and `https://app.quickgig.ph/`.
+- Helpers referenced by tests: `expectAuthAwareRedirect(page, pathRegex, timeout=8000)`.
+
 
 
 # Product Acceptance (Good Product Bar)

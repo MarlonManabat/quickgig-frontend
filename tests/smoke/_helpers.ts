@@ -1,26 +1,37 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
-export async function expectAuthAwareRedirect(
-  page: Page,
-  destPath: string,
-  timeout = 8000
-): Promise<'login' | 'landed'> {
-  const encoded = encodeURIComponent(destPath);
-  const loginRe = new RegExp(`/login\\?next=${encoded}$`);
-  const escaped = destPath.replace(/\//g, '\\/');
-  const destRe = new RegExp(`${escaped}\\/?$`);
-
-  const winner = await Promise.race([
-    page.waitForURL(loginRe, { timeout }).then(() => 'login'),
-    page.waitForURL(destRe, { timeout }).then(() => 'landed'),
-  ]);
-  return winner;
+export async function gotoHome(page: Page) {
+  await page.goto('/');
+  await page.waitForLoadState('domcontentloaded');
 }
 
-// Handy helper for mobile nav
-export async function openMobileMenu(page: Page) {
-  const btn = page.getByTestId('nav-menu-button');
-  if (await btn.isVisible()) {
-    await btn.click();
-  }
+export async function openMenu(page: Page) {
+  // Mobile: open the hamburger before selecting header CTAs
+  await page.getByTestId('nav-menu-button').click();
+}
+
+/**
+ * Waits for either a login redirect with ?next=<path> OR landing directly on the dest.
+ * Returns 'redirect' when /login?next=... wins, or 'visible' when destination wins.
+ */
+export async function expectAuthAwareRedirect(
+  page: Page,
+  path: string | RegExp,
+  timeout = 8000
+): Promise<'redirect' | 'visible'> {
+  const destRe =
+    typeof path === 'string'
+      ? new RegExp(path.replace(/\//g, '\\/') + '\\/?$')
+      : path;
+
+  const encoded = typeof path === 'string' ? encodeURIComponent(path) : null;
+  const loginRe = encoded ? new RegExp(`/login\\?next=${encoded}$`) : /\/login\?next=/;
+
+  const winner = await Promise.race([
+    page.waitForURL(loginRe, { timeout }).then(() => 'redirect' as const),
+    page.waitForURL(destRe, { timeout }).then(() => 'visible' as const),
+  ]);
+
+  expect(winner).toBeTruthy();
+  return winner;
 }
