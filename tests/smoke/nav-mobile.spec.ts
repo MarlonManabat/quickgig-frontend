@@ -1,13 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { gotoHome, expectToBeOnRoute } from '../e2e/_helpers';
-import { expectAuthAwareRedirect } from './_helpers';
+import { expectAuthAwareRedirect, openMenu } from './_helpers';
 
 test.use({ viewport: { width: 360, height: 740 } });
-
-async function openMenu(page) {
-  await page.getByTestId('nav-menu-button').click();
-  await expect(page.getByTestId('nav-menu')).toBeVisible();
-}
 
 test.describe('mobile header CTAs', () => {
   test('Browse Jobs', async ({ page }) => {
