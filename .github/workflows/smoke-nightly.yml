@@ -1,0 +1,93 @@
+name: smoke-nightly
+
+on:
+  schedule:
+    - cron: "0 18 * * *"  # daily 18:00 UTC (02:00 PH). Adjust if desired.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: smoke-nightly
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Smoke (main nightly)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Playwright (headless)
+        run: npx playwright install --with-deps
+
+      - name: Run smoke (enforced)
+        run: npx playwright test -c playwright.smoke.ts --reporter=list,json,junit --output=test-results
+
+      - name: Upload smoke artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-nightly-artifacts
+          path: |
+            test-results/**
+            playwright-report/**
+
+      - name: Parse failing tests → JSON
+        if: failure()
+        run: |
+          node -e "const fs=require('fs');const p='test-results/test-results.json';if(!fs.existsSync(p)){console.log('no json');process.exit(0)};const r=JSON.parse(fs.readFileSync(p,'utf8'));const fails=[];for(const proj of r){for(const s of proj.suites||[]){const walk=(n,pfx=[])=>{for(const t of (n.tests||[])){if(t.outcome==='failed'){fails.push({title:[...pfx,t.title].join(' › '),file:t.location?.file,project:proj.project?.name});}}for(const child of (n.suites||[]))walk(child,[...pfx,child.title]);};walk(s);} }fs.writeFileSync('test-results/failing.json',JSON.stringify(fails,null,2));console.log('Failing tests:',fails.length)"
+          test -f test-results/failing.json && cat test-results/failing.json || true
+
+      - name: Open/update issues per failing test
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'test-results/failing.json';
+            if (!fs.existsSync(path)) {
+              core.info('No failing.json; skipping issue creation');
+              return;
+            }
+            const fails = JSON.parse(fs.readFileSync(path,'utf8'));
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            for (const f of fails) {
+              const title = `Smoke failure: ${f.title}`;
+              // search open issues with exact title
+              const { data: found } = await github.search.issuesAndPullRequests({
+                q: `repo:${owner}/${repo} is:issue is:open in:title "${title}"`
+              });
+              const body = [
+                `Nightly smoke failed for **${f.title}**`,
+                '',
+                `- File: \`${f.file||'n/a'}\``,
+                `- Project: \`${f.project||'default'}\``,
+                '',
+                `Artifacts: download from the workflow run (smoke-nightly-artifacts).`,
+              ].join('\n');
+              if (found.items.length) {
+                const issue = found.items[0];
+                await github.issues.createComment({ owner, repo, issue_number: issue.number, body });
+              } else {
+                await github.issues.create({
+                  owner, repo,
+                  title,
+                  body,
+                  labels: ['smoke', 'nightly']
+                });
+              }
+            }
