@@ -24,6 +24,10 @@
 - CTAs include `data-cta` matching their test ID
 - Unauth flows: redirect to **/login?next=<dest>** counts as success
 - No white screens (page-level error/skeleton boundaries in gated flows)
+- Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-menu-button`
+- Hero CTA testids: `hero-browse-jobs`, `hero-post-job`
+- Canonical routes: `/browse-jobs`, `/post-job`, `/applications`
+- Auth-aware: unauthenticated clicks on gated CTAs may redirect to `/login?next=<dest>`.
 
 **Observability**
 - Sentry enabled (frontend DSN)

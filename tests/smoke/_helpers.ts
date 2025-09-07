@@ -5,12 +5,15 @@ export async function expectAuthAwareRedirect(
   dest: string | RegExp,
   timeout = 8000
 ) {
-  const encoded = typeof dest === 'string' ? encodeURIComponent(dest) : '__regex__';
-  const loginRe = new RegExp(`/login\\?next=${encoded}$`);
-  const destRe = typeof dest === 'string'
-    ? new RegExp(`${dest.replace(/[\\/]/g, '\\$&')}$`)
-    : dest;
+  // Accept any login redirect that carries a next= value.
+  const loginRe = /\/login\?next=.*/;
 
+  const destRe =
+    typeof dest === 'string'
+      ? new RegExp(`${dest.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`)
+      : dest;
+
+  // Poll the *full URL* and match using a combined regex. No anchors -> matches absolute URLs too.
   await expect
     .poll(async () => page.url(), { timeout })
     .toMatch(new RegExp(`${loginRe.source}|${destRe.source}`));

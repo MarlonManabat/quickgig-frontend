@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
-import LinkApp from '@/components/LinkApp';
+import Link from 'next/link';
 import { NAV_ITEMS, ROUTES } from '@/lib/routes';
+import { CTA_TARGET, type CtaKey } from '@/lib/navMap';
 import dynamic from 'next/dynamic';
 import { isAdmin } from '@/lib/admin';
 
@@ -15,10 +16,7 @@ export default function AppHeader() {
 
   const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(
     item => ({
-      href:
-        !user && item.auth === 'auth-aware'
-          ? `${ROUTES.login}?next=${encodeURIComponent(item.to)}`
-          : item.to,
+      href: (CTA_TARGET as Record<CtaKey, string>)[item.idDesktop as CtaKey] ?? item.to,
       label: item.label,
       testId: item.idDesktop,
       mobileId: item.idMobile,
@@ -45,17 +43,17 @@ export default function AppHeader() {
     <header data-testid="app-header" className="border-b bg-white/60 backdrop-blur">
       <div className="mx-auto max-w-5xl flex items-center justify-between p-4">
         <div className="flex items-center gap-4">
-          <LinkApp
-            href={ROUTES.browseJobs}
+          <Link
+            href={CTA_TARGET['nav-browse-jobs']}
             className="font-semibold"
             data-cta="nav-browse-jobs"
           >
             QuickGig
-          </LinkApp>
+          </Link>
           <nav className="hidden md:flex items-center gap-4">
             {links.map(link =>
               link.href ? (
-                <LinkApp
+                <Link
                   key={link.testId}
                   data-testid={link.testId}
                   data-cta={link.testId}
@@ -63,7 +61,7 @@ export default function AppHeader() {
                   prefetch={false}
                 >
                   {link.label}
-                </LinkApp>
+                </Link>
               ) : (
                 <button
                   key={link.testId}
@@ -89,12 +87,12 @@ export default function AppHeader() {
         </div>
         <div className="flex items-center gap-3">
           <TicketBalanceChip />
-          <LinkApp
+          <Link
             href={`${ROUTES.billingTickets}?next=${encodeURIComponent(ROUTES.postJob)}`}
             className="border rounded-xl px-3 py-1 text-sm"
           >
             Buy ticket
-          </LinkApp>
+          </Link>
         </div>
       </div>
       {open ? (
@@ -108,7 +106,7 @@ export default function AppHeader() {
           <div className="flex flex-col gap-2 p-4">
             {links.map(link =>
               link.href ? (
-                <LinkApp
+                <Link
                   key={link.mobileId}
                   data-testid={link.mobileId}
                   data-cta={link.mobileId}
@@ -118,7 +116,7 @@ export default function AppHeader() {
                   className="link"
                 >
                   {link.label}
-                </LinkApp>
+                </Link>
               ) : (
                 <button
                   key={link.mobileId}

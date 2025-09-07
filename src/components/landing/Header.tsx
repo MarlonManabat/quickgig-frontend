@@ -1,36 +1,40 @@
-import LinkApp from '@/components/LinkApp';
+import Link from 'next/link';
 import { ROUTES } from '@/lib/routes';
+import { CTA_TARGET } from '@/lib/navMap';
 
 export default function LandingHeader() {
   return (
     <nav className="...">
-      <LinkApp
+      <Link
         data-testid="nav-browse-jobs"
         data-cta="nav-browse-jobs"
-        href={ROUTES.browseJobs}
+        href={CTA_TARGET['nav-browse-jobs']}
         className="hover:underline"
       >
         Browse jobs
-      </LinkApp>
-      <LinkApp
+      </Link>
+      <Link
         data-testid="nav-post-job"
         data-cta="nav-post-job"
-        href={`${ROUTES.login}?next=${encodeURIComponent(ROUTES.postJob)}`}
+        href={CTA_TARGET['nav-post-job']}
         className="btn btn-primary"
       >
         Post a job
-      </LinkApp>
-      <LinkApp
+      </Link>
+      <Link
         data-testid="nav-my-applications"
         data-cta="nav-my-applications"
-        href={`${ROUTES.login}?next=${encodeURIComponent(ROUTES.applications)}`}
+        href={CTA_TARGET['nav-my-applications']}
         className="..."
       >
         My Applications
-      </LinkApp>
-      <LinkApp data-testid="nav-login" data-cta="nav-login" href={ROUTES.login} className="...">
+      </Link>
+      <Link data-testid="nav-login" data-cta="nav-login" href={ROUTES.login} className="...">
         Sign in
-      </LinkApp>
+      </Link>
+      <button type="button" data-testid="nav-menu-button" aria-label="Open menu" className="md:hidden">
+        Menu
+      </button>
     </nav>
   );
 }

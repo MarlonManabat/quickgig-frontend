@@ -1,6 +1,6 @@
 import React from 'react';
-import LinkApp from '@/components/LinkApp';
-import { ROUTES } from '@/lib/routes';
+import Link from 'next/link';
+import { CTA_TARGET } from '@/lib/navMap';
 
 type Props = {
   findClassName?: string;
@@ -18,18 +18,24 @@ export default function LandingCTAs({
   return (
       <div className="flex gap-3">
         {showFind && (
-          <LinkApp
+          <Link
             data-testid="hero-browse-jobs"
-            href={ROUTES.browseJobs}
+            data-cta="hero-browse-jobs"
+            href={CTA_TARGET['hero-browse-jobs']}
             className={findClassName}
           >
             Browse jobs
-          </LinkApp>
+          </Link>
         )}
         {showPost && (
-          <LinkApp data-testid="hero-post-job" href={ROUTES.postJob} className={postClassName}>
+          <Link
+            data-testid="hero-post-job"
+            data-cta="hero-post-job"
+            href={CTA_TARGET['hero-post-job']}
+            className={postClassName}
+          >
             Post a job
-          </LinkApp>
+          </Link>
         )}
       </div>
     );
