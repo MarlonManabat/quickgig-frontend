@@ -1,4 +1,12 @@
-<!-- AGENT CONTRACT v2025-09-06 -->
+<!-- AGENT CONTRACT v2025-09-07 -->
+
+## 2025-09-07
+- **Helper:** `expectAuthAwareRedirect(page, destPathOrRegex, timeout=8000)` now accepts a **string or RegExp** destination.  
+  - When `dest` is a string, CI expects `/login?next=<encoded dest>` OR a direct landing on `<dest>`.  
+  - When `dest` is a RegExp, CI treats **any** `/login?next=...` redirect as success (auth redirect seen) **or** a final URL matching the regex as success.
+- **Header/nav conventions (unchanged):** header CTAs use test IDs `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`. Mobile menu button: `nav-menu-button`. Header container: `app-header`.
+- **Sitemap (unchanged):** allow root host entries for `https://quickgig.ph/` and `https://app.quickgig.ph/`, and ensure `/browse-jobs` appears on the main host.
+- This section updates the CI contract to reflect the helper’s RegExp support used by smoke tests.
 
 ## 2025-09-06
 - Auth-aware redirects in CI: unauthenticated CTA clicks redirect to `/login?next=<path>`.
