@@ -1,4 +1,7 @@
-<!-- AGENT CONTRACT v2025-12-12 -->
+<!-- AGENT CONTRACT v2025-12-13 -->
+
+## 2025-09-07
+- Header CTAs canonicalized; friendly auth errors; non-blank 404/500; link-audit script.
 
 ## 2025-09-06
 - Auth-aware redirects in CI: unauthenticated CTA clicks redirect to `/login?next=<path>`.
