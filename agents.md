@@ -34,6 +34,7 @@
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - The landing page must not render duplicate CTAs with identical accessible names.
+- Helper: `expectAuthAwareRedirect(page, destPathOrRegex, timeout=8000)` supports string or RegExp destinations and treats `/login?next=<dest>` as success.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
@@ -41,7 +42,7 @@
 - Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-job`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-09-09 -->
+<!-- AGENT CONTRACT v2025-09-10 -->
 
 ---
 
