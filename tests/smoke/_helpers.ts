@@ -4,24 +4,17 @@ import { Page, expect } from '@playwright/test';
 // Treat either outcome as OK to avoid flakes.
 export async function expectAuthAwareRedirect(
   page: Page,
-  path: string | RegExp,
+  dest: string | RegExp,
   timeout = 8000
 ) {
-  const escape = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  const toRe = (p: string | RegExp) =>
-    p instanceof RegExp ? p : new RegExp(`${escape(p)}$`);
+  const encoded = encodeURIComponent(typeof dest === 'string' ? dest : '/__regex__/');
+  const loginRe = new RegExp(`/login\\?next=${encoded}$`);
+  const destRe = typeof dest === 'string'
+    ? new RegExp(`${dest.replace(/[/\\]/g, '\\$&')}$`)
+    : dest;
 
-  const destRe = toRe(path);
-  const pathStr = path instanceof RegExp ? null : path;
-  const loginRe = pathStr
-    ? new RegExp(`/login\\?next=${encodeURIComponent(pathStr)}$`)
-    : /\/login\?next=.*/;
-
-  const winner = await Promise.race([
-    page.waitForURL(loginRe, { timeout }).then(() => 'login'),
-    page.waitForURL(destRe, { timeout }).then(() => 'dest'),
-  ]);
-
-  expect(winner).toMatch(/^(login|dest)$/);
+  await expect
+    .poll(async () => page.url(), { timeout })
+    .toMatch(new RegExp(`${loginRe.source}|${destRe.source}`));
 }
 

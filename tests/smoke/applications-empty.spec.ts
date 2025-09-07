@@ -1,11 +1,17 @@
-import { test } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
+import { test, expect } from '@playwright/test';
+import { gotoHome, expectAuthAwareRedirect } from './_helpers';
 
 test('Applications page renders or redirects', async ({ page }) => {
-  await page.goto('/applications');
-  await expectAuthAwareRedirect(page, '/applications');
-  // If CI redirected to login, we're done. If we landed on /applications without auth, do not
-  // require the list to be visible (it may be hidden for guests).
-  // No further assertion needed here.
-});
+  await gotoHome(page);
+  const header = page.getByTestId('app-header');
+  await expect(header).toBeVisible();
+  await header.getByTestId('nav-my-applications').click();
 
+  await expectAuthAwareRedirect(page, '/applications');
+
+  if ((await page.url()).endsWith('/applications')) {
+    await expect(
+      page.locator('[data-testid="applications-empty"], [data-testid="applications-list"]')
+    ).toBeVisible();
+  }
+});
