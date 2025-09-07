@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { randomUrlSafe, challengeS256 } from '@/lib/pkce';
 import { sanitizeNext } from '@/lib/safeNext';
-import { setCookie } from '@/lib/cookies';
+import { crossSiteCookieOpts } from '@/lib/cookieOptions';
 
-const COOKIE_DOMAIN = '.quickgig.ph';
-const PKCE_COOKIE = 'qg_pkce';
-const STATE_COOKIE = 'qg_state';
-const NEXT_COOKIE = 'qg_next';
+const NEXT_COOKIE = 'next';
+const STATE_COOKIE = 'pkce_state';
+const PKCE_COOKIE = 'pkce_verifier';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const nextParam = url.searchParams.get('next');
-  const next = sanitizeNext(nextParam);
+  const nextParam = url.searchParams.get('next') || undefined;
 
   const authorizeUrl = process.env.AUTH_AUTHORIZE_URL!;
   const clientId = process.env.AUTH_CLIENT_ID!;
@@ -31,11 +30,11 @@ export async function GET(req: Request) {
   auth.searchParams.set('code_challenge', challenge);
   auth.searchParams.set('state', state);
 
-  const res = NextResponse.redirect(auth.toString(), { status: 302 });
-  setCookie(res.headers, PKCE_COOKIE, verifier, { domain: COOKIE_DOMAIN, maxAge: 600 });
-  setCookie(res.headers, STATE_COOKIE, state, { domain: COOKIE_DOMAIN, maxAge: 600 });
-  setCookie(res.headers, NEXT_COOKIE, next, { domain: COOKIE_DOMAIN, maxAge: 600 });
+  const store = cookies();
+  store.set(NEXT_COOKIE, sanitizeNext(nextParam), { ...crossSiteCookieOpts, maxAge: 300 });
+  store.set(STATE_COOKIE, state, { ...crossSiteCookieOpts, maxAge: 300 });
+  store.set(PKCE_COOKIE, verifier, { ...crossSiteCookieOpts, maxAge: 300 });
 
-  return res;
+  return NextResponse.redirect(auth.toString(), { status: 302 });
 }
 
