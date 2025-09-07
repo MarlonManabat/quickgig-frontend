@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-10
+**Version:** 2025-12-12
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -34,6 +34,7 @@
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - The landing page must not render duplicate CTAs with identical accessible names.
+- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` accepts a string or RegExp and succeeds on `/login?next=` or the destination.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).

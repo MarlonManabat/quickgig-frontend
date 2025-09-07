@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-12 — Robust cross-subdomain PKCE
+- Centralized login start/callback on app host using short-lived HttpOnly cookies.
+- Added `/login` shim and confirming page with retry.
+- Hardened smoke helper to accept `/login?next=` or destination URLs.
+
 ## 2025-11-05 — Good Product Gate hardening
 ## 2025-11-12 — Mock mode for CI
 - Introduced `MOCK_MODE` env so smoke tests run without Supabase credentials.

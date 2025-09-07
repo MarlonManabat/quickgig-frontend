@@ -5,8 +5,20 @@ export default function Page() {
     <main>
       <nav>
         <a data-testid="nav-browse-jobs" data-cta="nav-browse-jobs" href={ROUTES.browseJobs}>Browse jobs</a>
-        <a data-testid="nav-post-job" data-cta="nav-post-job" href={ROUTES.postJob}>Post a job</a>
-        <a data-testid="nav-my-applications" data-cta="nav-my-applications" href={ROUTES.applications}>My Applications</a>
+        <a
+          data-testid="nav-post-job"
+          data-cta="nav-post-job"
+          href={`${ROUTES.login}?next=${encodeURIComponent(ROUTES.postJob)}`}
+        >
+          Post a job
+        </a>
+        <a
+          data-testid="nav-my-applications"
+          data-cta="nav-my-applications"
+          href={`${ROUTES.login}?next=${encodeURIComponent(ROUTES.applications)}`}
+        >
+          My Applications
+        </a>
         <a data-testid="nav-tickets" data-cta="nav-tickets" href={ROUTES.tickets}>Tickets</a>
         <a data-testid="nav-login" data-cta="nav-login" href={ROUTES.login}>Login</a>
       </nav>
