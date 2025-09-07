@@ -20,12 +20,12 @@ for (const device of ['desktop', 'mobile'] as const) {
       await first.click();
 
       if (!loggedIn) {
-        await page.getByTestId('apply-button').click();
+        await page.getByTestId('job-card').first().getByTestId('apply-button').click();
         await expectAuthAwareRedirect(page, '/applications');
         return;
       }
 
-      await page.getByTestId('apply-button').click();
+      await page.getByTestId('job-card').first().getByTestId('apply-button').click();
       const note = `note ${Date.now()}`;
       await page.getByTestId('apply-cover-note').fill(note);
       page.once('dialog', d => d.dismiss());

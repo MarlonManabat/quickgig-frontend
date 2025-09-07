@@ -1,27 +1,32 @@
-import { Page, expect } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
-// In CI some routes land on their destination without auth, while prod redirects to /login?next=…
-// Treat either outcome as OK to avoid flakes.
+// Re-export to satisfy specs that import gotoHome from the smoke helpers.
+export { gotoHome } from '../e2e/_helpers';
+
+/**
+ * Wait until the page lands on the final destination OR the auth
+ * redirect (/login?next=...) that points toward it.
+ *
+ * - If `dest` is a string, we require an exact encoded match in next=.
+ * - If `dest` is a RegExp, we accept ANY /login?next=... (CI uses many
+ *   equivalent encodings), and we also accept a final URL that matches
+ *   the provided regex.
+ */
 export async function expectAuthAwareRedirect(
   page: Page,
-  path: string | RegExp,
+  dest: string | RegExp,
   timeout = 8000
 ) {
-  const escape = (s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  const toRe = (p: string | RegExp) =>
-    p instanceof RegExp ? p : new RegExp(`${escape(p)}$`);
+  const escapeRe = (s: string) => s.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
+  const destRe = typeof dest === 'string' ? new RegExp(`${escapeRe(dest)}$`) : dest;
 
-  const destRe = toRe(path);
-  const pathStr = path instanceof RegExp ? null : path;
-  const loginRe = pathStr
-    ? new RegExp(`/login\\?next=${encodeURIComponent(pathStr)}$`)
-    : /\/login\?next=.*/;
+  const loginRe =
+    typeof dest === 'string'
+      ? new RegExp(`/login\\?next=${encodeURIComponent(dest)}$`)
+      : /\/login\?next=.*/; // be permissive when the destination itself is a regex
 
-  const winner = await Promise.race([
-    page.waitForURL(loginRe, { timeout }).then(() => 'login'),
-    page.waitForURL(destRe, { timeout }).then(() => 'dest'),
-  ]);
-
-  expect(winner).toMatch(/^(login|dest)$/);
+  await expect
+    .poll(async () => page.url(), { timeout })
+    .toMatch(new RegExp(`${loginRe.source}|${destRe.source}`));
 }
 
