@@ -10,10 +10,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en-PH">
       <body>
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <AppHeader />
-        {children}
+        <main id="main-content" className="main-container">
+          {children}
+        </main>
         <Analytics />
       </body>
     </html>
