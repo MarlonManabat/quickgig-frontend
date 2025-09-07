@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { clearCookie, readCookieFromRequest } from '@/lib/cookies';
+import { sanitizeNext } from '@/lib/safeNext';
 
 const COOKIE_DOMAIN = '.quickgig.ph';
 const PKCE_COOKIE = 'qg_pkce';
@@ -13,7 +14,8 @@ export async function GET(req: Request) {
 
   const savedState = readCookieFromRequest(req, STATE_COOKIE);
   const verifier = readCookieFromRequest(req, PKCE_COOKIE);
-  const next = readCookieFromRequest(req, NEXT_COOKIE) || '/applications';
+  const rawNext = readCookieFromRequest(req, NEXT_COOKIE);
+  const next = sanitizeNext(rawNext);
 
   if (!code || !state || !verifier || !savedState || state !== savedState) {
     const retry = new URL('/auth/confirming', url.origin);
@@ -51,7 +53,7 @@ export async function GET(req: Request) {
   // TODO: set your app session here (existing mechanism)
   // e.g., setCookie(response.headers, 'qg_session', tokens.access_token, { domain: COOKIE_DOMAIN, ... })
 
-  const redirect = NextResponse.redirect(new URL(next, url.origin).toString(), { status: 302 });
+  const redirect = NextResponse.redirect(new URL(next, url.origin), { status: 302 });
   clearCookie(redirect.headers, PKCE_COOKIE, COOKIE_DOMAIN);
   clearCookie(redirect.headers, STATE_COOKIE, COOKIE_DOMAIN);
   clearCookie(redirect.headers, NEXT_COOKIE, COOKIE_DOMAIN);

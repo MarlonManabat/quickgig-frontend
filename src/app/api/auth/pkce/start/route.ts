@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { randomUrlSafe, challengeS256 } from '@/lib/pkce';
+import { sanitizeNext } from '@/lib/safeNext';
 import { setCookie } from '@/lib/cookies';
 
 const COOKIE_DOMAIN = '.quickgig.ph';
@@ -9,7 +10,8 @@ const NEXT_COOKIE = 'qg_next';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const next = url.searchParams.get('next') || '/applications';
+  const nextParam = url.searchParams.get('next');
+  const next = sanitizeNext(nextParam);
 
   const authorizeUrl = process.env.AUTH_AUTHORIZE_URL!;
   const clientId = process.env.AUTH_CLIENT_ID!;

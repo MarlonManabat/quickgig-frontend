@@ -1,8 +1,11 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+import { redirect } from 'next/navigation';
 
-import LoginClient from './LoginClient';
-
-export default function LoginPage() {
-  return <LoginClient />;
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { next?: string };
+}) {
+  const next = typeof searchParams?.next === 'string' ? searchParams.next : '';
+  const qs = next ? `?next=${encodeURIComponent(next)}` : '';
+  redirect(`/api/auth/pkce/start${qs}`);
 }
