@@ -15,7 +15,10 @@ export default function AppHeader() {
 
   const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(
     item => ({
-      href: item.to,
+      href:
+        !user && item.auth === 'auth-aware'
+          ? `${ROUTES.login}?next=${encodeURIComponent(item.to)}`
+          : item.to,
       label: item.label,
       testId: item.idDesktop,
       mobileId: item.idMobile,

@@ -15,7 +15,7 @@ export default function LandingHeader() {
       <LinkApp
         data-testid="nav-post-job"
         data-cta="nav-post-job"
-        href={ROUTES.postJob}
+        href={`${ROUTES.login}?next=${encodeURIComponent(ROUTES.postJob)}`}
         className="btn btn-primary"
       >
         Post a job
@@ -23,7 +23,7 @@ export default function LandingHeader() {
       <LinkApp
         data-testid="nav-my-applications"
         data-cta="nav-my-applications"
-        href={ROUTES.applications}
+        href={`${ROUTES.login}?next=${encodeURIComponent(ROUTES.applications)}`}
         className="..."
       >
         My Applications
