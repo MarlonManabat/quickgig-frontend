@@ -1,12 +1,13 @@
+import { ROUTES } from '@/lib/routes';
+
 export function sanitizeNext(raw: string | undefined | null): string {
-  if (!raw) return '/applications';
+  if (!raw) return ROUTES.applications;
   try {
     const dec = decodeURIComponent(raw);
-    if (dec.startsWith('/') && !dec.startsWith('//') && !dec.includes('://')) {
-      return dec;
-    }
+    // allow only same-site paths
+    if (dec.startsWith('/') && !dec.startsWith('//') && !dec.includes('://')) return dec || ROUTES.applications;
   } catch {
-    /* ignore */
+    /* noop */
   }
-  return '/applications';
+  return ROUTES.applications;
 }
