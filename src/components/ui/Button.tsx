@@ -17,7 +17,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "inline-flex h-11 min-h-[44px] w-full sm:w-auto items-center justify-center rounded-xl px-4 text-base md:text-lg font-medium focus:outline-none focus:ring-2 focus:ring-brand-accent";
+    "inline-flex min-h-[44px] w-full sm:w-auto items-center justify-center rounded-xl px-4 py-3 text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-brand-accent";
   const styles: Record<NonNullable<ButtonProps["variant"]>, string> = {
     primary:
       "bg-brand-accent text-brand-foreground hover:bg-brand-accent/90 shadow-[0_6px_20px_rgba(250,204,21,0.35)]",

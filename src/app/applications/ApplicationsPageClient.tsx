@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { Application, ApplicationStatus } from '@/types/db';
 import toast from '@/utils/toast';
+import { ROUTES } from '@/app/lib/routes';
+import Button from '@/components/ui/Button';
 
 function canWithdraw(status: ApplicationStatus) {
   return status === 'pending' || status === 'approved';
@@ -31,7 +34,18 @@ export default function ApplicationsPageClient({ initialApps }: { initialApps: A
   }
 
   if (items.length === 0) {
-    return <p className="text-slate-500">No applications yet.</p>;
+    return (
+      <div className="space-y-4 text-center" data-testid="applications-empty">
+        <p className="text-slate-500">No applications yet.</p>
+        <Link
+          href={ROUTES.GIGS_BROWSE}
+          data-testid="browse-jobs-from-empty"
+          data-cta="browse-jobs-from-empty"
+        >
+          <Button variant="primary">Browse jobs</Button>
+        </Link>
+      </div>
+    );
   }
 
   return (

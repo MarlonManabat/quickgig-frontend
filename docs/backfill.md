@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-15 — UI/UX polish
+- Added base typography, skip link, and content container in layout.
+- Introduced PH currency/date helpers and applied to gig cards.
+- Applications page now shows empty state with Browse Jobs CTA.
+
 ## 2025-11-05 — Good Product Gate hardening
 ## 2025-11-12 — Mock mode for CI
 - Introduced `MOCK_MODE` env so smoke tests run without Supabase credentials.

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Gig } from '@/types/db';
+import { formatCurrencyPHP, formatDatePH } from '@/lib/format';
 
 export default function GigCard({ gig }: { gig: Gig }) {
   return (
@@ -9,9 +10,9 @@ export default function GigCard({ gig }: { gig: Gig }) {
       </Link>
       <p className="text-sm text-slate-600">{gig.city || 'Anywhere'}</p>
       {gig.budget !== null && (
-        <p className="text-sm">₱{Number(gig.budget).toLocaleString()}</p>
+        <p className="text-sm">{formatCurrencyPHP(Number(gig.budget))}</p>
       )}
-      <p className="text-xs text-slate-500">{new Date(gig.created_at).toLocaleDateString()}</p>
+      <p className="text-xs text-slate-500">{formatDatePH(gig.created_at)}</p>
     </li>
   );
 }
