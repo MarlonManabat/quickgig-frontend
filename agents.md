@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-17
+**Version:** 2025-12-18
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -38,6 +38,7 @@
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
+- Applications smoke spec accepts `/login` redirect when unauthenticated.
 - Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
 - The landing page must not render duplicate CTAs with identical accessible names.
 - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` accepts a string or RegExp and succeeds on `/api/auth/pkce/start`, `/login?next=`, or the destination.

@@ -1,27 +1,28 @@
 import Link from "next/link";
 import { ROUTES } from "@/lib/routes";
-import { getUserSafe } from "@/lib/auth/getUserSafe";
-import { getSupabaseServer } from "@/app/lib/supabase.server";
+import { requireUser } from "@/lib/auth/requireUser";
+import { getSupabaseServer } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function ApplicationsPage() {
-  const user = await getUserSafe();
+  // Auth-gated route: redirect unauthenticated users to /login (contract).
+  const { user } = await requireUser(); // handles redirect if unauthenticated
+
+  // Still tolerate missing Supabase envs in preview by guarding the fetch.
   let applications: any[] = [];
-  if (user) {
-    try {
-      const supabase = getSupabaseServer?.();
-      if (supabase) {
-        const { data: rows } = await supabase
-          .from("applications")
-          .select("id,status,created_at,job:jobs(id,title)")
-          .eq("worker_id", user.id)
-          .order("created_at", { ascending: false });
-        applications = rows ?? [];
-      }
-    } catch {}
-  }
+  try {
+    const supabase = getSupabaseServer?.();
+    if (supabase) {
+      const { data: rows } = await supabase
+        .from("applications")
+        .select("id,status,created_at,job:jobs(id,title)")
+        .eq("worker_id", user.id)
+        .order("created_at", { ascending: false });
+      applications = rows ?? [];
+    }
+  } catch {}
 
   return (
     <div className="mx-auto max-w-3xl p-6">
