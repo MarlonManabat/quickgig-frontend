@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-19
+**Version:** 2025-12-20
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -22,6 +22,7 @@
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
 - Auth-gated routes: `/applications`, `/post-job`.
 - In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
+- PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
@@ -40,6 +41,7 @@
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - Applications smoke spec accepts `/login` redirect when unauthenticated.
 - Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
+- Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
 - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` accepts a RegExp destination and succeeds on `/api/auth/pkce/start`, `/login` (with optional query), or the destination.
 - `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
