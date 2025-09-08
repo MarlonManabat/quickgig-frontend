@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-14
+**Version:** 2025-12-15
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -11,6 +11,9 @@
   - `data-testid="nav-tickets"` → `/tickets`
   - `data-testid="nav-login"` → `/login`
   - `data-testid="nav-signup"` → `/signup`
+  - `data-testid="nav-logout"` → `/logout`
+- Hero CTA:
+  - `data-testid="hero-start"` → `/post-job`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
@@ -31,11 +34,11 @@
 - Mobile menu IDs: `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-tickets`, `navm-login`, `navm-signup`.
 - Landing hero IDs: `hero-start`.
 - Post Job skeleton test id: `post-job-skeleton`.
-- Browse list IDs: `jobs-list`, `job-card`.
+  - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - The landing page must not render duplicate CTAs with identical accessible names.
-- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` accepts a string or RegExp and succeeds on `/login?next=` or the destination.
+- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` accepts a string or RegExp and succeeds on `/api/auth/pkce/start`, `/login?next=`, or the destination.
   - Exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 
 ## CI guardrails
@@ -44,7 +47,7 @@
 - Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-job`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-09-09 -->
+<!-- AGENT CONTRACT v2025-12-15 -->
 
 ---
 

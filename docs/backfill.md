@@ -1,5 +1,12 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-15 — CTA cleanup & logout fix
+- PKCE callback reads `qg_next` before clearing cookies and validates redirect paths.
+- Removed duplicate `/login` page that conflicted with `(auth)` route.
+- Marketing header/hero CTAs point to the app host using `toAppPath`.
+- Added `/api/auth/logout` endpoint and client `/logout` page.
+- Restored `jobs-list` / `job-card` test IDs for `/browse-jobs`.
+
 ## 2025-12-14 — CTA and auth polish
 - Added cross-domain `/login` and `/signup` pages with short-lived `qg_next` cookie.
 - Introduced `/logout` endpoint and stub `/post-job` page.

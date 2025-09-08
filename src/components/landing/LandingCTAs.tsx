@@ -3,8 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { track } from '@/lib/analytics';
-import { ROUTES } from '@/lib/routes';
-import { loginNext } from '@/app/lib/authAware';
+import { ROUTES, toAppPath } from '@/lib/routes';
 
 type Props = {
   startClassName?: string;
@@ -25,22 +24,22 @@ export default function LandingCTAs({
             <Link
               data-testid="hero-start"
               data-cta="hero-start"
-              href={ROUTES.browseJobs}
+              href={toAppPath(ROUTES.postJob)}
               className={startClassName}
               onClick={() => track('cta_click', { cta: 'hero-start' })}
             >
-              Browse jobs
+              Simulan na
             </Link>
           )}
           {showPost && (
             <Link
-              data-testid="hero-post-job"
-              data-cta="hero-post-job"
-              href={loginNext(ROUTES.postJob)}
+              data-testid="hero-browse"
+              data-cta="hero-browse"
+              href={toAppPath(ROUTES.browseJobs)}
               className={postClassName}
-              onClick={() => track('cta_click', { cta: 'hero-post-job' })}
+              onClick={() => track('cta_click', { cta: 'hero-browse' })}
             >
-              Post a job
+              Browse jobs
             </Link>
           )}
       </div>

@@ -1,17 +1,19 @@
-import { cookies } from 'next/headers';
-import ClientLogout from './ClientLogout';
+'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase';
 
-export const dynamic = 'force-dynamic';
-
-export default async function LogoutPage() {
-  // Best-effort: clear server cookies so SSR reads as logged-out.
-  const jar = cookies();
-  try {
-    (['sb-access-token', 'sb-refresh-token', 'qg_next'] as const).forEach((n) => {
-      // @ts-ignore – cookie typings differ across Next versions
-      jar.delete(n);
-    });
-  } catch {}
-  // Render a client component to clear Supabase localStorage & redirect home.
-  return <ClientLogout />;
+export default function LogoutPage() {
+  const router = useRouter();
+  useEffect(() => {
+    const run = async () => {
+      try {
+        await createClient().auth.signOut();
+      } catch {}
+      // Let server clear cookies, then land home.
+      window.location.replace('/api/auth/logout?next=/');
+    };
+    run();
+  }, [router]);
+  return <p style={{ padding: '2rem' }}>Signing you out…</p>;
 }

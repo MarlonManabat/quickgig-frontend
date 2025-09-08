@@ -1,0 +1,4 @@
+- Hero "Simulan na" → /post-job (gated)
+- Hero "Browse jobs" → /browse-jobs
+- Header: Browse → /browse-jobs, Post → /post-job (gated), My Applications → /applications (gated), Tickets → /tickets (gated), Login → /login, Sign up → /signup, Sign out → /logout
+- Landing site links use absolute https://app.quickgig.ph/…; app uses relative paths.

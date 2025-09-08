@@ -1,7 +1,10 @@
-<!-- AGENT CONTRACT v2025-12-14 -->
+<!-- AGENT CONTRACT v2025-12-15 -->
 
 ## 2025-12-14
 - Added signup/logout routes, hero-start CTA, and per-route error/loading.
+
+## 2025-12-15
+- Documented CTA contract and logout endpoint.
 
 ## 2025-09-07
 - Header CTAs canonicalized; friendly auth errors; non-blank 404/500; link-audit script.
