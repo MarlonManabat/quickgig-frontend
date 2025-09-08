@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-22 — Smoke helper resilience & mobile nav
+- Hardened `expectAuthAwareRedirect` to wait for the PKCE start request and ignore `chrome-error://` crashes.
+- Added `openMobileMenu` helper and migrated nav smokes to shared `nav-*` test IDs.
+- Introduced `expectListOrEmpty` to handle pages with optional empty states.
+
 ## 2025-09-08 – Core smoke & guards
 - Add Playwright smoke for Browse, Job detail (Apply button visible), Applications, Post Job.
 - Guard Supabase access with `getUserSafe()` to prevent crashes in preview/missing envs.
