@@ -4,6 +4,7 @@ import {
   mobileViewport,
   openMobileMenu,
   expectHref,
+  loginOr,
 } from './_helpers';
 
 const viewports = [
@@ -18,17 +19,16 @@ for (const vp of viewports) {
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
       const isMobile = vp.name === 'mobile';
-      const scope = isMobile ? await openMobileMenu(page) : page;
-
-      const ctas = ['nav-browse-jobs', 'nav-post-job', 'nav-my-applications', 'nav-tickets'];
-      for (const id of ctas) {
-        await expect(scope.getByTestId(id)).toBeVisible();
-      }
-
+      let menu;
       if (isMobile) {
-        await scope.getByTestId('nav-browse-jobs').first().click();
+        menu = await openMobileMenu(page);
+        for (const id of ['nav-browse-jobs', 'nav-post-job', 'nav-my-applications']) {
+          await expect(menu.getByTestId(id)).toBeVisible();
+        }
+        await menu.getByTestId('nav-browse-jobs').click();
       } else {
-        await page.getByTestId('nav-browse-jobs').first().click();
+        await expectHref(page.getByTestId('nav-post-job'), loginOr(/\/post-jobs?\/?$/));
+        await page.getByTestId('nav-browse-jobs').click();
       }
       await expect(page).toHaveURL(/\/browse-jobs/);
       await expectListOrEmpty(page, 'jobs-list', {
@@ -39,15 +39,12 @@ for (const vp of viewports) {
       const postScope = isMobile ? await openMobileMenu(page) : page;
       const post = postScope.getByTestId('nav-post-job').first();
       await expect(post).toBeVisible();
-      await expectHref(post, /\/post-jobs(\/|\?|$)/);
+      await expectHref(post, loginOr(/\/post-jobs?\/?$/));
 
-      const appsScope = postScope; // menu already open if mobile
+      const appsScope = postScope;
       const apps = appsScope.getByTestId('nav-my-applications').first();
       await expect(apps).toBeVisible();
-      await expectHref(
-        apps,
-        /(\/applications$)|(\/login(\/.*)?$)|(\/api\/auth\/pkce\/start\?[^#]*dest=%2Fapplications)/
-      );
+      await expectHref(apps, loginOr(/\/applications$/));
 
       const ticketScope = postScope;
       const tickets = ticketScope.getByTestId('nav-tickets').first();

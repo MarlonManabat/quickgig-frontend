@@ -1,47 +1,35 @@
 import { expect, Page, Locator } from '@playwright/test';
 
-// Stub the PKCE start endpoint so unauthenticated flows don't crash the page.
+const LOGIN_WITH_NEXT = /^\/login(?:\?.*)?$/;
+
+export function loginOr(dest: RegExp): RegExp {
+  // match dest OR /login?next=...
+  return new RegExp(`(?:${dest.source})|(?:${LOGIN_WITH_NEXT.source})`);
+}
+
 export async function stubAuthPkce(page: Page) {
-  // @ts-expect-error mark once on the page object
-  if ((page as any).__pkceStubbed) return;
-  await page.route('**/api/auth/pkce/start', async (route) => {
-    try {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
-    } catch {
-      await route.continue();
-    }
+  await page.route('**/api/auth/pkce/start**', async (route) => {
+    const u = new URL(route.request().url());
+    const next = u.searchParams.get('next') || '';
+    const location = next ? `/login?next=${encodeURIComponent(next)}` : '/login';
+    await route.fulfill({
+      status: 302,
+      headers: { location },
+      contentType: 'text/plain',
+      body: 'redirect',
+    });
   });
-  // @ts-expect-error attach flag to avoid duplicate routes
-  (page as any).__pkceStubbed = true;
 }
 
 export const mobileViewport = { viewport: { width: 390, height: 844 } };
 
-// Ensure mobile drawer is open so nav items are visible
 export async function openMobileMenu(page: Page) {
-  const triggers = [
-    '[data-testid="nav-menu-button"]',
-    'button[aria-controls="nav-menu"]',
-    'button[aria-label="Menu"]',
-    'button:has-text("Menu")',
-  ];
-  for (const sel of triggers) {
-    const btn = page.locator(sel).first();
-    if (await btn.count()) {
-      await btn.click();
-      break;
-    }
-  }
-  const menu = page.getByTestId('nav-menu');
-  await expect(menu).toBeVisible();
-  await expect(
-    page
-      .locator(
-        '[role="dialog"]:not([aria-hidden="true"]), [data-testid="nav-menu"]:not([aria-hidden="true"])'
-      )
-      .first()
-  ).toBeVisible();
-  return menu;
+  const toggle = page.getByTestId('nav-menu-button').first();
+  await expect(toggle, 'mobile menu toggle should be visible').toBeVisible();
+  await toggle.click();
+  const drawer = page.getByTestId('nav-menu').first();
+  await expect(drawer, 'mobile drawer should become visible').toBeVisible();
+  return drawer;
 }
 
 export async function expectHref(loc: Locator, re: RegExp) {

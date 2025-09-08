@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-28 — PKCE stub to login & mobile toggle wait
+- `/api/auth/pkce/start` stub now 302s to `/login?next=` preventing chrome-error.
+- Added `loginOr` helper so smokes accept `/login?next=` fallback.
+- `openMobileMenu` clicks `nav-menu-button` directly and returns the drawer.
+- Nav smokes updated to use menu handle and `loginOr` for auth-aware CTAs.
+
 ## 2025-12-26 — Robust auth redirect & mobile nav selectors
 - Introduced `AUTH_PKCE_OPTIONAL` to force `/login` fallback in dev/CI.
 - Hardened `expectAuthAwareRedirect` against `chrome-error://` and increased timeout to 10s.

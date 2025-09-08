@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-27
+**Version:** 2025-12-28
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -42,8 +42,9 @@
 - Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
 - Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
-  - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` stubs `/api/auth/pkce/start`, polls up to ~8s for the provided destination, and fails fast on `chrome-error://` with the last seen URL.
+  - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` stubs `/api/auth/pkce/start` to `/login`, then polls up to ~8s for the provided destination.
 - `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
+- `loginOr(re)` builds a regex accepting either the destination or `/login?next=` fallback.
 - `openMobileMenu(page)` clicks `nav-menu-button`, waits for `nav-menu` to be visible, and falls back to role-based selectors when needed.
 - `expectListOrEmpty(page, listTestId, opts)` passes when either the first item or empty state becomes visible (defaults: `itemTestId="job-card"`, `emptyTestId="jobs-empty"`).
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
