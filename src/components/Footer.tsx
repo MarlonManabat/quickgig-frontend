@@ -9,7 +9,7 @@ export default function Footer() {
           © {new Date().getFullYear()} QuickGig
         </p>
         <LandingCTAs
-          findClassName="hover:underline text-sm"
+          startClassName="hover:underline text-sm"
           postClassName="hover:underline text-sm"
         />
       </Container>

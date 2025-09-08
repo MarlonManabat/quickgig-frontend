@@ -14,7 +14,7 @@ export default function LandingPage() {
           </p>
           <div className="actions">
             <LandingCTAs
-              findClassName="px-4 py-2 rounded-md bg-gray-100"
+              startClassName="px-4 py-2 rounded-md bg-gray-100"
               postClassName="px-4 py-2 rounded-md bg-blue-600 text-white"
             />
           </div>

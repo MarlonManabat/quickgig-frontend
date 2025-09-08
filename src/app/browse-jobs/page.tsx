@@ -29,13 +29,13 @@ export default async function BrowseJobsPage() {
   return (
     <div className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-semibold mb-4">Browse jobs</h1>
-      <ul data-testid="jobs-list" className="space-y-3">
+      <section data-testid="jobs-list" className="space-y-3">
         {jobs.map((j) => (
-          <li key={j.id} data-testid="job-card" className="rounded-xl border p-4">
+          <div key={j.id} data-testid="job-card" className="rounded-xl border p-4">
             <Link href={`/jobs/${j.id}`}>{j.title}</Link>
-          </li>
+          </div>
         ))}
-      </ul>
+      </section>
     </div>
   );
 }

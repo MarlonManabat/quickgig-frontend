@@ -12,11 +12,8 @@ export default function SmokeLandingCTAs() {
     <main className="p-8 space-y-4">
       <h1 className="text-xl font-semibold">Smoke: Landing CTAs</h1>
       <div className="flex flex-col gap-3">
-        <LinkApp data-testid="hero-browse-jobs" href={ROUTES.browseJobs}>
+        <LinkApp data-testid="hero-start" href={ROUTES.browseJobs}>
           Browse Jobs
-        </LinkApp>
-        <LinkApp data-testid="hero-post-job" href={ROUTES.postJob}>
-          Post a job
         </LinkApp>
       </div>
     </main>

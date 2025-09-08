@@ -9,7 +9,7 @@ export default function NotFound() {
       </p>
       <div className="flex gap-3 justify-center">
         <LandingCTAs
-          findClassName="qg-btn qg-btn--primary px-4 py-2"
+          startClassName="qg-btn qg-btn--primary px-4 py-2"
           postClassName="qg-btn qg-btn--outline px-4 py-2"
         />
       </div>
