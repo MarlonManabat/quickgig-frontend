@@ -16,51 +16,49 @@ export async function expectAuthAwareRedirect(
   dest: RegExp,
   timeout = 8000
 ) {
-  // Wait for our auth start *request* to fire.
-  const pkceHit = await page
-    .waitForRequest((r) => pkceStartRe.test(r.url()), { timeout })
-    .then(() => true)
-    .catch(() => false);
-
-  // Try to match the final URL, but ignore if Chrome crashed to the special page.
-  const crashed = page.url().startsWith('chrome-error://');
-  if (!crashed) {
-    // Give it another shot in case PKCE fired just before we awaited URL.
-    await expect(page).toHaveURL(dest, { timeout });
-  } else {
-    expect(pkceHit).toBeTruthy();
+  const start = Date.now();
+  let last = page.url();
+  while (Date.now() - start < timeout) {
+    last = page.url();
+    try {
+      const url = new URL(last, 'http://localhost');
+      const next = url.searchParams.get('next') || '';
+      if (
+        (loginRe.test(url.pathname) || pkceStartRe.test(url.pathname)) &&
+        dest.test(next)
+      ) {
+        return;
+      }
+      if (dest.test(url.pathname + url.search)) return;
+    } catch {
+      /* ignore parse errors */
+    }
+    await page.waitForTimeout(100);
   }
+  expect(
+    false,
+    `Expected auth-aware redirect to '${dest}', last URL was '${last}'`
+  ).toBeTruthy();
 }
 
 /** Ensure mobile drawer is open so nav items are visible */
 export async function openMobileMenu(page: Page) {
-  // Prefer the explicit toggle if present
-  const toggle =
-    // getByTestId if available (newer Playwright), else raw locator
-    (page as any).getByTestId?.('nav-menu-button') ??
-    page.locator('[data-testid="nav-menu-button"]');
-  const drawer =
-    (page as any).getByTestId?.('nav-menu') ??
-    page.locator('[data-testid="nav-menu"]');
-
-  if (await toggle.first().isVisible().catch(() => false)) {
-    await toggle.first().click();
-    await expect(drawer).toBeVisible({ timeout: 4000 });
+  try {
+    await page.getByTestId('nav-menu-button').click();
+    await expect(page.getByTestId('nav-menu')).toBeVisible();
     return;
-  }
+  } catch {}
 
-  // Fallbacks across headers
-  const candidates = [
+  const fallbacks = [
     '[data-testid="nav-menu-button"]',
-    '[data-test="nav-menu-button"]',
     'button[aria-label="Menu"]',
     'button:has-text("Menu")',
   ];
-  for (const sel of candidates) {
+  for (const sel of fallbacks) {
     const el = page.locator(sel).first();
     if (await el.isVisible().catch(() => false)) {
       await el.click();
-      await expect(drawer).toBeVisible({ timeout: 4000 });
+      await expect(page.locator('[data-testid="nav-menu"]').first()).toBeVisible();
       return;
     }
   }
@@ -70,26 +68,33 @@ export async function openMobileMenu(page: Page) {
 export async function expectListOrEmpty(
   page: Page,
   listTestId: string,
-  emptyMarker:
-    | { testId: string }
-    | { text: RegExp }
-    | { text: string },
-  timeout = 8000
+  opts: {
+    itemTestId?: string;
+    emptyTestId?: string;
+    emptyTextRe?: RegExp;
+  }
 ) {
-  const list = page.getByTestId(listTestId).first();
-  const empty =
-    'testId' in emptyMarker
-      ? page.getByTestId(emptyMarker.testId).first()
-      : page.getByText(emptyMarker.text as any, { exact: false }).first();
-  const started = Date.now();
-  while (Date.now() - started < timeout) {
-    if ((await list.isVisible().catch(() => false)) || (await empty.isVisible().catch(() => false))) {
+  const { itemTestId = 'job-card', emptyTestId = 'jobs-empty', emptyTextRe } =
+    opts;
+  const item = page.getByTestId(itemTestId).first();
+  const empty = emptyTextRe
+    ? page.getByText(emptyTextRe).first()
+    : page.getByTestId(emptyTestId).first();
+  const start = Date.now();
+  while (Date.now() - start < 8000) {
+    if (
+      (await item.isVisible().catch(() => false)) ||
+      (await empty.isVisible().catch(() => false))
+    ) {
       expect(true).toBeTruthy();
       return;
     }
     await page.waitForTimeout(100);
   }
-  expect(false, `Neither list '${listTestId}' nor empty-state became visible`).toBeTruthy();
+  expect(
+    false,
+    `Neither '${itemTestId}' nor '${emptyTestId}' became visible in list '${listTestId}'`
+  ).toBeTruthy();
 }
 
 /** Simpler helper for tests that expect “Login” directly but should allow PKCE start too. */

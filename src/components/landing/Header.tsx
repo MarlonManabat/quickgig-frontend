@@ -8,6 +8,7 @@ import { loginNext } from '@/app/lib/authAware';
 export default function LandingHeader() {
   return (
     <nav className="...">
+      <div id="nav-menu" data-testid="nav-menu">
         <Link
           data-testid="nav-browse-jobs"
           data-cta="nav-browse-jobs"
@@ -52,6 +53,7 @@ export default function LandingHeader() {
         >
           Login
         </Link>
+      </div>
       <button type="button" data-testid="nav-menu-button" aria-label="Open menu" className="md:hidden">
         Menu
       </button>

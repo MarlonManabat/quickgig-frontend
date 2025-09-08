@@ -28,5 +28,12 @@ test('mobile header CTAs › My Applications (auth-aware)', async ({ page }) => 
   await page.goto('/');
   await openMobileMenu(page);
   await page.getByTestId('nav-my-applications').first().click();
-  await expectAuthAwareRedirect(page, /\/login(\?.*)?$|\/applications$/);
+  await expectAuthAwareRedirect(page, /\/applications$/);
+});
+
+test('mobile header CTAs › Post a Job (auth-aware)', async ({ page }) => {
+  await page.goto('/');
+  await openMobileMenu(page);
+  await page.getByTestId('nav-post-job').first().click();
+  await expectAuthAwareRedirect(page, /\/post-job$/);
 });

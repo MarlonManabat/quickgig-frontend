@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-24 — Auth/nav smoke stabilization
+- `expectAuthAwareRedirect` now polls for `/login?next=`, PKCE start, or destination and reports last URL on timeout.
+- `openMobileMenu` clicks `nav-menu-button` directly then waits for `nav-menu` visibility.
+- `expectListOrEmpty` adds defaults for `job-card`/`jobs-empty` and is reused across smokes.
+- Browse Jobs page wraps list/cards/empty state with stable `jobs-*` test IDs.
+
 ## 2025-12-23 — Smoke nav toggle & Post Job fix
 - `openMobileMenu` clicks `nav-menu-button` and waits for `nav-menu` to appear.
 - Corrected Post Job smoke to assert skeleton/form/heading instead of `applications-list`.

@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-23
+**Version:** 2025-12-24
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -41,10 +41,10 @@
 - Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
 - Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
-- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` waits for the PKCE start request and tolerates `chrome-error://` fallbacks.
+- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` polls the URL until it matches `/login?next=<dest>`, `/api/auth/pkce/start?next=<dest>`, or `dest` itself and fails with the last seen URL on timeout.
 - `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
-- `openMobileMenu(page)` ensures mobile nav is open before interacting.
-- `expectListOrEmpty(page, listTestId, emptyMarker)` passes when either list or empty state is visible.
+- `openMobileMenu(page)` clicks `nav-menu-button`, waits for `nav-menu` to be visible, and falls back to alternate selectors when needed.
+- `expectListOrEmpty(page, listTestId, opts)` passes when either the first item or empty state becomes visible (defaults: `itemTestId="job-card"`, `emptyTestId="jobs-empty"`).
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 - `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.
 - Smoke tests avoid cross-origin navigation in CI; external links are validated by path only.

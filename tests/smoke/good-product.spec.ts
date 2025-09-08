@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref } from './_helpers';
+import {
+  expectAuthAwareRedirect,
+  clickIfSameOriginOrAssertHref,
+  expectListOrEmpty,
+} from './_helpers';
 
 const viewports = [
   { name: 'mobile', width: 390, height: 844 },
@@ -22,19 +26,10 @@ for (const vp of viewports) {
 
       await page.getByTestId('nav-browse-jobs').first().click();
       await expect(page).toHaveURL(/\/browse-jobs/);
-      // Tolerate empty state in preview. Prefer cards if present.
-      const list = page.getByTestId('jobs-list');
-      const listExists = (await list.count()) > 0;
-      if (listExists) {
-        await expect(list).toBeVisible();
-      } else {
-        const hasEmpty = await page
-          .getByText(/no jobs yet|wala pang jobs|empty state/i)
-          .first()
-          .isVisible()
-          .catch(() => false);
-        expect(hasEmpty).toBeTruthy();
-      }
+      await expectListOrEmpty(page, 'jobs-list', {
+        itemTestId: 'job-card',
+        emptyTestId: 'jobs-empty',
+      });
 
       {
         const cta = page.getByTestId('nav-post-job').first();

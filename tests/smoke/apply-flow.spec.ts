@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
+import { expectAuthAwareRedirect, expectListOrEmpty } from './_helpers';
 import { loginAs } from '../e2e/helpers';
 
 for (const device of ['desktop', 'mobile'] as const) {
@@ -15,6 +15,10 @@ for (const device of ['desktop', 'mobile'] as const) {
       } catch {}
 
       await page.goto('/browse-jobs');
+      await expectListOrEmpty(page, 'jobs-list', {
+        itemTestId: 'job-card',
+        emptyTestId: 'jobs-empty',
+      });
       const count = await page.getByTestId('job-card').count();
       if (count === 0) test.skip(true, 'No seeded jobs in preview; skipping apply flow.');
       const first = page.getByTestId('job-card').first();

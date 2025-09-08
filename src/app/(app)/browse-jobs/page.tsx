@@ -23,7 +23,7 @@ export default async function BrowseJobsPage() {
     return (
       <div className="mx-auto max-w-3xl p-6">
         <h1 className="text-2xl font-semibold mb-4">Browse jobs</h1>
-        <p data-testid="jobs-empty" className="opacity-70">No jobs yet</p>
+        <div data-testid="jobs-empty" className="opacity-70">No jobs yet</div>
       </div>
     );
   }
@@ -31,13 +31,13 @@ export default async function BrowseJobsPage() {
   return (
     <div className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-semibold mb-4">Browse jobs</h1>
-      <section data-testid="jobs-list" className="space-y-3">
+      <div data-testid="jobs-list" className="space-y-3">
         {jobs.map((j) => (
-          <div key={j.id} data-testid="job-card" className="rounded-xl border p-4">
+          <article key={j.id} data-testid="job-card" className="rounded-xl border p-4">
             <Link href={`/jobs/${j.id}`}>{j.title}</Link>
-          </div>
+          </article>
         ))}
-      </section>
+      </div>
     </div>
   );
 }
