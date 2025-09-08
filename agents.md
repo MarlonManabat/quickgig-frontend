@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-20
+**Version:** 2025-12-21
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -46,6 +46,8 @@
 - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` accepts a RegExp destination and succeeds on `/api/auth/pkce/start`, `/login` (with optional query), or the destination.
 - `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
+- `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.
+- Smoke tests avoid cross-origin navigation in CI; external links are validated by path only.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).

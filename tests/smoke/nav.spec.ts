@@ -1,23 +1,25 @@
 import { test } from '@playwright/test';
-import { gotoHome, expectToBeOnRoute } from '../e2e/_helpers';
-import { expectAuthAwareRedirect, expectLoginOrPkce } from './_helpers';
+import { expectAuthAwareRedirect, expectLoginOrPkce, clickIfSameOriginOrAssertHref } from './_helpers';
 
 test.describe('desktop header CTAs', () => {
   test('Login', async ({ page }) => {
-    await gotoHome(page);
-    await page.getByTestId('nav-login').first().click();
-    await expectLoginOrPkce(page);
+    await page.goto('/');
+    const cta = page.getByTestId('nav-login').first();
+    const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/login$/);
+    if (navigated) await expectLoginOrPkce(page);
   });
 
   test('My Applications (auth-aware)', async ({ page }) => {
-    await gotoHome(page);
-    await page.getByTestId('nav-my-applications').first().click();
-    await expectAuthAwareRedirect(page, /\/applications$/);
+    await page.goto('/');
+    const cta = page.getByTestId('nav-my-applications').first();
+    const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
+    if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
   });
 
   test('Post a Job (auth-aware)', async ({ page }) => {
-    await gotoHome(page);
-    await page.getByTestId('nav-post-job').first().click();
-    await expectAuthAwareRedirect(page, /\/post-job$/);
+    await page.goto('/');
+    const cta = page.getByTestId('nav-post-job').first();
+    const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
+    if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
   });
 });

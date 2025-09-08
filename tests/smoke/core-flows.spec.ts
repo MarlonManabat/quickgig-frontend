@@ -7,28 +7,25 @@ test.describe("QuickGig core flows (smoke)", () => {
   test("Browse Jobs page renders and shows at least one job or empty state", async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ""}/browse-jobs`);
     // Either job cards exist or an empty state is visible
-    const hasCards = await page.locator('[data-testid="job-card"], [data-test="job-card"]').first().isVisible().catch(() => false);
-    const hasEmpty = await page.getByText(/no jobs yet|wala pang jobs|empty state/i).first().isVisible().catch(() => false);
+    const hasCards = (await page.getByTestId("job-card").count()) > 0;
+    const hasEmpty = await page.getByText(/no jobs|empty state/i).first().isVisible().catch(() => false);
     expect(hasCards || hasEmpty).toBeTruthy();
   });
 
   test("Job detail renders and Apply button is present (not necessarily clickable in preview)", async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ""}/browse-jobs`);
-    const firstCard = page.locator('[data-testid="job-card"], [data-test="job-card"]').first();
-    const cardCount = await firstCard.count();
-    if (!cardCount) {
-      test.skip(true, "No job cards available in preview – skipping apply button assertion.");
-    }
-    await firstCard.click();
+    const first = page.getByTestId("job-card").first();
+    if (await first.count() === 0) test.skip(true, "No job cards available in preview – skipping apply assertion.");
+    await first.click();
     await expect(page).toHaveURL(/\/browse-jobs\/.+/);
     await expect(page.getByRole("button", { name: /apply|mag-apply/i })).toBeVisible();
   });
 
-  test("My Applications is auth-gated (redirects to /login) OR renders with empty state/list when authenticated", async ({ page, baseURL }) => {
+  test("My Applications is auth-gated (redirects to /login or PKCE) OR renders with empty state/list when authenticated", async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ""}/applications`);
     await page.waitForLoadState("domcontentloaded");
     const urlNow = page.url();
-    if (/\/login(\?|$)/.test(urlNow)) {
+    if (/\/login(\?|$)|\/api\/auth\/pkce\/start/.test(urlNow)) {
       // Auth redirect is expected for signed-out preview; treat as pass.
       expect(true).toBeTruthy();
       return;

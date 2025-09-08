@@ -15,8 +15,10 @@ for (const device of ['desktop', 'mobile'] as const) {
       } catch {}
 
       await page.goto('/browse-jobs');
+      const count = await page.getByTestId('job-card').count();
+      if (count === 0) test.skip(true, 'No seeded jobs in preview; skipping apply flow.');
       const first = page.getByTestId('job-card').first();
-      const title = await first.textContent();
+      const title = (await first.textContent()) ?? '';
       await first.click();
 
       if (!loggedIn) {

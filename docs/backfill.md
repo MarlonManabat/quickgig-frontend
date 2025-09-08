@@ -9,6 +9,7 @@
 - Smoke helpers now allow PKCE auth redirects and Browse Jobs smoke tolerates an empty list in preview.
 - PKCE start route now redirects to `/login` in preview/CI, avoiding crashes when env is missing.
 - Core flows smoke skips Apply button assertion when no jobs are seeded and Browse list spec accepts empty state.
+- Smoke tests avoid cross-origin navigation in CI using `clickIfSameOriginOrAssertHref`; cross-origin CTAs assert only the path.
 
 ## 2025-12-15 — CTA cleanup & logout fix
 - PKCE callback reads `qg_next` before clearing cookies and validates redirect paths.

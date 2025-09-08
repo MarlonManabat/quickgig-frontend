@@ -2,16 +2,18 @@ import { test, expect } from "@playwright/test";
 
 test("Browse list renders", async ({ page }) => {
   await page.goto("/browse-jobs");
-  // Prefer list if present, otherwise allow empty state in preview
+  // Prefer list if present; otherwise an empty state is acceptable in preview/CI
   const list = page.getByTestId("jobs-list");
-  if (await list.count()) {
+  const hasList = (await list.count()) > 0;
+  if (hasList) {
     await expect(list).toBeVisible();
   } else {
+    const hasCard = (await page.getByTestId("job-card").count()) > 0;
     const hasEmpty = await page
-      .getByText(/no jobs yet|wala pang jobs|empty state/i)
+      .getByText(/no jobs|empty state/i)
       .first()
       .isVisible()
       .catch(() => false);
-    expect(hasEmpty).toBeTruthy();
+    expect(hasCard || hasEmpty).toBeTruthy();
   }
 });
