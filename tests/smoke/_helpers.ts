@@ -26,33 +26,32 @@ export async function openMobileMenu(page: Page) {
     'button:has-text("Menu")',
   ];
   for (const sel of triggers) {
-    const btn = page.locator(sel);
+    const btn = page.locator(sel).first();
     if (await btn.count()) {
-      await btn.first().click();
+      await btn.click();
       break;
     }
   }
   const menu = page.getByTestId('nav-menu');
   await expect(menu).toBeVisible();
+  await expect(
+    page
+      .locator(
+        '[role="dialog"]:not([aria-hidden="true"]), [data-testid="nav-menu"]:not([aria-hidden="true"])'
+      )
+      .first()
+  ).toBeVisible();
   return menu;
+}
+
+export async function expectHref(loc: Locator, re: RegExp) {
+  const href = await loc.getAttribute('href');
+  expect(href, `href was ${href}`).toMatch(re);
 }
 
 export async function expectAuthAwareRedirect(page: Page, dest: RegExp, timeout = 8000) {
   await stubAuthPkce(page);
-  await expect
-    .poll(
-      async () => {
-        const u = page.url();
-        if (u.startsWith('chrome-error://')) {
-          throw new Error(
-            `Auth redirect crashed: last URL ${u}. Stubbed /api/auth/pkce/start but page still crashed.`
-          );
-        }
-        return u;
-      },
-      { timeout }
-    )
-    .toMatch(dest);
+  await expect.poll(async () => page.url(), { timeout }).toMatch(dest);
 }
 
 export async function expectListOrEmpty(

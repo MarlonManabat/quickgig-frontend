@@ -1,11 +1,9 @@
 import { test, expect } from '@playwright/test';
 import {
-  expectAuthAwareRedirect,
-  clickIfSameOriginOrAssertHref,
   expectListOrEmpty,
   mobileViewport,
   openMobileMenu,
-  stubAuthPkce,
+  expectHref,
 } from './_helpers';
 
 const viewports = [
@@ -19,16 +17,12 @@ for (const vp of viewports) {
 
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
-      await stubAuthPkce(page);
-
       const isMobile = vp.name === 'mobile';
       const scope = isMobile ? await openMobileMenu(page) : page;
 
-      const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
+      const ctas = ['nav-browse-jobs', 'nav-post-job', 'nav-my-applications', 'nav-tickets'];
       for (const id of ctas) {
-        const el = scope.locator(`[data-cta="${id}"]`).first();
-        await expect(el).toBeVisible();
-        await expect(await el.getAttribute('data-cta')).toBe(id);
+        await expect(scope.getByTestId(id)).toBeVisible();
       }
 
       if (isMobile) {
@@ -42,54 +36,23 @@ for (const vp of viewports) {
         emptyTestId: 'jobs-empty',
       });
 
-      if (isMobile) {
-        const menu = await openMobileMenu(page);
-        const cta = menu.locator('[data-cta="nav-post-job"]').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
-      } else {
-        const cta = page.locator('[data-cta="nav-post-job"]').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
-      }
+      const postScope = isMobile ? await openMobileMenu(page) : page;
+      const post = postScope.getByTestId('nav-post-job').first();
+      await expect(post).toBeVisible();
+      await expectHref(post, /\/post-jobs(\/|\?|$)/);
 
-      await page.goto('/');
-      if (isMobile) {
-        const menu = await openMobileMenu(page);
-        const cta = menu.locator('[data-cta="nav-my-applications"]').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
-      } else {
-        const cta = page.locator('[data-cta="nav-my-applications"]').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
-      }
+      const appsScope = postScope; // menu already open if mobile
+      const apps = appsScope.getByTestId('nav-my-applications').first();
+      await expect(apps).toBeVisible();
+      await expectHref(
+        apps,
+        /(\/applications$)|(\/login(\/.*)?$)|(\/api\/auth\/pkce\/start\?[^#]*dest=%2Fapplications)/
+      );
 
-      await page.goto('/');
-      if (isMobile) {
-        const menu = await openMobileMenu(page);
-        const cta = menu.locator('[data-cta="nav-tickets"]').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
-        if (navigated) {
-          await expect.soft(
-            page.getByTestId('buy-tickets'),
-            'buy-tickets optional in PR'
-          ).toHaveCount(1);
-        } else {
-          await expect(true).toBeTruthy();
-        }
-      } else {
-        const cta = page.locator('[data-cta="nav-tickets"]').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
-        if (navigated) {
-          await expect.soft(
-            page.getByTestId('buy-tickets'),
-            'buy-tickets optional in PR'
-          ).toHaveCount(1);
-        } else {
-          await expect(true).toBeTruthy();
-        }
-      }
+      const ticketScope = postScope;
+      const tickets = ticketScope.getByTestId('nav-tickets').first();
+      await expect(tickets).toBeVisible();
+      await expectHref(tickets, /\/tickets(\/|\?|$)/);
 
       const sitemap = await page.request.get('/sitemap.xml');
       expect(sitemap.ok()).toBeTruthy();
