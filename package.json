@@ -42,7 +42,10 @@
     "e2e:prod": "BASE_URL=https://app.quickgig.ph npx playwright test",
     "test": "echo \"E2E disabled while product is WIP\" && exit 0",
     "no-legacy": "bash scripts/no-legacy.sh",
-    "report:status": "tsx scripts/generate-status.ts"
+    "report:status": "tsx scripts/generate-status.ts",
+    "audit:links": "node --unhandled-rejections=strict scripts/check-cta-links.mjs",
+    "audit:links:urls": "bash tools/dev/audit-links.sh",
+    "smoke:local": "start-server-and-test \"next start -p 3000\" http://localhost:3000 \"npx playwright test -c playwright.smoke.ts\""
   },
   "dependencies": {
     "@jobuntux/psgc": "^0.2.1",
