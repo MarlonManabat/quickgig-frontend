@@ -38,11 +38,15 @@ const green = (s) => `\x1b[32m${s}\x1b[0m`;
 
 async function check(url) {
   try {
-    let resp = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+    // Do NOT follow redirects – we want to see 3xx and fail on them.
+    let resp = await fetch(url, { method: 'HEAD', redirect: 'manual' });
     if (resp.status === 405 || resp.status === 403) {
-      resp = await fetch(url, { method: 'GET', redirect: 'follow' });
+      resp = await fetch(url, { method: 'GET', redirect: 'manual' });
     }
-    return resp.status;
+    const isRedirect = resp.status >= 300 && resp.status < 400;
+    // If your caller expects a status, keep returning the status,
+    // but treat 3xx as a failure later.
+    return isRedirect ? 302 : resp.status;
   } catch (err) {
     return 0;
   }
@@ -52,10 +56,11 @@ const results = [];
 
 for (const url of links) {
   const status = await check(url);
-  results.push({ url, status });
+  const failed = status >= 400 || (status >= 300 && status < 400);
+  results.push({ url, status, failed });
 }
 
-const bad = results.filter((r) => r.status < 200 || r.status >= 300);
+const bad = results.filter((r) => r.status < 200 || r.failed);
 
 if (bad.length) {
   console.log(red('Non-2xx responses:'));
@@ -67,5 +72,5 @@ if (bad.length) {
   console.log(green('All links returned 2xx responses'));
 }
 
-process.exit(bad.some((r) => r.status >= 400 || r.status === 0) ? 1 : 0);
+process.exit(bad.some((r) => r.failed || r.status === 0) ? 1 : 0);
 
