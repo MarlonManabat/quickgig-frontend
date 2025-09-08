@@ -7,8 +7,9 @@ const CTAS = [
   { id: 'nav-my-applications', dest: '/applications', gated: true },
   { id: 'nav-tickets', dest: '/tickets', gated: true },
   { id: 'nav-login', dest: '/login', gated: false },
-  { id: 'nav-signup', dest: '/signup', gated: false },
   { id: 'hero-start', dest: '/browse-jobs', gated: false },
+  { id: 'hero-post', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
+  { id: 'hero-signup', dest: '/signup', gated: false },
 ] as const;
 
 async function openMobileMenuIfHidden(page: any) {

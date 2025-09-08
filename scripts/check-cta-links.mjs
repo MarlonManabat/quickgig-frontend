@@ -36,28 +36,35 @@ const red = (s) => `\x1b[31m${s}\x1b[0m`;
 const yellow = (s) => `\x1b[33m${s}\x1b[0m`;
 const green = (s) => `\x1b[32m${s}\x1b[0m`;
 
+const ALLOWED = new Set([
+  '/browse-jobs',
+  '/post-job',
+  '/applications',
+  '/tickets',
+  '/login',
+  '/logout',
+  '/signup',
+  '/tickets/buy',
+]);
+
 async function check(url) {
   try {
-    // Do NOT follow redirects – we want to see 3xx and fail on them.
-    let resp = await fetch(url, { method: 'HEAD', redirect: 'manual' });
-    if (resp.status === 405 || resp.status === 403) {
-      resp = await fetch(url, { method: 'GET', redirect: 'manual' });
-    }
-    const isRedirect = resp.status >= 300 && resp.status < 400;
-    // If your caller expects a status, keep returning the status,
-    // but treat 3xx as a failure later.
-    return isRedirect ? 302 : resp.status;
+    const resp = await fetch(url, { method: 'GET', redirect: 'follow' });
+    const finalUrl = resp.url;
+    const path = new URL(finalUrl).pathname;
+    const legacy = ![...ALLOWED].some((p) => path === p || path.startsWith(p + '/')) && !path.startsWith('/jobs/');
+    return { status: resp.status, legacy };
   } catch (err) {
-    return 0;
+    return { status: 0, legacy: true };
   }
 }
 
 const results = [];
 
 for (const url of links) {
-  const status = await check(url);
-  const failed = status >= 400 || (status >= 300 && status < 400);
-  results.push({ url, status, failed });
+  const { status, legacy } = await check(url);
+  const failed = status >= 400 || legacy;
+  results.push({ url, status, failed, legacy });
 }
 
 const bad = results.filter((r) => r.status < 200 || r.failed);
@@ -65,8 +72,9 @@ const bad = results.filter((r) => r.status < 200 || r.failed);
 if (bad.length) {
   console.log(red('Non-2xx responses:'));
   for (const r of bad) {
-    const color = r.status >= 400 || r.status === 0 ? red : yellow;
-    console.log(`${color(r.status)} ${r.url}`);
+    const color = r.status >= 400 || r.status === 0 || r.legacy ? red : yellow;
+    const note = r.legacy ? ' legacy-path' : '';
+    console.log(`${color(r.status)} ${r.url}${note}`);
   }
 } else {
   console.log(green('All links returned 2xx responses'));

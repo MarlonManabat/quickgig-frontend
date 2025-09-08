@@ -77,3 +77,10 @@ All landing CTAs resolve via `withAppOrigin()`.
 
 - GitHub UI: Actions → **E2E (manual or nightly)** → `target=prod` → optional `base_url` override.
 - Local: `npm run e2e:prod`.
+
+## Marketing Ready Checklist
+
+- `npm run audit:links` – CTAs resolve to canonical routes.
+- Preview seed ensures `/browse-jobs` has at least one card.
+- Login/signup routes redirect via PKCE start.
+- Route-level error pages avoid white screens.

@@ -4,45 +4,61 @@ import React from 'react';
 import Link from 'next/link';
 import { track } from '@/lib/analytics';
 import { ROUTES, toAppPath } from '@/lib/routes';
+import { loginNext } from '@/app/lib/authAware';
 
 type Props = {
-  startClassName?: string;
+  browseClassName?: string;
   postClassName?: string;
-  showStart?: boolean;
+  signupClassName?: string;
+  showBrowse?: boolean;
   showPost?: boolean;
+  showSignup?: boolean;
 };
 
 export default function LandingCTAs({
-  startClassName = "",
-  postClassName = "",
-  showStart = true,
+  browseClassName = '',
+  postClassName = '',
+  signupClassName = '',
+  showBrowse = true,
   showPost = true,
+  showSignup = false,
 }: Props) {
   return (
-      <div className="flex gap-3">
-          {showStart && (
-            <Link
-              data-testid="hero-start"
-              data-cta="hero-start"
-              href={toAppPath(ROUTES.postJob)}
-              className={startClassName}
-              onClick={() => track('cta_click', { cta: 'hero-start' })}
-            >
-              Simulan na
-            </Link>
-          )}
-          {showPost && (
-            <Link
-              data-testid="hero-browse"
-              data-cta="hero-browse"
-              href={toAppPath(ROUTES.browseJobs)}
-              className={postClassName}
-              onClick={() => track('cta_click', { cta: 'hero-browse' })}
-            >
-              Browse jobs
-            </Link>
-          )}
-      </div>
-    );
-  }
+    <div className="flex gap-3">
+      {showBrowse && (
+        <Link
+          data-testid="hero-start"
+          data-cta="hero-start"
+          href={toAppPath(ROUTES.browseJobs)}
+          className={browseClassName}
+          onClick={() => track('cta_click', { cta: 'hero-start' })}
+        >
+          Browse jobs
+        </Link>
+      )}
+      {showPost && (
+        <Link
+          data-testid="hero-post"
+          data-cta="hero-post"
+          href={toAppPath(loginNext(ROUTES.postJob))}
+          className={postClassName}
+          onClick={() => track('cta_click', { cta: 'hero-post' })}
+        >
+          Post a job
+        </Link>
+      )}
+      {showSignup && (
+        <Link
+          data-testid="hero-signup"
+          data-cta="hero-signup"
+          href={toAppPath(ROUTES.signup)}
+          className={signupClassName}
+          onClick={() => track('cta_click', { cta: 'hero-signup' })}
+        >
+          Sign up
+        </Link>
+      )}
+    </div>
+  );
+}
 

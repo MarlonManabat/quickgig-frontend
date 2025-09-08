@@ -6,12 +6,13 @@ const BASES = (process.env.BASE_URLS || "https://quickgig.ph,https://app.quickgi
 
 const CTAS = [
   ["/",  'data-cta="hero-start"',           "/browse-jobs"],
+  ["/",  'data-cta="hero-post"',           "/login?next=/post-job"],
+  ["/",  'data-cta="hero-signup"',         "/signup"],
   ["/",  'data-cta="nav-browse-jobs"',      "/browse-jobs"],
   ["/",  'data-cta="nav-post-job"',         "/login?next=/post-job"],
   ["/",  'data-cta="nav-my-applications"',  "/login?next=/applications"],
   ["/",  'data-cta="nav-tickets"',          "/login?next=/tickets"],
-  ["/",  'data-cta="nav-login"',            "/login"],
-  ["/",  'data-cta="nav-signup"',           "/signup"],
+  ["/",  'data-cta="nav-login"',            "/login?next=/browse-jobs"],
 ];
 
 async function finalStatus(base, href) {
