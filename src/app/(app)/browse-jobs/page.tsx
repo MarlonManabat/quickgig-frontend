@@ -1,13 +1,13 @@
 import Link from 'next/link';
-import { supabaseServer } from '@/lib/supabase/server';
 import { ensurePreviewSeed } from '@/app/(app)/_lib/ensurePreviewSeed';
+import { getSupabaseServer } from '@/app/lib/supabase.server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function BrowseJobsPage() {
   await ensurePreviewSeed();
-  const supabase = supabaseServer();
+  const supabase = getSupabaseServer();
   let jobs: { id: string; title: string }[] = [];
   if (supabase) {
     const { data } = await supabase

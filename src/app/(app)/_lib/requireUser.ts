@@ -1,10 +1,10 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ROUTES } from '@/lib/routes';
-import { getServerSupabase } from '@/lib/supabase-server';
+import { getSupabaseServer } from '@/app/lib/supabase.server';
 
 export async function requireUser() {
-  const supabase = getServerSupabase();
+  const supabase = getSupabaseServer();
   const { data } = await supabase.auth.getUser();
   const user = data?.user;
   if (!user) {
