@@ -1,13 +1,17 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { cookies } from 'next/headers';
+import ClientLogout from './ClientLogout';
+
+export const dynamic = 'force-dynamic';
 
 export default async function LogoutPage() {
-  // Best-effort sign out: clear session cookies your auth uses, then redirect home.
+  // Best-effort: clear server cookies so SSR reads as logged-out.
   const jar = cookies();
-  ["sb-access-token", "sb-refresh-token", "qg_next"].forEach((n) => {
-    try {
+  try {
+    (['sb-access-token', 'sb-refresh-token', 'qg_next'] as const).forEach((n) => {
+      // @ts-ignore – cookie typings differ across Next versions
       jar.delete(n);
-    } catch {}
-  });
-  redirect("/");
+    });
+  } catch {}
+  // Render a client component to clear Supabase localStorage & redirect home.
+  return <ClientLogout />;
 }
