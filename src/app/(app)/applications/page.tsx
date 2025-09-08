@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { ROUTES } from "@/lib/routes";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getServerSupabase as getSupabaseServer } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function ApplicationsPage() {
   // Auth-gated route: redirect unauthenticated users to /login (contract).
-  const { user } = await requireUser(); // handles redirect if unauthenticated
+  const { user } = await requireUser(ROUTES.applications); // include next param
 
   // Still tolerate missing Supabase envs in preview by guarding the fetch.
   let applications: any[] = [];
