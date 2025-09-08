@@ -75,14 +75,14 @@ Landing on **/login?next=<dest>** for any auth-gated route **counts as success**
 
 ## PR Acceptance Checklist
 - [ ] `bash scripts/no-legacy.sh`
-- [ ] `node scripts/check-cta-links.mjs`
+- [ ] `node scripts/audit-links.mjs`
 - [ ] `npx playwright test -c playwright.smoke.ts`
 - [ ] `docs/backfill.md` updated with rationale
 - [ ] Bump this header’s date when any contract item changes
 - [ ] Mobile menu panel renders only when open; `data-testid="nav-menu"` matches the visible container
 
 ## CI Guardrails
-- `scripts/no-legacy.sh` and `scripts/check-cta-links.mjs`
+- `scripts/no-legacy.sh` and `scripts/audit-links.mjs`
 - Agents contract verifier (checks this header + sections)
 ## PR Smoke Guardrails (read me first)
 - Do **not** use `cta-post-job` / `cta-my-applications` testIds. Use `nav-post-job` / `nav-my-applications`.

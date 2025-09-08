@@ -14,8 +14,18 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   }
 
   const supabase = getSupabaseServer();
-  const { data } = await supabase.auth.getUser();
-  const user = data?.user;
+
+// In preview/mocked envs Supabase may be unavailable.
+// Guard to avoid "Cannot read properties of null (reading 'auth')".
+let user: import("@supabase/supabase-js").User | null = null;
+if (supabase) {
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (!error) user = data?.user ?? null;
+  } catch {
+    user = null;
+  }
+}
 
   const dest = toAppPath(ROUTES.applications);
   const href = user ? dest : loginNext(dest);

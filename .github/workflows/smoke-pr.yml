@@ -23,6 +23,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
+      - run: node -v && npm -v
+
+      - run: npm run preflight:node
+
       - name: Install dependencies (strict)
         run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
 
@@ -46,7 +50,7 @@ jobs:
           npx --yes start-server-and-test \
             "next start -p 3000" \
             "http://localhost:3000/api/healthz" \
-            "node scripts/check-cta-links.mjs"
+            "node scripts/audit-links.mjs"
         # If this step ever proves flaky, uncomment the next line temporarily:
         # continue-on-error: true
       - name: Cache Playwright browsers

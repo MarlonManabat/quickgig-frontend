@@ -37,6 +37,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: node -v && npm -v
+      - run: npm run preflight:node
 
       - name: Install deps (quiet, resilient)
         run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error

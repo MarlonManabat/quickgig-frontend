@@ -44,7 +44,7 @@
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
-- `scripts/check-cta-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
+- `scripts/audit-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
 - Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-job`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
