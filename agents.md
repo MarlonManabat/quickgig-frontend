@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-25
+**Version:** 2025-12-26
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -23,6 +23,7 @@
 - Auth-gated routes: `/applications`, `/post-job`.
 - In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
 - PKCE is gated by `AUTH_PKCE_ENABLED`; when disabled or misconfigured, flows fall back to `/login?next=`.
+- `AUTH_PKCE_OPTIONAL=1` forces the PKCE start route to redirect to `/login`, avoiding chrome-error crashes in smoke/CI.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
@@ -41,9 +42,9 @@
 - Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
 - Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
-- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` polls the URL until it matches `/login?next=<dest>`, `/api/auth/pkce/start?next=<dest>`, or `dest` itself and fails with the last seen URL on timeout.
+  - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` polls up to ~10s for `/login?next=<dest>`, `/api/auth/pkce/start?next=<dest>`, or `dest` itself; it fails fast on `chrome-error://` with the last seen URL.
 - `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
-- `openMobileMenu(page)` clicks `nav-menu-button`, waits for `nav-menu` to be visible, and falls back to alternate selectors when needed.
+- `openMobileMenu(page)` clicks `nav-menu-button`, waits for `nav-menu` to be visible, and falls back to role-based selectors when needed.
 - `expectListOrEmpty(page, listTestId, opts)` passes when either the first item or empty state becomes visible (defaults: `itemTestId="job-card"`, `emptyTestId="jobs-empty"`).
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 - `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.

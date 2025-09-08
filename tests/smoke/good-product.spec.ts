@@ -49,7 +49,7 @@ for (const vp of viewports) {
         const cta = page.getByTestId('nav-tickets').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
         if (navigated) {
-          const buy = page.getByTestId('buy-tickets');
+          const buy = page.getByRole('link', { name: /buy ticket/i });
           await expect(buy).toBeVisible();
           await buy.click();
           await expect(page.locator('#order-status')).toHaveText('pending');

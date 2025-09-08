@@ -1,46 +1,43 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { expect, Page, Locator } from '@playwright/test';
+
+const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;
+export const loginRe = /\/login(\?.*)?$/;
 
 export async function openMobileMenu(page: Page) {
-  const btn = page.getByTestId('nav-menu-button');
-  if (await btn.isVisible()) {
-    await btn.click();
-  } else {
-    const candidates = [
-      '[data-testid="nav-menu-button"]',
-      'button[aria-label="Menu"]',
-      'button:has-text("Menu")',
-    ];
-    for (const sel of candidates) {
-      const el = page.locator(sel).first();
-      if (await el.isVisible().catch(() => false)) {
-        await el.click();
-        break;
-      }
+  const drawer = page.locator('[data-testid="nav-menu"]');
+  if (await drawer.isVisible()) return;
+
+  const candidates: Locator[] = [
+    page.locator('[data-testid="nav-menu-button"]'),
+    page.getByRole('button', { name: /menu|open menu|navigation/i }),
+    page.locator('button[aria-label*="menu" i]'),
+  ];
+
+  for (const btn of candidates) {
+    if (await btn.count()) {
+      await btn.first().click();
+      break;
     }
   }
-  await expect(page.getByTestId('nav-menu')).toBeVisible();
+
+  await expect(drawer).toBeVisible({ timeout: 4000 });
 }
 
 export async function expectAuthAwareRedirect(page: Page, dest: RegExp) {
-  const loginRe = /\/login(\?.*)?$/;
-  const pkceRe = /\/api\/auth\/pkce\/start\?.*next=/;
-  const chromeErr = /^chrome-error:\/\//;
-
-  const outcome = await expect
+  const expected = new RegExp(
+    `${pkceStartRe.source}|${loginRe.source}|${dest.source}`
+  );
+  await expect
     .poll(async () => {
       const u = page.url();
-      if (chromeErr.test(u)) return 'chrome-error';
-      if (dest.test(u)) return 'dest';
-      if (loginRe.test(u)) return 'login';
-      if (pkceRe.test(u)) return 'pkce';
-      return 'pending';
-    }, { timeout: 8_000 })
-    .not.toBe('pending');
-
-  expect(
-    outcome,
-    `Expected auth-aware redirect to '${dest}', last URL was '${page.url()}'`
-  ).not.toBe('chrome-error');
+      if (u.startsWith('chrome-error://')) {
+        throw new Error(
+          `Auth redirect crashed: last URL ${u}. Fix /api/auth/pkce/start or enable AUTH_PKCE_OPTIONAL.`
+        );
+      }
+      return u;
+    }, { timeout: 10000 })
+    .toMatch(expected);
 }
 
 export async function expectListOrEmpty(

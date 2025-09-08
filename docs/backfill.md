@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-26 — Robust auth redirect & mobile nav selectors
+- Introduced `AUTH_PKCE_OPTIONAL` to force `/login` fallback in dev/CI.
+- Hardened `expectAuthAwareRedirect` against `chrome-error://` and increased timeout to 10s.
+- `openMobileMenu` now falls back to role-based selectors; nav specs use accessible names instead of test IDs.
+- Updated smokes for Post Job waitlist CTA and tickets Buy link by role.
+
 ## 2025-12-25 — PKCE flag for auth-aware links
 - Added `AUTH_PKCE_ENABLED` with helpers to detect PKCE config.
 - PKCE start route and header CTAs fall back to `/login?next=` when disabled.
