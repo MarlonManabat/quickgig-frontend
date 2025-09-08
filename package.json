@@ -2,6 +2,7 @@
   "name": "quickgig-frontend",
   "private": true,
   "scripts": {
+    "test:smoke": "node --version && npm --version && playwright test tests/smoke --reporter=list",
     "dev": "next dev",
     "ci:verify": "node scripts/ci-verify.mjs",
     "prebuild": "node ./scripts/check-dynamic-route-conflicts.mjs && node ./scripts/assert-valid-revalidate.mjs",
