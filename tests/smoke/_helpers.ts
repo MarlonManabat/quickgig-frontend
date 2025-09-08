@@ -3,24 +3,17 @@ import { expect, Page, Locator } from '@playwright/test';
 const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;
 export const loginRe = /\/login(\?.*)?$/;
 
+export const mobileViewport = { viewport: { width: 390, height: 844 } };
+
+// Ensure mobile drawer is open so nav items are visible
 export async function openMobileMenu(page: Page) {
-  const drawer = page.locator('[data-testid="nav-menu"]');
-  if (await drawer.isVisible()) return;
-
-  const candidates: Locator[] = [
-    page.locator('[data-testid="nav-menu-button"]'),
-    page.getByRole('button', { name: /menu|open menu|navigation/i }),
-    page.locator('button[aria-label*="menu" i]'),
-  ];
-
-  for (const btn of candidates) {
-    if (await btn.count()) {
-      await btn.first().click();
-      break;
-    }
-  }
-
-  await expect(drawer).toBeVisible({ timeout: 4000 });
+  const btn = page.getByTestId('nav-menu-button').first();
+  await expect(
+    btn,
+    'mobile menu toggle should be visible at mobile widths'
+  ).toBeVisible();
+  await btn.click();
+  await expect(page.getByTestId('nav-menu')).toBeVisible();
 }
 
 export async function expectAuthAwareRedirect(page: Page, dest: RegExp) {
