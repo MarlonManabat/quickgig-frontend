@@ -65,7 +65,7 @@ export default async function TicketsPage() {
       <div className="flex items-center gap-3">
         <h1 className="text-2xl font-semibold">Tickets</h1>
         <span className="px-2 py-1 rounded bg-gray-100">Balance: <b>{balance}</b></span>
-        <Link href={ROUTES.TICKETS_BUY} data-cta="buy-tickets" className="ml-auto text-sm underline">
+        <Link href={ROUTES.ticketsBuy} data-cta="buy-tickets" className="ml-auto text-sm underline">
           Buy Tickets
         </Link>
       </div>

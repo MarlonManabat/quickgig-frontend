@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-14 — CTA and auth polish
+- Added cross-domain `/login` and `/signup` pages with short-lived `qg_next` cookie.
+- Introduced `/logout` endpoint and stub `/post-job` page.
+- Added route-level `error.tsx` and `loading.tsx` for Applications and Tickets.
+- Canonicalized header and hero CTAs; added signup link and buy-ticket flow.
+
 ## 2025-12-12 — Robust cross-subdomain PKCE
 - Centralized login start/callback on app host using short-lived HttpOnly cookies.
 - Added `/login` shim and confirming page with retry.

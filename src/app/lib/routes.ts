@@ -5,7 +5,9 @@ export const ROUTES = {
   GIGS_CREATE: '/post-job',
   APPLICATIONS: '/applications',
   LOGIN: '/login',
+  SIGNUP: '/signup',
+  LOGOUT: '/logout',
   TICKETS: '/tickets',
-  TICKETS_BUY: '/tickets/buy',
+  TICKETS_BUY: '/tickets/new',
   ADMIN_TICKETS: '/admin/tickets',
 } as const;

@@ -2,31 +2,32 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { CTA_TARGET } from '@/lib/navMap';
 import { track } from '@/lib/analytics';
+import { ROUTES } from '@/lib/routes';
+import { loginNext } from '@/app/lib/authAware';
 
 type Props = {
-  findClassName?: string;
+  startClassName?: string;
   postClassName?: string;
-  showFind?: boolean;
+  showStart?: boolean;
   showPost?: boolean;
 };
 
 export default function LandingCTAs({
-  findClassName = "",
+  startClassName = "",
   postClassName = "",
-  showFind = true,
+  showStart = true,
   showPost = true,
 }: Props) {
   return (
       <div className="flex gap-3">
-          {showFind && (
+          {showStart && (
             <Link
-              data-testid="hero-browse-jobs"
-              data-cta="hero-browse-jobs"
-              href={CTA_TARGET['hero-browse-jobs']}
-              className={findClassName}
-              onClick={() => track('cta_click', { cta: 'hero-browse-jobs' })}
+              data-testid="hero-start"
+              data-cta="hero-start"
+              href={ROUTES.browseJobs}
+              className={startClassName}
+              onClick={() => track('cta_click', { cta: 'hero-start' })}
             >
               Browse jobs
             </Link>
@@ -35,7 +36,7 @@ export default function LandingCTAs({
             <Link
               data-testid="hero-post-job"
               data-cta="hero-post-job"
-              href={CTA_TARGET['hero-post-job']}
+              href={loginNext(ROUTES.postJob)}
               className={postClassName}
               onClick={() => track('cta_click', { cta: 'hero-post-job' })}
             >

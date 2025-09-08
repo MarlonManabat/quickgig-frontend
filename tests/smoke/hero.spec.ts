@@ -4,13 +4,8 @@ import { expectAuthAwareRedirect } from './_helpers';
 
 test('Landing hero CTAs route to app host', async ({ page }) => {
   await gotoHome(page);
-  await expect(page.getByTestId('hero-browse-jobs')).toBeVisible();
-  await expect(page.getByTestId('hero-post-job')).toBeVisible();
+  await expect(page.getByTestId('hero-start')).toBeVisible();
 
-  await page.getByTestId('hero-browse-jobs').click();
+  await page.getByTestId('hero-start').click();
   await expectToBeOnRoute(page, /\/browse-jobs\/?$/);
-
-  await gotoHome(page);
-  await page.getByTestId('hero-post-job').click();
-  await expectAuthAwareRedirect(page, '/post-job');
 });

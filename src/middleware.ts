@@ -15,10 +15,23 @@ const MAP: Record<string, string> = {
   '/tickets': '/smoke/tickets',
 };
 
+const PUBLIC = new Set([
+  '/',
+  '/browse-jobs',
+  '/login',
+  '/signup',
+  '/logout',
+  '/post-job',
+  '/api/auth/pkce/start',
+  '/api/auth/pkce/callback',
+]);
+
 export function middleware(req: NextRequest) {
+  const url = new URL(req.url);
+  if (PUBLIC.has(url.pathname)) return NextResponse.next();
+
   if (!isSmoke) return NextResponse.next();
 
-  const url = new URL(req.url);
   const dest = MAP[url.pathname];
   if (dest) {
     const to = new URL(dest, url.origin);

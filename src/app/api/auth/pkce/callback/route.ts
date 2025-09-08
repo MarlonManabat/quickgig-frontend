@@ -1,18 +1,24 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { crossSiteCookieOpts } from '@/lib/cookieOptions';
-import { sanitizeNext } from '@/lib/safeNext';
 
-const NEXT_COOKIE = 'next';
+const COOKIE = 'qg_next';
 const STATE_COOKIE = 'pkce_state';
 const PKCE_COOKIE = 'pkce_verifier';
 
 function clearAuthCookies() {
   const c = cookies();
   const gone = { ...crossSiteCookieOpts, maxAge: 0 };
-  c.set(NEXT_COOKIE, '', gone);
+  c.set(COOKIE, '', gone);
   c.set(STATE_COOKIE, '', gone);
   c.set(PKCE_COOKIE, '', gone);
+}
+
+function consumeNext(): string {
+  const jar = cookies();
+  const v = jar.get(COOKIE)?.value;
+  if (v) jar.delete(COOKIE);
+  return typeof v === 'string' && v.startsWith('/') ? v : '/applications';
 }
 
 export async function GET(req: Request) {
@@ -23,8 +29,6 @@ export async function GET(req: Request) {
   const c = cookies();
   const savedState = c.get(STATE_COOKIE)?.value || '';
   const verifier = c.get(PKCE_COOKIE)?.value || '';
-  const rawNext = c.get(NEXT_COOKIE)?.value;
-  const nextPath = sanitizeNext(rawNext);
 
   if (!code || !verifier || !returnedState || returnedState !== savedState) {
     clearAuthCookies();
@@ -58,6 +62,10 @@ export async function GET(req: Request) {
   // TODO: set your app session here (existing mechanism)
 
   clearAuthCookies();
-  return NextResponse.redirect(new URL(nextPath, url.origin), { status: 302 });
+  const target = consumeNext();
+  return NextResponse.redirect(
+    new URL(target, process.env.NEXT_PUBLIC_APP_ORIGIN || 'https://app.quickgig.ph'),
+    { status: 302 },
+  );
 }
 

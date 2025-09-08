@@ -1,9 +1,13 @@
 export const ROUTES = {
+  home: '/',
   browseJobs: '/browse-jobs',
   postJob: '/post-job',
   applications: '/applications',
   login: '/login',
+  signup: '/signup',
+  logout: '/logout',
   tickets: '/tickets',
+  ticketsBuy: '/tickets/new',
   agreements: '/agreements',
   billingTickets: '/billing/tickets',
   accountTickets: '/account/tickets',
@@ -47,7 +51,7 @@ export const NAV_ITEMS = [
     to: ROUTES.tickets,
     idDesktop: 'nav-tickets',
     idMobile: 'navm-tickets',
-    auth: 'none',
+    auth: 'auth-aware',
   },
   {
     key: 'login',
@@ -55,6 +59,14 @@ export const NAV_ITEMS = [
     to: ROUTES.login,
     idDesktop: 'nav-login',
     idMobile: 'navm-login',
+    auth: 'none',
+  },
+  {
+    key: 'signup',
+    label: 'Sign up',
+    to: ROUTES.signup,
+    idDesktop: 'nav-signup',
+    idMobile: 'navm-signup',
     auth: 'none',
   },
 ] as const;

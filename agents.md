@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-13
+**Version:** 2025-12-14
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -10,6 +10,7 @@
   - `data-testid="nav-my-applications"` → `/applications`
   - `data-testid="nav-tickets"` → `/tickets`
   - `data-testid="nav-login"` → `/login`
+  - `data-testid="nav-signup"` → `/signup`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
@@ -25,10 +26,10 @@
 - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
 ## Test hooks (smoke/e2e)
-- Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
+- Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`, `nav-signup`.
 - Mobile menu button: `nav-menu-button`; container: `nav-menu`.
-- Mobile menu IDs: `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-login`.
-- Landing hero IDs: `hero-browse-jobs`, `hero-post-job`.
+- Mobile menu IDs: `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-tickets`, `navm-login`, `navm-signup`.
+- Landing hero IDs: `hero-start`.
 - Post Job skeleton test id: `post-job-skeleton`.
 - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.

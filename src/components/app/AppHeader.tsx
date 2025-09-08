@@ -7,7 +7,7 @@ export default function AppHeader() {
   return (
     <header className="w-full border-b bg-white">
       <nav className="mx-auto flex max-w-6xl items-center justify-end gap-6 p-4 text-sm">
-        <LandingCTAs findClassName="hover:underline" postClassName="hover:underline" />
+        <LandingCTAs startClassName="hover:underline" postClassName="hover:underline" />
         <a href={withAppOrigin('/login')} className="hover:underline">
           Login
         </a>

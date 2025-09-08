@@ -19,8 +19,15 @@ export default function Page() {
         >
           My Applications
         </a>
-        <a data-testid="nav-tickets" data-cta="nav-tickets" href={ROUTES.tickets}>Tickets</a>
+        <a
+          data-testid="nav-tickets"
+          data-cta="nav-tickets"
+          href={`${ROUTES.login}?next=${encodeURIComponent(ROUTES.tickets)}`}
+        >
+          Tickets
+        </a>
         <a data-testid="nav-login" data-cta="nav-login" href={ROUTES.login}>Login</a>
+        <a data-testid="nav-signup" data-cta="nav-signup" href={ROUTES.signup}>Sign up</a>
       </nav>
 
       <ul data-testid="jobs-list">
