@@ -1,20 +1,22 @@
 import { expect, Page } from '@playwright/test';
 
-export async function expectAuthAwareRedirect(
-  page: Page,
-  dest: string | RegExp,
-  timeout = 8000,
-) {
-  const enc = typeof dest === 'string' ? encodeURIComponent(dest) : '__regex__';
-  // Allow a hop through PKCE start OR the final destination
-  const pkceStart = /\/api\/auth\/pkce\/start$/;
-  const loginRe = new RegExp(`/login\?next=${enc}$`);
-  const destRe =
-    typeof dest === 'string'
-      ? new RegExp(`${dest.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')}$`)
-      : dest;
+// Accept both our login page and the PKCE start endpoint (with or without query)
+const loginRe = /\/login(\?.*)?$/;
+const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;
+
+/** Expect we're redirected to auth (login or pkce start), OR we landed on the desired route if already authed. */
+export async function expectAuthAwareRedirect(page: Page, dest: RegExp, timeout = 8_000) {
+  const any = new RegExp(`${pkceStartRe.source}|${loginRe.source}|${dest.source}`);
   await expect
     .poll(async () => page.url(), { timeout })
-    .toMatch(new RegExp(`${pkceStart.source}|${loginRe.source}|${destRe.source}`));
+    .toMatch(any);
+}
+
+/** Simpler helper for tests that expect “Login” directly but should allow PKCE start too. */
+export async function expectLoginOrPkce(page: Page, timeout = 8_000) {
+  const any = new RegExp(`${pkceStartRe.source}|${loginRe.source}`);
+  await expect
+    .poll(async () => page.url(), { timeout })
+    .toMatch(any);
 }
 

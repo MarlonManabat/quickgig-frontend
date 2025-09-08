@@ -21,7 +21,7 @@ for (const device of ['desktop', 'mobile'] as const) {
 
       if (!loggedIn) {
         await page.getByTestId('apply-button').click();
-        await expectAuthAwareRedirect(page, '/applications');
+        await expectAuthAwareRedirect(page, /\/applications$/);
         return;
       }
 

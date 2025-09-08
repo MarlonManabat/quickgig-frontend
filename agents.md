@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-18
+**Version:** 2025-12-19
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -41,8 +41,9 @@
 - Applications smoke spec accepts `/login` redirect when unauthenticated.
 - Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
 - The landing page must not render duplicate CTAs with identical accessible names.
-- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` accepts a string or RegExp and succeeds on `/api/auth/pkce/start`, `/login?next=`, or the destination.
-  - Exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
+- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` accepts a RegExp destination and succeeds on `/api/auth/pkce/start`, `/login` (with optional query), or the destination.
+- `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
+  - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).

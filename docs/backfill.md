@@ -6,6 +6,7 @@
 - Add friendly empty states to Applications page.
 - Ensure Post Job page exposes a stable heading for smoke.
 - Restore auth gating on Applications via `requireUser` and accept `/login` redirect in smoke.
+- Smoke helpers now allow PKCE auth redirects and Browse Jobs smoke tolerates an empty list in preview.
 
 ## 2025-12-15 — CTA cleanup & logout fix
 - PKCE callback reads `qg_next` before clearing cookies and validates redirect paths.

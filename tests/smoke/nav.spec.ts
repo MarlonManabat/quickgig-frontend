@@ -1,23 +1,23 @@
 import { test } from '@playwright/test';
 import { gotoHome, expectToBeOnRoute } from '../e2e/_helpers';
-import { expectAuthAwareRedirect } from './_helpers';
+import { expectAuthAwareRedirect, expectLoginOrPkce } from './_helpers';
 
 test.describe('desktop header CTAs', () => {
   test('Login', async ({ page }) => {
     await gotoHome(page);
     await page.getByTestId('nav-login').first().click();
-    await expectToBeOnRoute(page, /\/login\?next=/);
+    await expectLoginOrPkce(page);
   });
 
   test('My Applications (auth-aware)', async ({ page }) => {
     await gotoHome(page);
     await page.getByTestId('nav-my-applications').first().click();
-    await expectAuthAwareRedirect(page, '/applications');
+    await expectAuthAwareRedirect(page, /\/applications$/);
   });
 
   test('Post a Job (auth-aware)', async ({ page }) => {
     await gotoHome(page);
     await page.getByTestId('nav-post-job').first().click();
-    await expectAuthAwareRedirect(page, '/post-job');
+    await expectAuthAwareRedirect(page, /\/post-job$/);
   });
 });

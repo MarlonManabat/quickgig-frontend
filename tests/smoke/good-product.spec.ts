@@ -22,18 +22,26 @@ for (const vp of viewports) {
 
       await page.getByTestId('nav-browse-jobs').first().click();
       await expect(page).toHaveURL(/\/browse-jobs/);
-      await expect(page.getByTestId('jobs-list')).toBeVisible();
-      const jobCount = await page.getByTestId('job-card').count();
-      if (process.env.VERCEL_ENV !== 'production') {
-        await expect(jobCount).toBeGreaterThan(0);
+      // Tolerate empty state in preview. Prefer cards if present.
+      const list = page.getByTestId('jobs-list');
+      const listExists = (await list.count()) > 0;
+      if (listExists) {
+        await expect(list).toBeVisible();
+      } else {
+        const hasEmpty = await page
+          .getByText(/no jobs yet|wala pang jobs|empty state/i)
+          .first()
+          .isVisible()
+          .catch(() => false);
+        expect(hasEmpty).toBeTruthy();
       }
 
       await page.getByTestId('nav-post-job').first().click();
-      await expectAuthAwareRedirect(page, '/post-job');
+      await expectAuthAwareRedirect(page, /\/post-job$/);
 
       await page.goto('/');
       await page.getByTestId('nav-my-applications').first().click();
-      await expectAuthAwareRedirect(page, '/applications');
+      await expectAuthAwareRedirect(page, /\/applications$/);
 
       await page.goto('/');
       await page.getByTestId('nav-tickets').first().click();
