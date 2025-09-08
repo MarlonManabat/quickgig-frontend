@@ -31,10 +31,16 @@ test.describe('QuickGig core flows (smoke)', () => {
 
   test('Post Job page renders', async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ''}/post-job`);
-    await expectListOrEmpty(
-      page,
-      'applications-list',
-      { text: /(no applications yet|wala pang application|empty)/i }
-    );
+    // We’re on the correct route
+    await expect(page).toHaveURL(/\/post-job(?:\?|$)/);
+    // Accept either skeleton while loading or the hydrated form/heading
+    const skeleton = page.locator('[data-testid="post-job-skeleton"]');
+    const form = page.locator('[data-testid="post-job-form"]');
+    const heading = page.getByRole('heading', { name: /(Post a job|Create a gig)/i });
+    const ok =
+      (await skeleton.isVisible().catch(() => false)) ||
+      (await form.isVisible().catch(() => false)) ||
+      (await heading.isVisible().catch(() => false));
+    expect(ok).toBeTruthy();
   });
 });

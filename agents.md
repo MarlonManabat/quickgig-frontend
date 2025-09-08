@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-22
+**Version:** 2025-12-23
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -30,11 +30,10 @@
 - `/gigs/create`  → `/post-job` (CI mock bypasses auth)
 - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
-## Test hooks (smoke/e2e)
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
-- Mobile drawer toggles via `openMobileMenu(page)`; nav items share desktop test IDs.
+- Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
 - Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
-- Post Job skeleton test id: `post-job-skeleton`.
+- Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.

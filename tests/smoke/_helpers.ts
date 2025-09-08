@@ -1,4 +1,5 @@
-import { expect, Page, Locator } from '@playwright/test';
+import { expect, Locator } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 // Common destinations
 export const loginRe = /\/login(\?.*)?$/;
@@ -33,21 +34,33 @@ export async function expectAuthAwareRedirect(
 
 /** Ensure mobile drawer is open so nav items are visible */
 export async function openMobileMenu(page: Page) {
-  // Try common selectors/roles used in our header
+  // Prefer the explicit toggle if present
+  const toggle =
+    // getByTestId if available (newer Playwright), else raw locator
+    (page as any).getByTestId?.('nav-menu-button') ??
+    page.locator('[data-testid="nav-menu-button"]');
+  const drawer =
+    (page as any).getByTestId?.('nav-menu') ??
+    page.locator('[data-testid="nav-menu"]');
+
+  if (await toggle.first().isVisible().catch(() => false)) {
+    await toggle.first().click();
+    await expect(drawer).toBeVisible({ timeout: 4000 });
+    return;
+  }
+
+  // Fallbacks across headers
   const candidates = [
-    '[data-testid="nav-menu"]',
-    '[data-test="nav-menu"]',
+    '[data-testid="nav-menu-button"]',
+    '[data-test="nav-menu-button"]',
     'button[aria-label="Menu"]',
     'button:has-text("Menu")',
   ];
   for (const sel of candidates) {
-    const btn = page.locator(sel);
-    if (await btn.count()) {
-      // If already open, bail
-      const open =
-        (await page.locator('[data-testid="nav-drawer"]').isVisible().catch(() => false)) ||
-        (await page.locator('[data-test="nav-drawer"]').isVisible().catch(() => false));
-      if (!open) await btn.first().click();
+    const el = page.locator(sel).first();
+    if (await el.isVisible().catch(() => false)) {
+      await el.click();
+      await expect(drawer).toBeVisible({ timeout: 4000 });
       return;
     }
   }
