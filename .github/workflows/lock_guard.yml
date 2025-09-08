@@ -22,6 +22,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: node -v && npm -v
+      - run: npm run preflight:node
       - name: Refresh lockfile only (no install)
         run: |
           npm install --package-lock-only --ignore-scripts --audit=false --fund=false --loglevel=error

@@ -8,6 +8,6 @@ export const ROUTES = {
   SIGNUP: '/signup',
   LOGOUT: '/logout',
   TICKETS: '/tickets',
-  TICKETS_BUY: '/tickets/new',
+  TICKETS_BUY: '/tickets/buy',
   ADMIN_TICKETS: '/admin/tickets',
 } as const;

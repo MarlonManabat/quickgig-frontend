@@ -6,4 +6,4 @@ if [[ $# -lt 1 ]]; then
   exit 2
 fi
 BASE_URLS="$1" \
-node --unhandled-rejections=strict scripts/check-cta-links.mjs
+node scripts/audit-links.mjs

@@ -14,14 +14,12 @@ export default function AppHeader() {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
 
-  const links = NAV_ITEMS.filter(item => !(user && (item.key === 'login' || item.key === 'signup'))).map(
-    item => ({
-      href: user || item.auth !== 'auth-aware' ? item.to : loginNext(item.to),
-      label: item.label,
-      testId: item.idDesktop,
-      mobileId: item.idMobile,
-    }),
-  );
+  const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(item => {
+    let href = item.to;
+    if (item.key === 'login') href = loginNext(ROUTES.browseJobs);
+    else if (!user && item.auth === 'auth-aware') href = loginNext(item.to);
+    return { href, label: item.label, testId: item.idDesktop, mobileId: item.idMobile };
+  });
   if (user) {
     if (isAdmin(user.email)) {
       links.push({

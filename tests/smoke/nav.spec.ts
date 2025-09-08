@@ -6,7 +6,7 @@ test.describe('desktop header CTAs', () => {
   test('Login', async ({ page }) => {
     await gotoHome(page);
     await page.getByTestId('nav-login').first().click();
-    await expectToBeOnRoute(page, /\/login\/?$/);
+    await expectToBeOnRoute(page, /\/login\?next=/);
   });
 
   test('My Applications (auth-aware)', async ({ page }) => {

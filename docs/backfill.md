@@ -364,3 +364,11 @@
 - Browse Jobs now loads published jobs from Supabase.
 - Smoke test covers posting flow (auth-aware).
 
+
+## 2025-09-08 – Runtime pin + CI guardrails
+- Pinned Node to 20.17.0 via .nvmrc/.node-version.
+- Enforced engines (node >=20<21, npm >=10<11) and engine-strict=true.
+- CI now reads .nvmrc and runs a preflight check before install.
+- Added `audit:links:ci` and made `audit-links.mjs` tolerate missing BASE_URLS by defaulting to quickgig/app URLs.
+- Added `scripts/dev/fix-node.sh` and `npm run fix:node` convenience.
+Outcome: `npm ci` is deterministic across local + CI; wrong Node fails fast with actionable guidance.

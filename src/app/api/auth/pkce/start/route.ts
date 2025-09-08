@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { randomUrlSafe, challengeS256 } from '@/lib/pkce';
 import { crossSiteCookieOpts } from '@/lib/cookieOptions';
+import { sanitizeNext } from '@/lib/safeNext';
 
 const STATE_COOKIE = 'pkce_state';
 const PKCE_COOKIE = 'pkce_verifier';
@@ -12,6 +13,9 @@ export async function GET(req: Request) {
   const appHost = process.env.NEXT_PUBLIC_APP_HOST || 'app.quickgig.ph';
   const redirectPath = process.env.AUTH_REDIRECT_PATH || '/api/auth/pkce/callback';
   const redirectUri = `https://${appHost}${redirectPath}`;
+
+  const url = new URL(req.url);
+  const next = sanitizeNext(url.searchParams.get('next'));
 
   const verifier = randomUrlSafe(64);
   const challenge = await challengeS256(verifier);
@@ -28,7 +32,9 @@ export async function GET(req: Request) {
   const store = cookies();
   store.set(STATE_COOKIE, state, { ...crossSiteCookieOpts, maxAge: 300 });
   store.set(PKCE_COOKIE, verifier, { ...crossSiteCookieOpts, maxAge: 300 });
+  if (next) {
+    store.set('qg_next', next, { ...crossSiteCookieOpts, maxAge: 600 });
+  }
 
   return NextResponse.redirect(auth.toString(), { status: 302 });
 }
-

@@ -1,23 +1,12 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { supabaseServer } from '@/lib/supabase/server';
 import { ROUTES } from '@/lib/routes';
-import { toAppPath } from '@/lib/routes';
-import { loginNext } from '@/app/lib/authAware';
+import { requireUser } from '@/app/(app)/_lib/requireUser';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function ApplicationsPage() {
-  const supabase = supabaseServer();
-  const { data } = await supabase.auth.getUser();
-  const user = data?.user;
-
-  const dest = toAppPath(ROUTES.applications);
-  if (!user) {
-    redirect(loginNext(dest));
-  }
-
+  const { supabase, user } = await requireUser();
   const { data: rows } = await supabase
     .from('applications')
     .select('id,status,created_at,job:jobs(id,title)')
@@ -46,7 +35,7 @@ export default async function ApplicationsPage() {
           data-qa="applications-empty"
           className="opacity-70 space-y-3"
         >
-          <p>No applications yet</p>
+          <p>You haven’t applied to any gigs yet.</p>
           <Link
             href={ROUTES.browseJobs}
             data-cta="browse-jobs-from-empty"
