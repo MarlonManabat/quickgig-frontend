@@ -5,9 +5,8 @@ test('Post Job › auth-aware publish flow', async ({ page }) => {
   await page.goto('/');
   // open Post Job; in CI this may redirect to login
   await page.getByTestId('nav-post-job').click();
-  const dest = '/gigs' + '/create';
-  await expectAuthAwareRedirect(page, dest);
-  const destRe = new RegExp(`${dest.replace(/\//g, '\\/')}\/?$`);
+  const destRe = /\/gigs\/create\/?$/;
+  await expectAuthAwareRedirect(page, destRe);
   if (!destRe.test(page.url())) {
     // redirected to login; treat as success for this smoke and stop early
     return;

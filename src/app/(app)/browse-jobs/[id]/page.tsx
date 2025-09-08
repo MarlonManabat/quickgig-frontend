@@ -4,7 +4,6 @@ import { getSeededJobs } from '@/app/lib/seed';
 import { loginNext } from '@/app/lib/authAware';
 import { ROUTES } from '@/lib/routes';
 import { toAppPath } from '@/lib/routes';
-import { getSupabaseServer } from '@/app/lib/supabase.server';
 
 export default async function JobDetailPage({ params }: { params: { id: string } }) {
   const jobs = await getSeededJobs();
@@ -13,19 +12,9 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     notFound();
   }
 
-  const supabase = getSupabaseServer();
-
-// In preview/mocked envs Supabase may be unavailable.
-// Guard to avoid "Cannot read properties of null (reading 'auth')".
-let user: import("@supabase/supabase-js").User | null = null;
-if (supabase) {
-  try {
-    const { data, error } = await supabase.auth.getUser();
-    if (!error) user = data?.user ?? null;
-  } catch {
-    user = null;
-  }
-}
+  // Guard Supabase in preview/missing-envs to avoid "Cannot read properties of null (reading 'auth')"
+  const { getUserSafe } = await import("@/lib/auth/getUserSafe");
+  const user = await getUserSafe();
 
   const dest = toAppPath(ROUTES.applications);
   const href = user ? dest : loginNext(dest);

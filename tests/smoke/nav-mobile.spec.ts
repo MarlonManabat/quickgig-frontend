@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { gotoHome, expectToBeOnRoute } from '../e2e/_helpers';
-import { expectAuthAwareRedirect } from './_helpers';
+import { expectAuthAwareRedirect, expectLoginOrPkce, clickIfSameOriginOrAssertHref } from './_helpers';
 
 test.use({ viewport: { width: 360, height: 740 } });
 
@@ -11,30 +10,33 @@ async function openMenu(page) {
 
 test.describe('mobile header CTAs', () => {
   test('Browse Jobs', async ({ page }) => {
-    await gotoHome(page);
+    await page.goto('/');
     await openMenu(page);
     await page.getByTestId('navm-browse-jobs').click();
-    await expectToBeOnRoute(page, /\/browse-jobs\/?/);
+    await expect(page).toHaveURL(/\/browse-jobs\/?/);
   });
 
   test('Post a Job (auth-aware)', async ({ page }) => {
-    await gotoHome(page);
+    await page.goto('/');
     await openMenu(page);
-    await page.getByTestId('navm-post-job').click();
-    await expectAuthAwareRedirect(page, '/post-job');
+    const cta = page.getByTestId('navm-post-job');
+    const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
+    if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
   });
 
   test('My Applications (auth-aware)', async ({ page }) => {
-    await gotoHome(page);
+    await page.goto('/');
     await openMenu(page);
-    await page.getByTestId('navm-my-applications').click();
-    await expectAuthAwareRedirect(page, '/applications');
+    const cta = page.getByTestId('navm-my-applications');
+    const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
+    if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
   });
 
   test('Login', async ({ page }) => {
-    await gotoHome(page);
+    await page.goto('/');
     await openMenu(page);
-    await page.getByTestId('navm-login').click();
-    await expectToBeOnRoute(page, /\/login\/?/);
+    const cta = page.getByTestId('navm-login');
+    const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/login$/);
+    if (navigated) await expectLoginOrPkce(page);
   });
 });

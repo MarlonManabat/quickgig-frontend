@@ -1,18 +1,28 @@
-import Link from 'next/link';
-import { ROUTES } from '@/lib/routes';
-import { requireUser } from '@/app/(app)/_lib/requireUser';
+import Link from "next/link";
+import { ROUTES } from "@/lib/routes";
+import { requireUser } from "@/lib/auth/requireUser";
+import { getServerSupabase as getSupabaseServer } from "@/lib/supabase/server";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function ApplicationsPage() {
-  const { supabase, user } = await requireUser();
-  const { data: rows } = await supabase
-    .from('applications')
-    .select('id,status,created_at,job:jobs(id,title)')
-    .eq('worker_id', user.id)
-    .order('created_at', { ascending: false });
-  const applications = rows ?? [];
+  // Auth-gated route: redirect unauthenticated users to /login (contract).
+  const { user } = await requireUser(ROUTES.applications); // include next param
+
+  // Still tolerate missing Supabase envs in preview by guarding the fetch.
+  let applications: any[] = [];
+  try {
+    const supabase = getSupabaseServer?.();
+    if (supabase) {
+      const { data: rows } = await supabase
+        .from("applications")
+        .select("id,status,created_at,job:jobs(id,title)")
+        .eq("worker_id", user.id)
+        .order("created_at", { ascending: false });
+      applications = rows ?? [];
+    }
+  } catch {}
 
   return (
     <div className="mx-auto max-w-3xl p-6">
@@ -35,15 +45,14 @@ export default async function ApplicationsPage() {
           data-qa="applications-empty"
           className="opacity-70 space-y-3"
         >
-          <p>You haven’t applied to any gigs yet.</p>
-          <Link
+          <p>No applications yet. Start from <Link
             href={ROUTES.browseJobs}
             data-cta="browse-jobs-from-empty"
             data-testid="browse-jobs-from-empty"
             className="underline"
           >
-            Browse jobs
-          </Link>
+            Browse Jobs
+          </Link>.</p>
         </div>
       )}
     </div>

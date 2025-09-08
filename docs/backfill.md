@@ -1,5 +1,16 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-09-08 – Core smoke & guards
+- Add Playwright smoke for Browse, Job detail (Apply button visible), Applications, Post Job.
+- Guard Supabase access with `getUserSafe()` to prevent crashes in preview/missing envs.
+- Add friendly empty states to Applications page.
+- Ensure Post Job page exposes a stable heading for smoke.
+- Restore auth gating on Applications via `requireUser` and accept `/login` redirect in smoke.
+- Smoke helpers now allow PKCE auth redirects and Browse Jobs smoke tolerates an empty list in preview.
+- PKCE start route now redirects to `/login` in preview/CI, avoiding crashes when env is missing.
+- Core flows smoke skips Apply button assertion when no jobs are seeded and Browse list spec accepts empty state.
+- Smoke tests avoid cross-origin navigation in CI using `clickIfSameOriginOrAssertHref`; cross-origin CTAs assert only the path.
+
 ## 2025-12-15 — CTA cleanup & logout fix
 - PKCE callback reads `qg_next` before clearing cookies and validates redirect paths.
 - Removed duplicate `/login` page that conflicted with `(auth)` route.

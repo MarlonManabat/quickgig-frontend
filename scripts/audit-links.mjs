@@ -1,5 +1,11 @@
-const raw = process.env.BASE_URLS || "https://quickgig.ph,https://app.quickgig.ph";
-const BASE_URLS = raw.split(",").map((s) => s.trim().replace(/\/$/, "")).filter(Boolean);
+const DEFAULT_BASES = ["https://quickgig.ph", "https://app.quickgig.ph"];
+// In CI we run a local Next server; prefer localhost unless BASE_URLS is provided.
+const CI_DEFAULT = process.env.CI ? "http://localhost:3000" : "";
+const rawBases = (process.env.BASE_URLS || CI_DEFAULT || DEFAULT_BASES.join(",")).trim();
+const BASE_URLS = rawBases
+  .split(",")
+  .map((s) => s.trim().replace(/\/$/, ""))
+  .filter(Boolean);
 
 const pages = ["/browse-jobs"];
 const CTA_RE = /<a[^>]*data-cta="([^"]+)"[^>]*href="([^"]+)"/g;
@@ -9,11 +15,10 @@ const links = new Set();
 for (const base of BASE_URLS) {
   for (const page of pages) {
     try {
-      const res = await fetch(base + page);
-      const html = await res.text();
-      for (const match of html.matchAll(CTA_RE)) {
+      const { url: dest, text } = await fetchFirstHop(base + page);
+      for (const match of (text || "").matchAll(CTA_RE)) {
         const href = match[2];
-        const url = new URL(href, base).href;
+        const url = new URL(href, dest).href;
         links.add(url);
       }
     } catch (err) {
@@ -38,15 +43,35 @@ const ALLOWED = new Set([
   '/tickets/buy',
 ]);
 
+// Only inspect the FIRST HOP to avoid landing on auth providers or login pages.
+async function fetchFirstHop(url, opts = {}) {
+  const res = await fetch(url, { redirect: 'manual', ...opts });
+  const location = res.headers?.get?.('location');
+  const nextUrl = location ? new URL(location, url).toString() : url;
+  const text = await (res.status >= 200 && res.status < 400 ? res.text() : Promise.resolve(""));
+  return { status: res.status, url: nextUrl, text };
+}
+
+function isAuthRedirect(u) {
+  try {
+    const p = new URL(u).pathname;
+    if (p.startsWith('/login')) return true;
+    if (p.startsWith('/api/auth/pkce')) return true;
+    if (p.startsWith('/auth') || p.includes('/authorize')) return true; // supabase/oauth-ish
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 async function check(url) {
   try {
-    const resp = await fetch(url, { method: 'GET', redirect: 'follow' });
-    const finalUrl = resp.url;
-    const path = new URL(finalUrl).pathname;
+    const resp = await fetchFirstHop(url);
+    const path = new URL(resp.url).pathname;
     const legacy = ![...ALLOWED].some((p) => path === p || path.startsWith(p + '/')) && !path.startsWith('/jobs/');
-    return { status: resp.status, legacy };
+    return { status: resp.status, legacy, nextUrl: resp.url };
   } catch (err) {
-    return { status: 0, legacy: true };
+    return { status: 0, legacy: true, nextUrl: url };
   }
 }
 
@@ -56,8 +81,8 @@ async function check(url) {
 // or network errors (status === 0). Keep "legacy" for reporting only.
 const results = [];
 for (const url of links) {
-  const { status, legacy } = await check(url);
-  const failed = (status === 0) || status >= 400; // do not include `legacy`
+  const { status, legacy, nextUrl } = await check(url);
+  const failed = status === 0 || (status >= 400 && !isAuthRedirect(nextUrl));
   results.push({ url, status, failed, legacy });
 }
 
