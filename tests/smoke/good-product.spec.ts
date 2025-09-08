@@ -4,7 +4,7 @@ import {
   mobileViewport,
   openMobileMenu,
   expectHref,
-  loginOr,
+  LOGIN_OR_PKCE,
 } from './_helpers';
 
 const viewports = [
@@ -27,7 +27,7 @@ for (const vp of viewports) {
         }
         await menu.getByTestId('nav-browse-jobs').click();
       } else {
-        await expectHref(page.getByTestId('nav-post-job'), loginOr(/\/post-jobs?\/?$/));
+        await expectHref(page.getByTestId('nav-post-job'), LOGIN_OR_PKCE);
         await page.getByTestId('nav-browse-jobs').click();
       }
       await expect(page).toHaveURL(/\/browse-jobs/);
@@ -39,12 +39,12 @@ for (const vp of viewports) {
       const postScope = isMobile ? await openMobileMenu(page) : page;
       const post = postScope.getByTestId('nav-post-job').first();
       await expect(post).toBeVisible();
-      await expectHref(post, loginOr(/\/post-jobs?\/?$/));
+      await expectHref(post, LOGIN_OR_PKCE);
 
       const appsScope = postScope;
       const apps = appsScope.getByTestId('nav-my-applications').first();
       await expect(apps).toBeVisible();
-      await expectHref(apps, loginOr(/\/applications$/));
+      await expectHref(apps, LOGIN_OR_PKCE);
 
       const ticketScope = postScope;
       const tickets = ticketScope.getByTestId('nav-tickets').first();

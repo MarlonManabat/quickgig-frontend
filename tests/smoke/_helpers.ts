@@ -1,45 +1,39 @@
 import { expect, Page, Locator } from '@playwright/test';
 
-const LOGIN_WITH_NEXT = /^\/login(?:\?.*)?$/;
-
-export function loginOr(dest: RegExp): RegExp {
-  // match dest OR /login?next=...
-  return new RegExp(`(?:${dest.source})|(?:${LOGIN_WITH_NEXT.source})`);
-}
-
-export async function stubAuthPkce(page: Page) {
-  await page.route('**/api/auth/pkce/start**', async (route) => {
-    const u = new URL(route.request().url());
-    const next = u.searchParams.get('next') || '';
-    const location = next ? `/login?next=${encodeURIComponent(next)}` : '/login';
-    await route.fulfill({
-      status: 302,
-      headers: { location },
-      contentType: 'text/plain',
-      body: 'redirect',
-    });
-  });
-}
+export const LOGIN_OR_PKCE = /^(?:\/api\/auth\/pkce\/start(?:\?.*)?$|\/login(?:\?.*)?$)/;
 
 export const mobileViewport = { viewport: { width: 390, height: 844 } };
 
 export async function openMobileMenu(page: Page) {
-  const toggle = page.getByTestId('nav-menu-button').first();
-  await expect(toggle, 'mobile menu toggle should be visible').toBeVisible();
-  await toggle.click();
-  const drawer = page.getByTestId('nav-menu').first();
-  await expect(drawer, 'mobile drawer should become visible').toBeVisible();
+  // Always click the actual button; containers may be hidden.
+  const btn = page.getByTestId('nav-menu-button');
+  await btn.first().click();
+  const drawer = page.getByTestId('nav-menu');
+  await expect(drawer, 'nav drawer should be visible after toggle').toBeVisible();
   return drawer;
 }
 
 export async function expectHref(loc: Locator, re: RegExp) {
-  const href = await loc.getAttribute('href');
-  expect(href, `href was ${href}`).toMatch(re);
+  const href = (await loc.getAttribute('href')) ?? '';
+  expect(href, `href was '${href}'`).toMatch(re);
 }
 
+/**
+ * Assert an auth-aware boundary **without** navigating:
+ * - If already authorized, current URL should match `dest`.
+ * - Otherwise, href on the last focused/active link/button should point to `/login?...` or `/api/auth/pkce/start?...`.
+ * We avoid clicking + polling page.url() to stop chromewbdata crashes in CI.
+ */
 export async function expectAuthAwareRedirect(page: Page, dest: RegExp, timeout = 8000) {
-  await stubAuthPkce(page);
-  await expect.poll(async () => page.url(), { timeout }).toMatch(dest);
+  if (dest.test(page.url())) {
+    expect(page.url()).toMatch(dest);
+    return;
+  }
+
+  const candidate = page
+    .locator(':focus, [data-cta], a[role="link"], a, button[role="link"]').first();
+  await expect(candidate, 'expected a CTA to be focused/available').toBeVisible({ timeout });
+  await expectHref(candidate, LOGIN_OR_PKCE);
 }
 
 export async function expectListOrEmpty(

@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-29 — Auth-aware href checks & menu helper
+- Introduced `LOGIN_OR_PKCE` regex and `expectHref` helper for auth-aware href assertions.
+- `expectAuthAwareRedirect` no longer navigates; verifies current URL or CTA href.
+- Simplified `openMobileMenu` to click `nav-menu-button` and return the drawer.
+- Nav and landing smokes assert auth-boundary hrefs without navigating.
+
 ## 2025-12-28 — PKCE stub to login & mobile toggle wait
 - `/api/auth/pkce/start` stub now 302s to `/login?next=` preventing chrome-error.
 - Added `loginOr` helper so smokes accept `/login?next=` fallback.
