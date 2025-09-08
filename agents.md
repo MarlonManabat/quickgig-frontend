@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-24
+**Version:** 2025-12-25
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -22,7 +22,7 @@
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
 - Auth-gated routes: `/applications`, `/post-job`.
 - In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
-- PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
+- PKCE is gated by `AUTH_PKCE_ENABLED`; when disabled or misconfigured, flows fall back to `/login?next=`.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`

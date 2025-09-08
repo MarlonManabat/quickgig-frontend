@@ -29,10 +29,8 @@ test.describe('QuickGig core flows (smoke)', () => {
 
   test('Post Job page renders', async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ''}/post-job`);
-    await expect(
-      page
-        .getByTestId('post-job-skeleton')
-        .or(page.getByRole('heading', { name: /Post a Job/i }))
-    ).toBeVisible();
+    await expectAuthAwareRedirect(page, /\/post-job$/);
+    const btn = page.getByRole('button', { name: /join the employer waitlist/i });
+    await expect(btn).toBeVisible({ timeout: 2000 });
   });
 });

@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-25 — PKCE flag for auth-aware links
+- Added `AUTH_PKCE_ENABLED` with helpers to detect PKCE config.
+- PKCE start route and header CTAs fall back to `/login?next=` when disabled.
+- Hardened smoke helpers against `chrome-error://` and ensured mobile menu toggles reliably.
+
 ## 2025-12-24 — Auth/nav smoke stabilization
 - `expectAuthAwareRedirect` now polls for `/login?next=`, PKCE start, or destination and reports last URL on timeout.
 - `openMobileMenu` clicks `nav-menu-button` directly then waits for `nav-menu` visibility.
