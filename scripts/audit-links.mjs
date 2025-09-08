@@ -50,11 +50,14 @@ async function check(url) {
   }
 }
 
+// Note: "legacy" means the final path isn't in our preferred allowlist.
+// This can include legitimate auth redirects (e.g., /login → Supabase authorize),
+// which SHOULD NOT fail the build. We only fail on hard HTTP errors (>= 400)
+// or network errors (status === 0). Keep "legacy" for reporting only.
 const results = [];
-
 for (const url of links) {
   const { status, legacy } = await check(url);
-  const failed = status >= 400 || legacy;
+  const failed = (status === 0) || status >= 400; // do not include `legacy`
   results.push({ url, status, failed, legacy });
 }
 
