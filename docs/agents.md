@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-12-15 -->
+<!-- AGENT CONTRACT v2025-12-16 -->
 
 ## 2025-12-14
 - Added signup/logout routes, hero-start CTA, and per-route error/loading.
@@ -11,7 +11,7 @@
 
 ## 2025-09-06
 - Auth-aware redirects in CI: unauthenticated CTA clicks redirect to `/login?next=<path>`.
-- Header nav testids used by smoke: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`, `nav-signup`.
+- Header nav testids used by smoke: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile menu button testid: `nav-menu-button` (open menu before asserting mobile links).
 - Sitemap expectations: include `/browse-jobs` on the main host; also allow/expect base entries for `https://quickgig.ph/` and `https://app.quickgig.ph/`.
 - Helpers referenced by tests: `expectAuthAwareRedirect(page, dest, timeout=8000)`.
@@ -27,14 +27,13 @@
 **Employer**
 - **Post a job** → Job appears in **/browse-jobs**
 
-**No dead ends**
 - Root “/” **must** 302/308 → **/browse-jobs**
 - CTAs use canonical routes (no raw hrefs, no legacy paths)
 - CTAs include `data-cta` matching their test ID
 - Unauth flows: redirect to **/login?next=<dest>** counts as success
 - No white screens (page-level error/skeleton boundaries in gated flows)
-- Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`, `nav-signup`, `nav-menu-button`
-- Hero CTA testids: `hero-start`
+- Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`, `nav-menu-button`
+- Hero CTA testids: `hero-start`, `hero-post`, `hero-signup`
 - Canonical routes: `/browse-jobs`, `/post-job`, `/applications`
 - Auth-aware: unauthenticated clicks on gated CTAs may redirect to `/login?next=<dest>`.
 
@@ -56,11 +55,11 @@
 - **/login**
 
 ## CTA Test IDs
-**Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`, `nav-signup`
+**Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
 **Mobile menu button:** `nav-menu-button`
 **Mobile menu container:** `nav-menu`
-**Mobile menu items:** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-tickets`, `navm-login`, `navm-signup`
-**Landing hero:** `hero-start`
+**Mobile menu items:** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-tickets`, `navm-login`
+**Landing hero:** `hero-start`, `hero-post`, `hero-signup`
 **Applications empty CTA:** `browse-jobs-from-empty`
 
 **No duplicates:** each CTA test ID must appear at most once in the DOM.

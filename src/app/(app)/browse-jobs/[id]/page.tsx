@@ -4,7 +4,7 @@ import { getSeededJobs } from '@/app/lib/seed';
 import { loginNext } from '@/app/lib/authAware';
 import { ROUTES } from '@/lib/routes';
 import { toAppPath } from '@/lib/routes';
-import { supabaseServer } from '@/lib/supabase/server';
+import { getSupabaseServer } from '@/app/lib/supabase.server';
 
 export default async function JobDetailPage({ params }: { params: { id: string } }) {
   const jobs = await getSeededJobs();
@@ -13,7 +13,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     notFound();
   }
 
-  const supabase = supabaseServer();
+  const supabase = getSupabaseServer();
   const { data } = await supabase.auth.getUser();
   const user = data?.user;
 

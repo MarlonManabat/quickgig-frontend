@@ -7,7 +7,7 @@ export const ROUTES = {
   signup: '/signup',
   logout: '/logout',
   tickets: '/tickets',
-  ticketsBuy: '/tickets/new',
+  ticketsBuy: '/tickets/buy',
   agreements: '/agreements',
   billingTickets: '/billing/tickets',
   accountTickets: '/account/tickets',
@@ -59,14 +59,6 @@ export const NAV_ITEMS = [
     to: ROUTES.login,
     idDesktop: 'nav-login',
     idMobile: 'navm-login',
-    auth: 'none',
-  },
-  {
-    key: 'signup',
-    label: 'Sign up',
-    to: ROUTES.signup,
-    idDesktop: 'nav-signup',
-    idMobile: 'navm-signup',
     auth: 'none',
   },
 ] as const;
