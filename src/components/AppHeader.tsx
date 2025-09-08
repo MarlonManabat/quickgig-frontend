@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
-import { NAV_ITEMS, ROUTES } from '@/lib/routes';
+import { ROUTES } from '@/lib/routes';
 import dynamic from 'next/dynamic';
 import { isAdmin } from '@/lib/admin';
+import { navLinks } from '@/nav/links';
 import { loginNext } from '@/app/lib/authAware';
 
 const TicketBalanceChip = dynamic(() => import('@/components/TicketBalanceChip'), { ssr: false });
@@ -14,26 +15,21 @@ export default function AppHeader() {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
 
-  const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(item => {
-    let href = item.to;
-    if (item.key === 'login') href = loginNext(ROUTES.browseJobs);
-    else if (!user && item.auth === 'auth-aware') href = loginNext(item.to);
-    return { href, label: item.label, testId: item.idDesktop, mobileId: item.idMobile };
-  });
+  const links = navLinks(!!user).filter(item => !(user && item.id === 'login'));
   if (user) {
     if (isAdmin(user.email)) {
       links.push({
-        href: ROUTES.adminTickets,
+        id: 'admin-tickets',
         label: 'Admin · Tickets',
+        href: ROUTES.adminTickets,
         testId: 'nav-admin-tickets',
-        mobileId: 'navm-admin-tickets',
       });
     }
     links.push({
-      href: ROUTES.logout,
+      id: 'logout',
       label: 'Sign out',
+      href: ROUTES.logout,
       testId: 'nav-logout',
-      mobileId: 'navm-logout',
     });
   }
 
@@ -45,29 +41,17 @@ export default function AppHeader() {
             QuickGig
           </Link>
           <nav className="hidden md:flex items-center gap-4">
-            {links.map(link =>
-              link.href ? (
-                <Link
-                  key={link.testId}
-                  data-testid={link.testId}
-                  data-cta={link.testId}
-                  href={link.href}
-                  prefetch={false}
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <button
-                  key={link.testId}
-                  data-testid={link.testId}
-                  data-cta={link.testId}
-                  onClick={link.onClick}
-                  className="underline"
-                >
-                  {link.label}
-                </button>
-              ),
-            )}
+            {links.map(link => (
+              <Link
+                key={link.id}
+                data-testid={link.testId}
+                data-cta={link.testId}
+                href={link.href}
+                prefetch={false}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
           <button
             data-testid="nav-menu-button"
@@ -99,34 +83,19 @@ export default function AppHeader() {
           className="md:hidden border-t bg-white"
         >
           <div className="flex flex-col gap-2 p-4">
-            {links.map(link =>
-              link.href ? (
-                <Link
-                  key={link.mobileId}
-                  data-testid={link.mobileId}
-                  data-cta={link.mobileId}
-                  href={link.href}
-                  prefetch={false}
-                  onClick={() => setOpen(false)}
-                  className="link"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <button
-                  key={link.mobileId}
-                  data-testid={link.mobileId}
-                  data-cta={link.mobileId}
-                  onClick={() => {
-                    setOpen(false);
-                    link.onClick();
-                  }}
-                  className="underline text-left"
-                >
-                  {link.label}
-                </button>
-              ),
-            )}
+            {links.map(link => (
+              <Link
+                key={link.id}
+                data-testid={link.testId}
+                data-cta={link.testId}
+                href={link.href}
+                prefetch={false}
+                onClick={() => setOpen(false)}
+                className="link"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
       ) : null}

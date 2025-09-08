@@ -1,20 +1,23 @@
 # Agents Contract
-**Version:** 2025-12-23
+**Version:** 2026-02-24
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
 - All CTAs must include `data-cta` matching their test ID.
 - Header CTAs:
   - `data-testid="nav-browse-jobs"` → `/browse-jobs`
-  - `data-testid="nav-post-job"` → `/post-job`
+  - `data-testid="nav-post-job"` → `/post-jobs`
   - `data-testid="nav-my-applications"` → `/applications`
   - `data-testid="nav-tickets"` → `/tickets`
   - `data-testid="nav-login"` → `/login`
   - `data-testid="nav-logout"` → `/logout`
 - Hero CTAs:
   - `data-testid="hero-start"` → `/browse-jobs`
-  - `data-testid="hero-post"` → `/post-job`
+  - `data-testid="hero-cta-post-job"` → `/post-jobs`
+  - `data-testid="hero-cta-my-applications"` → `/applications`
   - `data-testid="hero-signup"` → `/signup`
+- Post Job page CTA:
+  - `data-testid="publish-gig"` → `/gigs/create`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
@@ -32,7 +35,7 @@
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
-- Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
+ - Landing hero IDs: `hero-start`, `hero-cta-post-job`, `hero-cta-my-applications`, `hero-signup`.
 - Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
@@ -43,7 +46,8 @@
 - The landing page must not render duplicate CTAs with identical accessible names.
 - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` waits for the PKCE start request and tolerates `chrome-error://` fallbacks.
 - `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
-- `openMobileMenu(page)` ensures mobile nav is open before interacting.
+- `openMobileMenu(page)` toggles `nav-menu-button` and waits for `nav-menu`.
+- `expectHref(loc, re)` asserts anchor `href` without navigation.
 - `expectListOrEmpty(page, listTestId, emptyMarker)` passes when either list or empty state is visible.
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 - `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.

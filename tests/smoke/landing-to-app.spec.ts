@@ -1,18 +1,16 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref } from './_helpers';
+import { expectHref } from './_helpers';
 
 test('Landing → App CTAs » "Post a job" opens on app host', async ({ page }) => {
   await page.goto('/');
-  const cta = page.getByTestId('nav-post-job');
+  const cta = page.getByTestId('hero-cta-post-job');
   await expect(cta).toBeVisible();
-  const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
-  if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
+  await expectHref(cta, /(\/post-jobs$|\/login\?next=\/post-jobs$)/);
 });
 
 test('Landing → App CTAs » "My Applications" opens on app host', async ({ page }) => {
   await page.goto('/');
-  const cta = page.getByTestId('nav-my-applications');
+  const cta = page.getByTestId('hero-cta-my-applications');
   await expect(cta).toBeVisible();
-  const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
-  if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
+  await expectHref(cta, /(\/applications$|\/login\?next=\/applications$)/);
 });
