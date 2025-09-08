@@ -2,17 +2,22 @@
 /**
  * check-cta-links.mjs
  * QuickGig CTA verifier for landing + app.
- * Node >= 20, no deps. Supports BASE_URLS env (comma-separated).
+ *
+ * - Node >= 20 (uses global fetch)
+ * - No external deps
+ * - Reads BASE_URLS env (comma-separated). Defaults to quickgig + app.
+ *
+ * What it checks
+ * 1) Landing CTAs ("Find Work"/"Browse jobs"/"Simulan na", "Post a Job") → App domain, sensible paths.
+ * 2) App domain: "/" resolves to browse; header CTAs: Browse Jobs, My Applications, Post Job.
+ * 3) Targets return 2xx/3xx and not the “Something went wrong / Go home” page.
  */
 
 import { URL } from "node:url";
 
 // --- Config -----------------------------------------------------------------
 
-const DEFAULT_BASES = [
-  "https://quickgig.ph",
-  "https://app.quickgig.ph",
-];
+const DEFAULT_BASES = ["https://quickgig.ph", "https://app.quickgig.ph"];
 
 const rawBases = (process.env.BASE_URLS || "").trim();
 const BASES = (rawBases ? rawBases : DEFAULT_BASES.join(","))
@@ -22,9 +27,9 @@ const BASES = (rawBases ? rawBases : DEFAULT_BASES.join(","))
 
 // Allowed path patterns (flexible to avoid churn)
 const RX = {
-  browse: /\/(browse[-\/]?jobs?|jobs(\/)?$|jobs\/browse)/i,
-  postJob: /\/(post[-\/]?job|jobs\/new|employer\/post)/i,
-  applications: /\/(my[-\/]?applications|applications)/i,
+  browse: /\/(browse[-/]?jobs?|jobs(\/)?$|jobs\/browse)/i,
+  postJob: /\/(post[-/]?job|jobs\/new|employer\/post)/i,
+  applications: /\/(my[-/]?applications|applications)/i,
 };
 
 const CTA = {
@@ -127,7 +132,7 @@ async function checkLanding(base){
     const r = await fetchFollow(dest);
     if(!r.ok) errors.push(`Landing browse target HTTP ${r.status} (${dest})`);
     if(looksLikeErrorPage(r.text)) errors.push(`Landing browse target shows error page (${dest}).`);
-    console.log(`\u2713 Landing browse CTA \u2192 ${r.url} [${r.status}]`);
+    console.log(`✓ Landing browse CTA → ${r.url} [${r.status}]`);
   }
 
   const aPost = findByKeywords(anchors, CTA.postKeywords);
@@ -140,7 +145,7 @@ async function checkLanding(base){
     const r = await fetchFollow(dest);
     if(!r.ok) errors.push(`Landing post-job target HTTP ${r.status} (${dest})`);
     if(looksLikeErrorPage(r.text)) errors.push(`Landing post-job target shows error page (${dest}).`);
-    console.log(`\u2713 Landing post-job CTA \u2192 ${r.url} [${r.status}]`);
+    console.log(`✓ Landing post-job CTA → ${r.url} [${r.status}]`);
   }
 
   return errors;
@@ -156,7 +161,7 @@ async function checkApp(base){
   if(!okPath(root.url, RX.browse)){
     errors.push(`App "/" should resolve to a browse page. Final URL: ${root.url}`);
   }else{
-    console.log(`\u2713 App "/" resolves to ${root.url}`);
+    console.log(`✓ App "/" resolves to ${root.url}`);
   }
 
   const anchors = Array.from(extractAnchors(root.text))
@@ -171,7 +176,7 @@ async function checkApp(base){
     if(!okPath(r.url, RX.applications)) errors.push(`"My Applications" path should look like /applications; got ${r.url}`);
     if(!r.ok) errors.push(`"My Applications" HTTP ${r.status} (${r.url})`);
     if(looksLikeErrorPage(r.text)) errors.push(`"My Applications" shows error page (${r.url}).`);
-    console.log(`\u2713 My Applications \u2192 ${r.url} [${r.status}]`);
+    console.log(`✓ My Applications → ${r.url} [${r.status}]`);
   }
 
   const aPost = findByKeywords(anchors, CTA.postKeywords);
@@ -182,7 +187,7 @@ async function checkApp(base){
     if(!okPath(r.url, RX.postJob)) errors.push(`"Post Job" path should look like /post-job; got ${r.url}`);
     if(!r.ok) errors.push(`"Post Job" HTTP ${r.status} (${r.url})`);
     if(looksLikeErrorPage(r.text)) errors.push(`"Post Job" shows error page (${r.url}).`);
-    console.log(`\u2713 Post Job \u2192 ${r.url} [${r.status}]`);
+    console.log(`✓ Post Job → ${r.url} [${r.status}]`);
   }
 
   return errors;
@@ -213,13 +218,13 @@ async function checkApp(base){
   }
 
   if(allErrors.length){
-    console.error("\n\u274c CTA checks failed:");
+    console.error("\n❌ CTA checks failed:");
     for(const e of allErrors) console.error(" - " + e);
-    console.error('\nHint: run with\n  BASE_URLS="https://quickgig.ph,https://app.quickgig.ph" node scripts/check-cta-links.mjs');
+    console.error('\nHint:\n  BASE_URLS="https://quickgig.ph,https://app.quickgig.ph" node scripts/check-cta-links.mjs');
     process.exit(1);
   }
 
-  console.log("\n\u2705 All CTA checks passed.");
+  console.log("\n✅ All CTA checks passed.");
   process.exit(0);
 })().catch(err=>{
   console.error("Unhandled error in CTA check:", err?.stack || err);
