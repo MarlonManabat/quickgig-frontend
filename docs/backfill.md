@@ -409,3 +409,8 @@
 - Added `audit:links:ci` and made `audit-links.mjs` tolerate missing BASE_URLS by defaulting to quickgig/app URLs.
 - Added `scripts/dev/fix-node.sh` and `npm run fix:node` convenience.
 Outcome: `npm ci` is deterministic across local + CI; wrong Node fails fast with actionable guidance.
+
+## 2025-12-27 — Smoke PKCE stub & nav selectors
+- Stubbed `/api/auth/pkce/start` in smoke helpers to prevent chrome-error crashes.
+- `openMobileMenu` now returns the drawer and tries common fallback selectors.
+- Mobile nav smokes assert CTAs via `data-cta` inside the opened drawer.

@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-26
+**Version:** 2025-12-27
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -32,7 +32,7 @@
 - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
-- Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
+- Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button`, waiting for `nav-menu`, and trying common fallbacks.
 - Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
 - Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.
@@ -42,7 +42,7 @@
 - Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
 - Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
-  - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` polls up to ~10s for `/login?next=<dest>`, `/api/auth/pkce/start?next=<dest>`, or `dest` itself; it fails fast on `chrome-error://` with the last seen URL.
+  - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` stubs `/api/auth/pkce/start`, polls up to ~8s for the provided destination, and fails fast on `chrome-error://` with the last seen URL.
 - `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
 - `openMobileMenu(page)` clicks `nav-menu-button`, waits for `nav-menu` to be visible, and falls back to role-based selectors when needed.
 - `expectListOrEmpty(page, listTestId, opts)` passes when either the first item or empty state becomes visible (defaults: `itemTestId="job-card"`, `emptyTestId="jobs-empty"`).

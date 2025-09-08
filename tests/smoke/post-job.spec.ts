@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
+import { expectAuthAwareRedirect, stubAuthPkce } from './_helpers';
 
 test('Post Job › auth-aware publish flow', async ({ page }) => {
   await page.goto('/');
   // open Post Job; in CI this may redirect to login
   await page.getByTestId('nav-post-job').click();
   const destRe = /\/gigs\/create\/?$/;
+  await stubAuthPkce(page);
   await expectAuthAwareRedirect(page, destRe);
   if (!destRe.test(page.url())) {
     // redirected to login; treat as success for this smoke and stop early

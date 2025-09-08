@@ -5,10 +5,8 @@ test.use(mobileViewport);
 
 test('mobile header menu exposes core CTAs', async ({ page }) => {
   await page.goto('/');
-  await openMobileMenu(page);
-  const menu = page.getByTestId('nav-menu');
-  await expect(menu.getByTestId('nav-browse-jobs')).toBeVisible();
-  await expect(menu.getByTestId('nav-login')).toBeVisible();
-  await expect(menu.getByTestId('nav-my-applications')).toBeVisible();
-  await expect(menu.getByTestId('nav-post-job')).toBeVisible();
+  const menu = await openMobileMenu(page);
+  for (const id of ['nav-browse-jobs', 'nav-login', 'nav-my-applications', 'nav-post-job']) {
+    await expect(menu.locator(`[data-cta="${id}"]`).first()).toBeVisible();
+  }
 });

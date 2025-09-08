@@ -5,6 +5,7 @@ import {
   expectListOrEmpty,
   mobileViewport,
   openMobileMenu,
+  stubAuthPkce,
 } from './_helpers';
 
 const viewports = [
@@ -18,17 +19,14 @@ for (const vp of viewports) {
 
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
+      await stubAuthPkce(page);
 
       const isMobile = vp.name === 'mobile';
-      if (isMobile) {
-        await openMobileMenu(page);
-      }
-
-      const scope = isMobile ? page.getByTestId('nav-menu') : page;
+      const scope = isMobile ? await openMobileMenu(page) : page;
 
       const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
       for (const id of ctas) {
-        const el = scope.getByTestId(id).first();
+        const el = scope.locator(`[data-cta="${id}"]`).first();
         await expect(el).toBeVisible();
         await expect(await el.getAttribute('data-cta')).toBe(id);
       }
@@ -45,36 +43,32 @@ for (const vp of viewports) {
       });
 
       if (isMobile) {
-        await openMobileMenu(page);
-      }
-      {
-        const cta = (isMobile
-          ? page.getByTestId('nav-menu').getByTestId('nav-post-job').first()
-          : page.getByTestId('nav-post-job').first());
+        const menu = await openMobileMenu(page);
+        const cta = menu.locator('[data-cta="nav-post-job"]').first();
+        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
+        if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
+      } else {
+        const cta = page.locator('[data-cta="nav-post-job"]').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
         if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
       }
 
       await page.goto('/');
       if (isMobile) {
-        await openMobileMenu(page);
-      }
-      {
-        const cta = (isMobile
-          ? page.getByTestId('nav-menu').getByTestId('nav-my-applications').first()
-          : page.getByTestId('nav-my-applications').first());
+        const menu = await openMobileMenu(page);
+        const cta = menu.locator('[data-cta="nav-my-applications"]').first();
+        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
+        if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
+      } else {
+        const cta = page.locator('[data-cta="nav-my-applications"]').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
         if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
       }
 
       await page.goto('/');
       if (isMobile) {
-        await openMobileMenu(page);
-      }
-      {
-        const cta = (isMobile
-          ? page.getByTestId('nav-menu').getByTestId('nav-tickets').first()
-          : page.getByTestId('nav-tickets').first());
+        const menu = await openMobileMenu(page);
+        const cta = menu.locator('[data-cta="nav-tickets"]').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
         if (navigated) {
           await expect.soft(
@@ -82,7 +76,17 @@ for (const vp of viewports) {
             'buy-tickets optional in PR'
           ).toHaveCount(1);
         } else {
-          // If cross-origin, we just assert href path above; no further action
+          await expect(true).toBeTruthy();
+        }
+      } else {
+        const cta = page.locator('[data-cta="nav-tickets"]').first();
+        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
+        if (navigated) {
+          await expect.soft(
+            page.getByTestId('buy-tickets'),
+            'buy-tickets optional in PR'
+          ).toHaveCount(1);
+        } else {
           await expect(true).toBeTruthy();
         }
       }
