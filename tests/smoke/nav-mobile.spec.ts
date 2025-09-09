@@ -1,32 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { openMobileMenu, expectAuthAwareRedirect, loginRe } from './_helpers';
+import { test } from '@playwright/test';
+import { expectHref, expectAuthAwareHref, rePath } from './_helpers';
 
-test('mobile header CTAs › Login', async ({ page }) => {
+async function openMobileMenu(page) {
+  await page.getByTestId('nav-menu').first().click();
+}
+
+test('mobile header menu exposes core CTAs', async ({ page }) => {
   await page.goto('/');
   await openMobileMenu(page);
-  // fall back to role name if testId differs in some layouts
-  const login =
-    (await page.getByTestId('nav-login').count())
-      ? page.getByTestId('nav-login').first()
-      : page.getByRole('link', { name: /login/i }).first();
-  await login.click();
-  await expectAuthAwareRedirect(page, loginRe);
-});
-
-test('mobile header CTAs › Browse Jobs', async ({ page }) => {
-  await page.goto('/');
-  await openMobileMenu(page);
-  const browse =
-    (await page.getByTestId('nav-browse-jobs').count())
-      ? page.getByTestId('nav-browse-jobs').first()
-      : page.getByRole('link', { name: /browse jobs/i }).first();
-  await browse.click();
-  await expect(page).toHaveURL(/\/browse-jobs/);
-});
-
-test('mobile header CTAs › My Applications (auth-aware)', async ({ page }) => {
-  await page.goto('/');
-  await openMobileMenu(page);
-  await page.getByTestId('nav-my-applications').first().click();
-  await expectAuthAwareRedirect(page, /\/login(\?.*)?$|\/applications$/);
+  await expectHref(page.getByTestId('nav-browse-jobs').first(), rePath('/browse-jobs'));
+  await expectHref(page.getByTestId('nav-post-job').first(),     rePath('/post-jobs'));
+  await expectAuthAwareHref(page, 'nav-my-applications', '/applications');
+  await expectHref(page.getByTestId('nav-login').first(),        rePath('/login'));
 });

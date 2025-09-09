@@ -40,7 +40,7 @@ export default function LandingCTAs({
         <Link
           data-testid="hero-cta-post-job"
           data-cta="hero-cta-post-job"
-          href={toAppPath(ROUTES.postJob)}
+          href={toAppPath(ROUTES.postJobs)}
           className={postClassName}
           onClick={() => track('cta_click', { cta: 'hero-cta-post-job' })}
         >

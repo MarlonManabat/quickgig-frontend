@@ -34,7 +34,7 @@ const green = (s) => `\x1b[32m${s}\x1b[0m`;
 
 const ALLOWED = new Set([
   '/browse-jobs',
-  '/post-job',
+  '/post-jobs',
   '/applications',
   '/tickets',
   '/login',

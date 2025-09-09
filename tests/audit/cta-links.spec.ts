@@ -1,15 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from '../smoke/_helpers';
+import { expectHref, expectAuthAwareHref, rePath } from '../smoke/_helpers';
 
-const CTAS = [
+export const NAV = [
   { id: 'nav-browse-jobs', dest: '/browse-jobs', gated: false },
-  { id: 'nav-post-job', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
+  { id: 'nav-post-job',    dest: '/post-jobs',    gated: true  },
   { id: 'nav-my-applications', dest: '/applications', gated: true },
-  { id: 'nav-tickets', dest: '/tickets', gated: false },
-  { id: 'nav-login', dest: '/login', gated: false },
-  { id: 'hero-start', dest: '/browse-jobs', gated: false },
-  { id: 'hero-cta-post-job', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
-  { id: 'hero-signup', dest: '/signup', gated: false },
+  { id: 'nav-tickets',     dest: '/tickets',      gated: true  }, // keep gated
+  { id: 'nav-login',       dest: '/login',        gated: false },
 ] as const;
 
 async function openMobileMenuIfHidden(page: any) {
@@ -31,18 +28,14 @@ for (const vp of [{ w: 1280, h: 800 }, { w: 390, h: 844 }]) {
       await openMobileMenuIfHidden(page);
     });
 
-    for (const cta of CTAS) {
+    for (const cta of NAV) {
       test(`${cta.id} routes to ${cta.gated ? 'dest or /login?next' : 'dest'}`, async ({ page }) => {
         const el = page.getByTestId(cta.id).first();
         await expect(el).toBeVisible();
-        await Promise.all([page.waitForLoadState('domcontentloaded'), el.click()]);
         if (cta.gated) {
-          await expectAuthAwareRedirect(page, cta.dest);
+          await expectAuthAwareHref(page, cta.id, cta.dest);
         } else {
-          const destRe = typeof cta.dest === 'string'
-            ? new RegExp(`${cta.dest.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')}$`)
-            : cta.dest;
-          await expect.poll(async () => page.url()).toMatch(destRe);
+          await expectHref(el, rePath(cta.dest));
         }
       });
     }

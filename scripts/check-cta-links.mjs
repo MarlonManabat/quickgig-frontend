@@ -28,7 +28,7 @@ const BASES = (rawBases ? rawBases : DEFAULT_BASES.join(","))
 // Allowed path patterns (flexible to avoid churn)
 const RX = {
   browse: /\/(browse[-/]?jobs?|jobs(\/)?$|jobs\/browse)/i,
-  postJob: /\/(post[-/]?job|jobs\/new|employer\/post)/i,
+  postJob: /\/(post[-/]?jobs|jobs\/new|employer\/post)/i,
   applications: /\/(my[-/]?applications|applications)/i,
 };
 
@@ -141,7 +141,7 @@ async function checkLanding(base){
   }else{
     const dest = aPost.abs;
     if(hostKind(dest) !== "app") errors.push(`Landing post-job CTA must point to App domain; got ${dest}`);
-    if(!okPath(dest, RX.postJob)) errors.push(`Landing post-job CTA should look like /post-job; got ${dest}`);
+    if(!okPath(dest, RX.postJob)) errors.push(`Landing post-job CTA should look like /post-jobs; got ${dest}`);
     const r = await fetchFollow(dest);
     if(!r.ok) errors.push(`Landing post-job target HTTP ${r.status} (${dest})`);
     if(looksLikeErrorPage(r.text)) errors.push(`Landing post-job target shows error page (${dest}).`);
@@ -184,7 +184,7 @@ async function checkApp(base){
     errors.push(`Missing "Post Job" link on app page.`);
   }else{
     const r = await fetchFollow(aPost.abs);
-    if(!okPath(r.url, RX.postJob)) errors.push(`"Post Job" path should look like /post-job; got ${r.url}`);
+    if(!okPath(r.url, RX.postJob)) errors.push(`"Post Job" path should look like /post-jobs; got ${r.url}`);
     if(!r.ok) errors.push(`"Post Job" HTTP ${r.status} (${r.url})`);
     if(looksLikeErrorPage(r.text)) errors.push(`"Post Job" shows error page (${r.url}).`);
     console.log(`✓ Post Job → ${r.url} [${r.status}]`);

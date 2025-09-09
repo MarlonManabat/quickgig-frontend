@@ -6,10 +6,10 @@ const BASES = (process.env.BASE_URLS || "https://quickgig.ph,https://app.quickgi
 
 const CTAS = [
   ["/",  'data-cta="hero-start"',           "/browse-jobs"],
-  ["/",  'data-cta="hero-cta-post-job"',   "/post-job"],
+  ["/",  'data-cta="hero-cta-post-job"',   "/post-jobs"],
   ["/",  'data-cta="hero-signup"',         "/signup"],
   ["/",  'data-cta="nav-browse-jobs"',      "/browse-jobs"],
-  ["/",  'data-cta="nav-post-job"',         "/post-job"],
+  ["/",  'data-cta="nav-post-job"',         "/post-jobs"],
   ["/",  'data-cta="nav-my-applications"',  "/login?next=/applications"],
   ["/",  'data-cta="nav-tickets"',          "/tickets"],
   ["/",  'data-cta="nav-login"',            "/login?next=/browse-jobs"],

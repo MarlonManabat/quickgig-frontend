@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-25 — Stabilize PR smokes & canonical /post-jobs
+- Switched smokes to href-only assertions; avoided auth navigation.
+- Canonicalized Post Job path to /post-jobs and kept Tickets gated.
+
 ## 2025-12-24 — Canonical nav hrefs & legacy redirects
 - Fixed auth-aware href regex helper and added `expectHref`.
 - Restored mobile nav test IDs and canonical `/post-job` link.

@@ -1,7 +1,7 @@
 export const ROUTES = {
   home: '/',
   browseJobs: '/browse-jobs',
-  postJob: '/post-job',
+  postJobs: '/post-jobs',
   applications: '/applications',
   login: '/login',
   signup: '/signup',
@@ -32,7 +32,7 @@ export const NAV_ITEMS = [
   {
     key: 'post-job',
     label: 'Post a job',
-    to: ROUTES.postJob,
+    to: ROUTES.postJobs,
     idDesktop: 'nav-post-job',
     idMobile: 'nav-post-job',
     auth: 'auth-aware',

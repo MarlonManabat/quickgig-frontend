@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 
 const HREFS: Record<string, string> = {
   'nav-browse-jobs': '/browse-jobs',
-  'nav-post-job': '/post-job',
+  'nav-post-job': '/post-jobs',
   'nav-my-applications': '/login?next=/applications',
   'nav-tickets': '/tickets',
-  'nav-login': '/login?next=/browse-jobs',
+  'nav-login': '/login',
   'hero-start': '/browse-jobs',
-  'hero-cta-post-job': '/post-job',
+  'hero-cta-post-job': '/post-jobs',
   'hero-signup': '/signup',
 };
 

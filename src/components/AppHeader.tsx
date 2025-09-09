@@ -16,7 +16,7 @@ export default function AppHeader() {
 
   const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(item => {
     let href = item.to;
-    if (item.key === 'login') href = loginNext(ROUTES.browseJobs);
+    if (item.key === 'login') href = ROUTES.login;
     else if (item.key === 'applications' && !user) href = loginNext(item.to);
     return { href, label: item.label, testId: item.idDesktop };
   });

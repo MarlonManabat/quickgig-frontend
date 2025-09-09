@@ -19,7 +19,7 @@ export default function LandingHero() {
           Browse jobs
         </Link>
         <Link
-          href={toAppPath(ROUTES.postJob)}
+          href={toAppPath(ROUTES.postJobs)}
           data-testid="hero-cta-post-job"
           data-cta="hero-cta-post-job"
           className="px-4 py-2 rounded-md bg-gray-100"

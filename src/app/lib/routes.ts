@@ -2,7 +2,7 @@
 export const ROUTES = {
   HOME: '/',
   BROWSE_JOBS: '/browse-jobs',
-  POST_JOB: '/post-job',
+  POST_JOB: '/post-jobs',
   APPLICATIONS: '/applications',
   LOGIN: '/login',
   SIGNUP: '/signup',

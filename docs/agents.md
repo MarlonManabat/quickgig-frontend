@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-12-24 -->
+<!-- AGENT CONTRACT v2025-12-25 -->
 
 ## 2025-12-14
 - Added signup/logout routes, hero-start CTA, and per-route error/loading.
@@ -34,7 +34,7 @@
 - No white screens (page-level error/skeleton boundaries in gated flows)
 - Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`, `nav-menu-button`
 - Hero CTA testids: `hero-start`, `hero-cta-post-job`, `hero-signup`
-- Canonical routes: `/browse-jobs`, `/post-job`, `/applications`
+- Canonical routes: `/browse-jobs`, `/post-jobs`, `/applications`
 - Auth-aware: unauthenticated clicks on gated CTAs may redirect to `/login?next=<dest>`.
 
 **Observability**
@@ -50,7 +50,7 @@
 
 ## Canonical Routes
 - **/browse-jobs**
-- **/post-job**  (Post Job)
+- **/post-jobs**  (Post Job)
 - **/applications**
 - **/login**
 
