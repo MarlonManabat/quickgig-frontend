@@ -1,5 +1,12 @@
 import { expect, Locator, Page } from '@playwright/test';
 
+export function reAuthAware(dest: string): RegExp {
+  const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+  const enc = encodeURIComponent(dest);
+  // Accept /login?next=<dest> OR <dest> (+ optional query/hash)
+  return new RegExp(`^(\/login\?next=${enc}(?:$|[&#])|${esc(dest)}(?:$|[?#]))`);
+}
+
 // Common destinations
 export const loginRe = /\/login(\?.*)?$/;
 export const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;

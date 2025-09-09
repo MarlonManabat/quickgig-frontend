@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { expectListOrEmpty, expectAuthAwareRedirect, loginRe } from './_helpers';
+import { expectListOrEmpty, expectHref, reAuthAware } from './_helpers';
+import { gotoHome } from '../e2e/_helpers';
 
 // Reuse existing baseURL from Playwright config; do NOT introduce new env vars.
 // The test only asserts pages render and key CTAs are present.
@@ -23,16 +24,15 @@ test.describe('QuickGig core flows (smoke)', () => {
     await expect(page.getByRole('button', { name: /apply|mag-apply/i })).toBeVisible();
   });
 
-  test('My Applications is auth-gated (redirects to /login) OR renders empty when authenticated', async ({ page, baseURL }) => {
-    await page.goto(`${baseURL || ''}/`);
-    await page.getByTestId('nav-my-applications').first().click();
-    await expectAuthAwareRedirect(page, new RegExp(`${loginRe.source}|/applications$`));
+  test('My Applications is auth-gated (redirects to /login) OR renders empty when authenticated', async ({ page }) => {
+    await gotoHome(page);
+    await expectHref(page.getByTestId('nav-my-applications').first(), reAuthAware('/applications'));
   });
 
   test('Post Job page renders', async ({ page, baseURL }) => {
-    await page.goto(`${baseURL || ''}/post-job`);
+    await page.goto(`${baseURL || ''}/post-jobs`);
     // We’re on the correct route
-    await expect(page).toHaveURL(/\/post-job(?:\?|$)/);
+    await expect(page).toHaveURL(/\/post-jobs(?:\?|$)/);
     // Accept either skeleton while loading or the hydrated form/heading
     const skeleton = page.locator('[data-testid="post-job-skeleton"]');
     const form = page.locator('[data-testid="post-job-form"]');

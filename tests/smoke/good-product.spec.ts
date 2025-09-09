@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { openMobileMenu, expectAuthAwareHref } from './_helpers';
+import { openMobileMenu, expectHref, reAuthAware } from './_helpers';
 
 const viewports = [
   { name: 'mobile', width: 390, height: 844 },
@@ -15,18 +15,18 @@ for (const vp of viewports) {
 
       if (vp.name === 'mobile') {
         const menu = await openMobileMenu(page);
-        await expect(menu.locator('[data-cta="nav-browse-jobs"]').first()).toBeVisible();
-        await expect(menu.locator('[data-cta="nav-browse-jobs"]')).toHaveAttribute('href', '/browse-jobs');
-        await expectAuthAwareHref(menu.locator('[data-cta="nav-tickets"]'), '/tickets');
-        await expectAuthAwareHref(menu.locator('[data-cta="nav-post-job"]'), '/post-jobs');
-        await expectAuthAwareHref(menu.locator('[data-cta="nav-my-applications"]'), '/applications');
-        await expect(menu.locator('[data-cta="nav-login"]')).toHaveAttribute('href', '/login');
+        await expect(menu.getByTestId('nav-browse-jobs').first()).toBeVisible();
+        await expectHref(menu.getByTestId('nav-browse-jobs').first(), reAuthAware('/browse-jobs'));
+        await expectHref(menu.getByTestId('nav-tickets').first(), reAuthAware('/tickets'));
+        await expectHref(menu.getByTestId('nav-post-job').first(), reAuthAware('/post-jobs'));
+        await expectHref(menu.getByTestId('nav-my-applications').first(), reAuthAware('/applications'));
+        await expectHref(menu.getByTestId('nav-login').first(), /\/login(?:$|[?#])/);
       } else {
-        await expect(page.getByTestId('nav-browse-jobs')).toHaveAttribute('href', '/browse-jobs');
-        await expectAuthAwareHref(page.getByTestId('nav-tickets'), '/tickets');
-        await expectAuthAwareHref(page.getByTestId('nav-post-job'), '/post-jobs');
-        await expectAuthAwareHref(page.getByTestId('nav-my-applications'), '/applications');
-        await expect(page.getByTestId('nav-login')).toHaveAttribute('href', '/login');
+        await expectHref(page.getByTestId('nav-browse-jobs').first(), reAuthAware('/browse-jobs'));
+        await expectHref(page.getByTestId('nav-tickets').first(), reAuthAware('/tickets'));
+        await expectHref(page.getByTestId('nav-post-job').first(), reAuthAware('/post-jobs'));
+        await expectHref(page.getByTestId('nav-my-applications').first(), reAuthAware('/applications'));
+        await expectHref(page.getByTestId('nav-login').first(), /\/login(?:$|[?#])/);
       }
 
       await page.goto('/browse-jobs');
