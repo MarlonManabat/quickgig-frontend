@@ -123,4 +123,3 @@ jobs:
             echo "## Snapshot"
             echo "- Changes detected: ${{ steps.detect.outputs.changed }}"
           } >> "$GITHUB_STEP_SUMMARY"
-
