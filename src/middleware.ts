@@ -27,7 +27,12 @@ const PUBLIC = new Set([
 ]);
 
 export function middleware(req: NextRequest) {
-  const url = new URL(req.url);
+  const url = req.nextUrl.clone();
+  const legacy = ['/post-jobs', '/gigs/create'];
+  if (legacy.includes(url.pathname)) {
+    url.pathname = '/post-job';
+    return NextResponse.redirect(url, 308);
+  }
   if (PUBLIC.has(url.pathname)) return NextResponse.next();
 
   if (!isSmoke) return NextResponse.next();

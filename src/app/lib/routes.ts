@@ -1,8 +1,8 @@
 // central app paths for cross-origin CTAs
 export const ROUTES = {
   HOME: '/',
-  GIGS_BROWSE: '/browse-jobs',      // keep existing browse path
-  GIGS_CREATE: '/post-job',
+  BROWSE_JOBS: '/browse-jobs',
+  POST_JOB: '/post-job',
   APPLICATIONS: '/applications',
   LOGIN: '/login',
   SIGNUP: '/signup',

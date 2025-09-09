@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-24 — Canonical nav hrefs & legacy redirects
+- Fixed auth-aware href regex helper and added `expectHref`.
+- Restored mobile nav test IDs and canonical `/post-job` link.
+- Landing hero CTA now uses `hero-cta-post-job` and `/post-job`.
+- Middleware redirects `/post-jobs` and `/gigs/create` to `/post-job`.
+
 ## 2025-12-23 — Smoke nav toggle & Post Job fix
 - `openMobileMenu` clicks `nav-menu-button` and waits for `nav-menu` to appear.
 - Corrected Post Job smoke to assert skeleton/form/heading instead of `applications-list`.

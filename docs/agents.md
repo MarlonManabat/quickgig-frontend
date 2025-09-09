@@ -1,4 +1,4 @@
-<!-- AGENT CONTRACT v2025-12-16 -->
+<!-- AGENT CONTRACT v2025-12-24 -->
 
 ## 2025-12-14
 - Added signup/logout routes, hero-start CTA, and per-route error/loading.
@@ -33,7 +33,7 @@
 - Unauth flows: redirect to **/login?next=<dest>** counts as success
 - No white screens (page-level error/skeleton boundaries in gated flows)
 - Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`, `nav-menu-button`
-- Hero CTA testids: `hero-start`, `hero-post`, `hero-signup`
+- Hero CTA testids: `hero-start`, `hero-cta-post-job`, `hero-signup`
 - Canonical routes: `/browse-jobs`, `/post-job`, `/applications`
 - Auth-aware: unauthenticated clicks on gated CTAs may redirect to `/login?next=<dest>`.
 
@@ -58,8 +58,8 @@
 **Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
 **Mobile menu button:** `nav-menu-button`
 **Mobile menu container:** `nav-menu`
-**Mobile menu items:** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-tickets`, `navm-login`
-**Landing hero:** `hero-start`, `hero-post`, `hero-signup`
+**Mobile menu items:** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
+**Landing hero:** `hero-start`, `hero-cta-post-job`, `hero-signup`
 **Applications empty CTA:** `browse-jobs-from-empty`
 
 **No duplicates:** each CTA test ID must appear at most once in the DOM.

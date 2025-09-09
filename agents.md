@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-23
+**Version:** 2025-12-24
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -13,7 +13,7 @@
   - `data-testid="nav-logout"` → `/logout`
 - Hero CTAs:
   - `data-testid="hero-start"` → `/browse-jobs`
-  - `data-testid="hero-post"` → `/post-job`
+  - `data-testid="hero-cta-post-job"` → `/post-job`
   - `data-testid="hero-signup"` → `/signup`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
@@ -27,12 +27,14 @@
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
 - `/find`      → `/browse-jobs`
+- `/post-jobs` → `/post-job`
 - `/gigs/create`  → `/post-job` (CI mock bypasses auth)
 - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
+- Mobile menu items reuse the same `nav-*` test IDs.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
-- Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
+- Landing hero IDs: `hero-start`, `hero-cta-post-job`, `hero-signup`.
 - Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.

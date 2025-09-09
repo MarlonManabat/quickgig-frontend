@@ -1,6 +1,22 @@
 import { expect, Locator } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+/** Escape a string for literal use inside a RegExp. */
+const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** Build a regex that accepts /login?next=<dest> OR <dest>, with optional query/hash. */
+export function reAuthAware(dest: string): RegExp {
+  const enc = encodeURIComponent(dest);
+  // ^(?:/login?next=<dest>|<dest>)(?:[?#].*)?$
+  return new RegExp(`^(?:\\/login\\?next=${enc}|${esc(dest)})(?:[?#].*)?$`);
+}
+
+/** Assert anchor href matches the given pattern and include href in failure message. */
+export async function expectHref(loc: Locator, re: RegExp) {
+  const href = await loc.getAttribute('href');
+  expect(href, `href was ${href}`).toMatch(re);
+}
+
 // Common destinations
 export const loginRe = /\/login(\?.*)?$/;
 export const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;

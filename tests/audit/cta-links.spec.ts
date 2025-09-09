@@ -5,10 +5,10 @@ const CTAS = [
   { id: 'nav-browse-jobs', dest: '/browse-jobs', gated: false },
   { id: 'nav-post-job', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
   { id: 'nav-my-applications', dest: '/applications', gated: true },
-  { id: 'nav-tickets', dest: '/tickets', gated: true },
+  { id: 'nav-tickets', dest: '/tickets', gated: false },
   { id: 'nav-login', dest: '/login', gated: false },
   { id: 'hero-start', dest: '/browse-jobs', gated: false },
-  { id: 'hero-post', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
+  { id: 'hero-cta-post-job', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
   { id: 'hero-signup', dest: '/signup', gated: false },
 ] as const;
 
