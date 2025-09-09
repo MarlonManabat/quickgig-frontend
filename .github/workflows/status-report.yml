@@ -1,18 +1,15 @@
 name: Status Report
+
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "32 6 * * *" # daily snapshot
   pull_request:
     paths:
-      - "scripts/status/**"
       - ".github/workflows/status-report.yml"
       - "docs/status/**"
-  push:
-    branches: [ main ]
-    paths:
-      - "scripts/status/**"
-      - ".github/workflows/status-report.yml"
+      - "scripts/status/status-snapshot.sh"
+  schedule:
+    # Weekdays at 09:00 UTC; harmless if it runs, will no-op when unchanged
+    - cron: "0 9 * * 1-5"
 
 permissions:
   contents: write
@@ -21,6 +18,7 @@ permissions:
 jobs:
   report:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,37 +28,46 @@ jobs:
       - name: Use Node from .nvmrc
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version-file: .nvmrc
+
+      - name: Prepare env
+        id: prep
+        run: |
+          echo "SNAPSHOT_DATE=$(date -u +%F)" >> "$GITHUB_OUTPUT"
 
       - name: Generate status snapshot (no build, no deps)
-        run: node scripts/status/report.mjs
-
-      - name: Create PR with snapshot (if changed)
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore(status): update status snapshot"
-          title: "chore(status): update status snapshot"
-          body: |
-            Automated status snapshot that reflects the current contract.
-
-            - Canonical routes: /browse-jobs, /post-job, /applications, /login
-            - Auth-aware redirects via /login?next=<dest> allowed in smokes
-            - Legacy /gigs/create is not canonical
-          branch: chore/status-snapshot-${{ github.run_id }}
-          labels: documentation, status
-          add-paths: |
-            docs/status/status-*.md
+        id: snapshot
+        run: |
+          echo "Generating status snapshot…"
+          chmod +x ./scripts/status/status-snapshot.sh
+          ./scripts/status/status-snapshot.sh "${{ steps.prep.outputs.SNAPSHOT_DATE }}"
+          # Tell downstream steps if the docs changed
+          if ! git diff --quiet -- docs/status; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Post Status Report
-        if: always()
         shell: bash
         run: |
-          {
-            echo "# QuickGig Status Report"
-            echo
-            echo "## Contract (enforced by docs/workflow)"
-            echo "- Canonical app routes: /browse-jobs, /post-job, /applications, /login"
-            echo "- Auth-aware redirects (\`/login?next=<dest>\`) are treated as success in smokes"
-            echo "- Legacy \`/gigs/create\` is not canonical"
-          } >> "$GITHUB_STEP_SUMMARY"
+          echo "# QuickGig Status Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Snapshot (${{ steps.prep.outputs.SNAPSHOT_DATE }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          cat "docs/status/latest.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create PR with snapshot (if changed)
+        if: steps.snapshot.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "chore(status): status snapshot ${{ steps.prep.outputs.SNAPSHOT_DATE }}"
+          commit-message: "chore(status): snapshot ${{ steps.prep.outputs.SNAPSHOT_DATE }}"
+          body: "Automated status snapshot. Skips PR if no changes."
+          branch: "chore/status-snapshot/${{ steps.prep.outputs.SNAPSHOT_DATE }}"
+          base: main
+          add-paths: |
+            docs/status/status-${{ steps.prep.outputs.SNAPSHOT_DATE }}.md
+            docs/status/latest.md
 
