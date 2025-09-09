@@ -2,7 +2,7 @@
 export const ROUTES = {
   HOME: '/',
   GIGS_BROWSE: '/browse-jobs',      // keep existing browse path
-  GIGS_CREATE: '/post-job',
+  GIGS_CREATE: '/post-jobs',
   APPLICATIONS: '/applications',
   LOGIN: '/login',
   SIGNUP: '/signup',

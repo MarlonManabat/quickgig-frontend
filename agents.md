@@ -1,38 +1,38 @@
 # Agents Contract
-**Version:** 2025-12-23
+**Version:** 2025-12-24
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
 - All CTAs must include `data-cta` matching their test ID.
 - Header CTAs:
   - `data-testid="nav-browse-jobs"` → `/browse-jobs`
-  - `data-testid="nav-post-job"` → `/post-job`
+  - `data-testid="nav-post-job"` → `/post-jobs`
   - `data-testid="nav-my-applications"` → `/applications`
   - `data-testid="nav-tickets"` → `/tickets`
   - `data-testid="nav-login"` → `/login`
   - `data-testid="nav-logout"` → `/logout`
 - Hero CTAs:
   - `data-testid="hero-start"` → `/browse-jobs`
-  - `data-testid="hero-post"` → `/post-job`
+  - `data-testid="hero-cta-post-job"` → `/post-jobs`
   - `data-testid="hero-signup"` → `/signup`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
-- Auth-gated routes: `/applications`, `/post-job`.
+- Auth-gated routes: `/applications`, `/post-jobs`.
 - In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
 - PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
 - `/find`      → `/browse-jobs`
-- `/gigs/create`  → `/post-job` (CI mock bypasses auth)
-- Unauthenticated users MAY be redirected to `/login?next=/post-job`.
+- `/gigs/create`  → `/post-jobs` (CI mock bypasses auth)
+- Unauthenticated users MAY be redirected to `/login?next=/post-jobs`.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
-- Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
+- Landing hero IDs: `hero-start`, `hero-cta-post-job`, `hero-signup`.
 - Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
@@ -52,7 +52,7 @@
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
 - `scripts/audit-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
-- Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-job`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
+- Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-jobs`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-12-16 -->

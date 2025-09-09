@@ -1,5 +1,34 @@
-import { expect, Locator } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
+
+// Escape for use inside a RegExp string (not a literal).
+function reEscape(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\]/g, '\$&');
+}
+
+/**
+ * Returns a RegExp that matches either:
+ *  - "/login?next=<enc(dest)>" with optional search/hash, OR
+ *  - "<dest>" with optional search/hash.
+ * Works with relative hrefs obtained from Next.js <Link>.
+ */
+export function reAuthAware(dest: string): RegExp {
+  const enc = encodeURIComponent(dest);
+  const escDest = reEscape(dest);
+  // Build pattern as a string, then new RegExp() to avoid parser errors.
+  const pattern =
+    `^(?:\\/login\\?next=${enc}(?:[?#].*)?|${escDest}(?:[?#].*)?)$`;
+  return new RegExp(pattern);
+}
+
+export async function expectHref(loc: Locator, re: RegExp) {
+  const href = await loc.getAttribute('href');
+  expect(href, `href was ${href}`).toMatch(re);
+}
+
+// Utility for common pages (if not already present)
+export async function gotoHome(page: Page) {
+  await page.goto('/');
+}
 
 // Common destinations
 export const loginRe = /\/login(\?.*)?$/;
