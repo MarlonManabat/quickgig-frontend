@@ -5,8 +5,8 @@ export const NAV = [
   { id: 'nav-browse-jobs', dest: '/browse-jobs', gated: false },
   { id: 'nav-post-job',    dest: '/post-jobs',    gated: true  },
   { id: 'nav-my-applications', dest: '/applications', gated: true },
-  { id: 'nav-tickets',     dest: '/tickets',      gated: true  }, // keep gated
-  { id: 'nav-login',       dest: '/login',        gated: false },
+  { id: 'nav-tickets',     dest: '/tickets',     gated: true  },
+  { id: 'nav-login',       dest: '/login',       gated: false },
 ] as const;
 
 async function openMobileMenuIfHidden(page: any) {
