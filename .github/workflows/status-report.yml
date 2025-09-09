@@ -1,11 +1,22 @@
 name: Status Report
-
 on:
-  pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "32 6 * * *" # daily snapshot
+  pull_request:
+    paths:
+      - "scripts/status/**"
+      - ".github/workflows/status-report.yml"
+      - "docs/status/**"
+  push:
+    branches: [ main ]
+    paths:
+      - "scripts/status/**"
+      - ".github/workflows/status-report.yml"
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   report:
@@ -13,47 +24,43 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Node
+      - name: Use Node from .nvmrc
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: ".nvmrc"
 
-      - name: Install (CI)
-        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+      - name: Generate status snapshot (no build, no deps)
+        run: node scripts/status/report.mjs
 
-      - name: Run guardrails (non-blocking)
-        shell: bash
-        run: |
-          set +e
-          if [ -f scripts/no-legacy.sh ]; then
-            bash scripts/no-legacy.sh > no-legacy.txt 2>&1 || true
-          else
-            echo "scripts/no-legacy.sh not found (skipped)" > no-legacy.txt
-          fi
+      - name: Create PR with snapshot (if changed)
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(status): update status snapshot"
+          title: "chore(status): update status snapshot"
+          body: |
+            Automated status snapshot that reflects the current contract.
 
-          if [ -f scripts/check-cta-links.mjs ]; then
-            node scripts/check-cta-links.mjs > cta-audit.txt 2>&1 || true
-          else
-            echo "scripts/check-cta-links.mjs not found (skipped)" > cta-audit.txt
-          fi
+            - Canonical routes: /browse-jobs, /post-job, /applications, /login
+            - Auth-aware redirects via /login?next=<dest> allowed in smokes
+            - Legacy /gigs/create is not canonical
+          branch: chore/status-snapshot-${{ github.run_id }}
+          labels: documentation, status
+          add-paths: |
+            docs/status/status-*.md
 
       - name: Post Status Report
+        if: always()
         shell: bash
         run: |
-          echo "# QuickGig Status Report" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Contract (enforced by tests & scripts)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Canonical app routes: /browse-jobs, /gigs/create, /applications, /login" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Auth-aware redirects (/login?next=<dest>) are treated as success in smoke" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Header & hero CTAs use central ROUTES + toAppPath(), with stable test IDs (desktop & mobile)" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Guardrail: scripts/no-legacy.sh" >> "$GITHUB_STEP_SUMMARY"
-          sed -n '1,200p' no-legacy.txt >> "$GITHUB_STEP_SUMMARY" || true
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Guardrail: scripts/check-cta-links.mjs" >> "$GITHUB_STEP_SUMMARY"
-          sed -n '1,200p' cta-audit.txt >> "$GITHUB_STEP_SUMMARY" || true
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## Local verification commands" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`bash scripts/no-legacy.sh\` and \`node scripts/check-cta-links.mjs\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`npx playwright test -c playwright.smoke.ts\`" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "# QuickGig Status Report"
+            echo
+            echo "## Contract (enforced by docs/workflow)"
+            echo "- Canonical app routes: /browse-jobs, /post-job, /applications, /login"
+            echo "- Auth-aware redirects (\`/login?next=<dest>\`) are treated as success in smokes"
+            echo "- Legacy \`/gigs/create\` is not canonical"
+          } >> "$GITHUB_STEP_SUMMARY"
+
