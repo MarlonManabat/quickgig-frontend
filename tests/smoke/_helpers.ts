@@ -37,6 +37,23 @@ export async function expectHref(loc: Locator, re: RegExp) {
   expect(href, `href was ${href}`).toMatch(re);
 }
 
+/**
+ * Assert that a link either points directly to `target` or is auth-guarded
+ * as `/login?next=${encodeURIComponent(target)}`. Never navigates.
+ */
+export async function expectAuthAwareHref(
+  loc: Locator,
+  target: string
+): Promise<void> {
+  const href = await loc.getAttribute('href');
+  expect(href, `href was ${href}`).toBeTruthy();
+  const dec = decodeURIComponent(href!);
+  expect(
+    dec === target || dec === `/login?next=${target}`,
+    `href was ${href}, expected ${target} or /login?next=${encodeURIComponent(target)}`
+  ).toBeTruthy();
+}
+
 /** Open the mobile drawer and return its container */
 export async function openMobileMenu(page: Page) {
   const btn = page.getByTestId('nav-menu-button').first();

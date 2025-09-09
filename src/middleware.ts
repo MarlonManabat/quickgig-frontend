@@ -10,7 +10,7 @@ export const config = {
 
 const MAP: Record<string, string> = {
   '/browse-jobs': '/smoke/browse-jobs',
-  '/post-job': '/smoke/post-job',
+  '/post-jobs': '/smoke/post-job',
   '/applications': '/smoke/applications',
   '/tickets': '/smoke/tickets',
 };
@@ -21,7 +21,7 @@ const PUBLIC = new Set([
   '/login',
   '/signup',
   '/logout',
-  '/post-job',
+  '/post-jobs',
   '/api/auth/pkce/start',
   '/api/auth/pkce/callback',
 ]);

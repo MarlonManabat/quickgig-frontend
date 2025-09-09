@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-02-24
+**Version:** 2026-02-25
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -23,15 +23,15 @@
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
-- Auth-gated routes: `/applications`, `/post-job`.
+- Auth-gated routes: `/applications`, `/post-jobs`.
 - In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
 - PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
 - `/find`      → `/browse-jobs`
-- `/gigs/create`  → `/post-job` (CI mock bypasses auth)
-- Unauthenticated users MAY be redirected to `/login?next=/post-job`.
+- `/gigs/create`  → `/post-jobs` (CI mock bypasses auth)
+- Unauthenticated users MAY be redirected to `/login?next=/post-jobs`.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
@@ -48,6 +48,7 @@
 - `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
 - `openMobileMenu(page)` toggles `nav-menu-button` and waits for `nav-menu`.
 - `expectHref(loc, re)` asserts anchor `href` without navigation.
+- `expectAuthAwareHref(loc, dest)` asserts link points to `dest` or `/login?next=dest`.
 - `expectListOrEmpty(page, listTestId, emptyMarker)` passes when either list or empty state is visible.
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 - `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.
@@ -56,7 +57,7 @@
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
 - `scripts/audit-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
-- Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-job`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
+- Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-jobs`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-12-16 -->
@@ -69,7 +70,7 @@
 - Use the canonical routes from `app/lib/routes.ts`. **Never** hardcode paths.
 - Treat auth-gated flows as **auth-aware**: redirects to `/login?next=` are a *success* condition in PR smoke.
 - Prefer stable selectors: `data-testid` over headings/text.
-- Do not introduce or resurrect legacy paths in UI (e.g., `/find`, `/browse-jobs`, `/post-job`) except where explicitly redirected by middleware.
+- Do not introduce or resurrect legacy paths in UI (e.g., `/find`, `/post-job`) except where explicitly redirected by middleware.
 - If you modify routes, middleware, or smoke tests, update **this file** and `BACKFILL.md` with rationale.
 
 ## Repository invariants

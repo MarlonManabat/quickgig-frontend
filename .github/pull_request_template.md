@@ -1,15 +1,5 @@
-## Summary
-<!-- What changed, why now? Link to Product Baseline item(s). -->
-
-- Feature ID(s): <!-- e.g., FEAT-PSGC-STATIC -->
-- Builds on PR(s): <!-- e.g., #529 -->
-
-## Scope
-- [ ] Product-first (no new tests)  [ ] Includes smoke/e2e
-- [ ] Data shape unchanged  [ ] Requires migration
-
-## Acceptance
-- [ ] Verified locally / Preview OK
-- [ ] No rework: does not re-implement an existing shipped feature
-
-## Screens / Notes
+## Release checks (must be ✅)
+- [ ] Mobile header: Browse→/browse-jobs, Tickets→/tickets, Post→/post-jobs (or /login?next=…), My Applications→/applications (or /login?next=…), Login→/login
+- [ ] Desktop header: same hrefs as above
+- [ ] Hero CTAs hrefs correct
+- [ ] PR smokes green (href-only; no auth navigation)

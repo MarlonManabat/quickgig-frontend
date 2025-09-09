@@ -1,7 +1,7 @@
 export const ROUTES = {
   home: '/',
   browseJobs: '/browse-jobs',
-  postJob: '/post-job',
+  postJob: '/post-jobs',
   applications: '/applications',
   login: '/login',
   signup: '/signup',

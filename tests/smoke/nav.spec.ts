@@ -1,12 +1,17 @@
 import { test, expect } from '@playwright/test';
-import { expectHref } from './_helpers';
+import { expectAuthAwareHref } from './_helpers';
 
-test('desktop header CTAs › Login', async ({ page }) => {
+test('desktop header CTAs', async ({ page }) => {
   await page.goto('/');
-  await expectHref(page.getByTestId('nav-login'), /\/login$/);
-});
+  await expect(page.getByTestId('nav-browse-jobs')).toBeVisible();
+  await expect(page.getByTestId('nav-tickets')).toBeVisible();
+  await expect(page.getByTestId('nav-post-job')).toBeVisible();
+  await expect(page.getByTestId('nav-my-applications')).toBeVisible();
+  await expect(page.getByTestId('nav-login')).toBeVisible();
 
-test('desktop header CTAs › My Applications (auth-aware)', async ({ page }) => {
-  await page.goto('/');
-  await expectHref(page.getByTestId('nav-my-applications'), /(\/applications$|\/login\?next=\/applications$)/);
+  await expect(page.getByTestId('nav-browse-jobs')).toHaveAttribute('href', '/browse-jobs');
+  await expectAuthAwareHref(page.getByTestId('nav-tickets'), '/tickets');
+  await expectAuthAwareHref(page.getByTestId('nav-post-job'), '/post-jobs');
+  await expectAuthAwareHref(page.getByTestId('nav-my-applications'), '/applications');
+  await expect(page.getByTestId('nav-login')).toHaveAttribute('href', '/login');
 });

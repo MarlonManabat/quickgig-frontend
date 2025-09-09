@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-02-25 — Nav href mapping & href-only smokes
+- Header links derive from `ROUTES` mapping and expose data-cta/testids.
+- Added `expectAuthAwareHref` helper; PR smokes assert hrefs without navigation.
+- Skipped auth-aware publish flow in PR smokes.
+
 ## 2025-12-23 — Smoke nav toggle & Post Job fix
 - `openMobileMenu` clicks `nav-menu-button` and waits for `nav-menu` to appear.
 - Corrected Post Job smoke to assert skeleton/form/heading instead of `applications-list`.
