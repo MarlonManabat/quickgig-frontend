@@ -1,6 +1,2 @@
-import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs';
-import type { Database } from '@/types/db';
-
-export function createClient() {
-  return createBrowserSupabaseClient<Database>();
-}
+export { getBrowserSupabase } from "./browser";
+export { getServerSupabase, getAdminClient } from "./server";

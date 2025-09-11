@@ -1,14 +1,14 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase';
+import { supabaseBrowser } from '@/lib/supabase/browser';
 
 export default function LogoutPage() {
   const router = useRouter();
   useEffect(() => {
     const run = async () => {
       try {
-        await createClient().auth.signOut();
+        await supabaseBrowser().auth.signOut();
       } catch {}
       // Let server clear cookies, then land home.
       window.location.replace('/api/auth/logout?next=/');

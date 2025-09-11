@@ -5,6 +5,8 @@ export const isAdmin = (email?: string) =>
     .map((s) => s.trim())
     .includes((email || "").toLowerCase());
 
+export { requireUser } from './auth/requireUser';
+
 import { supabaseBrowser } from "@/lib/supabase/browser";
 import type { Database } from "@/types/db";
 

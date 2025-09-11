@@ -1,16 +1,13 @@
-import { adminSupabase, supabaseServer } from './supabase/server';
+import { getServerSupabase, getAdminClient } from './supabase';
 
 const FREE_STARTER = Number(process.env.FREE_TICKETS_ON_FIRST_LOGIN ?? 3) || 0;
 
 function serverSupabase() {
-  const supa = supabaseServer();
-  if (!supa) throw new Error('Server not configured');
-  return supa;
+  return getServerSupabase();
 }
 
 export async function ensureTicketsRow(userId: string): Promise<void> {
-  const supa = await adminSupabase();
-  if (!supa) return;
+  const supa = await getAdminClient();
 
   try {
     // @ts-ignore: rpc name may not be in typed client
@@ -31,8 +28,7 @@ export async function ensureTicketsRow(userId: string): Promise<void> {
 
 export async function getTicketBalance(userId?: string): Promise<number> {
   if (userId) {
-    const supa = await adminSupabase();
-    if (!supa) return 0;
+    const supa = await getAdminClient();
     const { data, error } = await supa.rpc('ticket_balance', {
       p_user: userId,
     });
@@ -65,8 +61,7 @@ export async function deductTicketOnCreate(
   userId: string,
   info: CreateGigArgs,
 ): Promise<string> {
-  const supa = await adminSupabase();
-  if (!supa) throw new Error('Server not configured');
+  const supa = await getAdminClient();
 
   const { data, error } = await supa
     .rpc('rpc_debit_tickets_and_create_gig', {
@@ -101,5 +96,20 @@ export async function spendOneTicket(
   });
   if (error) throw error;
   return (data as number) ?? 0;
+}
+
+
+export async function debitTickets(
+  employerId: string,
+  agreementId: string,
+  amount: number,
+) {
+  const admin = await getAdminClient();
+  const { error } = await admin.rpc('tickets_debit', {
+    employer_id: employerId,
+    agreement_id: agreementId,
+    amount,
+  });
+  if (error) throw new Error(`tickets_debit failed: ${error.message}`);
 }
 

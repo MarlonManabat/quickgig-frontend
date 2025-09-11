@@ -1,73 +1,32 @@
 import 'server-only';
 
-import supabaseServer from '@/lib/supabase/server';
+import { getServerSupabase } from '@/lib/supabase';
 
-export type AgreementRole = 'employer' | 'worker';
+export async function createAgreementFromApplication(applicationId: string, employerId: string) {
+  const db = getServerSupabase();
 
-export async function assertUserCanConfirmAgreement(
-  agreementId: string,
-  userId: string,
-) {
-  const supa = supabaseServer();
-  if (!supa) throw new Error('Server not configured');
+  const { data: app, error: appErr } = await db
+    .from('applications')
+    .select('id, employer_id, seeker_id, quoted_amount')
+    .eq('id', applicationId)
+    .eq('employer_id', employerId)
+    .maybeSingle();
 
-  const { data, error } = await supa
+  if (appErr) return { error: appErr.message } as const;
+  if (!app) return { error: 'application_not_found_or_forbidden' } as const;
+
+  const { data, error: insErr } = await db
     .from('agreements')
-    .select(
-      'id, employer_id, worker_id, status, employer_confirmed_at, worker_confirmed_at, reached_at'
-    )
-    .eq('id', agreementId)
-    .single();
+    .insert({
+      application_id: app.id,
+      employer_id: employerId,
+      seeker_id: app.seeker_id,
+      amount: app.quoted_amount ?? 0,
+      status: 'pending',
+    })
+    .select('id')
+    .maybeSingle();
 
-  if (error || !data) throw new Error('Agreement not found');
-
-  let role: AgreementRole | null = null;
-  if (data.employer_id === userId) role = 'employer';
-  else if (data.worker_id === userId) role = 'worker';
-  if (!role) throw new Error('Forbidden');
-
-  const already =
-    role === 'employer'
-      ? data.employer_confirmed_at != null
-      : data.worker_confirmed_at != null;
-
-  return { agreement: data, role, already } as const;
+  if (insErr) return { error: insErr.message } as const;
+  return { id: data?.id } as const;
 }
-
-export async function confirmAgreementSide(
-  agreementId: string,
-  role: AgreementRole,
-) {
-  const supa = supabaseServer();
-  if (!supa) throw new Error('Server not configured');
-
-  const field = role === 'employer' ? 'employer_confirmed_at' : 'worker_confirmed_at';
-  const other = role === 'employer' ? 'worker_confirmed_at' : 'employer_confirmed_at';
-
-  const now = new Date().toISOString();
-
-  const { data, error } = await supa
-    .from('agreements')
-    .update({ [field]: now } as any)
-    .eq('id', agreementId)
-    .is(field, null)
-    .select('id, status, employer_confirmed_at, worker_confirmed_at, reached_at, employer_id, worker_id')
-    .single();
-
-  if (error) throw new Error(error.message);
-  if (!data) throw new Error('Failed to confirm');
-
-  if (data[field] && data[other] && data.status !== 'reached') {
-    const { data: reached, error: err2 } = await supa
-      .from('agreements')
-      .update({ status: 'reached', reached_at: now } as any)
-      .eq('id', agreementId)
-      .select('id, status, employer_confirmed_at, worker_confirmed_at, reached_at, employer_id, worker_id')
-      .single();
-    if (err2) throw new Error(err2.message);
-    return reached;
-  }
-
-  return data;
-}
-

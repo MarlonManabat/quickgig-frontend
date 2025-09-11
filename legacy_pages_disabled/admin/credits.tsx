@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase';
+import { supabaseBrowser } from '@/lib/supabase/browser';
 import { withAdminGuard } from '@/components/guards/withAdminGuard';
 
 function AdminCredits() {
-  const supabase = createClient();
+  const supabase = supabaseBrowser();
   const [query, setQuery] = useState('');
   const [userId, setUserId] = useState('');
   const [credits, setCredits] = useState<number | null>(null);

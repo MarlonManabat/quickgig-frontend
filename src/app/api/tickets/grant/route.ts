@@ -1,9 +1,8 @@
 // src/app/api/tickets/grant/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import supabaseServer from '@/lib/supabase/server';
+import { getServerSupabase, getAdminClient } from '@/lib/supabase';
 import { isAdmin } from '@/lib/admin';
-import { getAdminClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,8 +23,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 });
     }
 
-    const supa = supabaseServer();
-    const admin = getAdminClient();
+    const supa = getServerSupabase();
+    const admin = await getAdminClient();
     if (!supa || !admin) {
       return NextResponse.json(
         {
