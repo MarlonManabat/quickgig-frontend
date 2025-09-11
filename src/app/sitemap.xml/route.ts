@@ -17,8 +17,8 @@ export async function GET() {
   const origin = getOrigin();
   const routes = [
     ROUTES.HOME,
-    ROUTES.GIGS_BROWSE,
-    ROUTES.GIGS_CREATE,
+    ROUTES.BROWSE_JOBS,
+    ROUTES.POST_JOB,
     ROUTES.APPLICATIONS,
     ROUTES.TICKETS,
   ];

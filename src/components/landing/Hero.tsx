@@ -19,11 +19,11 @@ export default function LandingHero() {
           Browse jobs
         </Link>
         <Link
-          href={toAppPath(loginNext(ROUTES.postJob))}
-          data-testid="hero-post"
-          data-cta="hero-post"
+          href={toAppPath(ROUTES.postJobs)}
+          data-testid="hero-cta-post-job"
+          data-cta="hero-cta-post-job"
           className="px-4 py-2 rounded-md bg-gray-100"
-          onClick={() => track('cta_click', { cta: 'hero-post' })}
+          onClick={() => track('cta_click', { cta: 'hero-cta-post-job' })}
         >
           Post a job
         </Link>

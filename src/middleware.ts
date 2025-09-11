@@ -10,7 +10,7 @@ export const config = {
 
 const MAP: Record<string, string> = {
   '/browse-jobs': '/smoke/browse-jobs',
-  '/post-job': '/smoke/post-job',
+  '/post-jobs': '/smoke/post-jobs',
   '/applications': '/smoke/applications',
   '/tickets': '/smoke/tickets',
 };
@@ -21,13 +21,18 @@ const PUBLIC = new Set([
   '/login',
   '/signup',
   '/logout',
-  '/post-job',
+  '/post-jobs',
   '/api/auth/pkce/start',
   '/api/auth/pkce/callback',
 ]);
 
 export function middleware(req: NextRequest) {
-  const url = new URL(req.url);
+  const url = req.nextUrl.clone();
+  const legacy = ['/post-job', '/gigs/create'];
+  if (legacy.includes(url.pathname)) {
+    url.pathname = '/post-jobs';
+    return NextResponse.redirect(url, 308);
+  }
   if (PUBLIC.has(url.pathname)) return NextResponse.next();
 
   if (!isSmoke) return NextResponse.next();
