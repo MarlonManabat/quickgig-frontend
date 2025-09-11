@@ -1,48 +1,40 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies, headers } from 'next/headers';
+import "server-only";
 
+import { createServerClient } from "@supabase/ssr";
+import { cookies, headers } from "next/headers";
+
+/**
+ * Server-only Supabase client bound to request cookies.
+ * Use from App Router route handlers, server components, or server actions.
+ */
 export function getServerSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anon) return null;
-
   const cookieStore = cookies();
+  const headerStore = headers();
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   return createServerClient(url, anon, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
-      },
-      set(name: string, value: string, options?: any) {
-        cookieStore.set({ name, value, ...options });
-      },
-      remove(name: string, options?: any) {
-        cookieStore.set({ name, value: '', ...options, maxAge: 0 });
-      },
+      get: (name: string) => cookieStore.get(name)?.value,
+      set: (name: string, value: string, options: any) =>
+        cookieStore.set({ name, value, ...options }),
+      remove: (name: string, options: any) =>
+        cookieStore.set({ name, value: "", ...options }),
     },
     headers: {
-      get(name: string) {
-        return headers().get(name) ?? undefined;
-      },
-    },
+      get: (key: string) => headerStore.get(key) ?? undefined,
+    } as any,
   });
 }
 
+/** Admin PostgREST client for RPCs that must bypass RLS */
+export async function getAdminClient() {
+  const { createClient } = await import("@supabase/supabase-js");
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  return createClient(url, service, { auth: { persistSession: false } });
+}
+
+// Back-compat
 export const supabaseServer = getServerSupabase;
-
-export function adminSupabase() {
-  return getServerSupabase();
-}
-
-export function publicSupabase() {
-  return getServerSupabase();
-}
-
-export async function userIdFromCookie() {
-  const supa = getServerSupabase();
-  if (!supa) return null;
-  const { data } = await supa.auth.getUser();
-  return data.user?.id ?? null;
-}
-
 export default getServerSupabase;

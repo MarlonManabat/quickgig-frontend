@@ -1,19 +1,14 @@
-// src/lib/supabase/browser.ts
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+"use client";
 
-let _client: SupabaseClient | null = null
+import { createBrowserClient } from "@supabase/ssr";
 
-export function supabaseBrowser(): SupabaseClient {
-  if (_client) return _client
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!url || !anon) return null as unknown as SupabaseClient
-  _client = createClient(url, anon, {
-    auth: { persistSession: true, autoRefreshToken: true },
-  })
-  return _client
+/** Browser/client-side Supabase */
+export function getBrowserSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  return createBrowserClient(url, anon);
 }
 
-// Back-compat default so older imports work:
-export default supabaseBrowser
-
+// Back-compat exports
+export const supabaseBrowser = getBrowserSupabase;
+export default getBrowserSupabase;

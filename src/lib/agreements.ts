@@ -1,9 +1,9 @@
 import 'server-only';
 
-import { getClient } from '@/lib/supabase';
+import { getServerSupabase } from '@/lib/supabase';
 
 export async function createAgreementFromApplication(applicationId: string, employerId: string) {
-  const db = getClient();
+  const db = getServerSupabase();
 
   const { data: app, error: appErr } = await db
     .from('applications')

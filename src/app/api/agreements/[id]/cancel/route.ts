@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createServerClient } from '@supabase/ssr';
-import { getAdminClient } from '@/lib/supabase/admin';
+import { getServerSupabase, getAdminClient } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,9 +9,7 @@ export const fetchCache = 'force-no-store';
 export async function POST(_: Request, { params }: { params: { id: string } }) {
   const id = params.id;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supa = createServerClient(url, anon, { cookies });
+  const supa = getServerSupabase();
 
   const { data: userRes } = await supa.auth.getUser();
   const me = userRes?.user?.id;
@@ -41,8 +37,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
   if (upErr) return NextResponse.json({ ok: false, error: 'update_failed', detail: upErr.message }, { status: 500 });
 
   // Admin RPC call for refund
-  const admin = getAdminClient();
-  if (!admin) return NextResponse.json({ ok: false, error: 'server_not_configured' }, { status: 503 });
+  const admin = await getAdminClient();
 
   const { data: refund, error: refundErr } = await admin.rpc('tickets_agreement_refund', {
     p_employer: ag.employer_id,

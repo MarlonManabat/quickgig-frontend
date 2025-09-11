@@ -8,7 +8,8 @@ test('debits tickets only on first confirm', async () => {
   mock.method(auth, 'requireUser', async () => ({ id: 'emp1' }));
 
   let status = 'pending';
-  const db = {
+  const rpc = mock.fn(async () => ({ error: null }));
+  const admin = {
     from: () => ({
       select: () => ({
         eq: () => ({
@@ -27,15 +28,13 @@ test('debits tickets only on first confirm', async () => {
         }),
       }),
     }),
+    rpc,
   } as any;
-  mock.method(supabase, 'getClient', () => db);
-
-  const rpc = mock.fn(async () => ({ error: null }));
-  mock.method(supabase, 'getAdminClient', () => ({ rpc } as any));
+  mock.method(supabase, 'getAdminClient', async () => admin);
 
   const req = new Request('http://test', { method: 'POST' });
   let res = await POST(req, { params: { id: 'ag1' } } as any);
-  assert.deepEqual(await res.json(), { ok: true });
+  assert.deepEqual(await res.json(), { ok: true, id: 'ag1' });
   assert.equal(rpc.mock.callCount(), 1);
 
   res = await POST(req, { params: { id: 'ag1' } } as any);
