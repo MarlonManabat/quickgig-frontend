@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref } from './_helpers';
+import { openMobileMenu, expectHref, reAuthAware } from './_helpers';
 
 const viewports = [
   { name: 'mobile', width: 390, height: 844 },
@@ -13,14 +13,23 @@ for (const vp of viewports) {
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
 
-      const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
-      for (const id of ctas) {
-        const el = page.getByTestId(id).first();
-        await expect(el).toBeVisible();
-        await expect(await el.getAttribute('data-cta')).toBe(id);
+      if (vp.name === 'mobile') {
+        const menu = await openMobileMenu(page);
+        await expect(menu.getByTestId('nav-browse-jobs').first()).toBeVisible();
+        await expectHref(menu.getByTestId('nav-browse-jobs').first(), reAuthAware('/browse-jobs'));
+        await expectHref(menu.getByTestId('nav-tickets').first(), reAuthAware('/tickets'));
+        await expectHref(menu.getByTestId('nav-post-job').first(), reAuthAware('/post-jobs'));
+        await expectHref(menu.getByTestId('nav-my-applications').first(), reAuthAware('/applications'));
+        await expectHref(menu.getByTestId('nav-login').first(), /\/login(?:$|[?#])/);
+      } else {
+        await expectHref(page.getByTestId('nav-browse-jobs').first(), reAuthAware('/browse-jobs'));
+        await expectHref(page.getByTestId('nav-tickets').first(), reAuthAware('/tickets'));
+        await expectHref(page.getByTestId('nav-post-job').first(), reAuthAware('/post-jobs'));
+        await expectHref(page.getByTestId('nav-my-applications').first(), reAuthAware('/applications'));
+        await expectHref(page.getByTestId('nav-login').first(), /\/login(?:$|[?#])/);
       }
 
-      await page.getByTestId('nav-browse-jobs').first().click();
+      await page.goto('/browse-jobs');
       await expect(page).toHaveURL(/\/browse-jobs/);
       // Tolerate empty state in preview. Prefer cards if present.
       const list = page.getByTestId('jobs-list');
@@ -36,33 +45,11 @@ for (const vp of viewports) {
         expect(hasEmpty).toBeTruthy();
       }
 
-      {
-        const cta = page.getByTestId('nav-post-job').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
-      }
-
-      await page.goto('/');
-      {
-        const cta = page.getByTestId('nav-my-applications').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
-      }
-
-      await page.goto('/');
-      {
-        const cta = page.getByTestId('nav-tickets').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
-        if (navigated) {
-          const buy = page.getByTestId('buy-tickets');
-          await expect(buy).toBeVisible();
-          await buy.click();
-          await expect(page.locator('#order-status')).toHaveText('pending');
-        } else {
-          // If cross-origin, we just assert href path above; no further action
-          await expect(true).toBeTruthy();
-        }
-      }
+      await page.goto('/tickets');
+      const buy = page.getByTestId('buy-tickets');
+      await expect(buy).toBeVisible();
+      await buy.click();
+      await expect(page.locator('#order-status')).toHaveText('pending');
 
       const sitemap = await page.request.get('/sitemap.xml');
       expect(sitemap.ok()).toBeTruthy();

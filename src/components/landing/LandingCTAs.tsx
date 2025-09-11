@@ -9,18 +9,22 @@ import { loginNext } from '@/app/lib/authAware';
 type Props = {
   browseClassName?: string;
   postClassName?: string;
+  appsClassName?: string;
   signupClassName?: string;
   showBrowse?: boolean;
   showPost?: boolean;
+  showApps?: boolean;
   showSignup?: boolean;
 };
 
 export default function LandingCTAs({
   browseClassName = '',
   postClassName = '',
+  appsClassName = '',
   signupClassName = '',
   showBrowse = true,
   showPost = true,
+  showApps = false,
   showSignup = false,
 }: Props) {
   return (
@@ -38,13 +42,24 @@ export default function LandingCTAs({
       )}
       {showPost && (
         <Link
-          data-testid="hero-post"
-          data-cta="hero-post"
+          data-testid="hero-cta-post-job"
+          data-cta="hero-cta-post-job"
           href={toAppPath(loginNext(ROUTES.postJob))}
           className={postClassName}
-          onClick={() => track('cta_click', { cta: 'hero-post' })}
+          onClick={() => track('cta_click', { cta: 'hero-cta-post-job' })}
         >
           Post a job
+        </Link>
+      )}
+      {showApps && (
+        <Link
+          data-testid="hero-cta-my-applications"
+          data-cta="hero-cta-my-applications"
+          href={toAppPath(loginNext(ROUTES.applications))}
+          className={appsClassName}
+          onClick={() => track('cta_click', { cta: 'hero-cta-my-applications' })}
+        >
+          My Applications
         </Link>
       )}
       {showSignup && (
