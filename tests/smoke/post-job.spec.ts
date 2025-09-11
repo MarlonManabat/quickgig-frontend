@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
+import { expectAuthAwareRedirect, expectHref, LOGIN_OR_PKCE } from './_helpers';
 
 test('Post Job › auth-aware publish flow', async ({ page }) => {
   await page.goto('/');
-  // open Post Job; in CI this may redirect to login
-  await page.getByTestId('nav-post-job').click();
+  const cta = page.getByTestId('nav-post-job');
+  await expectHref(cta, LOGIN_OR_PKCE);
+  await cta.click();
   const destRe = /\/gigs\/create\/?$/;
   await expectAuthAwareRedirect(page, destRe);
   if (!destRe.test(page.url())) {

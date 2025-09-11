@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-23
+**Version:** 2025-12-29
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -22,7 +22,8 @@
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
 - Auth-gated routes: `/applications`, `/post-job`.
 - In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
-- PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
+- PKCE is gated by `AUTH_PKCE_ENABLED`; when disabled or misconfigured, flows fall back to `/login?next=`.
+- `AUTH_PKCE_OPTIONAL=1` forces the PKCE start route to redirect to `/login`, avoiding chrome-error crashes in smoke/CI.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
@@ -31,7 +32,7 @@
 - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
-- Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
+- Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button`, waiting for `nav-menu`, and trying common fallbacks. Helper returns the drawer element for scoped queries.
 - Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
 - Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.
@@ -41,10 +42,11 @@
 - Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
 - Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
-- Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` waits for the PKCE start request and tolerates `chrome-error://` fallbacks.
-- `expectLoginOrPkce(page, timeout)` matches either `/login` or `/api/auth/pkce/start` for unauthenticated flows.
-- `openMobileMenu(page)` ensures mobile nav is open before interacting.
-- `expectListOrEmpty(page, listTestId, emptyMarker)` passes when either list or empty state is visible.
+  - `LOGIN_OR_PKCE` regex matches `/api/auth/pkce/start` or `/login` for auth-aware href assertions.
+  - `expectHref(loc, re)` asserts an element's `href` with a clear failure message.
+  - `expectAuthAwareRedirect(page, dest, timeout)` does not navigate: if the current URL matches `dest` it passes, otherwise it asserts the focused CTA `href` matches `LOGIN_OR_PKCE`.
+- `openMobileMenu(page)` clicks `nav-menu-button`, waits for `nav-menu` to be visible, and falls back to role-based selectors when needed.
+- `expectListOrEmpty(page, listTestId, opts)` passes when either the first item or empty state becomes visible (defaults: `itemTestId="job-card"`, `emptyTestId="jobs-empty"`).
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 - `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.
 - Smoke tests avoid cross-origin navigation in CI; external links are validated by path only.

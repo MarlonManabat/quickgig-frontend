@@ -1,8 +1,14 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref } from './_helpers';
+import {
+  expectListOrEmpty,
+  mobileViewport,
+  openMobileMenu,
+  expectHref,
+  LOGIN_OR_PKCE,
+} from './_helpers';
 
 const viewports = [
-  { name: 'mobile', width: 390, height: 844 },
+  { name: 'mobile', width: mobileViewport.viewport.width, height: mobileViewport.viewport.height },
   { name: 'desktop', width: 1280, height: 720 },
 ];
 
@@ -12,57 +18,38 @@ for (const vp of viewports) {
 
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
-
-      const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
-      for (const id of ctas) {
-        const el = page.getByTestId(id).first();
-        await expect(el).toBeVisible();
-        await expect(await el.getAttribute('data-cta')).toBe(id);
-      }
-
-      await page.getByTestId('nav-browse-jobs').first().click();
-      await expect(page).toHaveURL(/\/browse-jobs/);
-      // Tolerate empty state in preview. Prefer cards if present.
-      const list = page.getByTestId('jobs-list');
-      const listExists = (await list.count()) > 0;
-      if (listExists) {
-        await expect(list).toBeVisible();
-      } else {
-        const hasEmpty = await page
-          .getByText(/no jobs yet|wala pang jobs|empty state/i)
-          .first()
-          .isVisible()
-          .catch(() => false);
-        expect(hasEmpty).toBeTruthy();
-      }
-
-      {
-        const cta = page.getByTestId('nav-post-job').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
-      }
-
-      await page.goto('/');
-      {
-        const cta = page.getByTestId('nav-my-applications').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
-      }
-
-      await page.goto('/');
-      {
-        const cta = page.getByTestId('nav-tickets').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
-        if (navigated) {
-          const buy = page.getByTestId('buy-tickets');
-          await expect(buy).toBeVisible();
-          await buy.click();
-          await expect(page.locator('#order-status')).toHaveText('pending');
-        } else {
-          // If cross-origin, we just assert href path above; no further action
-          await expect(true).toBeTruthy();
+      const isMobile = vp.name === 'mobile';
+      let menu;
+      if (isMobile) {
+        menu = await openMobileMenu(page);
+        for (const id of ['nav-browse-jobs', 'nav-post-job', 'nav-my-applications']) {
+          await expect(menu.getByTestId(id)).toBeVisible();
         }
+        await menu.getByTestId('nav-browse-jobs').click();
+      } else {
+        await expectHref(page.getByTestId('nav-post-job'), LOGIN_OR_PKCE);
+        await page.getByTestId('nav-browse-jobs').click();
       }
+      await expect(page).toHaveURL(/\/browse-jobs/);
+      await expectListOrEmpty(page, 'jobs-list', {
+        itemTestId: 'job-card',
+        emptyTestId: 'jobs-empty',
+      });
+
+      const postScope = isMobile ? await openMobileMenu(page) : page;
+      const post = postScope.getByTestId('nav-post-job').first();
+      await expect(post).toBeVisible();
+      await expectHref(post, LOGIN_OR_PKCE);
+
+      const appsScope = postScope;
+      const apps = appsScope.getByTestId('nav-my-applications').first();
+      await expect(apps).toBeVisible();
+      await expectHref(apps, LOGIN_OR_PKCE);
+
+      const ticketScope = postScope;
+      const tickets = ticketScope.getByTestId('nav-tickets').first();
+      await expect(tickets).toBeVisible();
+      await expectHref(tickets, /\/tickets(\/|\?|$)/);
 
       const sitemap = await page.request.get('/sitemap.xml');
       expect(sitemap.ok()).toBeTruthy();

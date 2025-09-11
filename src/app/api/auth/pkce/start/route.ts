@@ -1,24 +1,30 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
-/**
- * Preview/CI-safe PKCE start.
- * If required env/config is missing, just bounce to /login?next=… instead of throwing.
- * In non-production we always prefer the simple /login redirect to avoid flaky builds.
- */
-export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const next = url.searchParams.get("next") || "/";
+export async function GET(request: Request) {
+  const reqUrl = new URL(request.url);
+  const origin = reqUrl.origin;
+  const next = reqUrl.searchParams.get('next') ?? '/';
+  const loginURL = new URL(`/login?next=${encodeURIComponent(next)}`, origin);
 
-  // In CI/preview we don't depend on external IdP – always redirect to /login.
-  if (process.env.CI || process.env.NODE_ENV !== "production") {
-    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(next)}`, url), { status: 302 });
-  }
+  const allowFallback =
+    process.env.AUTH_PKCE_OPTIONAL === '1' ||
+    process.env.NODE_ENV !== 'production';
 
-  // If prod but misconfigured, also fall back gracefully.
   try {
-    // If you later add a real PKCE flow, do it here.
-    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(next)}`, url), { status: 302 });
+    if (allowFallback) {
+      // In CI/dev, avoid PKCE misconfig breaking smokes.
+      return NextResponse.redirect(loginURL, { status: 302 });
+    }
+
+    // --- existing PKCE logic here, but ensure it uses `origin` ---
+    // e.g., const authorize = new URL('/api/auth/authorize', origin);
+    // authorize.searchParams.set('next', next);
+    // return NextResponse.redirect(authorize, { status: 302 });
+
+    // TEMP safe default if PKCE is still wiring:
+    return NextResponse.redirect(loginURL, { status: 302 });
   } catch {
-    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(next)}`, url), { status: 302 });
+    // Never crash to chrome-error: always fall back to local /login.
+    return NextResponse.redirect(loginURL, { status: 302 });
   }
 }

@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     continue-on-error: true
+    env:
+      NEXT_PUBLIC_APP_HOST: http://localhost:3000
+      AUTH_PKCE_OPTIONAL: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,5 +83,7 @@ jobs:
           MOCK_MODE: "1"
           NEXT_PUBLIC_SUPABASE_URL: "https://example.invalid"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "dummy"
+          AUTH_PKCE_OPTIONAL: "true"
+          NEXT_PUBLIC_APP_HOST: "http://localhost:3000"
         run: |
           npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000" "npx playwright test -c playwright.smoke.ts"

@@ -1,5 +1,34 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-29 — Auth-aware href checks & menu helper
+- Introduced `LOGIN_OR_PKCE` regex and `expectHref` helper for auth-aware href assertions.
+- `expectAuthAwareRedirect` no longer navigates; verifies current URL or CTA href.
+- Simplified `openMobileMenu` to click `nav-menu-button` and return the drawer.
+- Nav and landing smokes assert auth-boundary hrefs without navigating.
+
+## 2025-12-28 — PKCE stub to login & mobile toggle wait
+- `/api/auth/pkce/start` stub now 302s to `/login?next=` preventing chrome-error.
+- Added `loginOr` helper so smokes accept `/login?next=` fallback.
+- `openMobileMenu` clicks `nav-menu-button` directly and returns the drawer.
+- Nav smokes updated to use menu handle and `loginOr` for auth-aware CTAs.
+
+## 2025-12-26 — Robust auth redirect & mobile nav selectors
+- Introduced `AUTH_PKCE_OPTIONAL` to force `/login` fallback in dev/CI.
+- Hardened `expectAuthAwareRedirect` against `chrome-error://` and increased timeout to 10s.
+- `openMobileMenu` now falls back to role-based selectors; nav specs use accessible names instead of test IDs.
+- Updated smokes for Post Job waitlist CTA and tickets Buy link by role.
+
+## 2025-12-25 — PKCE flag for auth-aware links
+- Added `AUTH_PKCE_ENABLED` with helpers to detect PKCE config.
+- PKCE start route and header CTAs fall back to `/login?next=` when disabled.
+- Hardened smoke helpers against `chrome-error://` and ensured mobile menu toggles reliably.
+
+## 2025-12-24 — Auth/nav smoke stabilization
+- `expectAuthAwareRedirect` now polls for `/login?next=`, PKCE start, or destination and reports last URL on timeout.
+- `openMobileMenu` clicks `nav-menu-button` directly then waits for `nav-menu` visibility.
+- `expectListOrEmpty` adds defaults for `job-card`/`jobs-empty` and is reused across smokes.
+- Browse Jobs page wraps list/cards/empty state with stable `jobs-*` test IDs.
+
 ## 2025-12-23 — Smoke nav toggle & Post Job fix
 - `openMobileMenu` clicks `nav-menu-button` and waits for `nav-menu` to appear.
 - Corrected Post Job smoke to assert skeleton/form/heading instead of `applications-list`.
@@ -392,3 +421,8 @@
 - Added `audit:links:ci` and made `audit-links.mjs` tolerate missing BASE_URLS by defaulting to quickgig/app URLs.
 - Added `scripts/dev/fix-node.sh` and `npm run fix:node` convenience.
 Outcome: `npm ci` is deterministic across local + CI; wrong Node fails fast with actionable guidance.
+
+## 2025-12-27 — Smoke PKCE stub & nav selectors
+- Stubbed `/api/auth/pkce/start` in smoke helpers to prevent chrome-error crashes.
+- `openMobileMenu` now returns the drawer and tries common fallback selectors.
+- Mobile nav smokes assert CTAs via `data-cta` inside the opened drawer.

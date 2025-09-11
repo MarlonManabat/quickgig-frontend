@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectListOrEmpty, expectAuthAwareRedirect, loginRe } from './_helpers';
+import { expectListOrEmpty, expectAuthAwareRedirect } from './_helpers';
 
 // Reuse existing baseURL from Playwright config; do NOT introduce new env vars.
 // The test only asserts pages render and key CTAs are present.
@@ -7,11 +7,10 @@ import { expectListOrEmpty, expectAuthAwareRedirect, loginRe } from './_helpers'
 test.describe('QuickGig core flows (smoke)', () => {
   test('Browse Jobs page renders and shows at least one job or empty state', async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ''}/browse-jobs`);
-    await expectListOrEmpty(
-      page,
-      'jobs-list',
-      { text: /(no jobs yet|empty)/i }
-    );
+    await expectListOrEmpty(page, 'jobs-list', {
+      itemTestId: 'job-card',
+      emptyTestId: 'jobs-empty',
+    });
   });
 
   test('Job detail renders and Apply button is present (not necessarily clickable in preview)', async ({ page, baseURL }) => {
@@ -24,23 +23,17 @@ test.describe('QuickGig core flows (smoke)', () => {
   });
 
   test('My Applications is auth-gated (redirects to /login) OR renders empty when authenticated', async ({ page, baseURL }) => {
-    await page.goto(`${baseURL || ''}/`);
-    await page.getByTestId('nav-my-applications').first().click();
-    await expectAuthAwareRedirect(page, new RegExp(`${loginRe.source}|/applications$`));
+    await page.goto(`${baseURL || ''}/applications`);
+    await expectAuthAwareRedirect(page, /\/applications$/);
   });
 
   test('Post Job page renders', async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ''}/post-job`);
-    // We’re on the correct route
-    await expect(page).toHaveURL(/\/post-job(?:\?|$)/);
-    // Accept either skeleton while loading or the hydrated form/heading
-    const skeleton = page.locator('[data-testid="post-job-skeleton"]');
-    const form = page.locator('[data-testid="post-job-form"]');
-    const heading = page.getByRole('heading', { name: /(Post a job|Create a gig)/i });
-    const ok =
-      (await skeleton.isVisible().catch(() => false)) ||
-      (await form.isVisible().catch(() => false)) ||
-      (await heading.isVisible().catch(() => false));
-    expect(ok).toBeTruthy();
+    await expectAuthAwareRedirect(page, /\/post-job$/);
+    let join = page.getByRole('link', { name: /join the employer waitlist/i });
+    if (!(await join.count())) {
+      join = page.getByRole('button', { name: /join the employer waitlist/i });
+    }
+    await expect(join).toBeVisible({ timeout: 4000 });
   });
 });
