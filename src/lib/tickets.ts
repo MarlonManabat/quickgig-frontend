@@ -1,4 +1,5 @@
 import { adminSupabase, supabaseServer } from './supabase/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const FREE_STARTER = Number(process.env.FREE_TICKETS_ON_FIRST_LOGIN ?? 3) || 0;
 
@@ -101,5 +102,19 @@ export async function spendOneTicket(
   });
   if (error) throw error;
   return (data as number) ?? 0;
+}
+
+export async function debit(
+  db: SupabaseClient,
+  userId: string,
+  amount: number,
+  meta: Record<string, unknown> = {},
+) {
+  const { error } = await db.rpc('tickets_debit', {
+    p_user_id: userId,
+    p_amount: amount,
+    p_meta: meta,
+  });
+  if (error) throw new Error(`tickets_debit failed: ${error.message}`);
 }
 

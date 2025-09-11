@@ -55,5 +55,11 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ ok: false, error: 'refund_failed', detail: refundErr.message }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true, refund }, { status: 200 });
+  const { data: updated } = await supa
+    .from('agreements')
+    .select('id, status')
+    .eq('id', ag.id)
+    .single();
+
+  return NextResponse.json({ ok: true, refund, agreement: updated }, { status: 200 });
 }

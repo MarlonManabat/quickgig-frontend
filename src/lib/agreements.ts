@@ -1,8 +1,43 @@
 import 'server-only';
 
-import supabaseServer from '@/lib/supabase/server';
+import supabaseServer, { adminSupabase } from '@/lib/supabase/server';
+import { getApplicationById } from '@/lib/applications/server';
 
 export type AgreementRole = 'employer' | 'worker';
+
+function computeAgreementTotal(app: any): number {
+  const price = (app && (app.price_php ?? app.price)) || 0;
+  return Number(price) || 0;
+}
+
+export async function createAgreementFromApplication(
+  appId: string,
+  actorId: string,
+): Promise<string> {
+  const app = await getApplicationById(appId);
+  if (!app) throw new Error('Application not found');
+  const amount = computeAgreementTotal(app);
+  const supa = await adminSupabase();
+  if (!supa) {
+    return `mock-agreement-${appId}`;
+  }
+  const { data, error } = await supa
+    .from('agreements')
+    .insert(
+      {
+        application_id: app.id,
+        gig_id: app.gig_id ?? app.gigId ?? null,
+        employer_id: app.employer_id ?? actorId,
+        worker_id: app.candidate_id ?? app.worker_id ?? app.candidateId ?? null,
+        amount,
+        status: 'pending',
+      },
+    )
+    .select('id')
+    .single();
+  if (error || !data) throw error || new Error('Failed to create agreement');
+  return data.id as string;
+}
 
 export async function assertUserCanConfirmAgreement(
   agreementId: string,
