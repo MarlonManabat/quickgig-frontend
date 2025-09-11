@@ -42,6 +42,9 @@ jobs:
       - name: Run smoke tests (no webServer)
         run: npx playwright test -c playwright.smoke.ts
         env:
+          NODE_ENV: production
+          NEXT_PUBLIC_APP_HOST: "http://localhost:3000"
+          DISABLE_EXTERNAL_AUTH_REDIRECTS: "1"
           BASE_URL: http://localhost:3000
 
       # Run audit but don't block artifacts; capture output to logs.

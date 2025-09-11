@@ -5,6 +5,30 @@ import type { Page } from '@playwright/test';
 export const loginRe = /\/login(\?.*)?$/;
 export const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;
 
+export async function stubAuthPkce(page: Page) {
+  // Block any PKCE/SSO kickouts that would navigate off localhost in CI.
+  await page.addInitScript(() => {
+    const block = (url: string | URL) =>
+      typeof url === 'string' && url.includes('/api/auth/pkce/start');
+    const origAssign = window.location.assign.bind(window.location);
+    const origReplace = window.location.replace.bind(window.location);
+    window.location.assign = ((url: any) => {
+      if ((window as any).DISABLE_EXTERNAL_AUTH_REDIRECTS || block(url)) {
+        console.debug('[smoke] blocked location.assign PKCE redirect:', url);
+        return;
+      }
+      return origAssign(url);
+    }) as any;
+    window.location.replace = ((url: any) => {
+      if ((window as any).DISABLE_EXTERNAL_AUTH_REDIRECTS || block(url)) {
+        console.debug('[smoke] blocked location.replace PKCE redirect:', url);
+        return;
+      }
+      return origReplace(url);
+    }) as any;
+  });
+}
+
 /**
  * Some CI/preview runs kick off PKCE then the browser navigates to
  * chrome-error://chromewebdata/ before the final hop is reachable.
