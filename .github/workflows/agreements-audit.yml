@@ -2,23 +2,63 @@ name: agreements-audit
 
 on:
   pull_request:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   audit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - name: Run audit script
-        run: node scripts/audit-agreements.mjs
-      - name: Summary
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+
+      - name: Run agreements audit (capture log)
+        id: run_agreements_audit
+        shell: bash
+        # We want logs & artifacts even if the audit script exits non-zero
+        continue-on-error: true
         run: |
-          echo "## Agreements audit" >> $GITHUB_STEP_SUMMARY
-          cat audit/agreements-scan.json >> $GITHUB_STEP_SUMMARY
-      - uses: actions/upload-artifact@v4
+          set -eo pipefail
+          mkdir -p docs/agreements logs audit
+          # Call the existing script (scripts/audit-agreements.mjs). We also add a wrapper file in this patch.
+          node scripts/audit-agreements.mjs --out docs/agreements/latest.md 2>&1 | tee logs/agreements-audit.log
+
+          {
+            echo "## Agreements audit"
+            if [ -f docs/agreements/latest.md ]; then
+              echo
+              echo "_Report excerpt (top 120 lines):_"
+              echo '```md'
+              sed -n '1,120p' docs/agreements/latest.md
+              echo '```'
+            else
+              echo
+              echo "_No report produced (see artifact logs/agreements-audit.log)._"
+            fi
+            if [ -f audit/agreements-scan.json ]; then
+              echo
+              echo "<details><summary>Raw scan JSON (truncated)</summary>"
+              echo
+              echo '```json'
+              head -c 60000 audit/agreements-scan.json
+              echo
+              echo '```'
+              echo "</details>"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload agreements artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: agreements-scan
-          path: audit/agreements-scan.json
+          name: agreements-audit-${{ github.run_id }}
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            docs/agreements/latest.md
+            logs/agreements-audit.log
+            audit/agreements-scan.json

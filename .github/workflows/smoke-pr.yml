@@ -2,7 +2,17 @@ name: Smoke (PR)
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    # Run smoke only when product code or tests change.
+    # CI/docs-only edits will skip smoke to avoid blocking infra PRs.
+    paths:
+      - "src/**"
+      - "app/**"
+      - "pages/**"
+      - "tests/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "next.config.*"
+      - "playwright.config.*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -77,6 +87,10 @@ jobs:
       - name: Run smoke tests
         env:
           NODE_ENV: production
+          # Hold auth on same-origin in CI so PKCE doesn't navigate away
+          # and crash to chrome-error during URL assertions.
+          NEXT_PUBLIC_APP_HOST: "http://localhost:3000"
+          DISABLE_EXTERNAL_AUTH_REDIRECTS: "1"
           MOCK_MODE: "1"
           NEXT_PUBLIC_SUPABASE_URL: "https://example.invalid"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "dummy"

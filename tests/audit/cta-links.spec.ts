@@ -5,6 +5,7 @@ const CTAS = [
   { id: 'nav-browse-jobs', dest: '/browse-jobs', gated: false },
   { id: 'nav-post-job', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
   { id: 'nav-my-applications', dest: '/applications', gated: true },
+  // Tickets page still requires auth; keep the CTA gated so audit matches product
   { id: 'nav-tickets', dest: '/tickets', gated: true },
   { id: 'nav-login', dest: '/login', gated: false },
   { id: 'hero-start', dest: '/browse-jobs', gated: false },
