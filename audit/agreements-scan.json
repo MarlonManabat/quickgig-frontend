@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-09-11T14:42:24.218Z",
+  "timestamp": "2025-09-11T15:07:08.061Z",
   "models": {
     "applications": {
       "found": true,
@@ -43,6 +43,7 @@
         "supabase/migrations/20251201000000_applications_e2e.sql",
         "tests/smoke.applications.spec.ts",
         "tests/smoke/applications-empty.spec.ts",
+        "tests/unit/applications.accept.test.ts",
         "tests_disabled/e2e/applications-manage.spec.ts",
         "tests_disabled/e2e/applications.spec.ts"
       ]
@@ -60,7 +61,6 @@
         "src/app/api/agreements/[id]/confirm/route.ts",
         "src/lib/agreements.ts",
         "supabase/migrations/20250825004500_tickets_and_agreements.sql",
-        "tests/agreements.spec.ts",
         "tests/unit/agreements.confirm.test.ts",
         "tests_disabled/unit/agreements.finalize.api.test.ts"
       ]
@@ -98,7 +98,7 @@
         "supabase/migrations/20250906093000_tickets_agreement_spend.sql",
         "supabase/migrations/20250906121500_tickets_agreement_refund.sql",
         "supabase/migrations/20250910000000_ensure_user_tickets.sql",
-        "supabase/migrations/20250911_add_tickets_debit.sql",
+        "supabase/migrations/20250911224500_tickets_debit_rpc.sql",
         "supabase/migrations/20251015000000_tickets_rls_and_rpcs.sql",
         "supabase/migrations/20251016000000_tickets_topup.sql",
         "tests/smoke.tickets-gate.spec.ts",
@@ -134,7 +134,7 @@
       "paths": [
         "src/app/api/applications/[id]/accept/route.ts",
         "src/lib/agreements.ts",
-        "tests/agreements.spec.ts"
+        "tests/unit/applications.accept.test.ts"
       ],
       "found": true
     },
@@ -142,7 +142,7 @@
       "paths": [
         "src/app/api/agreements/[id]/confirm/route.ts",
         "src/lib/tickets.ts",
-        "supabase/migrations/20250911_add_tickets_debit.sql"
+        "supabase/migrations/20250911224500_tickets_debit_rpc.sql"
       ],
       "found": true
     },
@@ -166,9 +166,7 @@
         "src/app/api/agreements/[id]/cancel/route.ts",
         "src/components/CancelAgreementButton.tsx",
         "supabase/migrations/20250825004500_tickets_and_agreements.sql",
-        "supabase/migrations/20250906121500_tickets_agreement_refund.sql",
-        "supabase/migrations/20250911_add_tickets_debit.sql",
-        "tests/agreements.spec.ts"
+        "supabase/migrations/20250906121500_tickets_agreement_refund.sql"
       ],
       "found": true
     },
@@ -180,8 +178,9 @@
         "src/components/ConfirmAgreementButton.tsx",
         "supabase/migrations/20250825004500_tickets_and_agreements.sql",
         "supabase/migrations/20250906121500_tickets_agreement_refund.sql",
-        "tests/agreements.spec.ts",
-        "tests/unit/agreements.confirm.test.ts"
+        "supabase/migrations/20250911224500_tickets_debit_rpc.sql",
+        "tests/unit/agreements.confirm.test.ts",
+        "tests/unit/applications.accept.test.ts"
       ],
       "found": true
     }

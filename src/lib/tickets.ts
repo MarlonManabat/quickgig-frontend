@@ -1,5 +1,6 @@
 import { adminSupabase, supabaseServer } from './supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { getAdminClient } from './supabase/admin';
 
 const FREE_STARTER = Number(process.env.FREE_TICKETS_ON_FIRST_LOGIN ?? 3) || 0;
 
@@ -104,16 +105,18 @@ export async function spendOneTicket(
   return (data as number) ?? 0;
 }
 
-export async function debit(
-  db: SupabaseClient,
-  userId: string,
+
+export async function debitTickets(
+  employerId: string,
+  agreementId: string,
   amount: number,
-  meta: Record<string, unknown> = {},
 ) {
-  const { error } = await db.rpc('tickets_debit', {
-    p_user_id: userId,
-    p_amount: amount,
-    p_meta: meta,
+  const admin = getAdminClient();
+  if (!admin) throw new Error('admin client not configured');
+  const { error } = await admin.rpc('tickets_debit', {
+    employer_id: employerId,
+    agreement_id: agreementId,
+    amount,
   });
   if (error) throw new Error(`tickets_debit failed: ${error.message}`);
 }
