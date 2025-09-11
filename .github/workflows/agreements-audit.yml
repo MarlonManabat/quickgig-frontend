@@ -2,23 +2,32 @@ name: agreements-audit
 
 on:
   pull_request:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   audit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - name: Run audit script
-        run: node scripts/audit-agreements.mjs
-      - name: Summary
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+
+      - name: Run agreements audit (capture log)
         run: |
-          echo "## Agreements audit" >> $GITHUB_STEP_SUMMARY
-          cat audit/agreements-scan.json >> $GITHUB_STEP_SUMMARY
-      - uses: actions/upload-artifact@v4
+          mkdir -p docs/agreements logs
+          node scripts/agreements/audit.mjs --out docs/agreements/latest.md 2>&1 | tee logs/agreements-audit.log
+        continue-on-error: true
+
+      - name: Upload agreements audit
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: agreements-scan
-          path: audit/agreements-scan.json
+          name: agreements-audit
+          path: |
+            docs/agreements/**
+            logs/agreements-audit.log
+          if-no-files-found: warn

@@ -10,7 +10,8 @@ concurrency:
 
 jobs:
   push:
-    runs-on: ubuntu-latest
+    # Pin to an image compatible with Playwright CLI deps install.
+    runs-on: ubuntu-22.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -24,12 +25,9 @@ jobs:
         run: npm run ci:lock
       - name: Install deps
         run: npm run ci:install
-      - name: Install Playwright browsers
-        uses: microsoft/playwright-github-action@v1
-        with:
-          with-deps: true
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
+      # Deprecated action removed; install via CLI instead.
+      - name: Install Playwright browsers & OS deps
+        run: npx playwright install --with-deps
       - name: Start dev server
         run: |
           nohup npm run dev >/dev/null 2>&1 &
@@ -45,6 +43,34 @@ jobs:
         run: npx playwright test -c playwright.smoke.ts
         env:
           BASE_URL: http://localhost:3000
+
+      # Run audit but don't block artifacts; capture output to logs.
+      - name: Check CTA links (capture log)
+        run: |
+          mkdir -p logs
+          node scripts/audit-links.mjs 2>&1 | tee logs/audit-links.log
+        continue-on-error: true
       - name: Stop dev server
         if: always()
         run: if [ -f .pidfile ]; then kill $(cat .pidfile) || true; fi
+
+      # Always collect whatever the run produced.
+      - name: Collect results
+        if: always()
+        run: |
+          mkdir -p artifacts
+          if [ -d test-results ]; then cp -R test-results artifacts/; fi
+          if [ -d playwright-report ]; then cp -R playwright-report artifacts/; fi
+          if [ -d logs ]; then cp -R logs artifacts/; fi
+          if [ -d docs/status ]; then mkdir -p artifacts/docs && cp -R docs/status artifacts/docs/; fi
+          if [ -d docs/agreements ]; then mkdir -p artifacts/docs && cp -R docs/agreements artifacts/docs/; fi
+          if [ -f agreements-scan.md ]; then mkdir -p artifacts/agreements && cp agreements-scan.md artifacts/agreements/; fi
+
+      - name: Upload CI artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-artifacts
+          path: |
+            artifacts/**
+          if-no-files-found: warn
