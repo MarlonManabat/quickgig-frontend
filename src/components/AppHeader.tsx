@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
-import { NAV_ITEMS, ROUTES } from '@/lib/routes';
+import { ROUTES, toAppPath } from '@/lib/routes';
 import dynamic from 'next/dynamic';
 import { isAdmin } from '@/lib/admin';
 import { loginNext } from '@/app/lib/authAware';
@@ -14,29 +14,6 @@ export default function AppHeader() {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
 
-  const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(item => {
-    let href = item.to;
-    if (item.key === 'login') href = loginNext(ROUTES.browseJobs);
-    else if (!user && item.auth === 'auth-aware') href = loginNext(item.to);
-    return { href, label: item.label, testId: item.idDesktop, mobileId: item.idMobile };
-  });
-  if (user) {
-    if (isAdmin(user.email)) {
-      links.push({
-        href: ROUTES.adminTickets,
-        label: 'Admin · Tickets',
-        testId: 'nav-admin-tickets',
-        mobileId: 'navm-admin-tickets',
-      });
-    }
-    links.push({
-      href: ROUTES.logout,
-      label: 'Sign out',
-      testId: 'nav-logout',
-      mobileId: 'navm-logout',
-    });
-  }
-
   return (
     <header data-testid="app-header" className="border-b bg-white/60 backdrop-blur">
       <div className="mx-auto max-w-5xl flex items-center justify-between p-4">
@@ -45,28 +22,67 @@ export default function AppHeader() {
             QuickGig
           </Link>
           <nav className="hidden md:flex items-center gap-4">
-            {links.map(link =>
-              link.href ? (
-                <Link
-                  key={link.testId}
-                  data-testid={link.testId}
-                  data-cta={link.testId}
-                  href={link.href}
-                  prefetch={false}
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <button
-                  key={link.testId}
-                  data-testid={link.testId}
-                  data-cta={link.testId}
-                  onClick={link.onClick}
-                  className="underline"
-                >
-                  {link.label}
-                </button>
-              ),
+            <Link
+              data-testid="nav-browse-jobs"
+              data-cta="nav-browse-jobs"
+              href={ROUTES.browseJobs}
+              prefetch={false}
+            >
+              Browse jobs
+            </Link>
+            <Link
+              data-testid="nav-post-job"
+              data-cta="nav-post-job"
+              href={toAppPath(loginNext(ROUTES.postJobs))}
+              prefetch={false}
+            >
+              Post a job
+            </Link>
+            <Link
+              data-testid="nav-my-applications"
+              data-cta="nav-my-applications"
+              href={loginNext(ROUTES.applications)}
+              prefetch={false}
+            >
+              My Applications
+            </Link>
+            <Link
+              data-testid="nav-tickets"
+              data-cta="nav-tickets"
+              href={ROUTES.tickets}
+              prefetch={false}
+            >
+              Tickets
+            </Link>
+            {!user && (
+              <Link
+                data-testid="nav-login"
+                data-cta="nav-login"
+                href={loginNext(ROUTES.browseJobs)}
+                prefetch={false}
+              >
+                Login
+              </Link>
+            )}
+            {user && isAdmin(user.email) && (
+              <Link
+                data-testid="nav-admin-tickets"
+                data-cta="nav-admin-tickets"
+                href={ROUTES.adminTickets}
+                prefetch={false}
+              >
+                Admin · Tickets
+              </Link>
+            )}
+            {user && (
+              <Link
+                data-testid="nav-logout"
+                data-cta="nav-logout"
+                href={ROUTES.logout}
+                prefetch={false}
+              >
+                Sign out
+              </Link>
             )}
           </nav>
           <button
@@ -99,33 +115,81 @@ export default function AppHeader() {
           className="md:hidden border-t bg-white"
         >
           <div className="flex flex-col gap-2 p-4">
-            {links.map(link =>
-              link.href ? (
-                <Link
-                  key={link.mobileId}
-                  data-testid={link.mobileId}
-                  data-cta={link.mobileId}
-                  href={link.href}
-                  prefetch={false}
-                  onClick={() => setOpen(false)}
-                  className="link"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <button
-                  key={link.mobileId}
-                  data-testid={link.mobileId}
-                  data-cta={link.mobileId}
-                  onClick={() => {
-                    setOpen(false);
-                    link.onClick();
-                  }}
-                  className="underline text-left"
-                >
-                  {link.label}
-                </button>
-              ),
+            <Link
+              data-testid="nav-browse-jobs"
+              data-cta="nav-browse-jobs"
+              href={ROUTES.browseJobs}
+              prefetch={false}
+              onClick={() => setOpen(false)}
+              className="link"
+            >
+              Browse jobs
+            </Link>
+            <Link
+              data-testid="nav-post-job"
+              data-cta="nav-post-job"
+              href={toAppPath(loginNext(ROUTES.postJobs))}
+              prefetch={false}
+              onClick={() => setOpen(false)}
+              className="link"
+            >
+              Post a job
+            </Link>
+            <Link
+              data-testid="nav-my-applications"
+              data-cta="nav-my-applications"
+              href={loginNext(ROUTES.applications)}
+              prefetch={false}
+              onClick={() => setOpen(false)}
+              className="link"
+            >
+              My Applications
+            </Link>
+            <Link
+              data-testid="nav-tickets"
+              data-cta="nav-tickets"
+              href={ROUTES.tickets}
+              prefetch={false}
+              onClick={() => setOpen(false)}
+              className="link"
+            >
+              Tickets
+            </Link>
+            {!user && (
+              <Link
+                data-testid="nav-login"
+                data-cta="nav-login"
+                href={loginNext(ROUTES.browseJobs)}
+                prefetch={false}
+                onClick={() => setOpen(false)}
+                className="link"
+              >
+                Login
+              </Link>
+            )}
+            {user && isAdmin(user.email) && (
+              <Link
+                data-testid="nav-admin-tickets"
+                data-cta="nav-admin-tickets"
+                href={ROUTES.adminTickets}
+                prefetch={false}
+                onClick={() => setOpen(false)}
+                className="link"
+              >
+                Admin · Tickets
+              </Link>
+            )}
+            {user && (
+              <Link
+                data-testid="nav-logout"
+                data-cta="nav-logout"
+                href={ROUTES.logout}
+                prefetch={false}
+                onClick={() => setOpen(false)}
+                className="link"
+              >
+                Sign out
+              </Link>
             )}
           </div>
         </div>

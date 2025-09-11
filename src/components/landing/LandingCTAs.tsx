@@ -38,11 +38,11 @@ export default function LandingCTAs({
       )}
       {showPost && (
         <Link
-          data-testid="hero-post"
-          data-cta="hero-post"
-          href={toAppPath(loginNext(ROUTES.postJob))}
+          data-testid="hero-cta-post-job"
+          data-cta="hero-cta-post-job"
+          href={toAppPath(loginNext(ROUTES.postJobs))}
           className={postClassName}
-          onClick={() => track('cta_click', { cta: 'hero-post' })}
+          onClick={() => track('cta_click', { cta: 'hero-cta-post-job' })}
         >
           Post a job
         </Link>

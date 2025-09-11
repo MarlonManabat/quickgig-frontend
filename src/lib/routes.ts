@@ -1,7 +1,9 @@
 export const ROUTES = {
   home: '/',
   browseJobs: '/browse-jobs',
-  postJob: '/post-job',
+  postJobs: '/post-jobs',
+  // TODO: remove alias after migrating all imports
+  postJob: '/post-jobs',
   applications: '/applications',
   login: '/login',
   signup: '/signup',
@@ -32,7 +34,7 @@ export const NAV_ITEMS = [
   {
     key: 'post-job',
     label: 'Post a job',
-    to: ROUTES.postJob,
+    to: ROUTES.postJobs,
     idDesktop: 'nav-post-job',
     idMobile: 'navm-post-job',
     auth: 'auth-aware',
@@ -51,7 +53,7 @@ export const NAV_ITEMS = [
     to: ROUTES.tickets,
     idDesktop: 'nav-tickets',
     idMobile: 'navm-tickets',
-    auth: 'auth-aware',
+    auth: 'none',
   },
   {
     key: 'login',
