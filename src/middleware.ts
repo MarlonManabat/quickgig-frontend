@@ -10,7 +10,6 @@ export const config = {
 
 const MAP: Record<string, string> = {
   '/browse-jobs': '/smoke/browse-jobs',
-  '/post-job': '/smoke/post-job',
   '/applications': '/smoke/applications',
   '/tickets': '/smoke/tickets',
 };

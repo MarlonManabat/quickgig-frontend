@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-26 — Remove duplicate Post Job route
+- Deleted legacy `/post-job` and smoke stub pages; kept route-group variant exposing `post-job-skeleton`.
+- Middleware no longer rewrites `/post-job` to a smoke stub.
+
 ## 2025-12-25 — Canonical Post Job redirect and smoke server
 - Redirected `/post`, `/posts`, `/gigs/new`, and `/gigs/create` to `/post-job`.
 - Added minimal `/post-job` placeholder page.
