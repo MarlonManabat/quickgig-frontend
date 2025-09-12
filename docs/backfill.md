@@ -1,5 +1,8 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-28 — Edge-safe Applications middleware redirect
+- Simplified middleware to only gate `/applications` and perform a single redirect without cloning, avoiding headers-sent errors.
+
 ## 2025-12-27 — Applications middleware gate & canonical nav IDs
 - Middleware redirects unauthenticated `/applications` visits to `/login?next=…`.
 - Mobile nav links now use canonical `nav-*` test IDs across desktop and mobile.

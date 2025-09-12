@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-27
+**Version:** 2025-12-28
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -21,9 +21,8 @@
 ## Auth behavior
 - If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
 - Auth-gated routes: `/applications`, `/post-job`.
-- In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
 - PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
-- Middleware redirects unauthenticated `/applications` requests to `/login?next=…`.
+- Middleware redirects unauthenticated `/applications` requests to `/login?next=…` using a single Edge-safe redirect.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
@@ -54,7 +53,7 @@
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
 - `scripts/audit-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
-- Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
+- Middleware (`src/middleware.ts`) only handles auth gating for `/applications`.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-12-16 -->
