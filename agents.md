@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-26
+**Version:** 2025-12-27
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -23,6 +23,7 @@
 - Auth-gated routes: `/applications`, `/post-job`.
 - In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
 - PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
+- Middleware redirects unauthenticated `/applications` requests to `/login?next=…`.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
@@ -32,6 +33,7 @@
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
+- Mobile menu links reuse canonical `nav-*` test IDs (no `navm-*`).
 - Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
 - Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.

@@ -26,7 +26,7 @@ export const NAV_ITEMS = [
     label: 'Browse jobs',
     to: ROUTES.browseJobs,
     idDesktop: 'nav-browse-jobs',
-    idMobile: 'navm-browse-jobs',
+    idMobile: 'nav-browse-jobs',
     auth: 'none',
   },
   {
@@ -34,7 +34,7 @@ export const NAV_ITEMS = [
     label: 'Post a job',
     to: ROUTES.postJob,
     idDesktop: 'nav-post-job',
-    idMobile: 'navm-post-job',
+    idMobile: 'nav-post-job',
     auth: 'auth-aware',
   },
   {
@@ -42,7 +42,7 @@ export const NAV_ITEMS = [
     label: 'My Applications',
     to: ROUTES.applications,
     idDesktop: 'nav-my-applications',
-    idMobile: 'navm-my-applications',
+    idMobile: 'nav-my-applications',
     auth: 'auth-aware',
   },
   {
@@ -50,7 +50,7 @@ export const NAV_ITEMS = [
     label: 'Tickets',
     to: ROUTES.tickets,
     idDesktop: 'nav-tickets',
-    idMobile: 'navm-tickets',
+    idMobile: 'nav-tickets',
     auth: 'auth-aware',
   },
   {
@@ -58,7 +58,7 @@ export const NAV_ITEMS = [
     label: 'Login',
     to: ROUTES.login,
     idDesktop: 'nav-login',
-    idMobile: 'navm-login',
+    idMobile: 'nav-login',
     auth: 'none',
   },
 ] as const;

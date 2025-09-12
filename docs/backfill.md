@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-27 — Applications middleware gate & canonical nav IDs
+- Middleware redirects unauthenticated `/applications` visits to `/login?next=…`.
+- Mobile nav links now use canonical `nav-*` test IDs across desktop and mobile.
+
 ## 2025-12-26 — Remove duplicate Post Job route
 - Deleted legacy `/post-job` and smoke stub pages; kept route-group variant exposing `post-job-skeleton`.
 - Middleware no longer rewrites `/post-job` to a smoke stub.
