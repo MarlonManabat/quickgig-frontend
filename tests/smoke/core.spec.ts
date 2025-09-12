@@ -39,6 +39,9 @@ test('Header/nav is wired', async ({ page }) => {
 
 test('Landing CTAs route correctly', async ({ page }) => {
   await page.goto(landing);
-  await expect(page.getByTestId('cta-start-now')).toHaveAttribute('href', '/search?intent=worker');
+  await expect(page.getByTestId('cta-start-now')).toHaveAttribute(
+    'href',
+    /\/search\?intent=worker$/
+  );
   await expect(page.getByTestId('hero-post-job')).toHaveAttribute('href', '/post-job');
 });

@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-24
+**Version:** 2025-12-25
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -27,8 +27,8 @@
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
   - `/find`      → `/browse-jobs`
-  - `/post-job`  → `/gigs/create`
-  - Unauthenticated users MAY be redirected to `/login?next=/gigs/create`.
+  - `/post`, `/posts`, `/gigs/new`, `/gigs/create` → `/post-job`
+  - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.

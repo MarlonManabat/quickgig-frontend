@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-25 — Canonical Post Job redirect and smoke server
+- Redirected `/post`, `/posts`, `/gigs/new`, and `/gigs/create` to `/post-job`.
+- Added minimal `/post-job` placeholder page.
+- Smoke config now starts a local server when `APP_ORIGIN` is unset and accepts absolute CTA URLs.
+
 ## 2025-12-23 — Smoke nav toggle & Post Job fix
 - `openMobileMenu` clicks `nav-menu-button` and waits for `nav-menu` to appear.
 - Corrected Post Job smoke to assert skeleton/form/heading instead of `applications-list`.
