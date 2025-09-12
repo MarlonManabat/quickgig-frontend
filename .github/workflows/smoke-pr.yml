@@ -74,11 +74,13 @@ jobs:
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: ""
 
+      - name: Seed demo data
+        run: npm run seed:demo
+
       - name: Run smoke tests
         env:
           NODE_ENV: production
           MOCK_MODE: "1"
           NEXT_PUBLIC_SUPABASE_URL: "https://example.invalid"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "dummy"
-        run: |
-          npx --yes start-server-and-test "next start -p 3000" "http://localhost:3000" "npx playwright test -c playwright.smoke.ts"
+        run: npm run test:smoke

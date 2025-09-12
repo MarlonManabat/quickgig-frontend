@@ -2,7 +2,7 @@
   "name": "quickgig-frontend",
   "private": true,
   "scripts": {
-    "test:smoke": "node --version && npm --version && playwright test tests/smoke --reporter=list",
+    "test:smoke": "playwright test -c playwright.smoke.config.ts",
     "dev": "next dev",
     "ci:verify": "node scripts/ci-verify.mjs",
     "prebuild": "node ./scripts/check-dynamic-route-conflicts.mjs && node ./scripts/assert-valid-revalidate.mjs",
@@ -30,7 +30,7 @@
     "codex:review": "codex review --config ./codex/config.json",
     "baseline:backfill": "node scripts/baseline/backfill.js",
     "typecheck:scripts": "tsc -p scripts/tsconfig.json",
-    "seed:demo": "tsx scripts/seed-demo.ts",
+    "seed:demo": "node scripts/seed-demo.mjs",
     "playwright:install": "npx playwright install --with-deps",
     "e2e": "playwright test",
     "e2e:headed": "playwright test tests/e2e --headed",

@@ -392,3 +392,8 @@
 - Added `audit:links:ci` and made `audit-links.mjs` tolerate missing BASE_URLS by defaulting to quickgig/app URLs.
 - Added `scripts/dev/fix-node.sh` and `npm run fix:node` convenience.
 Outcome: `npm ci` is deterministic across local + CI; wrong Node fails fast with actionable guidance.
+
+## 2025-09-12 – Canonical routes & stable smoke
+- Legacy `/post-job` now redirects to `/gigs/create`; `/find` continues to normalize to `/browse-jobs`.
+- Added `scripts/seed-demo.mjs` and core smoke suite (`tests/smoke/core.spec.ts`) covering browse, apply redirects, auth gates, nav, and landing CTAs.
+- PR smoke workflow seeds demo data and runs smoke tests on Node 20.

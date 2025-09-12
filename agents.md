@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-23
+**Version:** 2025-12-24
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -26,9 +26,9 @@
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
-- `/find`      → `/browse-jobs`
-- `/gigs/create`  → `/post-job` (CI mock bypasses auth)
-- Unauthenticated users MAY be redirected to `/login?next=/post-job`.
+  - `/find`      → `/browse-jobs`
+  - `/post-job`  → `/gigs/create`
+  - Unauthenticated users MAY be redirected to `/login?next=/gigs/create`.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
@@ -38,7 +38,7 @@
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - Applications smoke spec accepts `/login` redirect when unauthenticated.
-- Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
+- Added core flows smoke `tests/smoke/core.spec.ts` covering Browse Jobs, Apply redirects, Applications gate, Post Job skeleton, header nav, and landing CTAs.
 - Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
 - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` waits for the PKCE start request and tolerates `chrome-error://` fallbacks.
