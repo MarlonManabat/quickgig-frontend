@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-28
+**Version:** 2025-12-29
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -23,6 +23,7 @@
 - Auth-gated routes: `/applications`, `/post-job`.
 - PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
 - Middleware redirects unauthenticated `/applications` requests to `/login?next=…` using a single Edge-safe redirect.
+- A minimal `/login` page ships for preview/CI to avoid redirect loops.
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
@@ -38,6 +39,8 @@
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
+- Header smokes query `:visible` to ignore hidden duplicates; CTA href checks accept relative or absolute app URLs.
+- Tickets top-up smoke is disabled in PR runs and exercised only in full E2E.
 - Applications smoke spec accepts `/login` redirect when unauthenticated.
 - Added core flows smoke `tests/smoke/core.spec.ts` covering Browse Jobs, Apply redirects, Applications gate, Post Job skeleton, header nav, and landing CTAs.
 - Job detail smoke skips apply assertion when no job cards are seeded.

@@ -43,5 +43,5 @@ test('Landing CTAs route correctly', async ({ page }) => {
     'href',
     /\/search\?intent=worker$/
   );
-  await expect(page.getByTestId('hero-post-job')).toHaveAttribute('href', '/post-job');
+  await expect(page.getByTestId('hero-post-job')).toHaveAttribute('href', /\/post-job$/);
 });

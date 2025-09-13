@@ -25,7 +25,7 @@ test.describe('QuickGig core flows (smoke)', () => {
 
   test('My Applications is auth-gated (redirects to /login) OR renders empty when authenticated', async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ''}/`);
-    await page.getByTestId('nav-my-applications').first().click();
+    await page.getByTestId('nav-my-applications').locator(':visible').first().click();
     await expectAuthAwareRedirect(page, new RegExp(`${loginRe.source}|/applications$`));
   });
 

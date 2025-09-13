@@ -9,7 +9,7 @@ const AUTH_COOKIES = [
 ];
 
 function hasSession(req: NextRequest): boolean {
-  return AUTH_COOKIES.some((name) => req.cookies.has(name) || !!req.cookies.get(name));
+  return AUTH_COOKIES.some((n) => req.cookies.has(n) || !!req.cookies.get(n));
 }
 
 export function middleware(req: NextRequest) {
@@ -18,13 +18,11 @@ export function middleware(req: NextRequest) {
   // Gate Applications for guests (dev/CI too)
   if (pathname.startsWith("/applications") && !hasSession(req)) {
     const next = encodeURIComponent(pathname + (search || ""));
+    // Redirect to local /login (stable in CI); product PKCE remains valid in prod
     return NextResponse.redirect(new URL(`/login?next=${next}`, req.url));
   }
 
   return NextResponse.next();
 }
 
-// Only apply to /applications routes
-export const config = {
-  matcher: ["/applications/:path*"],
-};
+export const config = { matcher: ["/applications/:path*"] };

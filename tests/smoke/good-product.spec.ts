@@ -20,7 +20,7 @@ for (const vp of viewports) {
         await expect(await el.getAttribute('data-cta')).toBe(id);
       }
 
-      await page.getByTestId('nav-browse-jobs').first().click();
+      await page.getByTestId('nav-browse-jobs').locator(':visible').first().click();
       await expect(page).toHaveURL(/\/browse-jobs/);
       // Tolerate empty state in preview. Prefer cards if present.
       const list = page.getByTestId('jobs-list');
@@ -37,21 +37,21 @@ for (const vp of viewports) {
       }
 
       {
-        const cta = page.getByTestId('nav-post-job').first();
+        const cta = page.getByTestId('nav-post-job').locator(':visible').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
         if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
       }
 
       await page.goto('/');
       {
-        const cta = page.getByTestId('nav-my-applications').first();
+        const cta = page.getByTestId('nav-my-applications').locator(':visible').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
         if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
       }
 
       await page.goto('/');
       {
-        const cta = page.getByTestId('nav-tickets').first();
+        const cta = page.getByTestId('nav-tickets').locator(':visible').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
         if (navigated) {
           const buy = page.getByTestId('buy-tickets');

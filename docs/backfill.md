@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-29 — Local login placeholder & smoke hardening
+- Added a minimal `/login` page so auth-gated redirects don't loop in preview/CI.
+- Smoke tests now assert visible header links and tolerate absolute CTA hrefs.
+- Disabled tickets top-up smoke in PR runs; reserved for full E2E.
+
 ## 2025-12-28 — Edge-safe Applications middleware redirect
 - Simplified middleware to only gate `/applications` and perform a single redirect without cloning, avoiding headers-sent errors.
 
