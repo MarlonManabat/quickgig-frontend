@@ -1,35 +1,37 @@
 import { expect, Locator } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-// Common destinations
-export const loginRe = /\/login(\?.*)?$/;
-export const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;
+export const loginRe = /\/login(?:\?.*)?$/;
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export const browseJobsRe = /\/browse-jobs(\?.*)?$/;
 
-/**
- * Some CI/preview runs kick off PKCE then the browser navigates to
- * chrome-error://chromewebdata/ before the final hop is reachable.
- * Treat the flow as successful if we saw the PKCE start request,
- * and only assert the final URL when the page didn't crash to chrome-error.
- */
-export async function expectAuthAwareRedirect(
-  page: Page,
-  dest: RegExp,
-  timeout = 8000
-) {
-  // Wait for our auth start *request* to fire.
-  const pkceHit = await page
-    .waitForRequest((r) => pkceStartRe.test(r.url()), { timeout })
-    .then(() => true)
-    .catch(() => false);
+export function hostAware(re: RegExp) {
+  return new RegExp(`(?:https?:\\/\\/[^/]+)?${re.source}`);
+}
 
-  // Try to match the final URL, but ignore if Chrome crashed to the special page.
-  const crashed = page.url().startsWith('chrome-error://');
-  if (!crashed) {
-    // Give it another shot in case PKCE fired just before we awaited URL.
-    await expect(page).toHaveURL(dest, { timeout });
-  } else {
-    expect(pkceHit).toBeTruthy();
-  }
+export function loginOr(path: string | RegExp) {
+  const rhs = typeof path === 'string' ? escapeRe(path) : path.source;
+  return new RegExp(`${loginRe.source}|${rhs}`);
+}
+
+export async function expectToBeOnRoute(page: Page, path: string | RegExp, timeout = 8000) {
+  const src = typeof path === 'string' ? escapeRe(path) : path.source;
+  await expect(page).toHaveURL(hostAware(new RegExp(src)), { timeout });
+}
+
+export async function visByTestId(page: Page, id: string) {
+  const loc = page.getByTestId(id).locator(':visible').first();
+  await expect(loc).toBeVisible({ timeout: 12000 });
+  return loc;
+}
+
+export async function expectAuthAwareRedirect(page: Page, re: RegExp, timeout = 12000) {
+  await expect(page).toHaveURL(hostAware(re), { timeout });
+}
+
+export async function gotoHome(page: Page, baseURL?: string) {
+  await page.goto(baseURL || '/');
+  await expect(page).toHaveURL(new RegExp(`^.+(/|${browseJobsRe.source})$`));
 }
 
 /** Ensure mobile drawer is open so nav items are visible */
@@ -94,10 +96,9 @@ export async function expectListOrEmpty(
 
 /** Simpler helper for tests that expect “Login” directly but should allow PKCE start too. */
 export async function expectLoginOrPkce(page: Page, timeout = 8000) {
-  const any = new RegExp(`${pkceStartRe.source}|${loginRe.source}`);
   await expect
     .poll(async () => page.url(), { timeout })
-    .toMatch(any);
+    .toMatch(loginRe);
 }
 
 /** Returns true if we stayed on same origin, false if CTA points to a different origin. */

@@ -14,26 +14,23 @@ export default function AppHeader() {
   const { user } = useUser();
   const [open, setOpen] = useState(false);
 
-  const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(item => {
-    let href = item.to;
-    if (item.key === 'login') href = loginNext(ROUTES.browseJobs);
-    else if (!user && item.auth === 'auth-aware') href = loginNext(item.to);
-    return { href, label: item.label, testId: item.idDesktop, mobileId: item.idMobile };
-  });
+  const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(item => ({
+    href: item.to,
+    label: item.label,
+    testId: item.id,
+  }));
   if (user) {
     if (isAdmin(user.email)) {
       links.push({
         href: ROUTES.adminTickets,
         label: 'Admin · Tickets',
         testId: 'nav-admin-tickets',
-        mobileId: 'navm-admin-tickets',
       });
     }
     links.push({
       href: ROUTES.logout,
       label: 'Sign out',
       testId: 'nav-logout',
-      mobileId: 'navm-logout',
     });
   }
 
@@ -102,9 +99,9 @@ export default function AppHeader() {
             {links.map(link =>
               link.href ? (
                 <Link
-                  key={link.mobileId}
-                  data-testid={link.mobileId}
-                  data-cta={link.mobileId}
+                  key={link.testId}
+                  data-testid={link.testId}
+                  data-cta={link.testId}
                   href={link.href}
                   prefetch={false}
                   onClick={() => setOpen(false)}
@@ -114,9 +111,9 @@ export default function AppHeader() {
                 </Link>
               ) : (
                 <button
-                  key={link.mobileId}
-                  data-testid={link.mobileId}
-                  data-cta={link.mobileId}
+                  key={link.testId}
+                  data-testid={link.testId}
+                  data-cta={link.testId}
                   onClick={() => {
                     setOpen(false);
                     link.onClick();

@@ -3,8 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { track } from '@/lib/analytics';
-import { ROUTES, toAppPath } from '@/lib/routes';
-import { loginNext } from '@/app/lib/authAware';
+import { ROUTES } from '@/lib/routes';
 
 type Props = {
   browseClassName?: string;
@@ -29,7 +28,7 @@ export default function LandingCTAs({
         <Link
           data-testid="hero-start"
           data-cta="hero-start"
-          href={toAppPath(ROUTES.browseJobs)}
+          href={ROUTES.browseJobs}
           className={browseClassName}
           onClick={() => track('cta_click', { cta: 'hero-start' })}
         >
@@ -38,24 +37,24 @@ export default function LandingCTAs({
       )}
       {showPost && (
         <Link
-          data-testid="hero-post"
-          data-cta="hero-post"
-          href={toAppPath(loginNext(ROUTES.postJob))}
+          data-testid="hero-post-job"
+          data-cta="hero-post-job"
+          href={ROUTES.postJob}
           className={postClassName}
-          onClick={() => track('cta_click', { cta: 'hero-post' })}
+          onClick={() => track('cta_click', { cta: 'hero-post-job' })}
         >
           Post a job
         </Link>
       )}
       {showSignup && (
         <Link
-          data-testid="hero-signup"
-          data-cta="hero-signup"
-          href={toAppPath(ROUTES.signup)}
+          data-testid="hero-applications"
+          data-cta="hero-applications"
+          href={ROUTES.applications}
           className={signupClassName}
-          onClick={() => track('cta_click', { cta: 'hero-signup' })}
+          onClick={() => track('cta_click', { cta: 'hero-applications' })}
         >
-          Sign up
+          My applications
         </Link>
       )}
     </div>

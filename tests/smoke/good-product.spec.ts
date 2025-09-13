@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref } from './_helpers';
+import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref, expectToBeOnRoute, visByTestId, loginOr } from './_helpers';
 
 const viewports = [
   { name: 'mobile', width: 390, height: 844 },
@@ -15,13 +15,13 @@ for (const vp of viewports) {
 
       const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
       for (const id of ctas) {
-        const el = page.getByTestId(id).first();
-        await expect(el).toBeVisible();
+        const el = await visByTestId(page, id);
         await expect(await el.getAttribute('data-cta')).toBe(id);
       }
 
-      await page.getByTestId('nav-browse-jobs').first().click();
-      await expect(page).toHaveURL(/\/browse-jobs/);
+      const browse = await visByTestId(page, 'nav-browse-jobs');
+      if (await browse.isVisible()) await browse.click();
+      await expectToBeOnRoute(page, /\/browse-jobs\/?$/);
       // Tolerate empty state in preview. Prefer cards if present.
       const list = page.getByTestId('jobs-list');
       const listExists = (await list.count()) > 0;
@@ -37,21 +37,21 @@ for (const vp of viewports) {
       }
 
       {
-        const cta = page.getByTestId('nav-post-job').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
+        const cta = await visByTestId(page, 'nav-post-job');
+        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/gigs\/create$/);
+        if (navigated) await expectAuthAwareRedirect(page, loginOr(/\/gigs\/create$/));
       }
 
       await page.goto('/');
       {
-        const cta = page.getByTestId('nav-my-applications').first();
+        const cta = await visByTestId(page, 'nav-my-applications');
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
+        if (navigated) await expectAuthAwareRedirect(page, loginOr(/\/applications$/));
       }
 
       await page.goto('/');
       {
-        const cta = page.getByTestId('nav-tickets').first();
+        const cta = await visByTestId(page, 'nav-tickets');
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
         if (navigated) {
           const buy = page.getByTestId('buy-tickets');
@@ -59,7 +59,6 @@ for (const vp of viewports) {
           await buy.click();
           await expect(page.locator('#order-status')).toHaveText('pending');
         } else {
-          // If cross-origin, we just assert href path above; no further action
           await expect(true).toBeTruthy();
         }
       }

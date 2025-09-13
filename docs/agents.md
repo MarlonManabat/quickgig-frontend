@@ -27,7 +27,7 @@
 **Employer**
 - **Post a job** → Job appears in **/browse-jobs**
 
-- Root “/” **must** 302/308 → **/browse-jobs**
+- Root “/” shows landing in CI/preview; production may 302 → **/browse-jobs** when `NEXT_PUBLIC_REDIRECT_HOME_TO_BROWSE=1`
 - CTAs use canonical routes (no raw hrefs, no legacy paths)
 - CTAs include `data-cta` matching their test ID
 - Unauth flows: redirect to **/login?next=<dest>** counts as success

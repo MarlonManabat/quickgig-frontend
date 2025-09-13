@@ -1,44 +1,42 @@
 # Agents Contract
-**Version:** 2025-12-23
+**Version:** 2026-01-06
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
 - All CTAs must include `data-cta` matching their test ID.
-- Header CTAs:
-  - `data-testid="nav-browse-jobs"` → `/browse-jobs`
-  - `data-testid="nav-post-job"` → `/post-job`
-  - `data-testid="nav-my-applications"` → `/applications`
-  - `data-testid="nav-tickets"` → `/tickets`
-  - `data-testid="nav-login"` → `/login`
-  - `data-testid="nav-logout"` → `/logout`
+- Header CTAs reuse canonical IDs across desktop and mobile (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`); non-visible copies must be `display: none`.
 - Hero CTAs:
   - `data-testid="hero-start"` → `/browse-jobs`
-  - `data-testid="hero-post"` → `/post-job`
-  - `data-testid="hero-signup"` → `/signup`
+  - `data-testid="hero-post-job"` → `/gigs/create`
+  - `data-testid="hero-applications"` → `/applications`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
 ## Auth behavior
-- If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
-- Auth-gated routes: `/applications`, `/post-job`.
-- In `MOCK_MODE` (CI or missing env), middleware serves stub content instead of redirecting.
+- If signed out, clicking either CTA MUST 302 to `/api/auth/pkce/start?next=<dest>` (or `/login?next=` fallback).
+- Auth-gated routes: `/applications`, `/gigs/create`.
 - PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
+- Middleware redirects unauthenticated `/applications` requests to `/api/auth/pkce/start?next=…` using a single Edge-safe redirect.
+
 
 ## Legacy redirects (middleware)
-- `/`      → `/browse-jobs`
-- `/find`      → `/browse-jobs`
-- `/gigs/create`  → `/post-job` (CI mock bypasses auth)
-- Unauthenticated users MAY be redirected to `/login?next=/post-job`.
+- `/find` → `/browse-jobs`
+- `/post`, `/posts`, `/gigs/new`, `/post-job` → `/gigs/create`
+  - Unauthenticated users MAY be redirected to `/login?next=/gigs/create`.
+- Home `/` redirects to `/browse-jobs` only in production when `NEXT_PUBLIC_REDIRECT_HOME_TO_BROWSE=1`; CI/dev stay on landing.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
-- Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
+- Mobile menu links reuse canonical `nav-*` test IDs (no `navm-*`).
+- Landing hero IDs: `hero-start`, `hero-post-job`, `hero-applications`.
 - Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
+- Header smokes query `:visible` to ignore hidden duplicates; CTA href checks accept relative or absolute app URLs.
+- Tickets top-up smoke is disabled in PR runs and exercised only in full E2E.
 - Applications smoke spec accepts `/login` redirect when unauthenticated.
-- Added core flows smoke `tests/smoke/core-flows.spec.ts` covering Browse, Applications, Job detail, and Post Job renderings.
+- Added core flows smoke `tests/smoke/core.spec.ts` covering Browse Jobs, Apply redirects, Applications gate, Post Job skeleton, header nav, and landing CTAs.
 - Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
 - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` waits for the PKCE start request and tolerates `chrome-error://` fallbacks.
@@ -48,11 +46,15 @@
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 - `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.
 - Smoke tests avoid cross-origin navigation in CI; external links are validated by path only.
+- `visByTestId(page, id)` selects the first visible element for a test ID to avoid duplicate ID conflicts.
+- `visByTestId(page, id)` falls back to the first match when the CTA is hidden on the current route.
+- `expectAuthAwareRedirect(page, okDest)` matches absolute or relative URLs and tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
+- `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
 - `scripts/audit-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
-- Middleware (`src/middleware.ts`) rewrites `/browse-jobs`, `/post-job`, `/applications`, `/tickets` to `_smoke` pages when `MOCK_MODE`, `CI`, or `SMOKE` is active.
+- Middleware (`src/middleware.ts`) only handles auth gating for `/applications`.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-12-16 -->

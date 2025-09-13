@@ -1,18 +1,17 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref } from './_helpers';
+import { expectAuthAwareRedirect, loginOr, visByTestId } from './_helpers';
 
 test('Landing → App CTAs » "Post a job" opens on app host', async ({ page }) => {
   await page.goto('/');
-  const cta = page.getByTestId('nav-post-job');
-  await expect(cta).toBeVisible();
-  const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
-  if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
+  const cta = await visByTestId(page, 'nav-post-job');
+  await cta.click();
+  const destRe = /(?:\/gigs\/create\/?$)|(?:\/post-job\/?$)|(?:https?:\/\/app\.quickgig\.ph\/post-job\/?$)/;
+  await expectAuthAwareRedirect(page, destRe);
 });
 
 test('Landing → App CTAs » "My Applications" opens on app host', async ({ page }) => {
   await page.goto('/');
-  const cta = page.getByTestId('nav-my-applications');
-  await expect(cta).toBeVisible();
-  const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
-  if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
+  const cta = await visByTestId(page, 'nav-my-applications');
+  await cta.click();
+  await expectAuthAwareRedirect(page, loginOr(/\/applications$/));
 });

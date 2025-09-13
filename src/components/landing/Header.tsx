@@ -1,60 +1,75 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { ROUTES, toAppPath } from '@/lib/routes';
+import { NAV_ITEMS, ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
-import { loginNext } from '@/app/lib/authAware';
 
 export default function LandingHeader() {
+  const [open, setOpen] = useState(false);
+  const links = NAV_ITEMS.map(item => ({
+    href: item.to,
+    label: item.label,
+    testId: item.id,
+  }));
+
   return (
-    <nav className="...">
-        <Link
-          data-testid="nav-browse-jobs"
-          data-cta="nav-browse-jobs"
-          href={toAppPath(ROUTES.browseJobs)}
-          className="hover:underline"
-          onClick={() => track('cta_click', { cta: 'nav-browse-jobs' })}
-        >
-          Browse jobs
+    <header className="border-b bg-white/60 backdrop-blur">
+      <div className="mx-auto max-w-5xl flex items-center justify-between p-4">
+        <Link href={ROUTES.home} className="font-semibold">
+          QuickGig
         </Link>
-        <Link
-          data-testid="nav-post-job"
-          data-cta="nav-post-job"
-          href={toAppPath(loginNext(ROUTES.postJob))}
-          className="btn btn-primary"
-          onClick={() => track('cta_click', { cta: 'nav-post-job' })}
+        <nav className="hidden md:flex items-center gap-4">
+          {links.map(link => (
+            <Link
+              key={link.testId}
+              data-testid={link.testId}
+              data-cta={link.testId}
+              href={link.href}
+              className="hover:underline"
+              onClick={() => track('cta_click', { cta: link.testId })}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        <button
+          data-testid="nav-menu-button"
+          aria-expanded={open}
+          aria-controls="nav-menu"
+          className="md:hidden"
+          onClick={() => setOpen(o => !o)}
         >
-          Post a job
-        </Link>
-        <Link
-          data-testid="nav-my-applications"
-          data-cta="nav-my-applications"
-          href={toAppPath(loginNext(ROUTES.applications))}
-          className="..."
-          onClick={() => track('cta_click', { cta: 'nav-my-applications' })}
+          Menu
+        </button>
+      </div>
+      {open ? (
+        <div
+          id="nav-menu"
+          data-testid="nav-menu"
+          role="dialog"
+          aria-modal="true"
+          className="md:hidden border-t bg-white"
         >
-          My Applications
-        </Link>
-        <Link
-          data-testid="nav-tickets"
-          data-cta="nav-tickets"
-          href={toAppPath(loginNext(ROUTES.tickets))}
-          className="..."
-          onClick={() => track('cta_click', { cta: 'nav-tickets' })}
-        >
-          Tickets
-        </Link>
-        <Link
-          data-testid="nav-login"
-          data-cta="nav-login"
-          href={toAppPath(loginNext(ROUTES.browseJobs))}
-          className="..."
-        >
-          Login
-        </Link>
-      <button type="button" data-testid="nav-menu-button" aria-label="Open menu" className="md:hidden">
-        Menu
-      </button>
-    </nav>
+          <div className="flex flex-col gap-2 p-4">
+            {links.map(link => (
+              <Link
+                key={link.testId}
+                data-testid={link.testId}
+                data-cta={link.testId}
+                href={link.href}
+                onClick={() => {
+                  setOpen(false);
+                  track('cta_click', { cta: link.testId });
+                }}
+                className="link"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </header>
   );
 }

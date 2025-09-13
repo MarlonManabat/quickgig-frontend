@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+test.skip(true, 'Disabled in PR smoke: external payments not exercised');
+
 // basic smoke for manual top-up flow
 // does not upload receipt to keep fast
 

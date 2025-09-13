@@ -31,7 +31,9 @@ yarn-error.log*
 *.log
 
 # local env files
-.env*
+.env
+.env.local
+.env.*
 !.env.example
 
 # vercel
@@ -53,7 +55,7 @@ supabase/.temp/
 supabase/.branches/
 
 # ignore compressed and image artifacts generated during tests
-**/*.zip
+*.zip
 **/*.png
 **/*.jpg
 **/*.jpeg

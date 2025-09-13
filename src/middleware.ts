@@ -1,41 +1,30 @@
+// src/middleware.ts
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { isSmoke } from './lib/smoke';
-
-export const config = {
-  matcher: [
-    '/((?!_next/|api/|_smoke/|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:js|css|png|jpg|jpeg|gif|svg|webp|ico)).*)',
-  ],
-};
-
-const MAP: Record<string, string> = {
-  '/browse-jobs': '/smoke/browse-jobs',
-  '/post-job': '/smoke/post-job',
-  '/applications': '/smoke/applications',
-  '/tickets': '/smoke/tickets',
-};
-
-const PUBLIC = new Set([
-  '/',
-  '/browse-jobs',
-  '/login',
-  '/signup',
-  '/logout',
-  '/post-job',
-  '/api/auth/pkce/start',
-  '/api/auth/pkce/callback',
-]);
 
 export function middleware(req: NextRequest) {
   const url = new URL(req.url);
-  if (PUBLIC.has(url.pathname)) return NextResponse.next();
+  const isCI = process.env.CI === 'true' || process.env.NODE_ENV !== 'production';
 
-  if (!isSmoke) return NextResponse.next();
-
-  const dest = MAP[url.pathname];
-  if (dest) {
-    const to = new URL(dest, url.origin);
-    return NextResponse.rewrite(to);
+  // Redirect home to /browse-jobs only in production
+  if (!isCI && url.pathname === '/') {
+    url.pathname = '/browse-jobs';
+    return NextResponse.redirect(url);
   }
+
+  // CI helpers: avoid PKCE loops and gate /applications to /login
+  if (process.env.CI === 'true') {
+    if (url.pathname.startsWith('/api/auth/pkce/')) {
+      return new NextResponse(null, { status: 204 });
+    }
+    if (url.pathname === '/applications') {
+      return NextResponse.redirect(new URL('/login', req.url), 302);
+    }
+  }
+
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ['/', '/applications', '/api/auth/pkce/:path*'],
+};

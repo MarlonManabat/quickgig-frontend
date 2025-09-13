@@ -1,11 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { gotoHome, expectToBeOnRoute } from '../e2e/_helpers';
-import { expectAuthAwareRedirect } from './_helpers';
+import { hostAware } from './_helpers';
 
-test('Landing hero CTAs route to app host', async ({ page }) => {
-  await gotoHome(page);
+test('Landing hero CTA routes to Browse Jobs', async ({ page }) => {
+  await page.goto('/');
   await expect(page.getByTestId('hero-start')).toBeVisible();
-
   await page.getByTestId('hero-start').click();
-  await expectToBeOnRoute(page, /\/browse-jobs\/?$/);
+  await expect(page).toHaveURL(hostAware(/\/browse-jobs\/?$/));
 });

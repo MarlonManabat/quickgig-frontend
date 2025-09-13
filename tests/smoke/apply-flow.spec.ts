@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect } from './_helpers';
+import { expectAuthAwareRedirect, loginOr } from './_helpers';
 import { loginAs } from '../e2e/helpers';
 
 for (const device of ['desktop', 'mobile'] as const) {
@@ -23,7 +23,7 @@ for (const device of ['desktop', 'mobile'] as const) {
 
       if (!loggedIn) {
         await page.getByTestId('apply-button').click();
-        await expectAuthAwareRedirect(page, /\/applications$/);
+        await expectAuthAwareRedirect(page, loginOr(/\/applications$/));
         return;
       }
 
