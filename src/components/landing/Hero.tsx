@@ -2,15 +2,14 @@
 
 import Link from 'next/link';
 import { track } from '@/lib/analytics';
-import { ROUTES, toAppPath } from '@/lib/routes';
-import { loginNext } from '@/app/lib/authAware';
+import { ROUTES } from '@/lib/routes';
 
 export default function LandingHero() {
   return (
     <section className="...">
       <div className="flex gap-3">
         <Link
-          href={toAppPath(ROUTES.browseJobs)}
+          href={ROUTES.browseJobs}
           data-testid="hero-start"
           data-cta="hero-start"
           className="px-4 py-2 rounded-md bg-gray-100"
@@ -19,7 +18,7 @@ export default function LandingHero() {
           Browse jobs
         </Link>
         <Link
-          href={toAppPath(loginNext(ROUTES.postJob))}
+          href={ROUTES.postJob}
           data-testid="hero-post"
           data-cta="hero-post"
           className="px-4 py-2 rounded-md bg-gray-100"
@@ -28,7 +27,7 @@ export default function LandingHero() {
           Post a job
         </Link>
         <Link
-          href={toAppPath(ROUTES.signup)}
+          href={ROUTES.signup}
           data-testid="hero-signup"
           data-cta="hero-signup"
           className="px-4 py-2 rounded-md bg-gray-100"

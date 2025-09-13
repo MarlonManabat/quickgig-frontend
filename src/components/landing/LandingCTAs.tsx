@@ -3,8 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { track } from '@/lib/analytics';
-import { ROUTES, toAppPath } from '@/lib/routes';
-import { loginNext } from '@/app/lib/authAware';
+import { ROUTES } from '@/lib/routes';
 
 type Props = {
   browseClassName?: string;
@@ -29,7 +28,7 @@ export default function LandingCTAs({
         <Link
           data-testid="hero-start"
           data-cta="hero-start"
-          href={toAppPath(ROUTES.browseJobs)}
+          href={ROUTES.browseJobs}
           className={browseClassName}
           onClick={() => track('cta_click', { cta: 'hero-start' })}
         >
@@ -40,7 +39,7 @@ export default function LandingCTAs({
         <Link
           data-testid="hero-post"
           data-cta="hero-post"
-          href={toAppPath(loginNext(ROUTES.postJob))}
+          href={ROUTES.postJob}
           className={postClassName}
           onClick={() => track('cta_click', { cta: 'hero-post' })}
         >
@@ -51,7 +50,7 @@ export default function LandingCTAs({
         <Link
           data-testid="hero-signup"
           data-cta="hero-signup"
-          href={toAppPath(ROUTES.signup)}
+          href={ROUTES.signup}
           className={signupClassName}
           onClick={() => track('cta_click', { cta: 'hero-signup' })}
         >
