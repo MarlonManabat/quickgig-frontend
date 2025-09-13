@@ -12,7 +12,7 @@ export default function Header() {
         {/* Desktop */}
         <div className="ml-auto hidden md:flex items-center gap-4">
           <Link data-testid="nav-browse-jobs" href="/browse-jobs">Browse jobs</Link>
-          <Link data-testid="nav-post-job" href="/post-job">Post a job</Link>
+          <Link data-testid="nav-post-job" href="/gigs/create">Post a job</Link>
           <Link data-testid="nav-my-applications" href="/applications">My Applications</Link>
           <Link data-testid="nav-login" href="/login">Login</Link>
         </div>
@@ -36,7 +36,7 @@ export default function Header() {
       >
         <div className="mx-auto max-w-6xl p-4 flex flex-col gap-3">
           <Link data-testid="nav-browse-jobs" href="/browse-jobs">Browse jobs</Link>
-          <Link data-testid="nav-post-job" href="/post-job">Post a job</Link>
+          <Link data-testid="nav-post-job" href="/gigs/create">Post a job</Link>
           <Link data-testid="nav-my-applications" href="/applications">My Applications</Link>
           <Link data-testid="nav-login" href="/login">Login</Link>
         </div>
