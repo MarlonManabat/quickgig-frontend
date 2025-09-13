@@ -1,12 +1,10 @@
 # Agents Contract
-**Version:** 2026-01-02
+**Version:** 2026-01-06
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
 - All CTAs must include `data-cta` matching their test ID.
-- Header CTAs have unique IDs for desktop and mobile:
-  - Desktop: `nav-browse-jobs-header`, `nav-post-job-header`, `nav-my-applications-header`, `nav-tickets-header`, `nav-login-header`
-  - Mobile menu: `nav-browse-jobs-menu`, `nav-post-job-menu`, `nav-my-applications-menu`, `nav-tickets-menu`, `nav-login-menu`
+- Header CTAs reuse canonical IDs across desktop and mobile (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`); non-visible copies must be `display: none`.
 - Hero CTAs:
   - `data-testid="hero-start"` → `/browse-jobs`
   - `data-testid="hero-post-job"` → `/gigs/create`
@@ -22,10 +20,10 @@
 
 
 ## Legacy redirects (middleware)
-- `/`      → `/browse-jobs`
-  - `/find`      → `/browse-jobs`
+- `/find` → `/browse-jobs`
 - `/post`, `/posts`, `/gigs/new`, `/post-job` → `/gigs/create`
   - Unauthenticated users MAY be redirected to `/login?next=/gigs/create`.
+- Home `/` redirects to `/browse-jobs` only in production when `NEXT_PUBLIC_REDIRECT_HOME_TO_BROWSE=1`; CI/dev stay on landing.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.

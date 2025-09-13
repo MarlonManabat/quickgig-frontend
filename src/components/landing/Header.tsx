@@ -10,8 +10,7 @@ export default function LandingHeader() {
   const links = NAV_ITEMS.map(item => ({
     href: item.to,
     label: item.label,
-    testIdDesktop: item.idDesktop,
-    testIdMobile: item.idMobile,
+    testId: item.id,
   }));
 
   return (
@@ -23,12 +22,12 @@ export default function LandingHeader() {
         <nav className="hidden md:flex items-center gap-4">
           {links.map(link => (
             <Link
-              key={link.testIdDesktop}
-              data-testid={link.testIdDesktop}
-              data-cta={link.testIdDesktop}
+              key={link.testId}
+              data-testid={link.testId}
+              data-cta={link.testId}
               href={link.href}
               className="hover:underline"
-              onClick={() => track('cta_click', { cta: link.testIdDesktop })}
+              onClick={() => track('cta_click', { cta: link.testId })}
             >
               {link.label}
             </Link>
@@ -55,13 +54,13 @@ export default function LandingHeader() {
           <div className="flex flex-col gap-2 p-4">
             {links.map(link => (
               <Link
-                key={link.testIdMobile}
-                data-testid={link.testIdMobile}
-                data-cta={link.testIdMobile}
+                key={link.testId}
+                data-testid={link.testId}
+                data-cta={link.testId}
                 href={link.href}
                 onClick={() => {
                   setOpen(false);
-                  track('cta_click', { cta: link.testIdMobile });
+                  track('cta_click', { cta: link.testId });
                 }}
                 className="link"
               >

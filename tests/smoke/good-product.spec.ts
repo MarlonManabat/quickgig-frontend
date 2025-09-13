@@ -13,12 +13,9 @@ for (const vp of viewports) {
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
 
-      const ctas = vp.name === 'desktop'
-        ? ['nav-browse-jobs-header','nav-post-job-header','nav-my-applications-header','nav-tickets-header']
-        : ['nav-browse-jobs-menu','nav-post-job-menu','nav-my-applications-menu','nav-tickets-menu'];
+      const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
       for (const id of ctas) {
-        const el = page.getByTestId(id).first();
-        await expect(el).toBeVisible();
+        const el = await visByTestId(page, id);
         await expect(await el.getAttribute('data-cta')).toBe(id);
       }
 
@@ -40,24 +37,21 @@ for (const vp of viewports) {
       }
 
       {
-        const id = vp.name === 'desktop' ? 'nav-post-job-header' : 'nav-post-job-menu';
-        const cta = page.getByTestId(id).locator(':visible').first();
+        const cta = await visByTestId(page, 'nav-post-job');
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/gigs\/create$/);
         if (navigated) await expectAuthAwareRedirect(page, loginOr(/\/gigs\/create$/));
       }
 
       await page.goto('/');
       {
-        const id = vp.name === 'desktop' ? 'nav-my-applications-header' : 'nav-my-applications-menu';
-        const cta = page.getByTestId(id).locator(':visible').first();
+        const cta = await visByTestId(page, 'nav-my-applications');
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
         if (navigated) await expectAuthAwareRedirect(page, loginOr(/\/applications$/));
       }
 
       await page.goto('/');
       {
-        const id = vp.name === 'desktop' ? 'nav-tickets-header' : 'nav-tickets-menu';
-        const cta = page.getByTestId(id).locator(':visible').first();
+        const cta = await visByTestId(page, 'nav-tickets');
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
         if (navigated) {
           const buy = page.getByTestId('buy-tickets');
@@ -65,7 +59,6 @@ for (const vp of viewports) {
           await buy.click();
           await expect(page.locator('#order-status')).toHaveText('pending');
         } else {
-          // If cross-origin, we just assert href path above; no further action
           await expect(true).toBeTruthy();
         }
       }

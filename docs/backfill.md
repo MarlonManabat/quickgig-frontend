@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-01-06 — Landing visible in CI & unified nav IDs
+- Home no longer redirects to `/browse-jobs` in CI/preview; gated by `NEXT_PUBLIC_REDIRECT_HOME_TO_BROWSE` for production.
+- Header and mobile nav reuse canonical `nav-*` test IDs; helpers now accept host-prefixed URLs.
+
 ## 2026-01-02 — Tolerant login redirect & hidden CTA fallback
 - Broadened login regex and helper to accept PKCE start and `/login`.
 - `visByTestId` falls back when the current-route CTA is hidden; nav smoke no longer requires Browse Jobs link on `/browse-jobs`.

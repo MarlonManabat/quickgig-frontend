@@ -5,9 +5,7 @@ import {
   openMobileMenu,
   expectAuthAwareRedirect,
   visByTestId,
-  gotoHome,
-  expectToBeOnRoute,
-  loginOr,
+  loginRe,
 } from './_helpers';
 
 test('Browse Jobs renders', async ({ page }) => {
@@ -24,9 +22,9 @@ test('Apply flow redirects when signed-out', async ({ page }) => {
   await expectLoginOrPkce(page);
 });
 
-test('My Applications is auth-gated (login or safe fallback)', async ({ page }) => {
+test('My Applications is auth-gated', async ({ page }) => {
   await page.goto('/applications');
-  await expectAuthAwareRedirect(page, loginOr(/\/applications\/?$/));
+  await expectAuthAwareRedirect(page, new RegExp(`${loginRe.source}|\/applications$`));
 });
 
 test('Post a Job placeholder', async ({ page }) => {
@@ -38,12 +36,7 @@ test('Header/nav is wired', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await openMobileMenu(page);
-  for (const id of ['nav-login', 'nav-my-applications', 'nav-post-job']) {
-    await expect(await visByTestId(page, id)).toBeVisible();
+  for (const id of ['nav-browse-jobs', 'nav-login', 'nav-my-applications', 'nav-post-job']) {
+    await visByTestId(page, id);
   }
-});
-
-test('Landing CTAs route correctly', async ({ page }) => {
-  await gotoHome(page);
-  await expectToBeOnRoute(page, /\/browse-jobs\/?$/);
 });

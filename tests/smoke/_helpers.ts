@@ -1,34 +1,32 @@
 import { expect, Locator } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+export const loginRe = /\/login(?:\?.*)?$/;
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-export const appHostRe = /https?:\/\/app\.quickgig\.ph/;
-export const loginRe =
-  /(?:\/api\/auth\/pkce\/start\?next=.*|\/login(?:\?.*)?)$/;
 export const browseJobsRe = /\/browse-jobs(\?.*)?$/;
 
+export function hostAware(re: RegExp) {
+  return new RegExp(`(?:https?:\\/\\/[^/]+)?${re.source}`);
+}
+
 export function loginOr(path: string | RegExp) {
-  const rhs = typeof path === 'string' ? path : path.source;
+  const rhs = typeof path === 'string' ? escapeRe(path) : path.source;
   return new RegExp(`${loginRe.source}|${rhs}`);
 }
 
 export async function expectToBeOnRoute(page: Page, path: string | RegExp, timeout = 8000) {
   const src = typeof path === 'string' ? escapeRe(path) : path.source;
-  const pathRe = `(?:https?:\/\/[^\/]+)?${src}`;
-  await expect(page).toHaveURL(new RegExp(pathRe), { timeout });
+  await expect(page).toHaveURL(hostAware(new RegExp(src)), { timeout });
+}
+
+export async function visByTestId(page: Page, id: string) {
+  const loc = page.getByTestId(id).locator(':visible').first();
+  await expect(loc).toBeVisible({ timeout: 12000 });
+  return loc;
 }
 
 export async function expectAuthAwareRedirect(page: Page, re: RegExp, timeout = 12000) {
-  const pathRe = `(?:https?:\/\/[^\/]+)?${re.source}`;
-  await expect(page).toHaveURL(new RegExp(pathRe), { timeout });
-}
-
-/** Prefer visible match; fall back to existence when CTA is hidden on current route */
-export async function visByTestId(page: Page, id: string) {
-  const visible = page.getByTestId(id).locator(':visible');
-  if ((await visible.count()) > 0) return visible.first();
-  return page.getByTestId(id).first();
+  await expect(page).toHaveURL(hostAware(re), { timeout });
 }
 
 export async function gotoHome(page: Page, baseURL?: string) {

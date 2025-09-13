@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectListOrEmpty, expectAuthAwareRedirect, loginOr, expectToBeOnRoute } from './_helpers';
+import { expectListOrEmpty, expectAuthAwareRedirect, loginOr, expectToBeOnRoute, visByTestId } from './_helpers';
 
 // Reuse existing baseURL from Playwright config; do NOT introduce new env vars.
 // The test only asserts pages render and key CTAs are present.
@@ -25,7 +25,7 @@ test.describe('QuickGig core flows (smoke)', () => {
 
   test('My Applications is auth-gated (redirects to /login) OR renders empty when authenticated', async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ''}/`);
-    await page.getByTestId('nav-my-applications-header').locator(':visible').first().click();
+    await (await visByTestId(page, 'nav-my-applications')).click();
     await expectAuthAwareRedirect(page, loginOr(/\/applications$/));
   });
 
