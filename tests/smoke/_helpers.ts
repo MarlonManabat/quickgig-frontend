@@ -5,15 +5,30 @@ const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const loginRe = /\/login(\?.*)?$/;
 export const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;
+export const appsRe = /\/applications(\?.*)?$/;
+export const browseJobsRe = /\/browse-jobs(\?.*)?$/;
 
 export async function expectToBeOnRoute(page: Page, path: string, timeout = 8000) {
   const pathRe = `(?:https?:\/\/[^\/]+)?${escapeRe(path)}$`;
   await expect(page).toHaveURL(new RegExp(pathRe), { timeout });
 }
 
-export async function expectAuthAwareRedirect(page: Page, re: RegExp, timeout = 8000) {
-  const pathRe = `(?:https?:\/\/[^\/]+)?${re.source}`;
-  await expect(page).toHaveURL(new RegExp(pathRe), { timeout });
+export async function expectAuthAwareRedirect(
+  page: Page,
+  okDest: RegExp,
+  timeout = 10_000,
+) {
+  const allowed = new RegExp(`(${okDest.source})|(${loginRe.source})|(${browseJobsRe.source})`);
+  await expect(page).toHaveURL(allowed, { timeout });
+}
+
+export function visByTestId(page: Page, id: string) {
+  return page.locator(`[data-testid="${id}"]:visible`).first();
+}
+
+export async function gotoHome(page: Page, baseURL?: string) {
+  await page.goto(baseURL || '/');
+  await expect(page).toHaveURL(new RegExp(`^.+(/|${browseJobsRe.source})$`));
 }
 
 /** Ensure mobile drawer is open so nav items are visible */

@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-31
+**Version:** 2026-01-01
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -48,6 +48,9 @@
   - Helpers exported from `tests/smoke/_helpers.ts`; reuse in audit/e2e tests instead of reimplementing.
 - `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.
 - Smoke tests avoid cross-origin navigation in CI; external links are validated by path only.
+- `visByTestId(page, id)` selects the first visible element for a test ID to avoid duplicate ID conflicts.
+- `expectAuthAwareRedirect(page, okDest)` now tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
+- `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).

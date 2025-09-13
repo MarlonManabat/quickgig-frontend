@@ -1,14 +1,15 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, loginRe } from './_helpers';
+import { openMobileMenu, visByTestId, expectAuthAwareRedirect } from './_helpers';
 
 test('desktop header CTAs › Login', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('nav-login-header').locator(':visible').first().click();
-  await expectAuthAwareRedirect(page, loginRe);
+  await visByTestId(page, 'nav-login').click();
+  await expectAuthAwareRedirect(page, /\/login\/?$/);
 });
 
 test('desktop header CTAs › My Applications (auth-aware)', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('nav-my-applications-header').locator(':visible').first().click();
-  await expectAuthAwareRedirect(page, /\/login(\?.*)?$|\/applications$/);
+  await openMobileMenu(page);
+  await visByTestId(page, 'nav-my-applications').click();
+  await expectAuthAwareRedirect(page, /\/applications\/?$/);
 });

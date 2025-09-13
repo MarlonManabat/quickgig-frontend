@@ -22,8 +22,7 @@ for (const vp of viewports) {
         await expect(await el.getAttribute('data-cta')).toBe(id);
       }
 
-      const browseId = vp.name === 'desktop' ? 'nav-browse-jobs-header' : 'nav-browse-jobs-menu';
-      await page.getByTestId(browseId).locator(':visible').first().click();
+      await (await import('./_helpers')).visByTestId(page, 'nav-browse-jobs').click();
       await expectToBeOnRoute(page, '/browse-jobs');
       // Tolerate empty state in preview. Prefer cards if present.
       const list = page.getByTestId('jobs-list');

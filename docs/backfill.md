@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-01-01 — Stabilize smoke helpers for fixed snapshot
+- Smoke tests now use `visByTestId` to target visible nav links and tolerate `/browse-jobs` fallbacks.
+- `expectAuthAwareRedirect` accepts login or browse redirects; hero checks skipped when landing redirects.
+
 ## 2025-12-30 — PKCE-only Applications gate
 - Removed local `/login` placeholder page to avoid conflicts.
 - Middleware now redirects unauthenticated `/applications` visits to `/api/auth/pkce/start?next=…`.

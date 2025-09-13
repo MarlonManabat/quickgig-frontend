@@ -9,8 +9,8 @@ export default defineConfig({
   workers: 2,
   use: {
     baseURL: appOrigin || 'http://localhost:4010',
-    navigationTimeout: 20_000,
-    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
+    actionTimeout: 12_000,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   ...(appOrigin
