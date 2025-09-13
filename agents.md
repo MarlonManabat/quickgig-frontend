@@ -1,35 +1,25 @@
 # Agents Contract
-**Version:** 2026-01-06
+**Version:** 2026-09-13
 
 ## Routes & CTAs (source of truth)
-- Use `ROUTES` constants for all navigational links (no raw string paths).
-- All CTAs must include `data-cta` matching their test ID.
-- Header CTAs reuse canonical IDs across desktop and mobile (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`); non-visible copies must be `display: none`.
+- Header CTAs reuse canonical IDs across desktop and mobile (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`); non-visible copies must be `display: none`.
 - Hero CTAs:
   - `data-testid="hero-start"` → `/browse-jobs`
-  - `data-testid="hero-post-job"` → `/gigs/create`
-  - `data-testid="hero-applications"` → `/applications`
-- Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
 ## Auth behavior
-- If signed out, clicking either CTA MUST 302 to `/api/auth/pkce/start?next=<dest>` (or `/login?next=` fallback).
-- Auth-gated routes: `/applications`, `/gigs/create`.
-- PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
-- Middleware redirects unauthenticated `/applications` requests to `/api/auth/pkce/start?next=…` using a single Edge-safe redirect.
+- If signed out, clicking either CTA MUST redirect to `/login?next=<dest>`.
+- Auth-gated routes: `/applications`.
+- Middleware redirects unauthenticated `/applications` requests to `/login?next=…` using a single Edge-safe redirect.
 
 
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`
-- `/post`, `/posts`, `/gigs/new`, `/post-job` → `/gigs/create`
-  - Unauthenticated users MAY be redirected to `/login?next=/gigs/create`.
-- Home `/` redirects to `/browse-jobs` only in production when `NEXT_PUBLIC_REDIRECT_HOME_TO_BROWSE=1`; CI/dev stay on landing.
 
-- Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
+- Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
 - Mobile menu links reuse canonical `nav-*` test IDs (no `navm-*`).
-- Landing hero IDs: `hero-start`, `hero-post-job`, `hero-applications`.
-- Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
+- Landing hero IDs: `hero-start`.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
@@ -52,7 +42,7 @@
 - `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent.
 
 ## CI guardrails
-- `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`, `/post-job`).
+- `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`).
 - `scripts/audit-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
 - Middleware (`src/middleware.ts`) only handles auth gating for `/applications`.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
@@ -64,14 +54,12 @@
 # QuickGig Agent Playbook (READ ME FIRST)
 
 ## DO FIRST (hard rules)
-- Use the canonical routes from `app/lib/routes.ts`. **Never** hardcode paths.
 - Treat auth-gated flows as **auth-aware**: redirects to `/login?next=` are a *success* condition in PR smoke.
 - Prefer stable selectors: `data-testid` over headings/text.
-- Do not introduce or resurrect legacy paths in UI (e.g., `/find`, `/browse-jobs`, `/post-job`) except where explicitly redirected by middleware.
+- Do not introduce or resurrect legacy paths in UI (e.g., `/find`) except where explicitly redirected by middleware.
 - If you modify routes, middleware, or smoke tests, update **this file** and `BACKFILL.md` with rationale.
 
 ## Repository invariants
-- **Routes:** `app/lib/routes.ts` is the single source of truth. CTAs import from there.
 - **Redirects:** legacy paths normalize in `middleware.ts` and `next.config` `redirects()`.
 - **Auth-aware smoke:** specs accept `/login` for gated flows; otherwise assert the form (or skeleton) renders.
 - **Error handling:** global `app/error.tsx` + page-level boundaries (e.g., Post Job) prevent white screens.

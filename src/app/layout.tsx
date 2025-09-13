@@ -1,20 +1,15 @@
-import '@/styles/globals.css';
-import type { Metadata } from 'next';
-import AppHeader from '@/components/AppHeader';
-import Analytics from '@/components/Analytics';
+import type { Metadata } from "next";
+import "./globals.css";
+import Header from "@/components/Header";
 
-export const metadata: Metadata = {
-  title: 'QuickGig App',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_ORIGIN || 'http://localhost:3000'),
-};
+export const metadata: Metadata = { title: "QuickGig" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <AppHeader />
-        {children}
-        <Analytics />
+        <Header />
+        <main className="mx-auto max-w-6xl p-4">{children}</main>
       </body>
     </html>
   );
