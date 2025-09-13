@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2025-12-30 — PKCE-only Applications gate
+- Removed local `/login` placeholder page to avoid conflicts.
+- Middleware now redirects unauthenticated `/applications` visits to `/api/auth/pkce/start?next=…`.
+
 ## 2025-12-29 — Local login placeholder & smoke hardening
 - Added a minimal `/login` page so auth-gated redirects don't loop in preview/CI.
 - Smoke tests now assert visible header links and tolerate absolute CTA hrefs.

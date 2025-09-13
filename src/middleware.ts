@@ -18,8 +18,8 @@ export function middleware(req: NextRequest) {
   // Gate Applications for guests (dev/CI too)
   if (pathname.startsWith("/applications") && !hasSession(req)) {
     const next = encodeURIComponent(pathname + (search || ""));
-    // Redirect to local /login (stable in CI); product PKCE remains valid in prod
-    return NextResponse.redirect(new URL(`/login?next=${next}`, req.url));
+    // Use existing PKCE endpoint; avoids /login page conflicts
+    return NextResponse.redirect(new URL(`/api/auth/pkce/start?next=${next}`, req.url));
   }
 
   return NextResponse.next();

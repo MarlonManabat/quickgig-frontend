@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2025-12-29
+**Version:** 2025-12-30
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -19,11 +19,11 @@
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
 ## Auth behavior
-- If signed out, clicking either CTA MUST 302 to `/login?next=<dest>`.
+- If signed out, clicking either CTA MUST 302 to `/api/auth/pkce/start?next=<dest>` (or `/login?next=` fallback).
 - Auth-gated routes: `/applications`, `/post-job`.
 - PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
-- Middleware redirects unauthenticated `/applications` requests to `/login?next=…` using a single Edge-safe redirect.
-- A minimal `/login` page ships for preview/CI to avoid redirect loops.
+- Middleware redirects unauthenticated `/applications` requests to `/api/auth/pkce/start?next=…` using a single Edge-safe redirect.
+
 
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
