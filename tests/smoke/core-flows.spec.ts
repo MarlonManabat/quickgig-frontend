@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectListOrEmpty, expectAuthAwareRedirect, loginRe } from './_helpers';
+import { expectListOrEmpty, expectAuthAwareRedirect, loginRe, expectToBeOnRoute } from './_helpers';
 
 // Reuse existing baseURL from Playwright config; do NOT introduce new env vars.
 // The test only asserts pages render and key CTAs are present.
@@ -25,14 +25,14 @@ test.describe('QuickGig core flows (smoke)', () => {
 
   test('My Applications is auth-gated (redirects to /login) OR renders empty when authenticated', async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ''}/`);
-    await page.getByTestId('nav-my-applications').locator(':visible').first().click();
+    await page.getByTestId('nav-my-applications-header').locator(':visible').first().click();
     await expectAuthAwareRedirect(page, new RegExp(`${loginRe.source}|/applications$`));
   });
 
   test('Post Job page renders', async ({ page, baseURL }) => {
-    await page.goto(`${baseURL || ''}/post-job`);
+    await page.goto(`${baseURL || ''}/gigs/create`);
     // We’re on the correct route
-    await expect(page).toHaveURL(/\/post-job(?:\?|$)/);
+    await expectToBeOnRoute(page, '/gigs/create');
     // Accept either skeleton while loading or the hydrated form/heading
     const skeleton = page.locator('[data-testid="post-job-skeleton"]');
     const form = page.locator('[data-testid="post-job-form"]');

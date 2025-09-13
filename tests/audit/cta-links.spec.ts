@@ -2,20 +2,20 @@ import { test, expect } from '@playwright/test';
 import { expectAuthAwareRedirect } from '../smoke/_helpers';
 
 const CTAS = [
-  { id: 'nav-browse-jobs', dest: '/browse-jobs', gated: false },
-  { id: 'nav-post-job', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
-  { id: 'nav-my-applications', dest: '/applications', gated: true },
-  { id: 'nav-tickets', dest: '/tickets', gated: true },
-  { id: 'nav-login', dest: '/login', gated: false },
+  { id: 'nav-browse-jobs-header', dest: '/browse-jobs', gated: false },
+  { id: 'nav-post-job-header', dest: /\/gigs\/create\/?$/i, gated: true },
+  { id: 'nav-my-applications-header', dest: '/applications', gated: true },
+  { id: 'nav-tickets-header', dest: '/tickets', gated: true },
+  { id: 'nav-login-header', dest: '/login', gated: false },
   { id: 'hero-start', dest: '/browse-jobs', gated: false },
-  { id: 'hero-post', dest: /\/post-job$|\/gigs\/create\/?$/i, gated: true },
-  { id: 'hero-signup', dest: '/signup', gated: false },
+  { id: 'hero-post-job', dest: /\/gigs\/create\/?$/i, gated: true },
+  { id: 'hero-applications', dest: '/applications', gated: true },
 ] as const;
 
 async function openMobileMenuIfHidden(page: any) {
   const btn = page.getByTestId('nav-menu-button');
   if (await btn.count()) {
-    const anyNav = page.getByTestId('nav-browse-jobs');
+    const anyNav = page.getByTestId('nav-browse-jobs-header');
     if (!(await anyNav.isVisible().catch(() => false))) {
       await btn.click();
       await page.waitForTimeout(200);
@@ -32,8 +32,11 @@ for (const vp of [{ w: 1280, h: 800 }, { w: 390, h: 844 }]) {
     });
 
     for (const cta of CTAS) {
-      test(`${cta.id} routes to ${cta.gated ? 'dest or /login?next' : 'dest'}`, async ({ page }) => {
-        const el = page.getByTestId(cta.id).first();
+      const id = vp.w === 1280 && cta.id.endsWith('-header')
+        ? cta.id
+        : cta.id.replace('-header', '-menu');
+      test(`${id} routes to ${cta.gated ? 'dest or /login?next' : 'dest'}`, async ({ page }) => {
+        const el = page.getByTestId(id).first();
         await expect(el).toBeVisible();
         await Promise.all([page.waitForLoadState('domcontentloaded'), el.click()]);
         if (cta.gated) {

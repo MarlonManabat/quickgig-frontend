@@ -1,26 +1,22 @@
 # Agents Contract
-**Version:** 2025-12-30
+**Version:** 2025-12-31
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
 - All CTAs must include `data-cta` matching their test ID.
-- Header CTAs:
-  - `data-testid="nav-browse-jobs"` → `/browse-jobs`
-  - `data-testid="nav-post-job"` → `/post-job`
-  - `data-testid="nav-my-applications"` → `/applications`
-  - `data-testid="nav-tickets"` → `/tickets`
-  - `data-testid="nav-login"` → `/login`
-  - `data-testid="nav-logout"` → `/logout`
+- Header CTAs have unique IDs for desktop and mobile:
+  - Desktop: `nav-browse-jobs-header`, `nav-post-job-header`, `nav-my-applications-header`, `nav-tickets-header`, `nav-login-header`
+  - Mobile menu: `nav-browse-jobs-menu`, `nav-post-job-menu`, `nav-my-applications-menu`, `nav-tickets-menu`, `nav-login-menu`
 - Hero CTAs:
   - `data-testid="hero-start"` → `/browse-jobs`
-  - `data-testid="hero-post"` → `/post-job`
-  - `data-testid="hero-signup"` → `/signup`
+  - `data-testid="hero-post-job"` → `/gigs/create`
+  - `data-testid="hero-applications"` → `/applications`
 - Admin link `/admin/tickets` visible only to allowlisted emails (`ADMIN_EMAILS`).
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST 302 to `/api/auth/pkce/start?next=<dest>` (or `/login?next=` fallback).
-- Auth-gated routes: `/applications`, `/post-job`.
+- Auth-gated routes: `/applications`, `/gigs/create`.
 - PKCE start API falls back to `/login?next=` in CI/preview and when misconfigured.
 - Middleware redirects unauthenticated `/applications` requests to `/api/auth/pkce/start?next=…` using a single Edge-safe redirect.
 
@@ -28,13 +24,13 @@
 ## Legacy redirects (middleware)
 - `/`      → `/browse-jobs`
   - `/find`      → `/browse-jobs`
-  - `/post`, `/posts`, `/gigs/new`, `/gigs/create` → `/post-job`
-  - Unauthenticated users MAY be redirected to `/login?next=/post-job`.
+- `/post`, `/posts`, `/gigs/new`, `/post-job` → `/gigs/create`
+  - Unauthenticated users MAY be redirected to `/login?next=/gigs/create`.
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
 - Mobile menu links reuse canonical `nav-*` test IDs (no `navm-*`).
-- Landing hero IDs: `hero-start`, `hero-post`, `hero-signup`.
+- Landing hero IDs: `hero-start`, `hero-post-job`, `hero-applications`.
 - Post Job page exposes `post-job-skeleton` while loading and `post-job-form`/heading when hydrated; smokes accept either state.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.

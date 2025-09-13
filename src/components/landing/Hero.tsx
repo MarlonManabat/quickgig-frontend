@@ -19,21 +19,21 @@ export default function LandingHero() {
         </Link>
         <Link
           href={ROUTES.postJob}
-          data-testid="hero-post"
-          data-cta="hero-post"
+          data-testid="hero-post-job"
+          data-cta="hero-post-job"
           className="px-4 py-2 rounded-md bg-gray-100"
-          onClick={() => track('cta_click', { cta: 'hero-post' })}
+          onClick={() => track('cta_click', { cta: 'hero-post-job' })}
         >
           Post a job
         </Link>
         <Link
-          href={ROUTES.signup}
-          data-testid="hero-signup"
-          data-cta="hero-signup"
+          href={ROUTES.applications}
+          data-testid="hero-applications"
+          data-cta="hero-applications"
           className="px-4 py-2 rounded-md bg-gray-100"
-          onClick={() => track('cta_click', { cta: 'hero-signup' })}
+          onClick={() => track('cta_click', { cta: 'hero-applications' })}
         >
-          Sign up
+          My applications
         </Link>
       </div>
     </section>

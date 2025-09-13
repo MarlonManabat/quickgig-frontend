@@ -17,7 +17,8 @@ export default function AppHeader() {
   const links = NAV_ITEMS.filter(item => !(user && item.key === 'login')).map(item => ({
     href: item.to,
     label: item.label,
-    testId: item.idDesktop,
+    testIdDesktop: item.idDesktop,
+    testIdMobile: item.idMobile,
   }));
   if (user) {
     if (isAdmin(user.email)) {
@@ -45,9 +46,9 @@ export default function AppHeader() {
             {links.map(link =>
               link.href ? (
                 <Link
-                  key={link.testId}
-                  data-testid={link.testId}
-                  data-cta={link.testId}
+                  key={link.testIdDesktop}
+                  data-testid={link.testIdDesktop}
+                  data-cta={link.testIdDesktop}
                   href={link.href}
                   prefetch={false}
                 >
@@ -55,9 +56,9 @@ export default function AppHeader() {
                 </Link>
               ) : (
                 <button
-                  key={link.testId}
-                  data-testid={link.testId}
-                  data-cta={link.testId}
+                  key={link.testIdDesktop}
+                  data-testid={link.testIdDesktop}
+                  data-cta={link.testIdDesktop}
                   onClick={link.onClick}
                   className="underline"
                 >
@@ -99,9 +100,9 @@ export default function AppHeader() {
             {links.map(link =>
               link.href ? (
                 <Link
-                  key={link.testId}
-                  data-testid={link.testId}
-                  data-cta={link.testId}
+                  key={link.testIdMobile}
+                  data-testid={link.testIdMobile}
+                  data-cta={link.testIdMobile}
                   href={link.href}
                   prefetch={false}
                   onClick={() => setOpen(false)}
@@ -111,9 +112,9 @@ export default function AppHeader() {
                 </Link>
               ) : (
                 <button
-                  key={link.testId}
-                  data-testid={link.testId}
-                  data-cta={link.testId}
+                  key={link.testIdMobile}
+                  data-testid={link.testIdMobile}
+                  data-cta={link.testIdMobile}
                   onClick={() => {
                     setOpen(false);
                     link.onClick();

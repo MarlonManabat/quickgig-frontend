@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 const HREFS: Record<string, string> = {
-  'nav-browse-jobs': '/browse-jobs',
-  'nav-post-job': '/login?next=/post-job',
-  'nav-my-applications': '/login?next=/applications',
-  'nav-tickets': '/login?next=/tickets',
-  'nav-login': '/login?next=/browse-jobs',
+  'nav-browse-jobs-header': '/browse-jobs',
+  'nav-post-job-header': '/login?next=/gigs/create',
+  'nav-my-applications-header': '/login?next=/applications',
+  'nav-tickets-header': '/login?next=/tickets',
+  'nav-login-header': '/login?next=/browse-jobs',
   'hero-start': '/browse-jobs',
-  'hero-post': '/login?next=/post-job',
-  'hero-signup': '/signup',
+  'hero-post-job': '/login?next=/gigs/create',
+  'hero-applications': '/login?next=/applications',
 };
 
 test('header/hero CTAs use canonical hrefs', async ({ page }) => {

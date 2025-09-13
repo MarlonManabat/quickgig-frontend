@@ -24,7 +24,7 @@ test('My Applications is auth-gated', async ({ page }) => {
 });
 
 test('Post a Job placeholder', async ({ page }) => {
-  await page.goto('/post-job');
+  await page.goto('/gigs/create');
   await expect(page.getByTestId('post-job-skeleton')).toBeVisible();
 });
 
@@ -32,7 +32,7 @@ test('Header/nav is wired', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await openMobileMenu(page);
-  for (const id of ['nav-browse-jobs', 'nav-login', 'nav-my-applications', 'nav-post-job']) {
+  for (const id of ['nav-browse-jobs-menu', 'nav-login-menu', 'nav-my-applications-menu', 'nav-post-job-menu']) {
     await expect(page.getByTestId(id)).toBeVisible();
   }
 });
@@ -43,5 +43,6 @@ test('Landing CTAs route correctly', async ({ page }) => {
     'href',
     /\/search\?intent=worker$/
   );
-  await expect(page.getByTestId('hero-post-job')).toHaveAttribute('href', /\/post-job$/);
+  await expect(page.getByTestId('hero-post-job')).toHaveAttribute('href', /\/gigs\/create$/);
+  await expect(page.getByTestId('hero-applications')).toHaveAttribute('href', /\/applications$/);
 });

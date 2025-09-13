@@ -37,24 +37,24 @@ export default function LandingCTAs({
       )}
       {showPost && (
         <Link
-          data-testid="hero-post"
-          data-cta="hero-post"
+          data-testid="hero-post-job"
+          data-cta="hero-post-job"
           href={ROUTES.postJob}
           className={postClassName}
-          onClick={() => track('cta_click', { cta: 'hero-post' })}
+          onClick={() => track('cta_click', { cta: 'hero-post-job' })}
         >
           Post a job
         </Link>
       )}
       {showSignup && (
         <Link
-          data-testid="hero-signup"
-          data-cta="hero-signup"
-          href={ROUTES.signup}
+          data-testid="hero-applications"
+          data-cta="hero-applications"
+          href={ROUTES.applications}
           className={signupClassName}
-          onClick={() => track('cta_click', { cta: 'hero-signup' })}
+          onClick={() => track('cta_click', { cta: 'hero-applications' })}
         >
-          Sign up
+          My applications
         </Link>
       )}
     </div>

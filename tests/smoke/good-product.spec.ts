@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref } from './_helpers';
+import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref, expectToBeOnRoute } from './_helpers';
 
 const viewports = [
   { name: 'mobile', width: 390, height: 844 },
@@ -13,15 +13,18 @@ for (const vp of viewports) {
     test('good product smoke', async ({ page }) => {
       await page.goto('/');
 
-      const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
+      const ctas = vp.name === 'desktop'
+        ? ['nav-browse-jobs-header','nav-post-job-header','nav-my-applications-header','nav-tickets-header']
+        : ['nav-browse-jobs-menu','nav-post-job-menu','nav-my-applications-menu','nav-tickets-menu'];
       for (const id of ctas) {
         const el = page.getByTestId(id).first();
         await expect(el).toBeVisible();
         await expect(await el.getAttribute('data-cta')).toBe(id);
       }
 
-      await page.getByTestId('nav-browse-jobs').locator(':visible').first().click();
-      await expect(page).toHaveURL(/\/browse-jobs/);
+      const browseId = vp.name === 'desktop' ? 'nav-browse-jobs-header' : 'nav-browse-jobs-menu';
+      await page.getByTestId(browseId).locator(':visible').first().click();
+      await expectToBeOnRoute(page, '/browse-jobs');
       // Tolerate empty state in preview. Prefer cards if present.
       const list = page.getByTestId('jobs-list');
       const listExists = (await list.count()) > 0;
@@ -37,21 +40,24 @@ for (const vp of viewports) {
       }
 
       {
-        const cta = page.getByTestId('nav-post-job').locator(':visible').first();
-        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/post-job$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/post-job$/);
+        const id = vp.name === 'desktop' ? 'nav-post-job-header' : 'nav-post-job-menu';
+        const cta = page.getByTestId(id).locator(':visible').first();
+        const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/gigs\/create$/);
+        if (navigated) await expectAuthAwareRedirect(page, /\/gigs\/create$/);
       }
 
       await page.goto('/');
       {
-        const cta = page.getByTestId('nav-my-applications').locator(':visible').first();
+        const id = vp.name === 'desktop' ? 'nav-my-applications-header' : 'nav-my-applications-menu';
+        const cta = page.getByTestId(id).locator(':visible').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
         if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
       }
 
       await page.goto('/');
       {
-        const cta = page.getByTestId('nav-tickets').locator(':visible').first();
+        const id = vp.name === 'desktop' ? 'nav-tickets-header' : 'nav-tickets-menu';
+        const cta = page.getByTestId(id).locator(':visible').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);
         if (navigated) {
           const buy = page.getByTestId('buy-tickets');

@@ -1,35 +1,19 @@
 import { expect, Locator } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-// Common destinations
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export const loginRe = /\/login(\?.*)?$/;
 export const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;
 
-/**
- * Some CI/preview runs kick off PKCE then the browser navigates to
- * chrome-error://chromewebdata/ before the final hop is reachable.
- * Treat the flow as successful if we saw the PKCE start request,
- * and only assert the final URL when the page didn't crash to chrome-error.
- */
-export async function expectAuthAwareRedirect(
-  page: Page,
-  dest: RegExp,
-  timeout = 8000
-) {
-  // Wait for our auth start *request* to fire.
-  const pkceHit = await page
-    .waitForRequest((r) => pkceStartRe.test(r.url()), { timeout })
-    .then(() => true)
-    .catch(() => false);
+export async function expectToBeOnRoute(page: Page, path: string, timeout = 8000) {
+  const pathRe = `(?:https?:\/\/[^\/]+)?${escapeRe(path)}$`;
+  await expect(page).toHaveURL(new RegExp(pathRe), { timeout });
+}
 
-  // Try to match the final URL, but ignore if Chrome crashed to the special page.
-  const crashed = page.url().startsWith('chrome-error://');
-  if (!crashed) {
-    // Give it another shot in case PKCE fired just before we awaited URL.
-    await expect(page).toHaveURL(dest, { timeout });
-  } else {
-    expect(pkceHit).toBeTruthy();
-  }
+export async function expectAuthAwareRedirect(page: Page, re: RegExp, timeout = 8000) {
+  const pathRe = `(?:https?:\/\/[^\/]+)?${re.source}`;
+  await expect(page).toHaveURL(new RegExp(pathRe), { timeout });
 }
 
 /** Ensure mobile drawer is open so nav items are visible */

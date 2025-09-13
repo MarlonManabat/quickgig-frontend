@@ -6,13 +6,13 @@ const BASES = (process.env.BASE_URLS || "https://quickgig.ph,https://app.quickgi
 
 const CTAS = [
   ["/",  'data-cta="hero-start"',           "/browse-jobs"],
-  ["/",  'data-cta="hero-post"',           "/login?next=/post-job"],
-  ["/",  'data-cta="hero-signup"',         "/signup"],
-  ["/",  'data-cta="nav-browse-jobs"',      "/browse-jobs"],
-  ["/",  'data-cta="nav-post-job"',         "/login?next=/post-job"],
-  ["/",  'data-cta="nav-my-applications"',  "/login?next=/applications"],
-  ["/",  'data-cta="nav-tickets"',          "/login?next=/tickets"],
-  ["/",  'data-cta="nav-login"',            "/login?next=/browse-jobs"],
+  ["/",  'data-cta="hero-post-job"',        "/login?next=/gigs/create"],
+  ["/",  'data-cta="hero-applications"',    "/login?next=/applications"],
+  ["/",  'data-cta="nav-browse-jobs-header"',      "/browse-jobs"],
+  ["/",  'data-cta="nav-post-job-header"',         "/login?next=/gigs/create"],
+  ["/",  'data-cta="nav-my-applications-header"',  "/login?next=/applications"],
+  ["/",  'data-cta="nav-tickets-header"',          "/login?next=/tickets"],
+  ["/",  'data-cta="nav-login-header"',            "/login?next=/browse-jobs"],
 ];
 
 async function finalStatus(base, href) {
