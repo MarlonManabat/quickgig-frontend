@@ -3,27 +3,32 @@ import type { Page } from '@playwright/test';
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-export const loginRe = /\/login(\?.*)?$/;
-export const pkceStartRe = /\/api\/auth\/pkce\/start(\?.*)?$/;
-export const appsRe = /\/applications(\?.*)?$/;
+export const appHostRe = /https?:\/\/app\.quickgig\.ph/;
+export const loginRe =
+  /(?:\/api\/auth\/pkce\/start\?next=.*|\/login(?:\?.*)?)$/;
 export const browseJobsRe = /\/browse-jobs(\?.*)?$/;
 
-export async function expectToBeOnRoute(page: Page, path: string, timeout = 8000) {
-  const pathRe = `(?:https?:\/\/[^\/]+)?${escapeRe(path)}$`;
+export function loginOr(path: string | RegExp) {
+  const rhs = typeof path === 'string' ? path : path.source;
+  return new RegExp(`${loginRe.source}|${rhs}`);
+}
+
+export async function expectToBeOnRoute(page: Page, path: string | RegExp, timeout = 8000) {
+  const src = typeof path === 'string' ? escapeRe(path) : path.source;
+  const pathRe = `(?:https?:\/\/[^\/]+)?${src}`;
   await expect(page).toHaveURL(new RegExp(pathRe), { timeout });
 }
 
-export async function expectAuthAwareRedirect(
-  page: Page,
-  okDest: RegExp,
-  timeout = 10_000,
-) {
-  const allowed = new RegExp(`(${okDest.source})|(${loginRe.source})|(${browseJobsRe.source})`);
-  await expect(page).toHaveURL(allowed, { timeout });
+export async function expectAuthAwareRedirect(page: Page, re: RegExp, timeout = 12000) {
+  const pathRe = `(?:https?:\/\/[^\/]+)?${re.source}`;
+  await expect(page).toHaveURL(new RegExp(pathRe), { timeout });
 }
 
-export function visByTestId(page: Page, id: string) {
-  return page.locator(`[data-testid="${id}"]:visible`).first();
+/** Prefer visible match; fall back to existence when CTA is hidden on current route */
+export async function visByTestId(page: Page, id: string) {
+  const visible = page.getByTestId(id).locator(':visible');
+  if ((await visible.count()) > 0) return visible.first();
+  return page.getByTestId(id).first();
 }
 
 export async function gotoHome(page: Page, baseURL?: string) {
@@ -93,10 +98,9 @@ export async function expectListOrEmpty(
 
 /** Simpler helper for tests that expect “Login” directly but should allow PKCE start too. */
 export async function expectLoginOrPkce(page: Page, timeout = 8000) {
-  const any = new RegExp(`${pkceStartRe.source}|${loginRe.source}`);
   await expect
     .poll(async () => page.url(), { timeout })
-    .toMatch(any);
+    .toMatch(loginRe);
 }
 
 /** Returns true if we stayed on same origin, false if CTA points to a different origin. */

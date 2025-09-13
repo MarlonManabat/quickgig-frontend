@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-01-02 — Tolerant login redirect & hidden CTA fallback
+- Broadened login regex and helper to accept PKCE start and `/login`.
+- `visByTestId` falls back when the current-route CTA is hidden; nav smoke no longer requires Browse Jobs link on `/browse-jobs`.
+- Landing tests accept `/` → `/browse-jobs` redirect.
+
 ## 2026-01-01 — Stabilize smoke helpers for fixed snapshot
 - Smoke tests now use `visByTestId` to target visible nav links and tolerate `/browse-jobs` fallbacks.
 - `expectAuthAwareRedirect` accepts login or browse redirects; hero checks skipped when landing redirects.

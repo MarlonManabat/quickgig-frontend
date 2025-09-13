@@ -4,7 +4,7 @@ import { expectAuthAwareRedirect, visByTestId } from './_helpers';
 test('Post Job › auth-aware publish flow', async ({ page }) => {
   await page.goto('/');
   // open Post Job; in CI this may redirect to login
-  await visByTestId(page, 'nav-post-job').click();
+  await (await visByTestId(page, 'nav-post-job')).click();
   // Accept canonical (/gigs/create), legacy (/post-job), or absolute app host link
   const destRe = /(\/gigs\/create\/?$)|(\/post-job\/?$)|(https?:\/\/app\.quickgig\.ph\/post-job\/?$)/;
   await expectAuthAwareRedirect(page, destRe);

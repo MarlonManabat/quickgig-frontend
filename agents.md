@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-01-01
+**Version:** 2026-01-02
 
 ## Routes & CTAs (source of truth)
 - Use `ROUTES` constants for all navigational links (no raw string paths).
@@ -49,7 +49,8 @@
 - `clickIfSameOriginOrAssertHref(page, cta, path)` clicks CTAs only when on the same origin, otherwise asserts their href path.
 - Smoke tests avoid cross-origin navigation in CI; external links are validated by path only.
 - `visByTestId(page, id)` selects the first visible element for a test ID to avoid duplicate ID conflicts.
-- `expectAuthAwareRedirect(page, okDest)` now tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
+- `visByTestId(page, id)` falls back to the first match when the CTA is hidden on the current route.
+- `expectAuthAwareRedirect(page, okDest)` matches absolute or relative URLs and tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
 - `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent.
 
 ## CI guardrails

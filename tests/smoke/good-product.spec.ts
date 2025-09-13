@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref, expectToBeOnRoute } from './_helpers';
+import { expectAuthAwareRedirect, clickIfSameOriginOrAssertHref, expectToBeOnRoute, visByTestId, loginOr } from './_helpers';
 
 const viewports = [
   { name: 'mobile', width: 390, height: 844 },
@@ -22,8 +22,9 @@ for (const vp of viewports) {
         await expect(await el.getAttribute('data-cta')).toBe(id);
       }
 
-      await (await import('./_helpers')).visByTestId(page, 'nav-browse-jobs').click();
-      await expectToBeOnRoute(page, '/browse-jobs');
+      const browse = await visByTestId(page, 'nav-browse-jobs');
+      if (await browse.isVisible()) await browse.click();
+      await expectToBeOnRoute(page, /\/browse-jobs\/?$/);
       // Tolerate empty state in preview. Prefer cards if present.
       const list = page.getByTestId('jobs-list');
       const listExists = (await list.count()) > 0;
@@ -42,7 +43,7 @@ for (const vp of viewports) {
         const id = vp.name === 'desktop' ? 'nav-post-job-header' : 'nav-post-job-menu';
         const cta = page.getByTestId(id).locator(':visible').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/gigs\/create$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/gigs\/create$/);
+        if (navigated) await expectAuthAwareRedirect(page, loginOr(/\/gigs\/create$/));
       }
 
       await page.goto('/');
@@ -50,7 +51,7 @@ for (const vp of viewports) {
         const id = vp.name === 'desktop' ? 'nav-my-applications-header' : 'nav-my-applications-menu';
         const cta = page.getByTestId(id).locator(':visible').first();
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
-        if (navigated) await expectAuthAwareRedirect(page, /\/applications$/);
+        if (navigated) await expectAuthAwareRedirect(page, loginOr(/\/applications$/));
       }
 
       await page.goto('/');

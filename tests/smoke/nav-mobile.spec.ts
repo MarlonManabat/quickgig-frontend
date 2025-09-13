@@ -1,23 +1,23 @@
 import { test, expect } from '@playwright/test';
-import { openMobileMenu, expectAuthAwareRedirect, loginRe, expectToBeOnRoute, visByTestId } from './_helpers';
+import { openMobileMenu, expectAuthAwareRedirect, loginRe, expectToBeOnRoute, visByTestId, loginOr } from './_helpers';
 
 test('mobile header CTAs › Login', async ({ page }) => {
   await page.goto('/');
   await openMobileMenu(page);
-  await visByTestId(page, 'nav-login').click();
+  await (await visByTestId(page, 'nav-login')).click();
   await expectAuthAwareRedirect(page, loginRe);
 });
 
 test('mobile header CTAs › Browse Jobs', async ({ page }) => {
   await page.goto('/');
   await openMobileMenu(page);
-  await visByTestId(page, 'nav-browse-jobs').click();
+  await (await visByTestId(page, 'nav-browse-jobs')).click();
   await expectToBeOnRoute(page, '/browse-jobs');
 });
 
 test('mobile header CTAs › My Applications (auth-aware)', async ({ page }) => {
   await page.goto('/');
   await openMobileMenu(page);
-  await visByTestId(page, 'nav-my-applications').click();
-  await expectAuthAwareRedirect(page, /\/applications\/?$/);
+  await (await visByTestId(page, 'nav-my-applications')).click();
+  await expectAuthAwareRedirect(page, loginOr(/\/applications\/?$/));
 });
