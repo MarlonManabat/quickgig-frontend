@@ -1,19 +1,13 @@
-'use client';
-import Link from 'next/link';
+import Link from "next/link";
 
-export default function HomePage() {
+export default function Landing() {
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-semibold mb-4">QuickGig</h1>
-      <p className="mb-6">Find gigs fast. This landing intentionally renders a 200 in CI.</p>
-      <button
-        data-testid="hero-start"
-        className="px-4 py-2 border rounded"
-        onClick={() => (window.location.href = '/browse-jobs')}
-      >
-        Start browsing
-      </button>
-    </main>
+    <section>
+      <h1>Find flexible work fast</h1>
+      <p>Welcome to QuickGig.</p>
+      <div className="mt-4 flex gap-3">
+        <Link href="/browse-jobs" data-testid="hero-start">Start browsing</Link>
+      </div>
+    </section>
   );
 }
-
