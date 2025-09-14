@@ -435,3 +435,7 @@ Outcome: `npm ci` is deterministic across local + CI; wrong Node fails fast with
 - Legacy `/post-job` now redirects to `/gigs/create`; `/find` continues to normalize to `/browse-jobs`.
 - Added `scripts/seed-demo.mjs` and core smoke suite (`tests/smoke/core.spec.ts`) covering browse, apply redirects, auth gates, nav, and landing CTAs.
 - PR smoke workflow seeds demo data and runs smoke tests on Node 20.
+
+## 2026-09-15 – Nav menu test IDs
+- Mobile drawer links use `-menu` suffixed test IDs (e.g., `nav-browse-jobs-menu`) to avoid strict-mode collisions.
+- Browse Jobs page exposes `jobs-list` or `empty-state` for smoke flexibility.

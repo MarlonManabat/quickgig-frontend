@@ -11,7 +11,8 @@
 
 ## 2025-09-06
 - Auth-aware redirects in CI: unauthenticated CTA clicks redirect to `/login?next=<path>`.
-- Header nav testids used by smoke: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`.
+- Header nav testids used by smoke: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login` (desktop)
+- Mobile drawer duplicates use `-menu` test IDs (e.g., `nav-browse-jobs-menu`).
 - Mobile menu button testid: `nav-menu-button` (open menu before asserting mobile links).
 - Sitemap expectations: include `/browse-jobs` on the main host; also allow/expect base entries for `https://quickgig.ph/` and `https://app.quickgig.ph/`.
 - Helpers referenced by tests: `expectAuthAwareRedirect(page, dest, timeout=8000)`.
@@ -58,7 +59,7 @@
 **Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
 **Mobile menu button:** `nav-menu-button`
 **Mobile menu container:** `nav-menu`
-**Mobile menu items:** `navm-browse-jobs`, `navm-post-job`, `navm-my-applications`, `navm-tickets`, `navm-login`
+**Mobile menu items:** `nav-browse-jobs-menu`, `nav-post-job-menu`, `nav-my-applications-menu`, `nav-tickets-menu`, `nav-login-menu`
 **Landing hero:** `hero-start`, `hero-post`, `hero-signup`
 **Applications empty CTA:** `browse-jobs-from-empty`
 

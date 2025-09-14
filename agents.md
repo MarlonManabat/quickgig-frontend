@@ -1,8 +1,9 @@
 # Agents Contract
-**Version:** 2026-09-14
+**Version:** 2026-09-15
 
 ## Routes & CTAs (source of truth)
-- Header CTAs reuse canonical IDs across desktop and mobile (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`); non-visible copies must be `display: none`.
+- Header CTAs use canonical IDs on desktop (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
+- Mobile drawer links use `-menu` suffixed IDs (e.g., `nav-browse-jobs-menu`).
 - Hero CTAs:
   - `data-testid="hero-start"` → `/browse-jobs`
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
@@ -16,9 +17,9 @@
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`
 
-- Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
+- Stable header test IDs (desktop): `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
 - Mobile drawer toggles via `openMobileMenu(page)` expanding `data-testid="nav-menu"`.
-- Mobile menu links reuse canonical `nav-*` test IDs (no `navm-*`).
+- Mobile menu links use `*-menu` test IDs (e.g., `nav-browse-jobs-menu`).
 - Landing hero IDs: `hero-start`.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
