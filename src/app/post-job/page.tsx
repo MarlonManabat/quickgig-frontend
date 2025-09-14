@@ -1,19 +1,12 @@
-export default function PostJobPlaceholderPage() {
+export default function PostJobPage() {
   return (
-    <section>
-      <h2 style={{ fontSize: 24, marginBottom: 12 }}>Post a job</h2>
-      {/* Keep wording so tests can match 'Post a job' text on this page only */}
-      <div
-        data-testid="post-job-skeleton"
-        style={{
-          border: "1px solid #e5e7eb",
-          padding: 16,
-          borderRadius: 8,
-          background: "#fafafa",
-        }}
-      >
-        Post a job placeholder
+    <main className="mx-auto max-w-3xl px-4 py-8">
+      <h1 className="text-xl font-semibold mb-4">Post a job</h1>
+      {/* Placeholder until the flow is wired */}
+      <div data-testid="post-job-skeleton" className="rounded border p-6">
+        Posting flow coming soon.
       </div>
-    </section>
+    </main>
   );
 }
+

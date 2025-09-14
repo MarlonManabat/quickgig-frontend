@@ -1,5 +1,10 @@
 <!-- AGENT CONTRACT v2025-12-16 -->
 
+## 2026-09-19
+- Header renders canonical `nav-*` test IDs across breakpoints.
+- Landing hero uses `hero-start` container with `hero-browse-cta`.
+- `/applications` remains auth-gated via middleware.
+
 ## 2026-09-18
 - Simplified header with always-visible nav links and new landing CTAs `cta-browse-jobs`, `cta-post-job`, `cta-my-applications`.
 - Auth gate for `/applications` retained in middleware.
@@ -36,8 +41,8 @@
 - CTAs include `data-cta` matching their test ID
 - Unauth flows: redirect to **/login?next=<dest>** counts as success
 - No white screens (page-level error/skeleton boundaries in gated flows)
-- Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
-- Hero CTA testids: `hero-start`, `hero-post`, `hero-signup`
+  - Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
+  - Hero CTA testids: `hero-start`, `hero-browse-cta`
 - Canonical routes: `/browse-jobs`, `/post-job`, `/applications`
 - Auth-aware: unauthenticated clicks on gated CTAs may redirect to `/login?next=<dest>`.
 
@@ -60,7 +65,7 @@
 
 ## CTA Test IDs
 **Header:** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
-**Landing hero:** `hero-start`, `hero-post`, `hero-signup`
+**Landing hero:** `hero-start`, `hero-browse-cta`
 **Applications empty CTA:** `browse-jobs-from-empty`
 
 **No duplicates:** each CTA test ID must appear at most once in the DOM.

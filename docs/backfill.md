@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-19 — Test-friendly header and hero landing
+- Replaced header with `AppHeader` exposing stable `nav-*` IDs across breakpoints.
+- Landing now renders `hero-start` with `hero-browse-cta`; `/` no longer redirects.
+- Browse Jobs shows an explicit empty state and Post Job exposes `post-job-skeleton`.
+- Middleware keeps `/applications` auth-gated via `qg_auth`.
+
 ## 2026-09-18 — Inline header and landing CTAs
 - Simplified header into layout; removed mobile nav toggle and kept canonical `nav-*` IDs.
 - Added minimal landing and placeholder pages; middleware continues gating `/applications`.

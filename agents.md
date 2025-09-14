@@ -1,9 +1,9 @@
 # Agents Contract
-**Version:** 2026-09-18
+**Version:** 2026-09-19
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
-- Landing CTAs: `cta-browse-jobs`, `cta-post-job`, `cta-my-applications`
+- Landing hero: container `hero-start` with `hero-browse-cta` linking to `/browse-jobs`.
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
 ## Auth behavior
@@ -35,7 +35,7 @@
 - `visByTestId(page, id)` selects the first visible element for a test ID to avoid duplicate ID conflicts.
 - `visByTestId(page, id)` falls back to the first match when the CTA is hidden on the current route.
 - `expectAuthAwareRedirect(page, okDest)` matches absolute or relative URLs and tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
-- `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent; current landing returns 200 with `cta-browse-jobs` CTA.
+  - `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent; current landing returns 200 with `hero-browse-cta` CTA.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`).
