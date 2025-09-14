@@ -1,8 +1,10 @@
-export default function Page() {
+export default function LoginPage() {
   return (
     <section>
-      <h1>Sign in</h1>
-      <p>Please sign in to continue. In preview/CI this is a placeholder page.</p>
+      <h2 style={{ fontSize: 24, marginBottom: 12 }}>Sign in</h2>
+      <p style={{ color: "#6b7280" }}>
+        Please sign in to continue. In preview/CI this is a placeholder page.
+      </p>
     </section>
   );
 }

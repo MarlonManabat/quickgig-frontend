@@ -1,5 +1,9 @@
 <!-- AGENT CONTRACT v2025-12-16 -->
 
+## 2026-09-18
+- Simplified header with always-visible nav links and new landing CTAs `cta-browse-jobs`, `cta-post-job`, `cta-my-applications`.
+- Auth gate for `/applications` retained in middleware.
+
 ## 2025-12-14
 - Added signup/logout routes, hero-start CTA, and per-route error/loading.
 

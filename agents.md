@@ -1,10 +1,9 @@
 # Agents Contract
-**Version:** 2026-09-17
+**Version:** 2026-09-18
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
-- Hero CTAs:
-  - `data-testid="hero-start"` → `/browse-jobs`
+- Landing CTAs: `cta-browse-jobs`, `cta-post-job`, `cta-my-applications`
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 
 ## Auth behavior
@@ -17,9 +16,7 @@
 - `/find` → `/browse-jobs`
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
-- Mobile navigation toggles via `nav-mobile-toggle`/`nav-menu` but uses the same IDs as desktop links.
-- Landing hero IDs: `hero-start`.
-  - Browse list IDs: `jobs-list`, `job-card`.
+- Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - Header smokes query `:visible` to ignore hidden duplicates; CTA href checks accept relative or absolute app URLs.
@@ -38,7 +35,7 @@
 - `visByTestId(page, id)` selects the first visible element for a test ID to avoid duplicate ID conflicts.
 - `visByTestId(page, id)` falls back to the first match when the CTA is hidden on the current route.
 - `expectAuthAwareRedirect(page, okDest)` matches absolute or relative URLs and tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
-- `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent; current landing returns 200 with a `hero-start` CTA.
+- `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent; current landing returns 200 with `cta-browse-jobs` CTA.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`).

@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-18 — Inline header and landing CTAs
+- Simplified header into layout; removed mobile nav toggle and kept canonical `nav-*` IDs.
+- Added minimal landing and placeholder pages; middleware continues gating `/applications`.
+
 ## 2026-09-17 — Toggle mobile nav & narrow middleware
 - Header extracted to a shared component with `nav-mobile-toggle` / `nav-menu` and canonical `nav-*` IDs.
 - Middleware matcher limited to `/applications` so other routes aren't intercepted.

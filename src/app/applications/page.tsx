@@ -1,9 +1,10 @@
-// When authed, this can render the list; while unauthenticated, middleware will redirect.
 export default function ApplicationsPage() {
   return (
-    <section style={{ padding: 24 }}>
-      <h1>My Applications</h1>
-      <div data-testid="applications-empty">No applications yet</div>
+    <section>
+      <h2 style={{ fontSize: 24, marginBottom: 12 }}>My Applications</h2>
+      <p data-testid="applications-empty" style={{ color: "#6b7280" }}>
+        You have no applications yet.
+      </p>
     </section>
   );
 }

@@ -1,21 +1,24 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
-  // Gate Applications for unauthenticated users; leave everything else alone
-  if (pathname.startsWith('/applications')) {
-    const authed = req.cookies.get('qg_auth')?.value === '1';
+
+  // Gate /applications unless a simple preview cookie is set
+  if (pathname.startsWith("/applications")) {
+    const authed = req.cookies.get("qg_auth")?.value === "1";
     if (!authed) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/login';
-      url.search = `?next=${encodeURIComponent(pathname + (search || ''))}`;
-      return NextResponse.redirect(url);
+      const nextUrl = req.nextUrl.clone();
+      nextUrl.pathname = "/login";
+      nextUrl.search = `?next=${encodeURIComponent(pathname + (search || ""))}`;
+      return NextResponse.redirect(nextUrl, 302);
     }
   }
+
+  // Otherwise allow through.
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/applications'],
+  // Run on all app pages we care about
+  matcher: ["/applications/:path*", "/applications"],
 };
