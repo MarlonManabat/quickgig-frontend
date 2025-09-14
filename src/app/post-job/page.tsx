@@ -1,8 +1,4 @@
-export default function Page() {
-  return (
-    <section>
-      <h1>Post a job</h1>
-      <p>Post a job placeholder</p>
-    </section>
-  );
+export default function Page(){
+  // Use different copy so getByText('Post a job') only matches the nav link
+  return <div data-testid="post-job-skeleton">Create a job (placeholder)</div>;
 }

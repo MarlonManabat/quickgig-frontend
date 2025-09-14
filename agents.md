@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-09-16
+**Version:** 2026-09-17
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
@@ -17,7 +17,7 @@
 - `/find` → `/browse-jobs`
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
-- Header links are always visible; `openMobileMenu(page)` is a no-op but may be called for compatibility.
+- Mobile navigation toggles via `nav-mobile-toggle`/`nav-menu` but uses the same IDs as desktop links.
 - Landing hero IDs: `hero-start`.
   - Browse list IDs: `jobs-list`, `job-card`.
 - Job detail ID: `apply-button`.

@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-17 — Toggle mobile nav & narrow middleware
+- Header extracted to a shared component with `nav-mobile-toggle` / `nav-menu` and canonical `nav-*` IDs.
+- Middleware matcher limited to `/applications` so other routes aren't intercepted.
+
 ## 2026-09-16 — Simplified header nav IDs
 - Header links are always visible and reuse canonical `nav-*` IDs across viewports.
 - Removed `-menu` suffixed IDs and related mobile menu expectations.
