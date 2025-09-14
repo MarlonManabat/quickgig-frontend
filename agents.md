@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-09-13
+**Version:** 2026-09-14
 
 ## Routes & CTAs (source of truth)
 - Header CTAs reuse canonical IDs across desktop and mobile (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`); non-visible copies must be `display: none`.
@@ -17,7 +17,7 @@
 - `/find` → `/browse-jobs`
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
-- Mobile drawer toggles via `openMobileMenu(page)` clicking `nav-menu-button` and waiting for `nav-menu`.
+- Mobile drawer toggles via `openMobileMenu(page)` expanding `data-testid="nav-menu"`.
 - Mobile menu links reuse canonical `nav-*` test IDs (no `navm-*`).
 - Landing hero IDs: `hero-start`.
   - Browse list IDs: `jobs-list`, `job-card`.
@@ -39,12 +39,12 @@
 - `visByTestId(page, id)` selects the first visible element for a test ID to avoid duplicate ID conflicts.
 - `visByTestId(page, id)` falls back to the first match when the CTA is hidden on the current route.
 - `expectAuthAwareRedirect(page, okDest)` matches absolute or relative URLs and tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
-- `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent.
+- `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent; current landing returns 200 with a `hero-start` CTA.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`).
 - `scripts/audit-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
-- Middleware (`src/middleware.ts`) only handles auth gating for `/applications`.
+- Middleware (`src/middleware.ts`) handles auth gating for `/applications` and short-circuits `/api/auth/pkce/*` in CI.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-12-16 -->

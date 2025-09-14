@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { expectAuthAwareRedirect, visByTestId } from './_helpers';
 
 test('Post Job › auth-aware publish flow', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/browse-jobs');
   // open Post Job; in CI this may redirect to login
   await (await visByTestId(page, 'nav-post-job')).click();
   // Accept canonical (/gigs/create), legacy (/post-job), or absolute app host link
