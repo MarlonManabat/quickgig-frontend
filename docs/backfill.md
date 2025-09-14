@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-16 — Simplified header nav IDs
+- Header links are always visible and reuse canonical `nav-*` IDs across viewports.
+- Removed `-menu` suffixed IDs and related mobile menu expectations.
+
 ## 2026-01-06 — Landing visible in CI & unified nav IDs
 - Home no longer redirects to `/browse-jobs` in CI/preview; gated by `NEXT_PUBLIC_REDIRECT_HOME_TO_BROWSE` for production.
 - Header and mobile nav reuse canonical `nav-*` test IDs; helpers now accept host-prefixed URLs.

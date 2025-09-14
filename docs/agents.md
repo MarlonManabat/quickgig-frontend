@@ -12,8 +12,7 @@
 ## 2025-09-06
 - Auth-aware redirects in CI: unauthenticated CTA clicks redirect to `/login?next=<path>`.
 - Header nav testids used by smoke: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login` (desktop)
-- Mobile drawer duplicates use `-menu` test IDs (e.g., `nav-browse-jobs-menu`).
-- Mobile menu button testid: `nav-menu-button` (open menu before asserting mobile links).
+- Nav links reuse the same IDs on all viewports (no `-menu` suffix).
 - Sitemap expectations: include `/browse-jobs` on the main host; also allow/expect base entries for `https://quickgig.ph/` and `https://app.quickgig.ph/`.
 - Helpers referenced by tests: `expectAuthAwareRedirect(page, dest, timeout=8000)`.
 
@@ -33,7 +32,7 @@
 - CTAs include `data-cta` matching their test ID
 - Unauth flows: redirect to **/login?next=<dest>** counts as success
 - No white screens (page-level error/skeleton boundaries in gated flows)
-- Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`, `nav-menu-button`
+- Header CTA testids: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
 - Hero CTA testids: `hero-start`, `hero-post`, `hero-signup`
 - Canonical routes: `/browse-jobs`, `/post-job`, `/applications`
 - Auth-aware: unauthenticated clicks on gated CTAs may redirect to `/login?next=<dest>`.
@@ -56,10 +55,7 @@
 - **/login**
 
 ## CTA Test IDs
-**Header (desktop):** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
-**Mobile menu button:** `nav-menu-button`
-**Mobile menu container:** `nav-menu`
-**Mobile menu items:** `nav-browse-jobs-menu`, `nav-post-job-menu`, `nav-my-applications-menu`, `nav-tickets-menu`, `nav-login-menu`
+**Header:** `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-tickets`, `nav-login`
 **Landing hero:** `hero-start`, `hero-post`, `hero-signup`
 **Applications empty CTA:** `browse-jobs-from-empty`
 
@@ -80,7 +76,6 @@ Landing on **/login?next=<dest>** for any auth-gated route **counts as success**
 - [ ] `npx playwright test -c playwright.smoke.ts`
 - [ ] `docs/backfill.md` updated with rationale
 - [ ] Bump this header’s date when any contract item changes
-- [ ] Mobile menu panel renders only when open; `data-testid="nav-menu"` matches the visible container
 
 ## CI Guardrails
 - `scripts/no-legacy.sh` and `scripts/audit-links.mjs`
