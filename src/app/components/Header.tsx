@@ -18,7 +18,7 @@ export default function Header() {
         </button>
         <ul className={`md:flex gap-4 ${open ? 'flex' : 'hidden md:flex'}`}>
           <li><Link href="/browse-jobs" data-testid="nav-browse-jobs">Browse jobs</Link></li>
-          <li><Link href="/post-job"    data-testid="nav-post-job">Post a job</Link></li>
+          <li><Link href="/gigs/create" data-testid="nav-post-job">Post a job</Link></li>
           <li><Link href="/applications" data-testid="nav-my-applications">My Applications</Link></li>
           <li><Link href="/login"        data-testid="nav-login">Login</Link></li>
         </ul>
