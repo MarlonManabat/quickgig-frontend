@@ -11,7 +11,7 @@ for (const vp of viewports) {
     test.use({ viewport: { width: vp.width, height: vp.height } });
 
     test('good product smoke', async ({ page }) => {
-      await page.goto('/');
+      await page.goto('/browse-jobs');
 
       const ctas = ['nav-browse-jobs','nav-post-job','nav-my-applications','nav-tickets'];
       for (const id of ctas) {
@@ -42,14 +42,14 @@ for (const vp of viewports) {
         if (navigated) await expectAuthAwareRedirect(page, loginOr(/\/gigs\/create$/));
       }
 
-      await page.goto('/');
+      await page.goto('/browse-jobs');
       {
         const cta = await visByTestId(page, 'nav-my-applications');
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/applications$/);
         if (navigated) await expectAuthAwareRedirect(page, loginOr(/\/applications$/));
       }
 
-      await page.goto('/');
+      await page.goto('/browse-jobs');
       {
         const cta = await visByTestId(page, 'nav-tickets');
         const navigated = await clickIfSameOriginOrAssertHref(page, cta, /\/tickets$/);

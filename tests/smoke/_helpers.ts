@@ -36,18 +36,29 @@ export async function gotoHome(page: Page, baseURL?: string) {
 
 /** Ensure mobile drawer is open so nav items are visible */
 export async function openMobileMenu(page: Page) {
-  // Prefer the explicit toggle if present
-  const toggle =
-    // getByTestId if available (newer Playwright), else raw locator
-    (page as any).getByTestId?.('nav-menu-button') ??
-    page.locator('[data-testid="nav-menu-button"]');
   const drawer =
     (page as any).getByTestId?.('nav-menu') ??
     page.locator('[data-testid="nav-menu"]');
 
+  // Prefer explicit toggle if present
+  const toggle =
+    (page as any).getByTestId?.('nav-menu-button') ??
+    page.locator('[data-testid="nav-menu-button"]');
   if (await toggle.first().isVisible().catch(() => false)) {
     await toggle.first().click();
     await expect(drawer).toBeVisible({ timeout: 4000 });
+    return;
+  }
+
+  // Support <details data-testid="nav-menu">
+  if (
+    await drawer
+      .first()
+      .evaluate((el: any) => el.tagName === 'DETAILS' && !(el as HTMLDetailsElement).open)
+      .catch(() => false)
+  ) {
+    await drawer.locator('summary').first().click();
+    await expect(drawer).toHaveAttribute('open', '', { timeout: 4000 });
     return;
   }
 

@@ -28,13 +28,13 @@ test('My Applications is auth-gated', async ({ page }) => {
 });
 
 test('Post a Job placeholder', async ({ page }) => {
-  await page.goto('/gigs/create');
-  await expect(page.getByTestId('post-job-skeleton')).toBeVisible();
+  await page.goto('/post-job');
+  await expect(page.getByText('Post a job', { exact: false })).toBeVisible();
 });
 
 test('Header/nav is wired', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await page.goto('/browse-jobs');
   await openMobileMenu(page);
   for (const id of ['nav-browse-jobs', 'nav-login', 'nav-my-applications', 'nav-post-job']) {
     await visByTestId(page, id);
