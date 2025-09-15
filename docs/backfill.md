@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-21 — Redirect home and static header
+- Home now redirects to `/browse-jobs` which hosts the `hero-start` CTA.
+- Header always shows `nav-*` links (Login and My Applications present simultaneously).
+- Removed `(app)` duplicates for Applications and Browse Jobs to resolve Next.js build error.
+- Middleware continues to gate `/applications` for unauthenticated users.
+
 ## 2026-09-20 — Auth-aware header & simple placeholders
 - Header reads `qg_auth` cookie to toggle `nav-login` vs `nav-my-applications` and links Post a job to `/gigs/create`.
 - Landing hero keeps `hero-start` with `cta-browse-jobs`.

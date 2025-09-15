@@ -1,11 +1,11 @@
 # Agents Contract
-**Version:** 2026-09-20
+**Version:** 2026-09-21
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
-- Landing hero: container `hero-start` with `cta-browse-jobs` linking to `/browse-jobs`.
+- Home (`/`) redirects to `/browse-jobs`, which renders a hero CTA `hero-start` linking to `/browse-jobs`.
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
-- Header swaps Login for My Applications when `qg_auth=1` cookie is present.
+- Header shows Login and My Applications links unconditionally.
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST redirect to `/login?next=<dest>`.
