@@ -1,3 +1,5 @@
+import { hostAware } from '@/lib/hostAware';
+
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-5xl p-6">
@@ -14,6 +16,26 @@ export default function HomePage() {
         >
           Browse jobs
         </a>
+
+        {/* App CTAs that should open on the App Host (absolute when configured) */}
+        <div className="mt-8 flex gap-4">
+          <a
+            data-testid="app-cta-post-job"
+            className="underline"
+            href={hostAware('/gigs/create')}
+            rel="noopener"
+          >
+            Post a job
+          </a>
+          <a
+            data-testid="app-cta-my-applications"
+            className="underline"
+            href={hostAware('/applications')}
+            rel="noopener"
+          >
+            My Applications
+          </a>
+        </div>
       </section>
     </main>
   );
