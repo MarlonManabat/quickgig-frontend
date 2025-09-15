@@ -29,5 +29,7 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/applications/:path*", "/my-applications/:path*"],
+  // Both /applications and /my-applications are auth-gated. Keep gating at the Edge
+  // so unauthenticated users are redirected before any page renders.
+  matcher: ["/applications/:path*", "/my-applications"],
 };

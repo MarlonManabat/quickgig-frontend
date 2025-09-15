@@ -1,77 +1,64 @@
-// Server component that fails soft when API is not configured.
-import type { Metadata } from 'next';
+import 'server-only';
 
 type Job = {
-  id: string | number;
+  id: number | string;
   title: string;
-  company?: string;
+  company: string;
   location?: string;
-  url?: string;
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-async function fetchJobs(): Promise<Job[]> {
-  if (!API_BASE) {
+async function fetchJobs(
+  page = 1
+): Promise<{ jobs: Job[]; nextPage: number | null }> {
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL;
+  // CI/Smoke environments may not set the real API.
+  // Degrade gracefully so smoke can assert the empty state.
+  if (!base) {
     console.warn(
-      '[BrowseJobs] NEXT_PUBLIC_API_BASE_URL is not set; rendering empty state.',
+      'NEXT_PUBLIC_API_BASE_URL not set; returning empty jobs for CI/smoke.'
     );
-    return [];
+    return { jobs: [], nextPage: null };
   }
   try {
-    const res = await fetch(`${API_BASE}/jobs`, {
-      // Avoid caching in CI to reduce flakiness
+    const res = await fetch(`${base.replace(/\/$/, '')}/jobs?page=${page}`, {
       cache: 'no-store',
     });
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    const data = await res.json();
-    // Accept either {jobs: Job[]} or Job[]
-    return Array.isArray(data) ? data : Array.isArray(data.jobs) ? data.jobs : [];
+    if (!res.ok) throw new Error(String(res.status));
+    return res.json();
   } catch (err) {
-    console.error('[BrowseJobs] failed to load jobs:', err);
-    return [];
+    console.warn('Failed to load jobs, rendering empty state.', err);
+    return { jobs: [], nextPage: null };
   }
 }
 
-export const metadata: Metadata = {
-  title: 'Browse Jobs • QuickGig',
-};
-
 export default async function BrowseJobsPage() {
-  const jobs = await fetchJobs();
-
-  if (!jobs.length) {
+  const { jobs } = await fetchJobs();
+  if (!jobs || jobs.length === 0) {
     return (
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-semibold mb-4">Browse Jobs</h1>
-        <div
-          data-testid="jobs-empty-state"
-          className="rounded-lg border p-8 text-center text-gray-500"
-        >
-          No jobs yet. Please check back later.
-        </div>
-      </main>
+      <div
+        data-testid="jobs-empty-state"
+        className="p-6 text-center text-slate-500"
+      >
+        No jobs yet — check back soon.
+      </div>
     );
   }
-
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-4">Browse Jobs</h1>
-      <ul data-testid="jobs-list" className="grid gap-4 md:grid-cols-2">
-        {jobs.map((j) => (
-          <li key={String(j.id)} className="rounded-lg border p-4">
-            <a
-              className="block"
-              href={`/browse-jobs/${encodeURIComponent(String(j.id))}`}
-            >
-              <div className="text-lg font-medium">{j.title}</div>
-              {j.company ? <div className="text-sm text-gray-500">{j.company}</div> : null}
-              {j.location ? <div className="text-sm text-gray-500">{j.location}</div> : null}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </main>
+    <ul className="divide-y" data-testid="jobs-list">
+      {jobs.map((j) => (
+        <li key={String(j.id)} className="p-4" data-testid="job-card">
+          <a href={`/browse-jobs/${encodeURIComponent(String(j.id))}`}>
+            <div className="font-medium">{j.title}</div>
+            {j.company ? (
+              <div className="text-slate-500">{j.company}</div>
+            ) : null}
+            {j.location ? (
+              <div className="text-slate-500">{j.location}</div>
+            ) : null}
+          </a>
+        </li>
+      ))}
+    </ul>
   );
 }
 

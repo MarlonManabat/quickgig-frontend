@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-09-24
+**Version:** 2026-09-25
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
