@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { hostAware } from '@/lib/hostAware';
 
 type JobDetail = {
@@ -29,16 +30,20 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     return (
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-semibold mb-2">Job not found</h1>
-        <a className="underline" href="/browse-jobs">Back to jobs</a>
+        <Link className="underline" href="/browse-jobs">
+          Back to jobs
+        </Link>
       </main>
     );
   }
 
-  // Build an auth-aware Apply link that preserves the return path after login
+  // Build an auth-aware Apply link:
+  // • If the job has a direct applyUrl, target it (respect absolute/relative via hostAware).
+  // • Otherwise, fall back to /login?next=<returnTo> on the configured APP host.
   const returnTo = `/browse-jobs/${encodeURIComponent(String(job.id))}`;
   const applyHref = job.applyUrl
     ? hostAware(job.applyUrl)
-    : `/login?next=${encodeURIComponent(returnTo)}`;
+    : hostAware(`/login?next=${encodeURIComponent(returnTo)}`);
 
   return (
     <main className="container mx-auto px-4 py-8">

@@ -1,14 +1,19 @@
-const APP_HOST = process.env.NEXT_PUBLIC_APP_HOST_BASE_URL || process.env.NEXT_PUBLIC_APP_BASE_URL;
-/**
- * Builds an absolute URL to the App Host when configured, else returns the given path.
- * Examples:
- *   hostAware('/gigs/create') -> 'https://app.example.com/gigs/create' | '/gigs/create'
- */
-export function hostAware(path: string) {
-  if (!APP_HOST) return path;
+// Build an absolute, host-aware URL when an app host is configured.
+// - Absolute inputs are returned unchanged.
+// - Relative inputs are prefixed with NEXT_PUBLIC_APP_HOST (or NEXT_PUBLIC_HOST_BASE_URL).
+export function hostAware(urlOrPath: string): string {
+  const base =
+    process.env.NEXT_PUBLIC_APP_HOST ?? process.env.NEXT_PUBLIC_HOST_BASE_URL;
+  if (!base) return urlOrPath;
+  // Absolute already? leave untouched
   try {
-    return new URL(path, APP_HOST).toString();
+    // eslint-disable-next-line no-new
+    new URL(urlOrPath);
+    return urlOrPath;
   } catch {
-    return path;
+    const root = base.replace(/\/$/, "");
+    const path = urlOrPath.startsWith("/") ? urlOrPath : `/${urlOrPath}`;
+    return `${root}${path}`;
   }
 }
+
