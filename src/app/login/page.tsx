@@ -1,8 +1,10 @@
-export default function Page() {
+export default function LoginPage() {
   return (
-    <section>
-      <h1 className="text-2xl font-semibold">Sign in</h1>
-      <p className="text-sm mt-2">Please sign in to continue. In preview/CI this is a placeholder page.</p>
-    </section>
+    <main className="mx-auto max-w-4xl p-6">
+      <h1 className="text-2xl font-semibold">Login</h1>
+      <p className="mt-2 text-sm text-gray-600">
+        This is a placeholder login page.
+      </p>
+    </main>
   );
 }

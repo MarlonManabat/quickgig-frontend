@@ -1,15 +1,15 @@
 # Agents Contract
-**Version:** 2026-09-21
+**Version:** 2026-09-23
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
-- Home (`/`) redirects to `/browse-jobs`, which renders a hero CTA `hero-start` linking to `/browse-jobs`.
+- Home (`/`) renders a hero CTA `hero-start` linking to `/browse-jobs`.
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 - Header shows Login and My Applications links unconditionally.
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST redirect to `/login?next=<dest>`.
-- Auth-gated routes: `/applications`.
+- Auth-gated routes: `/applications` and `/my-applications`.
 - Middleware redirects unauthenticated `/applications` requests to `/login?next=…` using a single Edge-safe redirect.
 
 ## Legacy redirects (middleware)

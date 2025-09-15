@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-23 — Hero landing and auth-aware applications
+- Home now renders a hero with `hero-start` linking to `/browse-jobs`.
+- Added `/my-applications` page that redirects unauthenticated users to `/login?next=/my-applications`.
+- Inlined header with canonical `nav-*` IDs and set `metadataBase`.
+- Browse Jobs list always renders `jobs-list` container even when empty.
+
 ## 2026-09-22 — Browse jobs API integration
 - `/browse-jobs` now fetches real jobs with pagination and empty-state fallback.
 - Added `/browse-jobs/[id]` detail page with auth-aware Apply CTA.
