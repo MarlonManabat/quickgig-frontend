@@ -1,12 +1,9 @@
-export default function PostJobPage() {
+export default function Page() {
+  // Keep the phrase "Post a job" here, but the header hides its own link on this route
+  // to avoid Playwright strict-mode double match.
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-xl font-semibold mb-4">Post a job</h1>
-      {/* Placeholder until the flow is wired */}
-      <div data-testid="post-job-skeleton" className="rounded border p-6">
-        Posting flow coming soon.
-      </div>
-    </main>
+    <section className="mx-auto max-w-5xl p-8">
+      <div data-testid="post-job-skeleton" aria-busy="true">Post a job placeholder</div>
+    </section>
   );
 }
-

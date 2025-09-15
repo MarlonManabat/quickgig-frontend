@@ -1,15 +1,24 @@
-import type { Metadata } from "next";
-import AppHeader from "@/components/AppHeader";
-import "./globals.css";
+import type { ReactNode } from 'react';
+import './globals.css';
+import Header from '@/components/Header';
 
-export const metadata: Metadata = { title: "QuickGig" };
+export const metadata = {
+  // Quiets Next metadataBase warning in CI; falls back to local dev URL.
+  metadataBase: (() => {
+    try {
+      return new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:4010');
+    } catch {
+      return new URL('http://localhost:4010');
+    }
+  })(),
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <AppHeader />
-        <main className="mx-auto max-w-6xl p-4">{children}</main>
+        <Header />
+        <main>{children}</main>
       </body>
     </html>
   );

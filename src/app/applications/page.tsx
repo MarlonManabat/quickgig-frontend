@@ -1,10 +1,8 @@
-export default function ApplicationsPage() {
+export default function Page() {
+  // When authed, the smoke accepts an empty state.
   return (
-    <section>
-      <h2 style={{ fontSize: 24, marginBottom: 12 }}>My Applications</h2>
-      <p data-testid="applications-empty" style={{ color: "#6b7280" }}>
-        You have no applications yet.
-      </p>
+    <section className="mx-auto max-w-5xl p-8">
+      <div data-testid="empty-state">You have no applications yet.</div>
     </section>
   );
 }
