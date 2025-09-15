@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-22 — Browse jobs API integration
+- `/browse-jobs` now fetches real jobs with pagination and empty-state fallback.
+- Added `/browse-jobs/[id]` detail page with auth-aware Apply CTA.
+
 ## 2026-09-21 — Redirect home and static header
 - Home now redirects to `/browse-jobs` which hosts the `hero-start` CTA.
 - Header always shows `nav-*` links (Login and My Applications present simultaneously).
