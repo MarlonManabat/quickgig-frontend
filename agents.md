@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-09-23
+**Version:** 2026-09-24
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
@@ -10,13 +10,13 @@
 ## Auth behavior
 - If signed out, clicking either CTA MUST redirect to `/login?next=<dest>`.
 - Auth-gated routes: `/applications` and `/my-applications`.
-- Middleware redirects unauthenticated `/applications` requests to `/login?next=…` using a single Edge-safe redirect.
+- Middleware redirects unauthenticated `/applications` or `/my-applications` requests to `/login?next=…` using a single Edge-safe redirect.
 
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
-- Browse list IDs: `jobs-list`, `job-card`.
+- Browse list IDs: `jobs-list`, `job-card`; empty state `jobs-empty-state`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - Header smokes query `:visible` to ignore hidden duplicates; CTA href checks accept relative or absolute app URLs.
@@ -40,7 +40,7 @@
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`).
 - `scripts/audit-links.mjs` ensures CTAs point only to canonical routes and accepts auth redirects.
-- Middleware (`src/middleware.ts`) handles auth gating for `/applications` and short-circuits `/api/auth/pkce/*` in CI.
+- Middleware (`src/middleware.ts`) handles auth gating for `/applications` and `/my-applications` and short-circuits `/api/auth/pkce/*` in CI.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
 <!-- AGENT CONTRACT v2025-12-16 -->

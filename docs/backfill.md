@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-24 — Edge-gate my-applications
+- Middleware now gates `/my-applications` alongside `/applications` and preserves the full destination in `next` query param.
+- `/browse-jobs` soft-fails when API base is missing and exposes `jobs-empty-state` when no jobs are available.
+
 ## 2026-09-23 — Hero landing and auth-aware applications
 - Home now renders a hero with `hero-start` linking to `/browse-jobs`.
 - Added `/my-applications` page that redirects unauthenticated users to `/login?next=/my-applications`.

@@ -6,12 +6,13 @@ export default function HomePage() {
         <p className="mt-2 text-gray-600">
           Browse fresh jobs and apply in minutes.
         </p>
+        {/* Primary CTA → must navigate to /browse-jobs for smoke */}
         <a
           data-testid="hero-start"
           href="/browse-jobs"
           className="mt-6 inline-block rounded bg-blue-600 px-5 py-2 text-white"
         >
-          Start browsing
+          Browse jobs
         </a>
       </section>
     </main>
