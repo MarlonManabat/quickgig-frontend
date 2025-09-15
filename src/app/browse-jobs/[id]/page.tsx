@@ -12,9 +12,10 @@ export default async function JobPage({ params }: { params: { id: string } }) {
         <div className="text-sm">{job.location}</div>
         <div className="text-xs text-gray-500">{formatRelative(job.postedAt)}</div>
         {job.description && <p className="mt-4">{job.description}</p>}
+        {/* Preserve post-login return path so users come back to the job they intended to apply for */}
         <a
           data-testid="apply-button"
-          href={`${login}/login`}
+          href={`${login}/login?next=${encodeURIComponent(`/browse-jobs/${job.id}`)}`}
           className="mt-6 inline-block rounded bg-blue-500 px-4 py-2 text-white"
         >
           Apply
