@@ -1,5 +1,9 @@
 <!-- AGENT CONTRACT v2025-12-16 -->
 
+## 2026-09-27
+- Header swaps `nav-login` for `nav-logout` when `qg_auth` is present and keeps Post Job auth-aware.
+- Added `/api/mock-login` stub to mint the auth cookie and `/api/logout` to clear it for smoke flows.
+
 ## 2026-09-20
 - Header reads `qg_auth` cookie client-side and swaps `nav-login` for `nav-my-applications` when authenticated.
 - Landing hero uses `hero-start` with `cta-browse-jobs` CTA.

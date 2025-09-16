@@ -1,17 +1,18 @@
 # Agents Contract
-**Version:** 2026-09-26
+**Version:** 2026-09-27
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
 - Post Job CTAs resolve through `authAware('/gigs/create')` so unauthenticated clicks land on `/login?next=…` on the app host.
 - Home (`/`) renders a hero CTA `hero-start` linking to `/browse-jobs`.
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
-- Header shows Login and My Applications links unconditionally.
+- Header shows My Applications at all times and swaps `nav-login` ↔ `nav-logout` based on auth cookie presence.
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST redirect to `/login?next=<dest>`.
 - Auth-gated routes: `/applications` and `/my-applications`.
 - Middleware redirects unauthenticated `/applications` or `/my-applications` requests to `/login?next=…` using a single Edge-safe redirect.
+- `/api/mock-login?next=/…` sets the shared auth cookie for smoke flows; `/api/logout?next=/…` clears it.
 
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`

@@ -11,7 +11,7 @@ export default function LogoutPage() {
         await createClient().auth.signOut();
       } catch {}
       // Let server clear cookies, then land home.
-      window.location.replace('/api/auth/logout?next=/');
+      window.location.replace('/api/logout?next=/');
     };
     run();
   }, [router]);
