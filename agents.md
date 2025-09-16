@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-09-27
+**Version:** 2026-09-28
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
@@ -12,6 +12,7 @@
 - If signed out, clicking either CTA MUST redirect to `/login?next=<dest>`.
 - Auth-gated routes: `/applications` and `/my-applications`.
 - Middleware redirects unauthenticated `/applications` or `/my-applications` requests to `/login?next=…` using a single Edge-safe redirect.
+- Middleware matcher covers `/applications/:path*` and `/my-applications/:path*` so nested routes stay gated.
 - `/api/mock-login?next=/…` sets the shared auth cookie for smoke flows; `/api/logout?next=/…` clears it.
 
 ## Legacy redirects (middleware)
