@@ -6,6 +6,7 @@ import {
   expectAuthAwareRedirect,
   visByTestId,
   loginRe,
+  loginOr,
 } from './_helpers';
 
 test('Browse Jobs renders', async ({ page }) => {
@@ -27,9 +28,9 @@ test('My Applications is auth-gated', async ({ page }) => {
   await expectAuthAwareRedirect(page, new RegExp(`${loginRe.source}|\/applications$`));
 });
 
-test('Post a Job placeholder', async ({ page }) => {
+test('Post Job redirects through auth-aware flow', async ({ page }) => {
   await page.goto('/post-job');
-  await expect(page.getByText('Post a job', { exact: false })).toBeVisible();
+  await expectAuthAwareRedirect(page, loginOr(/\/gigs\/create$/));
 });
 
 test('Header/nav is wired', async ({ page }) => {
