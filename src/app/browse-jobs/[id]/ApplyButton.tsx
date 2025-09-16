@@ -15,11 +15,18 @@ export function ApplyButton({ href, jobId, title }: ApplyButtonProps) {
     if (busy) return;
     setBusy(true);
     try {
-      await fetch('/api/track/apply', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ jobId, title, href }),
-      });
+      await Promise.allSettled([
+        fetch('/api/applications/record', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ jobId }),
+        }),
+        fetch('/api/track/apply', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ jobId, title, href }),
+        }),
+      ]);
     } catch {}
     window.location.href = href;
   }, [busy, href, jobId, title]);
