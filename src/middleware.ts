@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { AUTH_COOKIE_NAMES } from "@/lib/constants";
+import { hasAuthCookieHeader } from "@/lib/auth/cookies";
 
 // Gate both /applications and /my-applications at the edge so unauthenticated
 // requests redirect before the page is rendered (matches agents contract).
@@ -11,10 +11,7 @@ export function middleware(req: NextRequest) {
     path.startsWith("/applications") || path.startsWith("/my-applications");
   if (!isGated) return NextResponse.next();
 
-  const authed = AUTH_COOKIE_NAMES.some((name) => {
-    const value = req.cookies.get(name)?.value;
-    return typeof value === "string" && value.length > 0;
-  });
+  const authed = hasAuthCookieHeader(req.headers.get("cookie"));
 
   if (!authed) {
     const dest = new URL("/login", url.origin);

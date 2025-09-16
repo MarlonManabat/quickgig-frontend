@@ -2,6 +2,7 @@ import 'server-only';
 
 import { randomUUID } from 'node:crypto';
 import { cookies } from 'next/headers';
+import { hasAuthCookieHeader } from '@/lib/auth/cookies';
 
 type Application = {
   id: string | number;
@@ -11,12 +12,11 @@ type Application = {
   appliedAt?: string;
 };
 
-async function fetchApplications(): Promise<Application[]> {
+async function fetchApplications(cookieHeader?: string): Promise<Application[]> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   if (!baseUrl) return [];
 
   try {
-    const cookieHeader = cookies().toString();
     const response = await fetch(`${baseUrl.replace(/\/$/, '')}/applications`, {
       cache: 'no-store',
       headers: cookieHeader ? { cookie: cookieHeader } : undefined,
@@ -63,7 +63,23 @@ async function fetchApplications(): Promise<Application[]> {
 }
 
 export default async function MyApplicationsPage() {
-  const applications = await fetchApplications();
+  const jar = cookies();
+  const cookieHeader = jar
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join('; ');
+  const authed = hasAuthCookieHeader(cookieHeader || undefined);
+
+  if (!authed) {
+    return (
+      <main className="mx-auto max-w-3xl p-6">
+        <h1 className="text-2xl font-semibold">My Applications</h1>
+        <p className="mt-4 text-gray-500">Please log in to view your applications.</p>
+      </main>
+    );
+  }
+
+  const applications = await fetchApplications(cookieHeader || undefined);
   const hasApplications = applications.length > 0;
 
   return (

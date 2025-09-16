@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-29 — Auth cookie helpers & apply tracking
+- Added `/api/mock/login` and `/api/mock/logout` POST helpers (with shared cookie domains) and wired the login page to submit forms.
+- Middleware now inspects the raw cookie header so Edge gating stays in sync with SSR checks.
+- Browse job Apply CTA records `/api/track/apply` before navigating, ensuring apply clicks are tracked even when mocks run.
+
 ## 2026-09-27 — Mock auth helpers and logout swap
 - Added `/api/mock-login` to set the shared auth cookie and `/api/logout` to clear it with safe redirects.
 - Header now toggles `nav-login`/`nav-logout` when signed in and links Post Job directly for authed requests.

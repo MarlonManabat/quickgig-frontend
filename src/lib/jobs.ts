@@ -1,9 +1,7 @@
-import { getApiBase } from "@/lib/env";
+import { apiBaseUrl } from "@/lib/env";
 import { supabase } from "@/lib/supabaseClient";
 import { MOCK_JOBS, MOCK_JOB_BY_ID, type MockJob } from "@/mocks/jobs";
 import type { Insert } from "@/types/db";
-
-const isProd = process.env.NODE_ENV === "production";
 
 type Pagination = { page?: number; pageSize?: number };
 
@@ -11,9 +9,17 @@ export async function fetchJobs(opts: Pagination = {}): Promise<{
   items: MockJob[];
   total: number;
 }> {
-  const base = getApiBase();
+  const isProd = process.env.NODE_ENV === "production";
+  const base = apiBaseUrl();
+  if (!base) {
+    if (!isProd) {
+      // eslint-disable-next-line no-console
+      console.warn("[WebServer] using mock jobs fallback:", "API base unset");
+      return { items: MOCK_JOBS, total: MOCK_JOBS.length };
+    }
+    return { items: [], total: 0 };
+  }
   try {
-    if (!base) throw new Error("no-api");
     const search = new URLSearchParams();
     if (opts.page) search.set("page", String(opts.page));
     if (opts.pageSize) search.set("pageSize", String(opts.pageSize));
@@ -42,9 +48,17 @@ export async function fetchJobs(opts: Pagination = {}): Promise<{
 }
 
 export async function fetchJob(id: string | number): Promise<MockJob | null> {
-  const base = getApiBase();
+  const isProd = process.env.NODE_ENV === "production";
+  const base = apiBaseUrl();
+  if (!base) {
+    if (!isProd) {
+      // eslint-disable-next-line no-console
+      console.warn("[WebServer] using mock job fallback:", "API base unset");
+      return MOCK_JOB_BY_ID(id);
+    }
+    return null;
+  }
   try {
-    if (!base) throw new Error("no-api");
     const res = await fetch(`${base}/jobs/${encodeURIComponent(String(id))}`, {
       next: { revalidate: 60 },
     });
