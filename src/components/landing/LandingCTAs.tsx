@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { track } from '@/lib/analytics';
 import { ROUTES } from '@/lib/routes';
-import { authAware } from '@/lib/hostAware';
+import { authAware, hostAware } from '@/lib/hostAware';
 
 type Props = {
   browseClassName?: string;
@@ -29,7 +29,7 @@ export default function LandingCTAs({
         <Link
           data-testid="hero-start"
           data-cta="hero-start"
-          href={ROUTES.browseJobs}
+          href={hostAware(ROUTES.browseJobs)}
           className={browseClassName}
           onClick={() => track('cta_click', { cta: 'hero-start' })}
         >
