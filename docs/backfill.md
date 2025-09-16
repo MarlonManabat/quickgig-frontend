@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-27 — Mock auth helpers and logout swap
+- Added `/api/mock-login` to set the shared auth cookie and `/api/logout` to clear it with safe redirects.
+- Header now toggles `nav-login`/`nav-logout` when signed in and links Post Job directly for authed requests.
+- Middleware and auth utilities share cookie constants so gate checks stay consistent.
+
 ## 2026-09-26 — Auth-aware Post Job publish flow
 - `/post-job` now server-redirects to the app host login with `next` preserving `/gigs/create`.
 - Header, landing CTAs, and shared nav use the new `authAware('/gigs/create')` helper so app-host deployments stay absolute.

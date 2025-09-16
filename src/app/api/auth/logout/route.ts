@@ -1,15 +1,28 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import { AUTH_COOKIE, NEXT_COOKIE } from "@/lib/constants";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const next = url.searchParams.get('next') || '/';
+  const target = url.searchParams.get("next") ?? "/";
+  let dest: URL;
+  try {
+    dest = new URL(target, url.origin);
+  } catch {
+    dest = new URL("/", url.origin);
+  }
+  if (dest.origin !== url.origin) {
+    dest = new URL("/", url.origin);
+  }
+
   const jar = cookies();
-  ['sb-access-token', 'sb-refresh-token', 'qg_next'].forEach((n) => {
-    try {
-      // @ts-ignore – cookie typings differ across Next versions
-      jar.delete(n);
-    } catch {}
-  });
-  return NextResponse.redirect(new URL(next, url.origin), { status: 302 });
+  [AUTH_COOKIE, "sb-access-token", "sb-refresh-token", NEXT_COOKIE].forEach(
+    (n) => {
+      try {
+        // @ts-ignore – cookie typings differ across Next versions
+        jar.delete(n);
+      } catch {}
+    },
+  );
+  return NextResponse.redirect(dest, { status: 302 });
 }
