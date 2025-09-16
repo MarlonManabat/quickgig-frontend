@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { hostAware } from '@/lib/hostAware';
+import { ApplyButton } from './ApplyButton';
 
 type JobDetail = {
   id: string | number;
@@ -51,13 +52,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
       {job.company ? <div className="text-gray-500">{job.company}</div> : null}
       {job.location ? <div className="text-gray-500">{job.location}</div> : null}
       <div className="prose mt-6">{job.description || '—'}</div>
-      <a
-        data-testid="apply-button"
-        href={applyHref}
-        className="mt-6 inline-block rounded bg-blue-500 px-4 py-2 text-white"
-      >
-        Apply
-      </a>
+      <ApplyButton href={applyHref} jobId={job.id} title={job.title} />
     </main>
   );
 }
