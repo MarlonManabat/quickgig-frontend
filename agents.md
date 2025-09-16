@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-09-28
+**Version:** 2026-09-29
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
@@ -13,7 +13,7 @@
 - Auth-gated routes: `/applications` and `/my-applications`.
 - Middleware redirects unauthenticated `/applications` or `/my-applications` requests to `/login?next=…` using a single Edge-safe redirect.
 - Middleware matcher covers `/applications/:path*` and `/my-applications/:path*` so nested routes stay gated.
-- `/api/mock-login?next=/…` sets the shared auth cookie for smoke flows; `/api/logout?next=/…` clears it.
+- `/api/mock-login?next=/…` or `/api/mock/login?next=/…` set the shared auth cookie for smoke flows; `/api/logout?next=/…` and `/api/mock/logout?next=/…` clear it.
 
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`

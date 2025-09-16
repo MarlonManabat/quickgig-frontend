@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:4010";
+import { metadataBaseOrigin } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "QuickGig",
   description: "Find and post gigs fast",
-  metadataBase: new URL(siteUrl),
+  metadataBase: metadataBaseOrigin(),
 };
 
 export default function RootLayout({

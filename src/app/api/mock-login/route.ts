@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_COOKIE } from "@/lib/constants";
+import { cookieDomainFor } from "@/lib/auth/cookies";
 
 function resolveNext(req: NextRequest): URL {
   const { origin } = req.nextUrl;
@@ -16,9 +17,10 @@ function resolveNext(req: NextRequest): URL {
   return url;
 }
 
-export async function GET(req: NextRequest) {
+function handle(req: NextRequest) {
   const redirectTo = resolveNext(req);
   const res = NextResponse.redirect(redirectTo);
+  const domain = cookieDomainFor(req.nextUrl.hostname);
   res.cookies.set({
     name: AUTH_COOKIE,
     value: "1",
@@ -27,6 +29,15 @@ export async function GET(req: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 2 * 60 * 60,
+    ...(domain ? { domain } : {}),
   });
   return res;
+}
+
+export async function GET(req: NextRequest) {
+  return handle(req);
+}
+
+export async function POST(req: NextRequest) {
+  return handle(req);
 }

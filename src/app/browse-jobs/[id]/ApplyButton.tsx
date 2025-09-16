@@ -1,6 +1,6 @@
 'use client';
 
-import { trackApply } from '@/lib/track';
+import { useCallback, useState } from 'react';
 
 type ApplyButtonProps = {
   href: string;
@@ -9,16 +9,30 @@ type ApplyButtonProps = {
 };
 
 export function ApplyButton({ href, jobId, title }: ApplyButtonProps) {
+  const [busy, setBusy] = useState(false);
+
+  const onClick = useCallback(async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fetch('/api/track/apply', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ jobId, title, href }),
+      });
+    } catch {}
+    window.location.href = href;
+  }, [busy, href, jobId, title]);
+
   return (
-    <a
+    <button
+      type="button"
       data-testid="apply-button"
-      data-analytics="apply-click"
-      href={href}
       className="mt-6 inline-block rounded bg-blue-500 px-4 py-2 text-white"
-      rel="noopener"
-      onClick={() => trackApply({ id: jobId, title })}
+      onClick={onClick}
+      aria-disabled={busy}
     >
-      Apply
-    </a>
+      {busy ? 'Opening…' : 'Apply'}
+    </button>
   );
 }
