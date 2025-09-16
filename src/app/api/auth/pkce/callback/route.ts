@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { clearAuthCookies, readCookie, safePath } from '@/app/api/auth/pkce/utils';
+import { NEXT_COOKIE } from '@/lib/constants';
 
 const STATE_COOKIE = 'pkce_state';
 const PKCE_COOKIE = 'pkce_verifier';
@@ -46,9 +47,9 @@ export async function GET(req: Request) {
   // TODO: set your app session here (existing mechanism)
 
   // Read and decode the raw `next` value BEFORE clearing cookies.
-  const rawNext = readCookie('qg_next') ?? '/applications';
+  const rawNext = readCookie(NEXT_COOKIE) ?? '/applications';
   const target = safePath(rawNext) ?? '/applications';
-  clearAuthCookies({ also: ['qg_next'] });
+  clearAuthCookies({ also: [NEXT_COOKIE] });
   return NextResponse.redirect(new URL(target, url.origin), { status: 302 });
 }
 

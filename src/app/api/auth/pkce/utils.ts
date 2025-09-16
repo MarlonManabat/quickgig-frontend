@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { NEXT_COOKIE } from '@/lib/constants';
 
 export function readCookie(name: string): string | null {
   try {
@@ -22,7 +23,7 @@ export function safePath(p: string | null | undefined): string | null {
 
 export function clearAuthCookies(opts?: { also?: string[] }) {
   const jar = cookies();
-  ['sb-access-token', 'sb-refresh-token', 'qg_next', ...(opts?.also ?? [])].forEach((n) => {
+  ['sb-access-token', 'sb-refresh-token', NEXT_COOKIE, ...(opts?.also ?? [])].forEach((n) => {
     try {
       // @ts-ignore – cookie typings differ across Next versions
       jar.delete(n);

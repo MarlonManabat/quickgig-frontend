@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { AUTH_COOKIE } from "@/lib/constants";
+import { AUTH_COOKIE, NEXT_COOKIE } from "@/lib/constants";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   }
 
   const jar = cookies();
-  [AUTH_COOKIE, "sb-access-token", "sb-refresh-token", "qg_next"].forEach(
+  [AUTH_COOKIE, "sb-access-token", "sb-refresh-token", NEXT_COOKIE].forEach(
     (n) => {
       try {
         // @ts-ignore – cookie typings differ across Next versions

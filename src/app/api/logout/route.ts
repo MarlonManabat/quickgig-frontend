@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE } from "@/lib/constants";
+import { AUTH_COOKIE, NEXT_COOKIE } from "@/lib/constants";
 
 function resolveNext(req: NextRequest): URL {
   const { origin } = req.nextUrl;
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     path: "/",
     maxAge: 0,
   };
-  [AUTH_COOKIE, "sb-access-token", "sb-refresh-token", "qg_next"].forEach(
+  [AUTH_COOKIE, "sb-access-token", "sb-refresh-token", NEXT_COOKIE].forEach(
     (name) => {
       res.cookies.set({
         name,
