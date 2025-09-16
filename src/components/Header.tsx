@@ -1,4 +1,4 @@
-import { hostAware } from '@/lib/hostAware';
+import { authAware } from '@/lib/hostAware';
 
 export default function Header() {
   return (
@@ -12,7 +12,7 @@ export default function Header() {
           {/* App-host action */}
           <a
             data-testid="nav-post-job"
-            href={hostAware('/gigs/create')}
+            href={authAware('/gigs/create')}
             rel="noopener"
           >
             Post a job

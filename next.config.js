@@ -57,10 +57,9 @@ const baseConfig = {
     async redirects() {
       return [
         // legacy to canonical
-        { source: "/post", destination: "/gigs/create", permanent: true },
-        { source: "/posts", destination: "/gigs/create", permanent: true },
-        { source: "/gigs/new", destination: "/gigs/create", permanent: true },
-        { source: "/post-job", destination: "/gigs/create", permanent: true },
+        { source: "/post", destination: "/post-job", permanent: true },
+        { source: "/posts", destination: "/post-job", permanent: true },
+        { source: "/gigs/new", destination: "/post-job", permanent: true },
         { source: "/find", destination: "/browse-jobs", permanent: true },
         { source: "/finds", destination: "/browse-jobs", permanent: true },
         { source: "/jobs", destination: "/browse-jobs", permanent: true },
@@ -90,8 +89,8 @@ const baseConfig = {
     },
     async rewrites() {
       return [
-        { source: "/employer/post", destination: "/gigs/create" },
-        { source: "/jobs/post", destination: "/gigs/create" },
+        { source: "/employer/post", destination: "/post-job" },
+        { source: "/jobs/post", destination: "/post-job" },
       ];
     },
 };

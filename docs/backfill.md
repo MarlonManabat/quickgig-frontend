@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-26 — Auth-aware Post Job publish flow
+- `/post-job` now server-redirects to the app host login with `next` preserving `/gigs/create`.
+- Header, landing CTAs, and shared nav use the new `authAware('/gigs/create')` helper so app-host deployments stay absolute.
+- Legacy `/post*` routes and rewrites funnel into `/post-job` to keep the auth-aware publish flow consistent.
+
 ## 2026-09-24 — Edge-gate my-applications
 - Middleware now gates `/my-applications` alongside `/applications` and preserves the full destination in `next` query param.
 - `/browse-jobs` soft-fails when API base is missing and exposes `jobs-empty-state` when no jobs are available.

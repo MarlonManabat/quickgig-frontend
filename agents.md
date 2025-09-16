@@ -1,8 +1,9 @@
 # Agents Contract
-**Version:** 2026-09-25
+**Version:** 2026-09-26
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
+- Post Job CTAs resolve through `authAware('/gigs/create')` so unauthenticated clicks land on `/login?next=…` on the app host.
 - Home (`/`) renders a hero CTA `hero-start` linking to `/browse-jobs`.
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 - Header shows Login and My Applications links unconditionally.
@@ -14,6 +15,7 @@
 
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`
+- `/post`, `/posts`, and `/gigs/new` → `/post-job` (server page issues the auth-aware redirect)
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
 - Browse list IDs: `jobs-list`, `job-card`; empty state `jobs-empty-state`.

@@ -1,4 +1,4 @@
-import { hostAware } from '@/lib/hostAware';
+import { authAware, hostAware } from '@/lib/hostAware';
 
 export default function HomePage() {
   return (
@@ -22,7 +22,7 @@ export default function HomePage() {
           <a
             data-testid="app-cta-post-job"
             className="underline"
-            href={hostAware('/gigs/create')}
+            href={authAware('/gigs/create')}
             rel="noopener"
           >
             Post a job

@@ -3,15 +3,21 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { NAV_ITEMS, ROUTES } from '@/lib/routes';
+import { authAware } from '@/lib/hostAware';
 import { track } from '@/lib/analytics';
 
 export default function LandingHeader() {
   const [open, setOpen] = useState(false);
-  const links = NAV_ITEMS.map(item => ({
-    href: item.to,
-    label: item.label,
-    testId: item.id,
-  }));
+  const links = NAV_ITEMS.map(item => {
+    const href = item.auth === 'auth-aware' ? authAware(item.to) : item.to;
+    const external = /^https?:\/\//.test(href);
+    return {
+      href,
+      external,
+      label: item.label,
+      testId: item.id,
+    };
+  });
 
   return (
     <header className="border-b bg-white/60 backdrop-blur">
@@ -26,6 +32,8 @@ export default function LandingHeader() {
               data-testid={link.testId}
               data-cta={link.testId}
               href={link.href}
+              rel={link.external ? 'noopener' : undefined}
+              prefetch={!link.external}
               className="hover:underline"
               onClick={() => track('cta_click', { cta: link.testId })}
             >
@@ -58,6 +66,8 @@ export default function LandingHeader() {
                 data-testid={link.testId}
                 data-cta={link.testId}
                 href={link.href}
+                rel={link.external ? 'noopener' : undefined}
+                prefetch={!link.external}
                 onClick={() => {
                   setOpen(false);
                   track('cta_click', { cta: link.testId });
