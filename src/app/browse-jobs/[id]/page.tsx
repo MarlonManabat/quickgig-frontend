@@ -1,38 +1,20 @@
 import Link from 'next/link';
+
 import { hostAware } from '@/lib/hostAware';
+import { fetchJob } from '@/lib/jobs';
+
 import { ApplyButton } from './ApplyButton';
 
-type JobDetail = {
-  id: string | number;
-  title: string;
-  company?: string;
-  location?: string;
-  description?: string;
-  applyUrl?: string;
-};
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-async function getJob(id: string): Promise<JobDetail | null> {
-  if (!API_BASE) return { id, title: 'Job', description: 'Details unavailable.' };
-  try {
-    const res = await fetch(`${API_BASE}/jobs/${encodeURIComponent(id)}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error(String(res.status));
-    const data = await res.json();
-    return data || null;
-  } catch {
-    return null;
-  }
-}
+export const dynamic = 'force-dynamic';
 
 export default async function JobDetailPage({ params }: { params: { id: string } }) {
-  const job = await getJob(params.id);
+  const job = await fetchJob(params.id);
   if (!job) {
     return (
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-semibold mb-2">Job not found</h1>
-        <Link className="underline" href="/browse-jobs">
-          Back to jobs
+      <main className="max-w-3xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-semibold mb-4">Job not found</h1>
+        <Link className="text-blue-600 hover:underline" href={hostAware('/browse-jobs')}>
+          Back to Jobs
         </Link>
       </main>
     );
@@ -47,11 +29,12 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     : hostAware(`/login?next=${encodeURIComponent(returnTo)}`);
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-semibold">{job.title}</h1>
-      {job.company ? <div className="text-gray-500">{job.company}</div> : null}
-      {job.location ? <div className="text-gray-500">{job.location}</div> : null}
-      <div className="prose mt-6">{job.description || '—'}</div>
+      <div className="text-sm text-gray-600">
+        {job.company ?? '—'} • {job.location ?? 'Anywhere'}
+      </div>
+      <p className="mt-6 whitespace-pre-wrap">{job.description ?? ''}</p>
       <ApplyButton href={applyHref} jobId={job.id} title={job.title} />
     </main>
   );

@@ -14,3 +14,9 @@ export const ENV = {
 };
 
 export const IS_PROD = ENV.NODE_ENV === 'production';
+
+// Safe reader for public API base URL. Never throws.
+export function getApiBase(): string | null {
+  const raw = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  return raw ? raw.replace(/\/+$/, '') : null;
+}
