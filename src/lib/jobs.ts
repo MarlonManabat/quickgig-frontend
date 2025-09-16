@@ -3,6 +3,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { MOCK_JOBS, MOCK_JOB_BY_ID, type MockJob } from "@/mocks/jobs";
 import type { Insert } from "@/types/db";
 
+const isProd = process.env.NODE_ENV === "production";
+
 type Pagination = { page?: number; pageSize?: number };
 
 export async function fetchJobs(opts: Pagination = {}): Promise<{
@@ -28,11 +30,14 @@ export async function fetchJobs(opts: Pagination = {}): Promise<{
     const total = Number.isFinite(data?.total) ? Number(data.total) : items.length;
     return { items, total };
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
+    if (!isProd) {
       // eslint-disable-next-line no-console
       console.warn("[WebServer] using mock jobs fallback:", (error as Error).message);
+      return { items: MOCK_JOBS, total: MOCK_JOBS.length };
     }
-    return { items: MOCK_JOBS, total: MOCK_JOBS.length };
+    // eslint-disable-next-line no-console
+    console.error("[WebServer] jobs fetch failed:", (error as Error).message);
+    return { items: [], total: 0 };
   }
 }
 
@@ -46,11 +51,14 @@ export async function fetchJob(id: string | number): Promise<MockJob | null> {
     if (!res.ok) throw new Error(`HTTP_${res.status}`);
     return (await res.json()) as MockJob;
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
+    if (!isProd) {
       // eslint-disable-next-line no-console
       console.warn("[WebServer] using mock job fallback:", (error as Error).message);
+      return MOCK_JOB_BY_ID(id);
     }
-    return MOCK_JOB_BY_ID(id);
+    // eslint-disable-next-line no-console
+    console.error("[WebServer] job fetch failed:", (error as Error).message);
+    return null;
   }
 }
 

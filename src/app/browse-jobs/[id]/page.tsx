@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { hostAware } from '@/lib/hostAware';
 import { fetchJob } from '@/lib/jobs';
@@ -10,14 +10,7 @@ export const dynamic = 'force-dynamic';
 export default async function JobDetailPage({ params }: { params: { id: string } }) {
   const job = await fetchJob(params.id);
   if (!job) {
-    return (
-      <main className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-semibold mb-4">Job not found</h1>
-        <Link className="text-blue-600 hover:underline" href={hostAware('/browse-jobs')}>
-          Back to Jobs
-        </Link>
-      </main>
-    );
+    redirect('/browse-jobs');
   }
 
   // Build an auth-aware Apply link:
