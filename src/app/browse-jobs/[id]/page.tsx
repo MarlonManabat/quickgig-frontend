@@ -1,3 +1,4 @@
+import ApplyButton from '@/components/ApplyButton';
 import { hostAware } from '@/lib/hostAware';
 import { fetchJob } from '@/lib/jobs';
 import { hasApplied } from '@/lib/applications';
@@ -25,10 +26,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
       : hostAware('/applications')
     : loginHref;
 
-  // Always click through the server-side /apply redirect which records the application.
-  const applyHref = `/apply?next=${encodeURIComponent(finalTarget)}${
-    jobMissing ? '' : `&jobId=${encodeURIComponent(String(job.id))}&title=${encodeURIComponent(job.title ?? '')}`
-  }`;
+  const applyHref = finalTarget;
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
@@ -46,14 +44,12 @@ export default async function JobDetailPage({ params }: { params: { id: string }
           : job.description ?? ''}
       </p>
       <div className="mt-6 flex items-center gap-3">
-        <a
-          data-testid="apply-button"
+        <ApplyButton
           href={applyHref}
-          aria-disabled={jobMissing ? 'true' : undefined}
-          className="inline-block rounded bg-blue-500 px-4 py-2 text-white"
-        >
-          Apply
-        </a>
+          jobId={job?.id}
+          title={job?.title ?? undefined}
+          disabled={jobMissing}
+        />
         {!jobMissing && applied && (
           <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs text-green-700">
             You’ve applied to this job
