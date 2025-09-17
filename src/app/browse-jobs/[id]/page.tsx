@@ -1,5 +1,3 @@
-import { cookies } from 'next/headers';
-
 import { hostAware } from '@/lib/hostAware';
 import { fetchJob } from '@/lib/jobs';
 import { hasApplied } from '@/lib/applications';
@@ -8,20 +6,29 @@ import { isAuthedServer } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 export default async function JobDetailPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
-  const authed = isAuthedServer(cookieStore);
+  // Server-side check; the helper reads cookies internally.
+  const authed = isAuthedServer();
   const id = params.id;
   const job = await fetchJob(id);
 
-  // Build an auth-aware Apply href that always exists so tests & UX are stable.
-  const returnTo = `/browse-jobs/${encodeURIComponent(String(id))}`;
-  const loginHref = `${hostAware('/login')}?next=${encodeURIComponent(returnTo)}`;
-  const appHref = job?.applyUrl ? hostAware(job.applyUrl) : hostAware('/applications');
-  const applyHref = authed ? appHref : loginHref;
-
-  // Even when the job failed to load, keep the page/CTA structure present.
   const jobMissing = !job;
   const applied = jobMissing ? false : hasApplied(job.id);
+
+  // Build the final destination (app host or login fallback) and keep the return path.
+  const returnTo = `/browse-jobs/${encodeURIComponent(String(id))}`;
+  const loginHref = `${hostAware('/login')}?next=${encodeURIComponent(returnTo)}`;
+  const finalTarget = jobMissing
+    ? loginHref
+    : authed
+    ? job.applyUrl
+      ? hostAware(job.applyUrl)
+      : hostAware('/applications')
+    : loginHref;
+
+  // Always click through the server-side /apply redirect which records the application.
+  const applyHref = `/apply?next=${encodeURIComponent(finalTarget)}${
+    jobMissing ? '' : `&jobId=${encodeURIComponent(String(job.id))}&title=${encodeURIComponent(job.title ?? '')}`
+  }`;
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
