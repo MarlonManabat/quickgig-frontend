@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { hasAuthCookies } from '@/lib/auth/cookies';
 import { fetchJob } from '@/lib/jobs';
-import { readAppliedIdsFromCookie } from '@/lib/applications';
+import { readApplications } from '@/lib/applications';
 
 export default async function MyApplicationsPage() {
   const jar = cookies();
@@ -19,10 +19,21 @@ export default async function MyApplicationsPage() {
     );
   }
 
-  const ids = readAppliedIdsFromCookie();
+  const applications = readApplications()
+    .slice(0, 50)
+    .sort((a, b) => b.ts - a.ts);
+
+  type JobResult = Awaited<ReturnType<typeof fetchJob>>;
   const jobs = (
-    await Promise.all(ids.map((id) => fetchJob(id)))
-  ).filter((job): job is NonNullable<typeof job> => Boolean(job));
+    await Promise.allSettled(applications.map((application) => fetchJob(application.id)))
+  )
+    .map((result, index) => {
+      if (result.status === 'fulfilled' && result.value) {
+        return { job: result.value, ts: applications[index].ts };
+      }
+      return null;
+    })
+    .filter((entry): entry is { job: NonNullable<JobResult>; ts: number } => Boolean(entry));
 
   if (!jobs.length) {
     return (
@@ -34,6 +45,17 @@ export default async function MyApplicationsPage() {
         >
           You haven’t applied to any jobs yet.
         </div>
+        {process.env.NODE_ENV !== 'production' && (
+          <form method="post" action="/api/applications/clear" className="mt-4">
+            <button
+              type="submit"
+              className="rounded bg-gray-200 px-3 py-2 text-sm"
+              data-testid="applications-clear"
+            >
+              Clear list
+            </button>
+          </form>
+        )}
       </main>
     );
   }
@@ -42,18 +64,34 @@ export default async function MyApplicationsPage() {
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-semibold">My Applications</h1>
       <ul className="mt-6 space-y-3" data-testid="applications-list">
-        {jobs.map((job) => {
+        {jobs.map(({ job, ts }) => {
           const id = String(job.id);
           const title = job.title?.trim() || `Job #${id}`;
           return (
-            <li key={id} className="rounded border p-4" data-testid="application-row">
+            <li
+              key={id}
+              className="flex items-center justify-between rounded border p-4"
+              data-testid="application-row"
+            >
               <Link className="text-blue-600 underline" href={`/browse-jobs/${encodeURIComponent(id)}`}>
                 {title}
               </Link>
+              <span className="text-xs text-gray-500">Applied {new Date(ts).toLocaleString()}</span>
             </li>
           );
         })}
       </ul>
+      {process.env.NODE_ENV !== 'production' && (
+        <form method="post" action="/api/applications/clear" className="mt-4">
+          <button
+            type="submit"
+            className="rounded bg-gray-200 px-3 py-2 text-sm"
+            data-testid="applications-clear"
+          >
+            Clear list
+          </button>
+        </form>
+      )}
     </main>
   );
 }
