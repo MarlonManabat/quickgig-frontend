@@ -1,4 +1,4 @@
-import { apiBaseUrl } from "@/lib/env";
+import { apiBaseUrl, isVercelProd } from "@/lib/env";
 import { supabase } from "@/lib/supabaseClient";
 import { MOCK_JOBS, MOCK_JOB_BY_ID, type MockJob } from "@/mocks/jobs";
 import type { Insert } from "@/types/db";
@@ -35,7 +35,7 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
   items: MockJob[];
   total: number;
 }> {
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = isVercelProd();
   const base = apiBaseUrl();
   const page = Number.isFinite(opts.page) && (opts.page ?? 0) > 0 ? Number(opts.page) : 1;
   const pageSize =
@@ -97,7 +97,7 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
 }
 
 export async function fetchJob(id: string | number): Promise<MockJob | null> {
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = isVercelProd();
   const base = apiBaseUrl();
   if (!base) {
     if (!isProd) {

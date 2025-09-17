@@ -1,9 +1,9 @@
 # Agents Contract
-**Version:** 2026-09-29
+**Version:** 2026-10-01
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
-- Post Job CTAs resolve through `authAware('/gigs/create')` so unauthenticated clicks land on `/login?next=…` on the app host.
+- Post Job CTAs resolve through `authAware('/gigs/create')` so unauthenticated clicks land on `/login?next=…` on the app host; the `/post-job` route handler performs a host-aware 302 directly to `/gigs/create`.
 - Home (`/`) renders a hero CTA `hero-start` linking to `/browse-jobs`.
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 - Header shows My Applications at all times and swaps `nav-login` ↔ `nav-logout` based on auth cookie presence.
@@ -17,10 +17,10 @@
 
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`
-- `/post`, `/posts`, and `/gigs/new` → `/post-job` (server page issues the auth-aware redirect)
+- `/post`, `/posts`, and `/gigs/new` → `/post-job` (route issues a 302 to `/gigs/create`; header/nav remain auth-aware)
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
-- Browse list IDs: `jobs-list`, `job-card`; empty state `jobs-empty-state`.
+- Browse list IDs: `jobs-list`, `job-card`; empty state `jobs-empty`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - Header smokes query `:visible` to ignore hidden duplicates; CTA href checks accept relative or absolute app URLs.

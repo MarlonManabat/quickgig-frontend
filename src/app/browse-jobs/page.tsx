@@ -96,7 +96,7 @@ export default async function BrowseJobsPage({
       </form>
 
       {items.length === 0 ? (
-        <div className="mt-8 rounded border p-6 text-gray-600" data-testid="jobs-empty-state">
+        <div className="mt-8 rounded border p-6 text-gray-600" data-testid="jobs-empty">
           {q || location ? (
             <>
               No jobs found for{' '}

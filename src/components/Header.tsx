@@ -8,6 +8,9 @@ export default function Header() {
     : authAware("/gigs/create");
   const logoutHref = hostAware("/api/logout?next=/");
   const loginHref = hostAware("/login");
+  const myApplicationsHref = authed
+    ? hostAware("/my-applications")
+    : authAware("/my-applications");
 
   return (
     <header className="w-full border-b">
@@ -15,7 +18,9 @@ export default function Header() {
         <a href="/" className="font-semibold">QuickGig</a>
         <div className="flex items-center gap-4">
           <a data-testid="nav-browse-jobs" href="/browse-jobs">Browse Jobs</a>
-          <a data-testid="nav-my-applications" href="/my-applications">My Applications</a>
+          <a data-testid="nav-my-applications" href={myApplicationsHref}>
+            My Applications
+          </a>
           {authed ? (
             <a data-testid="nav-logout" href={logoutHref}>
               Logout
