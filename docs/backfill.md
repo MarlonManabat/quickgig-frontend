@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-09-30 — Prod-safe jobs fallback & legacy redirect
+- Env reader only hard-requires `NEXT_PUBLIC_API_BASE_URL` on Vercel production; previews/CI/dev render fallbacks.
+- `/browse-jobs` exposes `jobs-empty` for the empty state and keeps deterministic mock listings when the API is unavailable.
+- Added a route handler so `/post-job` issues a 302 to `/gigs/create` while header CTAs remain auth-aware (My Applications uses `authAware` when signed out).
+
 ## 2026-09-29 — Auth cookie helpers & apply tracking
 - Added `/api/mock/login` and `/api/mock/logout` POST helpers (with shared cookie domains) and wired the login page to submit forms.
 - Middleware now inspects the raw cookie header so Edge gating stays in sync with SSR checks.

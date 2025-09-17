@@ -1,5 +1,5 @@
 # Agents Contract
-**Version:** 2026-09-29
+**Version:** 2026-09-30
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
@@ -17,10 +17,10 @@
 
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`
-- `/post`, `/posts`, and `/gigs/new` → `/post-job` (server page issues the auth-aware redirect)
+- `/post`, `/posts`, and `/gigs/new` → `/post-job` (route issues a 302 to `/gigs/create`; header/nav remain auth-aware)
 
 - Stable header test IDs: `nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`.
-- Browse list IDs: `jobs-list`, `job-card`; empty state `jobs-empty-state`.
+- Browse list IDs: `jobs-list`, `job-card`; empty state `jobs-empty`.
 - Job detail ID: `apply-button`.
 - Applications IDs: `applications-list`, `application-row`, `applications-empty`.
 - Header smokes query `:visible` to ignore hidden duplicates; CTA href checks accept relative or absolute app URLs.

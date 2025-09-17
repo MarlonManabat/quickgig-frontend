@@ -34,14 +34,17 @@ export function requireServer(key: string): string {
 // Minimal, safe env reader that won't crash CI/preview builds,
 // but *will* enforce correctness in real production deploys.
 export function isVercelProd(): boolean {
-  return rawEnv.VERCEL_ENV === 'production' && !rawEnv.CI;
+  const isVercel = rawEnv.VERCEL === '1' || rawEnv.VERCEL?.toLowerCase() === 'true';
+  const isProdEnv = rawEnv.VERCEL_ENV === 'production';
+  const isCi = rawEnv.CI === 'true' || rawEnv.CI === '1';
+  return Boolean(isVercel && isProdEnv && !isCi);
 }
 
 export function apiBaseUrl(): string | undefined {
   const url = rawEnv.NEXT_PUBLIC_API_BASE_URL?.trim();
   if (!url) {
-    if (NODE_ENV === 'production' && isVercelProd()) {
-      throw new Error('NEXT_PUBLIC_API_BASE_URL is required in production');
+    if (isVercelProd()) {
+      throw new Error('NEXT_PUBLIC_API_BASE_URL is required in Vercel production');
     }
     return undefined; // allow empty in CI/preview/local so pages render empty state
   }
