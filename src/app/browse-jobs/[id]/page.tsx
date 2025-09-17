@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { hostAware } from '@/lib/hostAware';
 import { fetchJob } from '@/lib/jobs';
+import { hasApplied } from '@/lib/applications';
 
 import { ApplyButton } from './ApplyButton';
 
@@ -20,6 +21,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const applyHref = job.applyUrl
     ? hostAware(job.applyUrl)
     : hostAware(`/login?next=${encodeURIComponent(returnTo)}`);
+  const applied = hasApplied(job.id);
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
@@ -28,7 +30,14 @@ export default async function JobDetailPage({ params }: { params: { id: string }
         {job.company ?? '—'} • {job.location ?? 'Anywhere'}
       </div>
       <p className="mt-6 whitespace-pre-wrap">{job.description ?? ''}</p>
-      <ApplyButton href={applyHref} jobId={job.id} title={job.title} />
+      <div className="mt-6 flex items-center gap-3">
+        <ApplyButton href={applyHref} jobId={job.id} title={job.title} />
+        {applied && (
+          <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs text-green-700">
+            You’ve applied to this job
+          </span>
+        )}
+      </div>
     </main>
   );
 }

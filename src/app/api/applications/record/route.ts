@@ -14,18 +14,36 @@ export async function POST(req: NextRequest) {
   if (!id) return new NextResponse('missing jobId', { status: 400 });
 
   const cookie = req.cookies.get(APPLICATIONS_COOKIE)?.value;
-  let current: string[] = [];
+  const now = Date.now();
+  let current: Array<{ id: string; ts: number }> = [];
   try {
-    current = cookie ? JSON.parse(cookie) : [];
-    if (!Array.isArray(current)) current = [];
+    const parsed = cookie ? JSON.parse(cookie) : [];
+    if (Array.isArray(parsed)) {
+      current = parsed
+        .map((entry) => {
+          const rawId = (entry as { id?: unknown }).id;
+          if (rawId == null) return null;
+          return {
+            id: String(rawId),
+            ts: Number((entry as { ts?: unknown }).ts) || now,
+          };
+        })
+        .filter((entry): entry is { id: string; ts: number } => Boolean(entry));
+    }
   } catch {
     current = [];
   }
-  if (!current.includes(id)) current.unshift(id);
-  current = current.slice(0, 100);
+  const seen = new Set<string>();
+  const next = [{ id, ts: now }, ...current]
+    .filter((entry) => {
+      if (seen.has(entry.id)) return false;
+      seen.add(entry.id);
+      return true;
+    })
+    .slice(0, 100);
 
   const res = new NextResponse(null, { status: 204 });
-  res.cookies.set(APPLICATIONS_COOKIE, JSON.stringify(current), cookieOptionsForHost());
+  res.cookies.set(APPLICATIONS_COOKIE, JSON.stringify(next), cookieOptionsForHost());
   return res;
 }
 
