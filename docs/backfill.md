@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-10-01 — /post-job served via route handler
+- Removed the conflicting `/post-job/page.tsx` so the route handler owns the 302 redirect to `/gigs/create`.
+- Route handler now documents the host-aware redirect behavior.
+
 ## 2026-09-30 — Prod-safe jobs fallback & legacy redirect
 - Env reader only hard-requires `NEXT_PUBLIC_API_BASE_URL` on Vercel production; previews/CI/dev render fallbacks.
 - `/browse-jobs` exposes `jobs-empty` for the empty state and keeps deterministic mock listings when the API is unavailable.
