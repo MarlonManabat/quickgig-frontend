@@ -3,27 +3,76 @@ import { supabase } from "@/lib/supabaseClient";
 import { MOCK_JOBS, MOCK_JOB_BY_ID, type MockJob } from "@/mocks/jobs";
 import type { Insert } from "@/types/db";
 
-type Pagination = { page?: number; pageSize?: number };
+type JobsQuery = { page?: number; pageSize?: number; q?: string; location?: string };
 
-export async function fetchJobs(opts: Pagination = {}): Promise<{
+const DEFAULT_PAGE_SIZE = 10;
+
+function filterMockJobs(jobs: MockJob[], q?: string, location?: string): MockJob[] {
+  let filtered = jobs;
+  if (q) {
+    const needle = q.trim().toLowerCase();
+    if (needle) {
+      filtered = filtered.filter((job) =>
+        `${job.title ?? ""} ${job.description ?? ""}`.toLowerCase().includes(needle),
+      );
+    }
+  }
+  if (location) {
+    const loc = location.trim().toLowerCase();
+    if (loc) {
+      filtered = filtered.filter((job) => String(job.location ?? "").toLowerCase().includes(loc));
+    }
+  }
+  return filtered;
+}
+
+function paginate<T>(items: T[], page: number, pageSize: number): T[] {
+  const start = (page - 1) * pageSize;
+  return start < 0 ? items.slice(0, pageSize) : items.slice(start, start + pageSize);
+}
+
+export async function fetchJobs(opts: JobsQuery = {}): Promise<{
   items: MockJob[];
   total: number;
 }> {
   const isProd = process.env.NODE_ENV === "production";
   const base = apiBaseUrl();
+  const page = Number.isFinite(opts.page) && (opts.page ?? 0) > 0 ? Number(opts.page) : 1;
+  const pageSize =
+    Number.isFinite(opts.pageSize) && (opts.pageSize ?? 0) > 0
+      ? Number(opts.pageSize)
+      : DEFAULT_PAGE_SIZE;
+  const q = opts.q?.trim();
+  const location = opts.location?.trim();
+  const search = new URLSearchParams();
+  if (page) search.set("page", String(page));
+  if (pageSize) {
+    search.set("pageSize", String(pageSize));
+    search.set("limit", String(pageSize));
+  }
+  if (q) {
+    search.set("q", q);
+    search.set("query", q);
+    search.set("search", q);
+  }
+  if (location) search.set("location", location);
+  const queryString = search.toString();
+
+  const mockResponse = () => {
+    const filtered = filterMockJobs(MOCK_JOBS, q, location);
+    return { items: paginate(filtered, page, pageSize), total: filtered.length };
+  };
+
   if (!base) {
     if (!isProd) {
       // eslint-disable-next-line no-console
       console.warn("[WebServer] using mock jobs fallback:", "API base unset");
-      return { items: MOCK_JOBS, total: MOCK_JOBS.length };
+      return mockResponse();
     }
     return { items: [], total: 0 };
   }
   try {
-    const search = new URLSearchParams();
-    if (opts.page) search.set("page", String(opts.page));
-    if (opts.pageSize) search.set("pageSize", String(opts.pageSize));
-    const url = `${base}/jobs${search.toString() ? `?${search.toString()}` : ""}`;
+    const url = `${base}/jobs${queryString ? `?${queryString}` : ""}`;
     const res = await fetch(url, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error(`HTTP_${res.status}`);
     const data: any = await res.json();
@@ -39,7 +88,7 @@ export async function fetchJobs(opts: Pagination = {}): Promise<{
     if (!isProd) {
       // eslint-disable-next-line no-console
       console.warn("[WebServer] using mock jobs fallback:", (error as Error).message);
-      return { items: MOCK_JOBS, total: MOCK_JOBS.length };
+      return mockResponse();
     }
     // eslint-disable-next-line no-console
     console.error("[WebServer] jobs fetch failed:", (error as Error).message);
