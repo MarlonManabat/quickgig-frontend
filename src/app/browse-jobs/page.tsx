@@ -17,6 +17,16 @@ function parsePage(value: string | string[] | undefined, fallback = 1): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function parsePageSize(
+  value: string | string[] | undefined,
+  fallback = 10,
+): number {
+  const raw = firstValue(value);
+  const parsed = raw.trim() === '' ? NaN : Number(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
+  return Math.min(50, Math.max(1, parsed));
+}
+
 export default async function BrowseJobsPage({
   searchParams = {},
 }: {
@@ -25,7 +35,7 @@ export default async function BrowseJobsPage({
   const q = firstValue(searchParams.q).trim();
   const location = firstValue(searchParams.location).trim();
   const page = parsePage(searchParams.page, 1);
-  const pageSize = 10;
+  const pageSize = parsePageSize(searchParams.pageSize, 10);
 
   const { items, total } = await fetchJobs({ page, pageSize, q, location });
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -38,6 +48,7 @@ export default async function BrowseJobsPage({
     if (q) params.set('q', q);
     if (location) params.set('location', location);
     params.set('page', String(page));
+    params.set('pageSize', String(pageSize));
     Object.entries(overrides).forEach(([key, value]) => {
       if (value === undefined || value === '') params.delete(key);
       else params.set(key, String(value));
@@ -79,19 +90,36 @@ export default async function BrowseJobsPage({
             data-testid="filter-location"
           />
         </label>
-        <div className="flex items-end gap-2">
-          <button className="rounded bg-blue-600 px-4 py-2 text-white" data-testid="filter-apply">
-            Search
-          </button>
-          {(q || location) && (
-            <Link
-              href="/browse-jobs"
-              className="rounded border px-4 py-2 text-sm"
-              data-testid="filter-clear"
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col text-sm">
+            <span className="mb-1 font-medium">Page size</span>
+            <select
+              name="pageSize"
+              defaultValue={String(pageSize)}
+              className="rounded border px-3 py-2"
+              data-testid="filter-page-size"
             >
-              Clear
-            </Link>
-          )}
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+              <option value="40">40</option>
+              <option value="50">50</option>
+            </select>
+          </label>
+          <div className="flex items-end gap-2">
+            <button className="rounded bg-blue-600 px-4 py-2 text-white" data-testid="filter-apply">
+              Search
+            </button>
+            {(q || location) && (
+              <Link
+                href="/browse-jobs"
+                className="rounded border px-4 py-2 text-sm"
+                data-testid="filter-clear"
+              >
+                Clear
+              </Link>
+            )}
+          </div>
         </div>
       </form>
 
