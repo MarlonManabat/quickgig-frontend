@@ -20,13 +20,16 @@ export function withAppOrigin(path: string): string {
 export type PlainParams = Record<string, string | number | boolean | undefined | null>;
 
 /** Keep only whitelisted keys from a ReadonlyURLSearchParams. */
+const DEFAULT_ALLOWED_PARAMS = ["q", "location", "sort", "page", "pageSize", "applied"] as const;
+
 export function keepParams(
   sp: ReadonlyURLSearchParams,
-  allow: string[],
-): Record<string, string> {
-  const out: Record<string, string> = {};
+  allow: string[] = [...DEFAULT_ALLOWED_PARAMS],
+): Partial<Record<string, string>> {
+  const allowSet = new Set(allow);
+  const out: Partial<Record<string, string>> = {};
   for (const [k, v] of sp.entries()) {
-    if (allow.includes(k)) out[k] = v;
+    if (allowSet.has(k)) out[k] = v;
   }
   return out;
 }

@@ -59,8 +59,11 @@ export default async function BrowseJobsPage({
   searchParams?: SearchParams;
 }) {
   const normalized = normalizeSearchParams(searchParams);
-  const query = (normalized.get("q") ?? "").trim();
-  const location = (normalized.get("location") ?? "").trim();
+  const sanitizedFilters = keepParams(normalized, ["q", "location"]);
+  const rawQuery = sanitizedFilters.q ?? "";
+  const rawLocation = sanitizedFilters.location ?? "";
+  const q = rawQuery.trim();
+  const locationFilter = rawLocation.trim();
   const sort = parseSort(normalized.get("sort"));
   const page = parsePage(normalized.get("page"), 1);
   const pageSize = parsePageSize(normalized.get("pageSize"), 10);
@@ -69,29 +72,12 @@ export default async function BrowseJobsPage({
   const { items: fetchedItems, total } = await fetchJobs({
     page,
     pageSize,
-    query,
-    q: query,
-    location,
+    q,
+    location: locationFilter,
     sort,
   });
 
   let items = fetchedItems;
-
-  if (query) {
-    const needle = query.toLowerCase();
-    items = items.filter((job) => {
-      const haystack = `${job.title ?? ""} ${job.company ?? ""} ${job.location ?? ""}`.toLowerCase();
-      return haystack.includes(needle);
-    });
-  }
-
-  if (location) {
-    const locNeedle = location.toLowerCase();
-    items = items.filter((job) => {
-      const haystack = `${job.location ?? ""} ${job.city ?? ""}`.toLowerCase();
-      return haystack.includes(locNeedle);
-    });
-  }
 
   if (appliedOnly) {
     const ids = new Set(readAppliedIdsFromCookie().map((id) => String(id)));
@@ -102,13 +88,12 @@ export default async function BrowseJobsPage({
   const totalPages = Math.max(1, Math.ceil(Math.max(derivedTotal, 0) / pageSize));
 
   const showClear = Boolean(
-    query ||
-      location ||
+    rawQuery ||
+      rawLocation ||
       appliedOnly ||
       sort !== "newest" ||
       pageSize !== 10 ||
-      normalized.has("page") ||
-      normalized.has("pageSize"),
+      page > 1,
   );
 
   return (
@@ -117,38 +102,40 @@ export default async function BrowseJobsPage({
       <div className="text-sm text-gray-600">{derivedTotal} results</div>
 
       <form
+        role="search"
         method="get"
         action="/browse-jobs"
-        className="mt-4 mb-6 flex flex-wrap items-end gap-3"
+        className="mt-4 mb-6 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end"
       >
         <input type="hidden" name="page" value="1" />
-        <div className="min-w-[220px] flex-1">
-          <label htmlFor="q" className="block text-sm font-medium">
-            Search
+        <div className="flex min-w-[220px] flex-1 md:min-w-[240px]">
+          <label htmlFor="filter-q" className="sr-only">
+            Search title or company
           </label>
           <input
-            id="q"
+            id="filter-q"
             name="q"
-            defaultValue={query}
-            placeholder="Keyword, company, location…"
-            className="mt-1 w-full rounded border px-3 py-2"
+            type="search"
+            defaultValue={rawQuery}
+            placeholder="Search title or company…"
+            className="w-full rounded border px-3 py-2"
             data-testid="filter-q"
           />
         </div>
-        <div className="min-w-[180px]">
-          <label htmlFor="location" className="block text-sm font-medium">
-            Location
+        <div className="flex min-w-[200px] flex-1 md:min-w-[220px]">
+          <label htmlFor="filter-location" className="sr-only">
+            City, State or Remote
           </label>
           <input
-            id="location"
+            id="filter-location"
             name="location"
-            defaultValue={location}
-            placeholder="City or area"
-            className="mt-1 w-full rounded border px-3 py-2"
+            defaultValue={rawLocation}
+            placeholder="City, State or Remote"
+            className="w-full rounded border px-3 py-2"
             data-testid="filter-location"
           />
         </div>
-        <div>
+        <div className="min-w-[160px]">
           <label htmlFor="sort" className="block text-sm font-medium">
             Sort
           </label>
@@ -156,7 +143,7 @@ export default async function BrowseJobsPage({
             id="sort"
             name="sort"
             defaultValue={sort}
-            className="mt-1 rounded border px-3 py-2"
+            className="mt-1 w-full rounded border px-3 py-2"
             data-testid="sort-select"
           >
             <option value="newest">Newest</option>
@@ -164,7 +151,7 @@ export default async function BrowseJobsPage({
             <option value="pay">Pay</option>
           </select>
         </div>
-        <div>
+        <div className="min-w-[140px]">
           <label htmlFor="pageSize" className="block text-sm font-medium">
             Page size
           </label>
@@ -172,7 +159,7 @@ export default async function BrowseJobsPage({
             id="pageSize"
             name="pageSize"
             defaultValue={String(pageSize)}
-            className="mt-1 rounded border px-3 py-2"
+            className="mt-1 w-full rounded border px-3 py-2"
             data-testid="filter-page-size"
           >
             {[10, 20, 30, 50].map((n) => (
@@ -182,7 +169,7 @@ export default async function BrowseJobsPage({
             ))}
           </select>
         </div>
-        <div className="flex items-center gap-2 pl-2">
+        <div className="flex items-center gap-2 md:pl-2">
           <input
             id="applied"
             name="applied"
@@ -196,15 +183,19 @@ export default async function BrowseJobsPage({
             Applied only
           </label>
         </div>
-        <div className="ml-auto flex gap-2">
-          <button className="rounded bg-blue-600 px-4 py-2 text-white" data-testid="filter-apply">
-            Filter
+        <div className="flex items-center gap-2 md:ml-auto">
+          <button
+            type="submit"
+            className="rounded bg-blue-600 px-4 py-2 text-white"
+            data-testid="filters-apply"
+          >
+            Apply
           </button>
           {showClear && (
             <Link
-              href="/browse-jobs"
-              className="rounded border px-4 py-2 text-sm"
-              data-testid="filter-clear"
+              href={withParams("/browse-jobs", { page: 1, pageSize })}
+              className="text-sm text-blue-600 hover:underline"
+              data-testid="filters-clear"
             >
               Clear
             </Link>
@@ -213,20 +204,10 @@ export default async function BrowseJobsPage({
       </form>
 
       {items.length === 0 ? (
-        <div className="mt-8 rounded border p-6 text-gray-600" data-testid="jobs-empty">
-          {appliedOnly ? (
-            "No applied jobs yet. Start applying to track them here."
-          ) : query || location ? (
-            <>
-              No jobs found for{" "}
-              <span className="font-medium">
-                {query ? `“${query}”` : ""} {query && location ? "in" : ""} {location ? `“${location}”` : ""}
-              </span>
-              . Try adjusting your filters.
-            </>
-          ) : (
-            "No jobs yet. Please check back later."
-          )}
+        <div className="mt-8 rounded border p-6 text-gray-600" data-testid="empty-state">
+          {appliedOnly
+            ? "No applied jobs yet. Start applying to track them here."
+            : "No jobs found. Try adjusting your filters."}
         </div>
       ) : (
         <ul className="mt-8 space-y-4" data-testid="jobs-list">
@@ -271,22 +252,18 @@ export default async function BrowseJobsPage({
             const preservedParams = keepParams(normalized, [
               "q",
               "location",
-              "sort",
               "pageSize",
+              "sort",
               "applied",
             ]);
             const baseParams = {
               ...preservedParams,
-              q: query || undefined,
-              location: location || undefined,
+              q: q || undefined,
+              location: locationFilter || undefined,
               sort: sort !== "newest" ? sort : undefined,
               pageSize,
               applied: appliedOnly ? "1" : undefined,
             } as const;
-            const currentHref = withParams("/browse-jobs", {
-              ...baseParams,
-              page,
-            });
             const prevHref = withParams("/browse-jobs", {
               ...baseParams,
               page: Math.max(1, page - 1),
@@ -300,7 +277,7 @@ export default async function BrowseJobsPage({
               <>
                 <a
                   data-testid="nav-prev"
-                  href={prevDisabled ? currentHref : prevHref}
+                  href={prevDisabled ? undefined : prevHref}
                   aria-disabled={prevDisabled}
                   tabIndex={prevDisabled ? -1 : 0}
                   className={`rounded border px-3 py-2 text-sm ${prevDisabled ? "pointer-events-none opacity-50" : ""}`}
@@ -312,7 +289,7 @@ export default async function BrowseJobsPage({
                 </span>
                 <a
                   data-testid="nav-next"
-                  href={nextDisabled ? currentHref : nextHref}
+                  href={nextDisabled ? undefined : nextHref}
                   aria-disabled={nextDisabled}
                   tabIndex={nextDisabled ? -1 : 0}
                   className={`rounded border px-3 py-2 text-sm ${nextDisabled ? "pointer-events-none opacity-50" : ""}`}
