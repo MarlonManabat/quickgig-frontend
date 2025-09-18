@@ -1,52 +1,70 @@
 import Link from "next/link";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 
 import { hasApplied, readAppliedIdsFromCookie } from "@/lib/applications";
 import { hostAware } from "@/lib/hostAware";
 import { fetchJobs } from "@/lib/jobs";
-import { withParams } from "@/lib/url";
+import { keepParams, withParams } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = { [key: string]: string | string[] | undefined };
+type SearchParams = { [key: string]: string | string[] | undefined } | ReadonlyURLSearchParams;
 
-function firstValue(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
-
-function parsePage(value: string | string[] | undefined, fallback = 1): number {
-  const raw = firstValue(value);
+function parsePage(value: string | null | undefined, fallback = 1): number {
+  const raw = value ?? undefined;
   const parsed = raw ? Number(raw) : Number.NaN;
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
 }
 
 function parsePageSize(
-  value: string | string[] | undefined,
+  value: string | null | undefined,
   fallback = 10,
 ): number {
-  const raw = firstValue(value);
+  const raw = value ?? undefined;
   const parsed = raw && raw.trim() !== "" ? Number(raw) : Number.NaN;
   if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
   return Math.min(50, Math.max(1, Math.floor(parsed)));
 }
 
 function parseSort(
-  value: string | string[] | undefined,
+  value: string | null | undefined,
 ): "newest" | "relevance" | "pay" {
-  const raw = (firstValue(value) ?? "").toLowerCase();
+  const raw = (value ?? "").toLowerCase();
   return raw === "relevance" || raw === "pay" ? (raw as "relevance" | "pay") : "newest";
 }
 
+function normalizeSearchParams(
+  value?: SearchParams,
+): ReadonlyURLSearchParams {
+  if (!value) return new URLSearchParams();
+  if (typeof (value as ReadonlyURLSearchParams).entries === "function") {
+    return value as ReadonlyURLSearchParams;
+  }
+  const qs = new URLSearchParams();
+  Object.entries(value).forEach(([key, raw]) => {
+    if (Array.isArray(raw)) {
+      raw.forEach((entry) => {
+        if (entry != null) qs.append(key, entry);
+      });
+    } else if (raw != null) {
+      qs.set(key, raw);
+    }
+  });
+  return qs;
+}
+
 export default async function BrowseJobsPage({
-  searchParams = {},
+  searchParams,
 }: {
   searchParams?: SearchParams;
 }) {
-  const query = (firstValue(searchParams.q) ?? "").trim();
-  const location = (firstValue(searchParams.location) ?? "").trim();
-  const sort = parseSort(searchParams.sort);
-  const page = parsePage(searchParams.page, 1);
-  const pageSize = parsePageSize(searchParams.pageSize, 10);
-  const appliedOnly = firstValue(searchParams.applied) === "1";
+  const normalized = normalizeSearchParams(searchParams);
+  const query = (normalized.get("q") ?? "").trim();
+  const location = (normalized.get("location") ?? "").trim();
+  const sort = parseSort(normalized.get("sort"));
+  const page = parsePage(normalized.get("page"), 1);
+  const pageSize = parsePageSize(normalized.get("pageSize"), 10);
+  const appliedOnly = normalized.get("applied") === "1";
 
   const { items: fetchedItems, total } = await fetchJobs({
     page,
@@ -89,8 +107,8 @@ export default async function BrowseJobsPage({
       appliedOnly ||
       sort !== "newest" ||
       pageSize !== 10 ||
-      firstValue(searchParams.page) ||
-      firstValue(searchParams.pageSize),
+      normalized.has("page") ||
+      normalized.has("pageSize"),
   );
 
   return (
@@ -250,35 +268,39 @@ export default async function BrowseJobsPage({
           {(() => {
             const prevDisabled = page <= 1;
             const nextDisabled = page >= totalPages;
-            const preserved = new URLSearchParams(searchParams as any);
+            const preservedParams = keepParams(normalized, [
+              "q",
+              "location",
+              "sort",
+              "pageSize",
+              "applied",
+            ]);
             const baseParams = {
-              pageSize,
+              ...preservedParams,
               q: query || undefined,
               location: location || undefined,
               sort: sort !== "newest" ? sort : undefined,
+              pageSize,
               applied: appliedOnly ? "1" : undefined,
             } as const;
-
-            const prevHref = !prevDisabled
-              ? withParams(
-                  "/browse-jobs",
-                  { ...baseParams, page: Math.max(1, page - 1) },
-                  preserved,
-                )
-              : undefined;
-            const nextHref = !nextDisabled
-              ? withParams(
-                  "/browse-jobs",
-                  { ...baseParams, page: Math.min(totalPages, page + 1) },
-                  preserved,
-                )
-              : undefined;
+            const currentHref = withParams("/browse-jobs", {
+              ...baseParams,
+              page,
+            });
+            const prevHref = withParams("/browse-jobs", {
+              ...baseParams,
+              page: Math.max(1, page - 1),
+            });
+            const nextHref = withParams("/browse-jobs", {
+              ...baseParams,
+              page: Math.min(totalPages, page + 1),
+            });
 
             return (
               <>
                 <a
                   data-testid="nav-prev"
-                  {...(prevHref ? { href: prevHref } : {})}
+                  href={prevDisabled ? currentHref : prevHref}
                   aria-disabled={prevDisabled}
                   tabIndex={prevDisabled ? -1 : 0}
                   className={`rounded border px-3 py-2 text-sm ${prevDisabled ? "pointer-events-none opacity-50" : ""}`}
@@ -290,7 +312,7 @@ export default async function BrowseJobsPage({
                 </span>
                 <a
                   data-testid="nav-next"
-                  {...(nextHref ? { href: nextHref } : {})}
+                  href={nextDisabled ? currentHref : nextHref}
                   aria-disabled={nextDisabled}
                   tabIndex={nextDisabled ? -1 : 0}
                   className={`rounded border px-3 py-2 text-sm ${nextDisabled ? "pointer-events-none opacity-50" : ""}`}
