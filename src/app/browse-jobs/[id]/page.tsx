@@ -1,4 +1,3 @@
-import ApplyButton from '@/components/ApplyButton';
 import { hostAware } from '@/lib/hostAware';
 import { fetchJob } from '@/lib/jobs';
 import { hasApplied } from '@/lib/applications';
@@ -15,18 +14,13 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const jobMissing = !job;
   const applied = jobMissing ? false : hasApplied(job.id);
 
-  // Build the final destination (app host or login fallback) and keep the return path.
-  const returnTo = `/browse-jobs/${encodeURIComponent(String(id))}`;
-  const loginHref = `${hostAware('/login')}?next=${encodeURIComponent(returnTo)}`;
-  const finalTarget = jobMissing
-    ? loginHref
-    : authed
-    ? job.applyUrl
+  const detailPath = `/browse-jobs/${encodeURIComponent(String(id))}`;
+  const loginFallback = hostAware(`/login?next=${encodeURIComponent(detailPath)}`);
+  const applyHref = !jobMissing && authed
+    ? job?.applyUrl
       ? hostAware(job.applyUrl)
       : hostAware('/applications')
-    : loginHref;
-
-  const applyHref = finalTarget;
+    : loginFallback;
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
@@ -44,12 +38,17 @@ export default async function JobDetailPage({ params }: { params: { id: string }
           : job.description ?? ''}
       </p>
       <div className="mt-6 flex items-center gap-3">
-        <ApplyButton
+        {/* Apply CTA */}
+        <a
+          data-testid="apply-button"
           href={applyHref}
-          jobId={job?.id}
-          title={job?.title ?? undefined}
-          disabled={jobMissing}
-        />
+          aria-disabled={jobMissing ? "true" : undefined}
+          className="inline-block rounded bg-blue-500 px-4 py-2 text-white"
+        >
+          Apply
+        </a>
+
+        {/* Applied badge stays separate so we don't hide the CTA */}
         {!jobMissing && applied && (
           <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs text-green-700">
             You’ve applied to this job

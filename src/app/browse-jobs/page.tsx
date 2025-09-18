@@ -16,14 +16,12 @@ function parsePage(value: string | null | undefined, fallback = 1): number {
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
 }
 
-function parsePageSize(
-  value: string | null | undefined,
-  fallback = 10,
-): number {
-  const raw = value ?? undefined;
-  const parsed = raw && raw.trim() !== "" ? Number(raw) : Number.NaN;
-  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
-  return Math.min(50, Math.max(1, Math.floor(parsed)));
+function parsePageSize(value: string | string[] | undefined, fallback = 10): number {
+  const first = Array.isArray(value) ? value[0] : value;
+  if (!first) return fallback;
+  const n = Number(first);
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  return Math.min(50, Math.max(1, n));
 }
 
 function parseSort(
@@ -66,7 +64,14 @@ export default async function BrowseJobsPage({
   const locationFilter = rawLocation.trim();
   const sort = parseSort(normalized.get("sort"));
   const page = parsePage(normalized.get("page"), 1);
-  const pageSize = parsePageSize(normalized.get("pageSize"), 10);
+  const pageSize = parsePageSize(
+    (() => {
+      const all = normalized.getAll("pageSize");
+      if (all.length > 0) return all;
+      return normalized.get("pageSize") ?? undefined;
+    })(),
+    10,
+  );
   const appliedOnly = normalized.get("applied") === "1";
 
   const { items: fetchedItems, total } = await fetchJobs({
@@ -279,7 +284,6 @@ export default async function BrowseJobsPage({
                   data-testid="nav-prev"
                   href={prevDisabled ? undefined : prevHref}
                   aria-disabled={prevDisabled}
-                  tabIndex={prevDisabled ? -1 : 0}
                   className={`rounded border px-3 py-2 text-sm ${prevDisabled ? "pointer-events-none opacity-50" : ""}`}
                 >
                   Previous
@@ -291,7 +295,6 @@ export default async function BrowseJobsPage({
                   data-testid="nav-next"
                   href={nextDisabled ? undefined : nextHref}
                   aria-disabled={nextDisabled}
-                  tabIndex={nextDisabled ? -1 : 0}
                   className={`rounded border px-3 py-2 text-sm ${nextDisabled ? "pointer-events-none opacity-50" : ""}`}
                 >
                   Next
