@@ -12,3 +12,20 @@ export function withAppOrigin(path: string): string {
   const origin = getAppOrigin();
   return `${origin}${p}`.replace(/([^:]\/)\/+/g, "$1");
 }
+
+// Small helper to build URLs while preserving/sanitizing query params.
+export function withParams(
+  basePath: string,
+  params: Record<string, string | number | boolean | undefined | null>,
+  preserve: URLSearchParams | null = null
+): string {
+  const url = new URL(basePath, "http://local"); // base irrelevant; we only need search
+  const out = new URLSearchParams(preserve ?? undefined);
+  Object.entries(params).forEach(([k, v]) => {
+    if (v === undefined || v === null || v === "") out.delete(k);
+    else out.set(k, String(v));
+  });
+  url.search = out.toString();
+  // Return path + search only
+  return url.pathname + (out.toString() ? `?${out.toString()}` : "");
+}

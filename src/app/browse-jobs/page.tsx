@@ -1,20 +1,22 @@
-import Link from 'next/link';
+import Link from "next/link";
 
-import { hasApplied } from '@/lib/applications';
-import { hostAware } from '@/lib/hostAware';
-import { fetchJobs } from '@/lib/jobs';
+import { hasApplied, readAppliedIdsFromCookie } from "@/lib/applications";
+import { hostAware } from "@/lib/hostAware";
+import { fetchJobs } from "@/lib/jobs";
+import { withParams } from "@/lib/url";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 
-function firstValue(value: string | string[] | undefined): string {
-  return Array.isArray(value) ? value[0] ?? '' : value ?? '';
+function firstValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
 }
 
 function parsePage(value: string | string[] | undefined, fallback = 1): number {
-  const parsed = Number(firstValue(value));
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+  const raw = firstValue(value);
+  const parsed = raw ? Number(raw) : Number.NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
 }
 
 function parsePageSize(
@@ -22,9 +24,25 @@ function parsePageSize(
   fallback = 10,
 ): number {
   const raw = firstValue(value);
-  const parsed = raw.trim() === '' ? NaN : Number(raw);
+  const parsed = raw && raw.trim() !== "" ? Number(raw) : Number.NaN;
   if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
-  return Math.min(50, Math.max(1, parsed));
+  return Math.min(50, Math.max(1, Math.floor(parsed)));
+}
+
+function parseSort(
+  value: string | string[] | undefined,
+): "newest" | "relevance" | "pay" {
+  const raw = (firstValue(value) ?? "").toLowerCase();
+  return raw === "relevance" || raw === "pay" ? (raw as "relevance" | "pay") : "newest";
+}
+
+function toSearchParams(input: SearchParams): URLSearchParams {
+  const params = new URLSearchParams();
+  Object.entries(input).forEach(([key, value]) => {
+    if (Array.isArray(value)) value.forEach((v) => params.append(key, v));
+    else if (typeof value === "string") params.set(key, value);
+  });
+  return params;
 }
 
 export default async function BrowseJobsPage({
@@ -32,109 +50,197 @@ export default async function BrowseJobsPage({
 }: {
   searchParams?: SearchParams;
 }) {
-  const q = firstValue(searchParams.q).trim();
-  const location = firstValue(searchParams.location).trim();
+  const query = (firstValue(searchParams.q) ?? "").trim();
+  const location = (firstValue(searchParams.location) ?? "").trim();
+  const sort = parseSort(searchParams.sort);
   const page = parsePage(searchParams.page, 1);
   const pageSize = parsePageSize(searchParams.pageSize, 10);
+  const appliedOnly = firstValue(searchParams.applied) === "1";
 
-  const { items, total } = await fetchJobs({ page, pageSize, q, location });
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const preservedParams = toSearchParams(searchParams);
+
+  const { items: fetchedItems, total } = await fetchJobs({
+    page,
+    pageSize,
+    query,
+    q: query,
+    location,
+    sort,
+  });
+
+  let items = fetchedItems;
+
+  if (query) {
+    const needle = query.toLowerCase();
+    items = items.filter((job) => {
+      const haystack = `${job.title ?? ""} ${job.company ?? ""} ${job.location ?? ""}`.toLowerCase();
+      return haystack.includes(needle);
+    });
+  }
+
+  if (location) {
+    const locNeedle = location.toLowerCase();
+    items = items.filter((job) => {
+      const haystack = `${job.location ?? ""} ${job.city ?? ""}`.toLowerCase();
+      return haystack.includes(locNeedle);
+    });
+  }
+
+  if (appliedOnly) {
+    const ids = new Set(readAppliedIdsFromCookie().map((id) => String(id)));
+    items = ids.size === 0 ? [] : items.filter((job) => ids.has(String(job.id)));
+  }
+
+  const derivedTotal = appliedOnly ? items.length : total;
+  const totalPages = Math.max(1, Math.ceil(Math.max(derivedTotal, 0) / pageSize));
 
   const linkClass = (disabled: boolean) =>
-    `rounded border px-3 py-2 text-sm ${disabled ? 'pointer-events-none opacity-50' : ''}`;
+    `rounded border px-3 py-2 text-sm ${disabled ? "pointer-events-none opacity-50" : ""}`;
 
-  const qp = (overrides: Record<string, string | number | undefined>) => {
-    const params = new URLSearchParams();
-    if (q) params.set('q', q);
-    if (location) params.set('location', location);
-    params.set('page', String(page));
-    params.set('pageSize', String(pageSize));
-    Object.entries(overrides).forEach(([key, value]) => {
-      if (value === undefined || value === '') params.delete(key);
-      else params.set(key, String(value));
-    });
-    return `?${params.toString()}`;
-  };
+  const baseParams = {
+    pageSize,
+    q: query || undefined,
+    location: location || undefined,
+    sort: sort !== "newest" ? sort : undefined,
+    applied: appliedOnly ? "1" : undefined,
+  } satisfies Record<string, string | number | undefined>;
+
+  const prevHref = withParams(
+    "/browse-jobs",
+    { ...baseParams, page: Math.max(1, page - 1) },
+    preservedParams,
+  );
+  const nextHref = withParams(
+    "/browse-jobs",
+    { ...baseParams, page: page + 1 },
+    preservedParams,
+  );
+
+  const showClear = Boolean(
+    query ||
+      location ||
+      appliedOnly ||
+      sort !== "newest" ||
+      pageSize !== 10 ||
+      firstValue(searchParams.page) ||
+      firstValue(searchParams.pageSize),
+  );
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-8">
-      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Browse Jobs</h1>
-          <div className="text-sm text-gray-600">{total} results</div>
-        </div>
-      </div>
+    <main className="mx-auto max-w-4xl p-6">
+      <h1 className="text-2xl font-semibold">Browse Jobs</h1>
+      <div className="text-sm text-gray-600">{derivedTotal} results</div>
 
       <form
         method="get"
         action="/browse-jobs"
-        className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-[2fr,2fr,auto]"
+        className="mt-4 mb-6 flex flex-wrap items-end gap-3"
       >
-        <label className="flex flex-col text-sm">
-          <span className="mb-1 font-medium">Keyword</span>
+        <input type="hidden" name="page" value="1" />
+        <div className="min-w-[220px] flex-1">
+          <label htmlFor="q" className="block text-sm font-medium">
+            Search
+          </label>
           <input
+            id="q"
             name="q"
-            defaultValue={q}
-            placeholder="e.g. cashier, barista"
-            className="rounded border px-3 py-2"
+            defaultValue={query}
+            placeholder="Keyword, company, location…"
+            className="mt-1 w-full rounded border px-3 py-2"
             data-testid="filter-q"
           />
-        </label>
-        <label className="flex flex-col text-sm">
-          <span className="mb-1 font-medium">Location</span>
+        </div>
+        <div className="min-w-[180px]">
+          <label htmlFor="location" className="block text-sm font-medium">
+            Location
+          </label>
           <input
+            id="location"
             name="location"
             defaultValue={location}
             placeholder="City or area"
-            className="rounded border px-3 py-2"
+            className="mt-1 w-full rounded border px-3 py-2"
             data-testid="filter-location"
           />
-        </label>
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col text-sm">
-            <span className="mb-1 font-medium">Page size</span>
-            <select
-              name="pageSize"
-              defaultValue={String(pageSize)}
-              className="rounded border px-3 py-2"
-              data-testid="filter-page-size"
-            >
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="40">40</option>
-              <option value="50">50</option>
-            </select>
+        </div>
+        <div>
+          <label htmlFor="sort" className="block text-sm font-medium">
+            Sort
           </label>
-          <div className="flex items-end gap-2">
-            <button className="rounded bg-blue-600 px-4 py-2 text-white" data-testid="filter-apply">
-              Search
-            </button>
-            {(q || location) && (
-              <Link
-                href="/browse-jobs"
-                className="rounded border px-4 py-2 text-sm"
-                data-testid="filter-clear"
-              >
-                Clear
-              </Link>
-            )}
-          </div>
+          <select
+            id="sort"
+            name="sort"
+            defaultValue={sort}
+            className="mt-1 rounded border px-3 py-2"
+            data-testid="sort-select"
+          >
+            <option value="newest">Newest</option>
+            <option value="relevance">Relevance</option>
+            <option value="pay">Pay</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="pageSize" className="block text-sm font-medium">
+            Page size
+          </label>
+          <select
+            id="pageSize"
+            name="pageSize"
+            defaultValue={String(pageSize)}
+            className="mt-1 rounded border px-3 py-2"
+            data-testid="filter-page-size"
+          >
+            {[10, 20, 30, 50].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-2 pl-2">
+          <input
+            id="applied"
+            name="applied"
+            type="checkbox"
+            value="1"
+            defaultChecked={appliedOnly}
+            className="h-4 w-4"
+            data-testid="filter-applied"
+          />
+          <label htmlFor="applied" className="text-sm">
+            Applied only
+          </label>
+        </div>
+        <div className="ml-auto flex gap-2">
+          <button className="rounded bg-blue-600 px-4 py-2 text-white" data-testid="filter-apply">
+            Filter
+          </button>
+          {showClear && (
+            <Link
+              href="/browse-jobs"
+              className="rounded border px-4 py-2 text-sm"
+              data-testid="filter-clear"
+            >
+              Clear
+            </Link>
+          )}
         </div>
       </form>
 
       {items.length === 0 ? (
         <div className="mt-8 rounded border p-6 text-gray-600" data-testid="jobs-empty">
-          {q || location ? (
+          {appliedOnly ? (
+            "No applied jobs yet. Start applying to track them here."
+          ) : query || location ? (
             <>
-              No jobs found for{' '}
+              No jobs found for{" "}
               <span className="font-medium">
-                {q ? `“${q}”` : ''} {q && location ? 'in' : ''} {location ? `“${location}”` : ''}
+                {query ? `“${query}”` : ""} {query && location ? "in" : ""} {location ? `“${location}”` : ""}
               </span>
               . Try adjusting your filters.
             </>
           ) : (
-            'No jobs yet. Please check back later.'
+            "No jobs yet. Please check back later."
           )}
         </div>
       ) : (
@@ -148,9 +254,9 @@ export default async function BrowseJobsPage({
                 data-testid="job-card"
               >
                 <div>
-                  <div className="font-medium text-lg">{job.title ?? `Job #${job.id}`}</div>
+                  <div className="text-lg font-medium">{job.title ?? `Job #${job.id}`}</div>
                   <div className="text-sm text-gray-600">
-                    {job.company ?? '—'} • {job.location ?? job.city ?? 'Anywhere'}
+                    {job.company ?? "—"} • {job.location ?? job.city ?? "Anywhere"}
                   </div>
                   <div className="mt-3">
                     <Link
@@ -172,15 +278,20 @@ export default async function BrowseJobsPage({
         </ul>
       )}
 
-      {totalPages > 1 && (
+      {items.length > 0 && totalPages > 1 && (
         <nav className="mt-8 flex flex-wrap items-center justify-between gap-3" aria-label="pagination">
-          <Link className={linkClass(page <= 1)} aria-disabled={page <= 1} href={`/browse-jobs${qp({ page: 1 })}`}>
+          <Link
+            className={linkClass(page <= 1)}
+            aria-disabled={page <= 1}
+            href={withParams("/browse-jobs", { ...baseParams, page: 1 }, preservedParams)}
+          >
             First
           </Link>
           <Link
             className={linkClass(page <= 1)}
             aria-disabled={page <= 1}
-            href={`/browse-jobs${qp({ page: Math.max(1, page - 1) })}`}
+            href={prevHref}
+            data-testid="nav-prev"
           >
             Prev
           </Link>
@@ -190,14 +301,15 @@ export default async function BrowseJobsPage({
           <Link
             className={linkClass(page >= totalPages)}
             aria-disabled={page >= totalPages}
-            href={`/browse-jobs${qp({ page: Math.min(totalPages, page + 1) })}`}
+            href={nextHref}
+            data-testid="nav-next"
           >
             Next
           </Link>
           <Link
             className={linkClass(page >= totalPages)}
             aria-disabled={page >= totalPages}
-            href={`/browse-jobs${qp({ page: totalPages })}`}
+            href={withParams("/browse-jobs", { ...baseParams, page: totalPages }, preservedParams)}
           >
             Last
           </Link>
