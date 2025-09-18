@@ -38,10 +38,11 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
   const isProd = isVercelProd();
   const base = apiBaseUrl();
   const page = Number.isFinite(opts.page) && (opts.page ?? 0) > 0 ? Number(opts.page) : 1;
-  const pageSize =
+  const rawPageSize =
     Number.isFinite(opts.pageSize) && (opts.pageSize ?? 0) > 0
       ? Number(opts.pageSize)
       : DEFAULT_PAGE_SIZE;
+  const pageSize = Math.min(50, Math.max(1, rawPageSize));
   const q = opts.q?.trim();
   const location = opts.location?.trim();
   const search = new URLSearchParams();
