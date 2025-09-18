@@ -3,12 +3,24 @@ import { supabase } from "@/lib/supabaseClient";
 import { MOCK_JOBS, MOCK_JOB_BY_ID, type MockJob } from "@/mocks/jobs";
 import type { Insert } from "@/types/db";
 
-type JobsQuery = { page?: number; pageSize?: number; q?: string; location?: string };
+type JobsQuery = {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  query?: string;
+  location?: string;
+  sort?: "newest" | "relevance" | "pay";
+};
 
 const DEFAULT_PAGE_SIZE = 10;
 
-function filterMockJobs(jobs: MockJob[], q?: string, location?: string): MockJob[] {
-  let filtered = jobs;
+function filterMockJobs(
+  jobs: MockJob[],
+  q?: string,
+  location?: string,
+  sort: JobsQuery['sort'] = "newest",
+): MockJob[] {
+  let filtered = [...jobs];
   if (q) {
     const needle = q.trim().toLowerCase();
     if (needle) {
@@ -22,6 +34,13 @@ function filterMockJobs(jobs: MockJob[], q?: string, location?: string): MockJob
     if (loc) {
       filtered = filtered.filter((job) => String(job.location ?? "").toLowerCase().includes(loc));
     }
+  }
+  if (sort === "newest" || sort === "relevance") {
+    filtered.sort((a, b) => {
+      const aTs = a.postedAt ? Date.parse(a.postedAt) : 0;
+      const bTs = b.postedAt ? Date.parse(b.postedAt) : 0;
+      return bTs - aTs;
+    });
   }
   return filtered;
 }
@@ -43,8 +62,11 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
       ? Number(opts.pageSize)
       : DEFAULT_PAGE_SIZE;
   const pageSize = Math.min(50, Math.max(1, rawPageSize));
-  const q = opts.q?.trim();
+  const q = (opts.query ?? opts.q)?.trim();
   const location = opts.location?.trim();
+  const sort =
+    opts.sort && ["newest", "relevance", "pay"].includes(opts.sort) ? opts.sort : undefined;
+  const effectiveSort = sort ?? "newest";
   const search = new URLSearchParams();
   if (page) search.set("page", String(page));
   if (pageSize) {
@@ -57,10 +79,11 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
     search.set("search", q);
   }
   if (location) search.set("location", location);
+  if (sort) search.set("sort", sort);
   const queryString = search.toString();
 
   const mockResponse = () => {
-    const filtered = filterMockJobs(MOCK_JOBS, q, location);
+    const filtered = filterMockJobs(MOCK_JOBS, q, location, effectiveSort);
     return { items: paginate(filtered, page, pageSize), total: filtered.length };
   };
 
