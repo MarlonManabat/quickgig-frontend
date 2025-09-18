@@ -7,7 +7,6 @@ type JobsQuery = {
   page?: number;
   pageSize?: number;
   q?: string;
-  query?: string;
   location?: string;
   sort?: "newest" | "relevance" | "pay";
 };
@@ -24,15 +23,26 @@ function filterMockJobs(
   if (q) {
     const needle = q.trim().toLowerCase();
     if (needle) {
-      filtered = filtered.filter((job) =>
-        `${job.title ?? ""} ${job.description ?? ""}`.toLowerCase().includes(needle),
-      );
+      filtered = filtered.filter((job) => {
+        const title = job.title ?? "";
+        const company = job.company ?? "";
+        return `${title} ${company}`.toLowerCase().includes(needle);
+      });
     }
   }
   if (location) {
     const loc = location.trim().toLowerCase();
     if (loc) {
-      filtered = filtered.filter((job) => String(job.location ?? "").toLowerCase().includes(loc));
+      filtered = filtered.filter((job) => {
+        const jobLocation = String(job.location ?? "").toLowerCase();
+        if (jobLocation.includes(loc)) return true;
+        if (!loc.includes("remote")) return false;
+        const remoteFlag =
+          "remote" in job && typeof (job as { remote?: boolean }).remote === "boolean"
+            ? Boolean((job as { remote?: boolean }).remote)
+            : false;
+        return remoteFlag;
+      });
     }
   }
   if (sort === "newest" || sort === "relevance") {
@@ -62,7 +72,7 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
       ? Number(opts.pageSize)
       : DEFAULT_PAGE_SIZE;
   const pageSize = Math.min(50, Math.max(1, rawPageSize));
-  const q = (opts.query ?? opts.q)?.trim();
+  const q = opts.q?.trim();
   const location = opts.location?.trim();
   const sort =
     opts.sort && ["newest", "relevance", "pay"].includes(opts.sort) ? opts.sort : undefined;
@@ -75,8 +85,6 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
   }
   if (q) {
     search.set("q", q);
-    search.set("query", q);
-    search.set("search", q);
   }
   if (location) search.set("location", location);
   if (sort) search.set("sort", sort);

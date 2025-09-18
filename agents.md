@@ -1,5 +1,11 @@
 # Agents Contract
-**Version:** 2026-10-01
+## Contract version
+- **Version**: 2025-09-18
+- **Changes**:
+  - Browse Jobs empty state keeps `data-testid="jobs-empty"` (was briefly renamed to `empty-state`).
+  - Job detail always renders a clickable `data-testid="apply-button"`. If the job source is missing,
+    the anchor is present but marked `aria-disabled="true"`. Apply falls back to `/login?next=/browse-jobs/[id]`
+    when unauthenticated, and respects `NEXT_PUBLIC_APP_HOST` for hosted flows.
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
@@ -47,7 +53,7 @@
 - Middleware (`src/middleware.ts`) handles auth gating for `/applications` and `/my-applications` and short-circuits `/api/auth/pkce/*` in CI.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-12-16 -->
+<!-- AGENT CONTRACT v2025-09-18 -->
 
 ---
 

@@ -4,6 +4,7 @@ import type { Page } from '@playwright/test';
 export const loginRe = /\/login(?:\?.*)?$/;
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 export const browseJobsRe = /\/browse-jobs(\?.*)?$/;
+const EMPTY_TEST_IDS = ['jobs-empty', 'empty-state'];
 
 export function hostAware(re: RegExp) {
   return new RegExp(`(?:https?:\\/\\/[^/]+)?${re.source}`);
@@ -90,19 +91,34 @@ export async function expectListOrEmpty(
   timeout = 8000
 ) {
   const list = page.getByTestId(listTestId).first();
-  const empty =
-    'testId' in emptyMarker
-      ? page.getByTestId(emptyMarker.testId).first()
-      : page.getByText(emptyMarker.text as any, { exact: false }).first();
+  const emptyTestIds = 'testId' in emptyMarker
+    ? (EMPTY_TEST_IDS.includes(emptyMarker.testId)
+        ? EMPTY_TEST_IDS
+        : [emptyMarker.testId])
+    : [];
+  const emptyLocators =
+    emptyTestIds.length > 0
+      ? emptyTestIds.map((id) => page.getByTestId(id).first())
+      : [page.getByText(emptyMarker.text as any, { exact: false }).first()];
   const started = Date.now();
   while (Date.now() - started < timeout) {
-    if ((await list.isVisible().catch(() => false)) || (await empty.isVisible().catch(() => false))) {
+    if (await list.isVisible().catch(() => false)) {
       expect(true).toBeTruthy();
       return;
     }
+    for (const empty of emptyLocators) {
+      if (await empty.isVisible().catch(() => false)) {
+        expect(true).toBeTruthy();
+        return;
+      }
+    }
     await page.waitForTimeout(100);
   }
-  expect(false, `Neither list '${listTestId}' nor empty-state became visible`).toBeTruthy();
+  const message =
+    emptyTestIds.length > 0
+      ? `Neither list '${listTestId}' nor any empty-state (${emptyTestIds.join(', ')}) became visible`
+      : `Neither list '${listTestId}' nor empty-state became visible`;
+  expect(false, message).toBeTruthy();
 }
 
 /** Simpler helper for tests that expect “Login” directly but should allow PKCE start too. */

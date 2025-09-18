@@ -17,33 +17,35 @@ export function withAppOrigin(path: string): string {
 
 // Small helper to build URLs while preserving/sanitizing query params.
 // Small URL helpers that are safe with Next.js ReadonlyURLSearchParams
-export type PlainParams = Record<string, string | number | boolean | undefined | null>;
 
 /** Keep only whitelisted keys from a ReadonlyURLSearchParams. */
+const DEFAULT_ALLOWED_PARAMS = ["q", "location", "sort", "page", "pageSize", "applied"] as const;
+
 export function keepParams(
   sp: ReadonlyURLSearchParams,
-  allow: string[],
-): Record<string, string> {
-  const out: Record<string, string> = {};
+  allow: string[] = [...DEFAULT_ALLOWED_PARAMS],
+): Partial<Record<string, string>> {
+  const allowSet = new Set(allow);
+  const out: Partial<Record<string, string>> = {};
   for (const [k, v] of sp.entries()) {
-    if (allow.includes(k)) out[k] = v;
+    if (allowSet.has(k)) out[k] = v;
   }
   return out;
 }
 
-/** Build a path + query string from plain params (strings only). */
-export function withParams(path: string, params: PlainParams): string {
-  const qs = new URLSearchParams();
+// Safer query-string builder that only serializes primitives.
+export function withParams(path: string, params: Record<string, unknown> = {}) {
+  const usp = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
     if (v === undefined || v === null) continue;
-    // Skip falsey booleans but allow true as a flag (e.g., ?foo=1)
-    if (typeof v === "boolean") {
-      if (!v) continue;
-      qs.set(k, "1");
-      continue;
-    }
-    qs.set(k, String(v));
+    // Avoid Symbols/objects creeping in from accidental spreads
+    const val = typeof v === "string" || typeof v === "number" || typeof v === "boolean"
+      ? String(v)
+      : Array.isArray(v)
+        ? v.map((x) => String(x)).join(",")
+        : undefined;
+    if (val && val.trim() !== "") usp.set(k, val);
   }
-  const s = qs.toString();
-  return s ? `${path}?${s}` : path;
+  const q = usp.toString();
+  return q ? `${path}?${q}` : path;
 }
