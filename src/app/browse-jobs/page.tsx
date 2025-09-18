@@ -17,9 +17,13 @@ function parsePage(value: string | string[] | undefined, fallback = 1): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function parsePageSize(value: string | string[] | undefined, fallback = 10): number {
-  const parsed = Number(firstValue(value));
-  if (!Number.isFinite(parsed)) return fallback;
+function parsePageSize(
+  value: string | string[] | undefined,
+  fallback = 10,
+): number {
+  const raw = firstValue(value);
+  const parsed = raw.trim() === '' ? NaN : Number(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallback;
   return Math.min(50, Math.max(1, parsed));
 }
 
