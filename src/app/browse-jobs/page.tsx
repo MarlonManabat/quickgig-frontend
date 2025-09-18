@@ -204,7 +204,7 @@ export default async function BrowseJobsPage({
       </form>
 
       {items.length === 0 ? (
-        <div className="mt-8 rounded border p-6 text-gray-600" data-testid="empty-state">
+        <div className="mt-8 rounded border p-6 text-gray-600" data-testid="jobs-empty">
           {appliedOnly
             ? "No applied jobs yet. Start applying to track them here."
             : "No jobs found. Try adjusting your filters."}
