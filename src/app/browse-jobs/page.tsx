@@ -36,15 +36,6 @@ function parseSort(
   return raw === "relevance" || raw === "pay" ? (raw as "relevance" | "pay") : "newest";
 }
 
-function toSearchParams(input: SearchParams): URLSearchParams {
-  const params = new URLSearchParams();
-  Object.entries(input).forEach(([key, value]) => {
-    if (Array.isArray(value)) value.forEach((v) => params.append(key, v));
-    else if (typeof value === "string") params.set(key, value);
-  });
-  return params;
-}
-
 export default async function BrowseJobsPage({
   searchParams = {},
 }: {
@@ -56,8 +47,6 @@ export default async function BrowseJobsPage({
   const page = parsePage(searchParams.page, 1);
   const pageSize = parsePageSize(searchParams.pageSize, 10);
   const appliedOnly = firstValue(searchParams.applied) === "1";
-
-  const preservedParams = toSearchParams(searchParams);
 
   const { items: fetchedItems, total } = await fetchJobs({
     page,
@@ -93,28 +82,6 @@ export default async function BrowseJobsPage({
 
   const derivedTotal = appliedOnly ? items.length : total;
   const totalPages = Math.max(1, Math.ceil(Math.max(derivedTotal, 0) / pageSize));
-
-  const linkClass = (disabled: boolean) =>
-    `rounded border px-3 py-2 text-sm ${disabled ? "pointer-events-none opacity-50" : ""}`;
-
-  const baseParams = {
-    pageSize,
-    q: query || undefined,
-    location: location || undefined,
-    sort: sort !== "newest" ? sort : undefined,
-    applied: appliedOnly ? "1" : undefined,
-  } satisfies Record<string, string | number | undefined>;
-
-  const prevHref = withParams(
-    "/browse-jobs",
-    { ...baseParams, page: Math.max(1, page - 1) },
-    preservedParams,
-  );
-  const nextHref = withParams(
-    "/browse-jobs",
-    { ...baseParams, page: page + 1 },
-    preservedParams,
-  );
 
   const showClear = Boolean(
     query ||
@@ -278,41 +245,61 @@ export default async function BrowseJobsPage({
         </ul>
       )}
 
-      {items.length > 0 && totalPages > 1 && (
+      {items.length > 0 && (
         <nav className="mt-8 flex flex-wrap items-center justify-between gap-3" aria-label="pagination">
-          <Link
-            className={linkClass(page <= 1)}
-            aria-disabled={page <= 1}
-            href={withParams("/browse-jobs", { ...baseParams, page: 1 }, preservedParams)}
-          >
-            First
-          </Link>
-          <Link
-            className={linkClass(page <= 1)}
-            aria-disabled={page <= 1}
-            href={prevHref}
-            data-testid="nav-prev"
-          >
-            Prev
-          </Link>
-          <div className="text-sm text-gray-600">
-            Page {page} of {totalPages}
-          </div>
-          <Link
-            className={linkClass(page >= totalPages)}
-            aria-disabled={page >= totalPages}
-            href={nextHref}
-            data-testid="nav-next"
-          >
-            Next
-          </Link>
-          <Link
-            className={linkClass(page >= totalPages)}
-            aria-disabled={page >= totalPages}
-            href={withParams("/browse-jobs", { ...baseParams, page: totalPages }, preservedParams)}
-          >
-            Last
-          </Link>
+          {(() => {
+            const prevDisabled = page <= 1;
+            const nextDisabled = page >= totalPages;
+            const preserved = new URLSearchParams(searchParams as any);
+            const baseParams = {
+              pageSize,
+              q: query || undefined,
+              location: location || undefined,
+              sort: sort !== "newest" ? sort : undefined,
+              applied: appliedOnly ? "1" : undefined,
+            } as const;
+
+            const prevHref = !prevDisabled
+              ? withParams(
+                  "/browse-jobs",
+                  { ...baseParams, page: Math.max(1, page - 1) },
+                  preserved,
+                )
+              : undefined;
+            const nextHref = !nextDisabled
+              ? withParams(
+                  "/browse-jobs",
+                  { ...baseParams, page: Math.min(totalPages, page + 1) },
+                  preserved,
+                )
+              : undefined;
+
+            return (
+              <>
+                <a
+                  data-testid="nav-prev"
+                  {...(prevHref ? { href: prevHref } : {})}
+                  aria-disabled={prevDisabled}
+                  tabIndex={prevDisabled ? -1 : 0}
+                  className={`rounded border px-3 py-2 text-sm ${prevDisabled ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  Previous
+                </a>
+                <span className="text-sm text-gray-600">
+                  Page {page} of {totalPages}
+                </span>
+                <a
+                  data-testid="nav-next"
+                  {...(nextHref ? { href: nextHref } : {})}
+                  aria-disabled={nextDisabled}
+                  tabIndex={nextDisabled ? -1 : 0}
+                  className={`rounded border px-3 py-2 text-sm ${nextDisabled ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  Next
+                </a>
+              </>
+            );
+          })()}
         </nav>
       )}
     </main>
