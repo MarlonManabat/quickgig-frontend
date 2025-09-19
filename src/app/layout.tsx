@@ -20,8 +20,8 @@ export default function RootLayout({
       <body>
         <Header />
         {children}
-        {/* Vercel Speed Insights: collects real user performance metrics */}
-        <SpeedInsights />
+        {/* Render Speed Insights in production only to avoid non-prod noise */}
+        {process.env.NODE_ENV === "production" && <SpeedInsights />}
       </body>
     </html>
   );
