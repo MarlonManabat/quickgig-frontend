@@ -30,6 +30,16 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
   const applicationsHref = hostAware("/applications");
 
+  const applyButton = (
+    <ApplyButton
+      href={applyHref}
+      jobId={!jobMissing && !applied ? job?.id : undefined}
+      jobTitle={job?.title ?? undefined}
+      disabled={jobMissing}
+      data-testid="apply-button"
+    />
+  );
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="text-2xl font-semibold">{jobMissing ? "Job details" : job.title}</h1>
@@ -44,9 +54,8 @@ export default async function JobDetailPage({ params }: { params: { id: string }
           : job.description ?? ""}
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        {jobMissing ? (
-          <ApplyButton href={applyHref} disabled data-testid="apply-button" />
-        ) : applied ? (
+        {applyButton}
+        {!jobMissing && applied && (
           <>
             <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs text-green-700">
               You’ve applied to this job
@@ -55,8 +64,6 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               View applications
             </a>
           </>
-        ) : (
-          <ApplyButton href={applyHref} jobId={job.id} jobTitle={job.title ?? undefined} />
         )}
       </div>
       <div className="mt-8">
