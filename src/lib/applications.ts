@@ -1,56 +1,100 @@
-import { cookies, headers } from 'next/headers';
-import { cookieDomainFor } from '@/lib/auth/cookies';
+import { cookies, headers } from "next/headers";
+import { cookieDomainFor } from "@/lib/auth/cookies";
+import { APPLICATIONS_COOKIE, APPLICATIONS_MAX } from "@/lib/constants";
 
-export const APPLICATIONS_COOKIE = 'gg_apps';
+export type ApplicationsStore = {
+  ids: string[];
+};
 
-export type ApplicationEntry = { id: string; ts: number };
+type MaybeIds = { ids?: unknown } | unknown;
 
-type RawEntry = { id?: unknown; ts?: unknown };
+type LegacyEntry = { id?: unknown; ts?: unknown } | string | number | null | undefined;
 
-function parse(raw: string | undefined): ApplicationEntry[] {
-  if (!raw) return [];
-  try {
-    const val = JSON.parse(raw);
-    if (Array.isArray(val)) {
-      if (val.length && typeof val[0] !== 'object') {
-        const now = Date.now();
-        return [...new Set(val.map((v: unknown) => String(v)))].map((id) => ({ id, ts: now }));
-      }
-      return val
-        .map((entry: RawEntry) => {
-          if (!entry || entry.id == null) return null;
-          return { id: String(entry.id), ts: Number(entry.ts) || Date.now() } satisfies ApplicationEntry;
-        })
-        .filter((entry): entry is ApplicationEntry => Boolean(entry));
-    }
-  } catch {}
-  return [];
+function toId(value: LegacyEntry): string | null {
+  if (value == null) return null;
+  if (typeof value === "string" || typeof value === "number") {
+    const str = String(value).trim();
+    return str ? str : null;
+  }
+  if (typeof value === "object" && "id" in value) {
+    const raw = (value as { id?: unknown }).id;
+    if (raw == null) return null;
+    const str = String(raw).trim();
+    return str ? str : null;
+  }
+  return null;
 }
 
-export function readApplications(): ApplicationEntry[] {
-  const raw = cookies().get(APPLICATIONS_COOKIE)?.value;
-  return parse(raw).slice(0, 100);
+function uniqueIds(values: Array<LegacyEntry>): string[] {
+  const deduped = new Set<string>();
+  for (const value of values) {
+    const id = toId(value);
+    if (id) deduped.add(id);
+  }
+  return Array.from(deduped);
+}
+
+function parseStore(raw: string | undefined): ApplicationsStore {
+  if (!raw) return { ids: [] };
+  try {
+    const parsed = JSON.parse(raw) as MaybeIds;
+    if (Array.isArray(parsed)) {
+      return { ids: uniqueIds(parsed).slice(0, APPLICATIONS_MAX) };
+    }
+    if (parsed && typeof parsed === "object" && Array.isArray((parsed as { ids?: unknown }).ids)) {
+      return { ids: uniqueIds((parsed as { ids: LegacyEntry[] }).ids).slice(0, APPLICATIONS_MAX) };
+    }
+  } catch {
+    // ignore malformed data and fall back to empty
+  }
+  return { ids: [] };
+}
+
+function readStore(): ApplicationsStore {
+  const jar = cookies();
+  const raw = jar.get(APPLICATIONS_COOKIE)?.value;
+  const store = parseStore(raw);
+  return { ids: store.ids.slice(-APPLICATIONS_MAX) };
+}
+
+export function readApplications(): ApplicationsStore {
+  return readStore();
 }
 
 export function readAppliedIdsFromCookie(): string[] {
-  return readApplications().map((entry) => entry.id);
+  return readStore().ids;
 }
 
 export function hasApplied(id: string | number): boolean {
   const target = String(id);
-  return readApplications().some((entry) => entry.id === target);
+  return readStore().ids.includes(target);
 }
 
-// Helper for API routes to set the applications cookie consistently
 export function cookieOptionsForHost() {
-  const host = headers().get('host') || '';
-  const domain = cookieDomainFor(host.split(':')[0] ?? '');
+  const host = headers().get("host") || "";
+  const domain = cookieDomainFor(host.split(":")[0] ?? "");
   return {
-    httpOnly: true as const,
-    sameSite: 'lax' as const,
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 90, // 90 days
+    httpOnly: false as const,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
     ...(domain ? { domain } : {}),
   };
+}
+
+export function writeApplications(nextIds: Array<string | number>) {
+  const ids = Array.from(new Set(nextIds.map((value) => String(value)))).slice(-APPLICATIONS_MAX);
+  const jar = cookies();
+  jar.set(APPLICATIONS_COOKIE, JSON.stringify({ ids }), cookieOptionsForHost());
+  return { ids } satisfies ApplicationsStore;
+}
+
+export function recordApplication(jobId: string | number) {
+  const store = readStore();
+  const target = String(jobId);
+  if (store.ids.includes(target)) {
+    return store;
+  }
+  return writeApplications([...store.ids, target]);
 }

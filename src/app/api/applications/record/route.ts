@@ -1,49 +1,26 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { APPLICATIONS_COOKIE, cookieOptionsForHost } from '@/lib/applications';
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { recordApplication } from "@/lib/applications";
 
 export async function POST(req: NextRequest) {
-  let id: string | null = null;
+  let jobId: string | number | null = null;
   try {
     const body = await req.json();
-    if (body && (body.id ?? body.jobId) != null) {
-      id = String(body.id ?? body.jobId);
-    }
-  } catch {}
-
-  if (!id) return new NextResponse('missing jobId', { status: 400 });
-
-  const cookie = req.cookies.get(APPLICATIONS_COOKIE)?.value;
-  const now = Date.now();
-  let current: Array<{ id: string; ts: number }> = [];
-  try {
-    const parsed = cookie ? JSON.parse(cookie) : [];
-    if (Array.isArray(parsed)) {
-      current = parsed
-        .map((entry) => {
-          const rawId = (entry as { id?: unknown }).id;
-          if (rawId == null) return null;
-          return {
-            id: String(rawId),
-            ts: Number((entry as { ts?: unknown }).ts) || now,
-          };
-        })
-        .filter((entry): entry is { id: string; ts: number } => Boolean(entry));
+    if (body && (body.jobId ?? body.id) != null) {
+      jobId = body.jobId ?? body.id;
     }
   } catch {
-    current = [];
+    // ignore invalid JSON and fall through to error response
   }
-  const seen = new Set<string>();
-  const next = [{ id, ts: now }, ...current]
-    .filter((entry) => {
-      if (seen.has(entry.id)) return false;
-      seen.add(entry.id);
-      return true;
-    })
-    .slice(0, 100);
 
-  const res = new NextResponse(null, { status: 204 });
-  res.cookies.set(APPLICATIONS_COOKIE, JSON.stringify(next), cookieOptionsForHost());
-  return res;
+  if (jobId == null) {
+    return NextResponse.json({ ok: false, error: "missing jobId" }, { status: 400 });
+  }
+
+  try {
+    const store = recordApplication(jobId);
+    return NextResponse.json({ ok: true, ids: store.ids });
+  } catch (error) {
+    return NextResponse.json({ ok: false, error: "unexpected" }, { status: 500 });
+  }
 }
-
