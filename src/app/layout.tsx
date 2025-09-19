@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Header from "@/components/Header";
 import { metadataBaseOrigin } from "@/lib/env";
 
@@ -19,6 +20,8 @@ export default function RootLayout({
       <body>
         <Header />
         {children}
+        {/* Vercel Speed Insights: collects real user performance metrics */}
+        <SpeedInsights />
       </body>
     </html>
   );

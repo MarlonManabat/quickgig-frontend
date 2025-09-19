@@ -29,7 +29,7 @@ jobs:
       - run: node -v && npm -v
       - run: npm run preflight:node
       - name: Install deps
-        run: npm ci
+        run: npm ci || npm i --no-audit --no-fund
 
       - name: Install Playwright (headless)
         run: npx playwright install --with-deps

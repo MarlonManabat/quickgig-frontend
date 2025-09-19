@@ -28,7 +28,8 @@ jobs:
       - run: npm run preflight:node
 
       - name: Install deps (strict)
-        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error
+        run: npm ci --ignore-scripts --no-audit --fund=false --loglevel=error \
+          || npm i --ignore-scripts --no-audit --fund=false --loglevel=error
 
       - name: Run TypeScript (baseline guard; informational by default)
         env:

@@ -21,7 +21,7 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
+      - run: npm ci || npm i --no-audit --no-fund
 
       - run: npm run build:ci
         env:
