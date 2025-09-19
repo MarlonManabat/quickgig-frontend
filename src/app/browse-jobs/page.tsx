@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 
 import { hasApplied, readAppliedIdsFromCookie } from "@/lib/applications";
-import { hostAware } from "@/lib/hostAware";
 import { fetchJobs } from "@/lib/jobs";
 import { keepParams, withParams } from "@/lib/url";
 
@@ -225,14 +224,21 @@ export default async function BrowseJobsPage({
                 data-testid="job-card"
               >
                 <div>
-                  <div className="text-lg font-medium">{job.title ?? `Job #${job.id}`}</div>
+                  <h3 className="text-lg font-medium">
+                    <Link
+                      href={`/browse-jobs/${encodeURIComponent(String(job.id))}`}
+                      className="hover:underline"
+                    >
+                      {job.title ?? `Job #${job.id}`}
+                    </Link>
+                  </h3>
                   <div className="text-sm text-gray-600">
                     {job.company ?? "—"} • {job.location ?? job.city ?? "Anywhere"}
                   </div>
                   <div className="mt-3">
                     <Link
-                      className="text-blue-600 hover:underline"
-                      href={hostAware(`/browse-jobs/${encodeURIComponent(String(job.id))}`)}
+                      className="text-blue-600 underline"
+                      href={`/browse-jobs/${encodeURIComponent(String(job.id))}`}
                     >
                       View details
                     </Link>
