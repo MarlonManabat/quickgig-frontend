@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-10-02 — Demo auth routes and login wiring
+- Added `/api/auth/demo` GET helper that issues the shared auth cookie then redirects with `next` fallback to `/my-applications`.
+- `/api/auth/logout` now mirrors the mock helper cookie clearing (domain-aware) so demo logouts clear subdomain cookies.
+- Login page switches to host-aware GET anchors for demo login/logout; header + logout page now hit `/api/auth/logout`.
+
 ## 2026-10-01 — /post-job served via route handler
 - Removed the conflicting `/post-job/page.tsx` so the route handler owns the 302 redirect to `/gigs/create`.
 - Route handler now documents the host-aware redirect behavior.

@@ -19,7 +19,7 @@
 - Auth-gated routes: `/applications` and `/my-applications`.
 - Middleware redirects unauthenticated `/applications` or `/my-applications` requests to `/login?next=…` using a single Edge-safe redirect.
 - Middleware matcher covers `/applications/:path*` and `/my-applications/:path*` so nested routes stay gated.
-- `/api/mock-login?next=/…` or `/api/mock/login?next=/…` set the shared auth cookie for smoke flows; `/api/logout?next=/…` and `/api/mock/logout?next=/…` clear it.
+- `/api/auth/demo?next=/…` mints the shared auth cookie for smoke flows (legacy `/api/mock-login` + `/api/mock/login` remain available). `/api/auth/logout?next=/…` and `/api/mock/logout?next=/…` clear it.
 
 ## Legacy redirects (middleware)
 - `/find` → `/browse-jobs`

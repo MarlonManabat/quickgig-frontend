@@ -6,7 +6,7 @@ export default function Header() {
   const postHref = authed
     ? hostAware("/gigs/create")
     : authAware("/gigs/create");
-  const logoutHref = hostAware("/api/logout?next=/");
+  const logoutHref = hostAware("/api/auth/logout?next=/");
   const loginHref = hostAware("/login");
   const myApplicationsHref = authed
     ? hostAware("/my-applications")

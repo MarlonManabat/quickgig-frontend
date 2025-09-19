@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { hostAware } from "@/lib/hostAware";
 
 type LoginPageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -15,26 +16,32 @@ function resolveNext(searchParams?: Record<string, string | string[] | undefined
 
 export default function LoginPage({ searchParams }: LoginPageProps) {
   const safeNext = resolveNext(searchParams);
-  const loginAction = `/api/mock/login?next=${encodeURIComponent(safeNext)}`;
-  const logoutAction = `/api/mock/logout?next=${encodeURIComponent('/')}`;
+  const loginHref = hostAware(
+    `/api/auth/demo?next=${encodeURIComponent(safeNext)}`,
+  );
+  const logoutHref = hostAware(
+    `/api/auth/logout?next=${encodeURIComponent('/')}`,
+  );
 
   return (
     <main className="container mx-auto px-4 py-16">
       <h1 className="text-3xl font-semibold mb-3">Login</h1>
       <p className="text-gray-600 mb-8">Use the demo button to simulate an authenticated session.</p>
-      <form method="POST" action={loginAction} className="mb-4">
-        <button
+      <div className="mb-8 flex flex-wrap items-center gap-3">
+        <a
           data-testid="login-start"
+          href={loginHref}
           className="inline-flex items-center rounded bg-blue-600 px-4 py-2 text-white"
         >
           Continue as demo user
-        </button>
-      </form>
-      <form method="POST" action={logoutAction} className="mb-8">
-        <button className="inline-flex items-center rounded border px-4 py-2 text-sm text-gray-700">
+        </a>
+        <a
+          href={logoutHref}
+          className="inline-flex items-center rounded border px-4 py-2 text-sm text-gray-700"
+        >
           Clear session
-        </button>
-      </form>
+        </a>
+      </div>
       <div className="mt-6">
         <Link href="/" className="underline">
           Back to home
