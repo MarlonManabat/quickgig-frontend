@@ -1,20 +1,16 @@
 import type { NextRequest } from 'next/server';
-import { AUTH_COOKIE_NAMES } from '@/lib/constants';
+import { AUTH_COOKIE } from '@/lib/constants';
 
 type CookieJar = { get(name: string): { value?: string } | undefined };
 
 export function hasAuthCookies(jar: CookieJar): boolean {
-  return AUTH_COOKIE_NAMES.some((name) => {
-    const value = jar.get(name)?.value;
-    return typeof value === 'string' && value.length > 0;
-  });
+  const value = jar.get(AUTH_COOKIE)?.value;
+  return typeof value === 'string' && value.length > 0;
 }
 
 export function hasAuthCookieHeader(cookieHeader: string | null | undefined): boolean {
   if (!cookieHeader) return false;
-  return AUTH_COOKIE_NAMES.some((name) =>
-    new RegExp(`(?:^|;\\s*)${name}=`).test(cookieHeader),
-  );
+  return new RegExp(`(?:^|;\\s*)${AUTH_COOKIE}=`).test(cookieHeader);
 }
 
 export function isAuthedRequest(req: NextRequest): boolean {
