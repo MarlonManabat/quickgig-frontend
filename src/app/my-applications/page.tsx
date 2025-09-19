@@ -1,6 +1,6 @@
 import "server-only";
 
-import { hostAware } from "@/lib/hostAware";
+import { headers, cookies } from "next/headers";
 
 type JobLike = {
   id?: string | number | null;
@@ -9,12 +9,26 @@ type JobLike = {
   location?: string | null;
 };
 
+// Build an absolute URL that respects the current request host so that
+// server-side fetches and rendered anchors stay on the same origin.
+function hostAware(path: string) {
+  const hdrs = headers();
+  const proto = hdrs.get("x-forwarded-proto") ?? "https";
+  const host = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "";
+  if (!host) return path;
+  const normalised = path.startsWith("/") ? path : `/${path}`;
+  return `${proto}://${host}${normalised}`;
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function MyApplicationsPage() {
   let items: JobLike[] = [];
   try {
-    const res = await fetch("/api/applications/list", { cache: "no-store" });
+    const res = await fetch(hostAware("/api/applications/list"), {
+      cache: "no-store",
+      headers: { cookie: cookies().toString() },
+    });
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data?.items)) {
