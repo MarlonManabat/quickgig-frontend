@@ -217,6 +217,7 @@ export default async function BrowseJobsPage({
         <ul className="mt-8 space-y-4" data-testid="jobs-list">
           {items.map((job) => {
             const applied = hasApplied(job.id);
+            const detailsHref = `/browse-jobs/${encodeURIComponent(String(job.id))}`;
             return (
               <li
                 key={String(job.id)}
@@ -225,10 +226,7 @@ export default async function BrowseJobsPage({
               >
                 <div>
                   <h3 className="text-lg font-medium">
-                    <Link
-                      href={`/browse-jobs/${encodeURIComponent(String(job.id))}`}
-                      className="hover:underline"
-                    >
+                    <Link href={detailsHref} className="hover:underline" data-testid="job-title-link">
                       {job.title ?? `Job #${job.id}`}
                     </Link>
                   </h3>
@@ -236,10 +234,7 @@ export default async function BrowseJobsPage({
                     {job.company ?? "—"} • {job.location ?? job.city ?? "Anywhere"}
                   </div>
                   <div className="mt-3">
-                    <Link
-                      className="text-blue-600 underline"
-                      href={`/browse-jobs/${encodeURIComponent(String(job.id))}`}
-                    >
+                    <Link className="text-blue-600 underline" href={detailsHref} data-testid="view-details">
                       View details
                     </Link>
                   </div>

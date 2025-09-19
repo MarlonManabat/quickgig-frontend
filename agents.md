@@ -44,6 +44,7 @@
 - Smoke tests avoid cross-origin navigation in CI; external links are validated by path only.
 - `visByTestId(page, id)` selects the first visible element for a test ID to avoid duplicate ID conflicts.
 - `visByTestId(page, id)` falls back to the first match when the CTA is hidden on the current route.
+- Smoke helpers now wait up to 20s for `data-testid` targets and the smoke config uses 30s/10s timeouts to reduce flake (2026-10-08).
 - `expectAuthAwareRedirect(page, okDest)` matches absolute or relative URLs and tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
   - `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent; current landing returns 200 with `hero-browse-cta` CTA.
 

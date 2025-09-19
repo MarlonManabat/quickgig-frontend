@@ -1,51 +1,65 @@
-import 'server-only';
+import "server-only";
 
-import Link from 'next/link';
-import { cookies } from 'next/headers';
-import { hasAuthCookies } from '@/lib/auth/cookies';
-import { fetchJob } from '@/lib/jobs';
-import { readApplications } from '@/lib/applications';
+import { headers, cookies } from "next/headers";
+
+type JobLike = {
+  id?: string | number | null;
+  title?: string | null;
+  company?: string | null;
+  location?: string | null;
+};
+
+// Build an absolute URL that respects the current request host so that
+// server-side fetches and rendered anchors stay on the same origin.
+function hostAware(path: string) {
+  const hdrs = headers();
+  const proto = hdrs.get("x-forwarded-proto") ?? "https";
+  const host = hdrs.get("x-forwarded-host") ?? hdrs.get("host") ?? "";
+  if (!host) return path;
+  const normalised = path.startsWith("/") ? path : `/${path}`;
+  return `${proto}://${host}${normalised}`;
+}
+
+export const dynamic = "force-dynamic";
 
 export default async function MyApplicationsPage() {
-  const jar = cookies();
-  const authed = hasAuthCookies(jar);
-
-  if (!authed) {
-    return (
-      <main className="mx-auto max-w-3xl p-6">
-        <h1 className="text-2xl font-semibold">My Applications</h1>
-        <p className="mt-4 text-gray-500">Please log in to view your applications.</p>
-      </main>
-    );
+  let items: JobLike[] = [];
+  try {
+    const res = await fetch(hostAware("/api/applications/list"), {
+      cache: "no-store",
+      headers: { cookie: cookies().toString() },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data?.items)) {
+        items = data.items as JobLike[];
+      }
+    }
+  } catch {
+    items = [];
   }
 
-  const applications = readApplications()
-    .slice(0, 50)
-    .sort((a, b) => b.ts - a.ts);
-
-  type JobResult = Awaited<ReturnType<typeof fetchJob>>;
-  const jobs = (
-    await Promise.allSettled(applications.map((application) => fetchJob(application.id)))
-  )
-    .map((result, index) => {
-      if (result.status === 'fulfilled' && result.value) {
-        return { job: result.value, ts: applications[index].ts };
-      }
-      return null;
+  const normalized = items
+    .map((job) => {
+      if (job?.id == null) return null;
+      const id = String(job.id);
+      return {
+        id,
+        title: job.title ?? undefined,
+        company: job.company ?? undefined,
+        location: job.location ?? undefined,
+      };
     })
-    .filter((entry): entry is { job: NonNullable<JobResult>; ts: number } => Boolean(entry));
+    .filter((job): job is { id: string; title?: string; company?: string; location?: string } => Boolean(job));
 
-  if (!jobs.length) {
+  if (normalized.length === 0) {
     return (
       <main className="mx-auto max-w-3xl p-6">
         <h1 className="text-2xl font-semibold">My Applications</h1>
-        <div
-          className="mt-6 rounded border border-dashed p-6 text-center text-slate-600"
-          data-testid="applications-empty"
-        >
+        <div className="mt-6 rounded border border-dashed p-6 text-center text-slate-600" data-testid="applications-empty">
           You haven’t applied to any jobs yet.
         </div>
-        {process.env.NODE_ENV !== 'production' && (
+        {process.env.NODE_ENV !== "production" && (
           <form method="post" action="/api/applications/clear" className="mt-4">
             <button
               type="submit"
@@ -64,24 +78,21 @@ export default async function MyApplicationsPage() {
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-semibold">My Applications</h1>
       <ul className="mt-6 space-y-3" data-testid="applications-list">
-        {jobs.map(({ job, ts }) => {
-          const id = String(job.id);
-          const title = job.title?.trim() || `Job #${id}`;
+        {normalized.map((job) => {
+          const title = job.title?.trim() || `Job #${job.id}`;
+          const subtitle = [job.company, job.location].filter(Boolean).join(" • ");
           return (
-            <li
-              key={id}
-              className="flex items-center justify-between rounded border p-4"
-              data-testid="application-row"
-            >
-              <Link className="text-blue-600 underline" href={`/browse-jobs/${encodeURIComponent(id)}`}>
-                {title}
-              </Link>
-              <span className="text-xs text-gray-500">Applied {new Date(ts).toLocaleString()}</span>
+            <li key={job.id} className="rounded border p-4" data-testid="application-row">
+              <div className="font-medium">{title}</div>
+              {subtitle ? <div className="text-sm text-gray-600">{subtitle}</div> : null}
+              <a className="text-blue-600 underline" href={hostAware(`/browse-jobs/${encodeURIComponent(job.id)}`)}>
+                View details
+              </a>
             </li>
           );
         })}
       </ul>
-      {process.env.NODE_ENV !== 'production' && (
+      {process.env.NODE_ENV !== "production" && (
         <form method="post" action="/api/applications/clear" className="mt-4">
           <button
             type="submit"
@@ -95,4 +106,3 @@ export default async function MyApplicationsPage() {
     </main>
   );
 }
-

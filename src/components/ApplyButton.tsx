@@ -1,70 +1,99 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import type { ButtonHTMLAttributes } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
-type Props = {
-  href: string;
+type NativeButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick" | "type">;
+
+type Props = NativeButtonProps & {
+  href?: string;
   jobId?: string | number;
-  title?: string;
-  disabled?: boolean;
-  className?: string;
-  ['data-testid']?: string;
+  jobTitle?: string;
 };
 
+function resolveHref(href: string) {
+  try {
+    return new URL(href, window.location.origin);
+  } catch {
+    return null;
+  }
+}
+
 export default function ApplyButton({
-  href,
+  href = "/applications",
   jobId,
-  title,
+  jobTitle,
   disabled,
   className,
+  "data-testid": dataTestId,
   ...rest
 }: Props) {
-  const onClick = React.useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>) => {
-      if (disabled) {
-        event.preventDefault();
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  const isDisabled = Boolean(disabled) || pending;
+
+  const navigate = useCallback(
+    (destination: string) => {
+      if (!destination) return;
+      if (typeof window === "undefined") return;
+      const resolved = resolveHref(destination);
+      if (resolved && resolved.origin === window.location.origin) {
+        router.push(`${resolved.pathname}${resolved.search}${resolved.hash}`);
         return;
       }
-
-      const headers = { 'content-type': 'application/json' } as const;
-
-      try {
-        if (jobId !== undefined) {
-          void fetch('/api/applications/record', {
-            method: 'POST',
-            keepalive: true,
-            headers,
-            body: JSON.stringify({ jobId }),
-          });
-        }
-
-        void fetch('/api/track/apply', {
-          method: 'POST',
-          keepalive: true,
-          headers,
-          body: JSON.stringify({ jobId, title, href }),
-        });
-      } catch {
-        // Best-effort tracking; navigation should proceed regardless.
-      }
+      window.location.assign(destination);
     },
-    [disabled, href, jobId, title],
+    [router],
   );
 
-  return (
-    <a
-      href={href}
-      onClick={onClick}
-      data-testid="apply-button"
-      aria-disabled={disabled ? 'true' : undefined}
-      className={
-        `inline-block rounded bg-blue-500 px-4 py-2 text-white` +
-        (disabled ? ' opacity-50 pointer-events-none' : '') +
-        (className ? ` ${className}` : '')
+  const onClick = useCallback(() => {
+    if (isDisabled) return;
+    startTransition(async () => {
+      setError(null);
+      let success = true;
+      if (jobId != null) {
+        try {
+          const res = await fetch("/api/applications/record", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ jobId, title: jobTitle }),
+          });
+          if (!res.ok) {
+            success = false;
+          }
+        } catch {
+          success = false;
+        }
       }
+      if (!success) {
+        setError("Could not record application. Please try again.");
+        return;
+      }
+      navigate(href);
+    });
+  }, [href, isDisabled, jobId, jobTitle, navigate]);
+
+  const classes = useMemo(() => {
+    const base = "inline-flex items-center justify-center rounded bg-blue-500 px-4 py-2 text-white transition";
+    const state = isDisabled ? "opacity-50" : "hover:bg-blue-600";
+    return [base, state, className].filter(Boolean).join(" ");
+  }, [className, isDisabled]);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={isDisabled}
+      data-testid={dataTestId ?? "apply-button"}
+      aria-disabled={isDisabled ? true : undefined}
+      className={classes}
       {...rest}
     >
-      Apply
-    </a>
+      {pending ? "Applying…" : "Apply"}
+      {error ? <span className="ml-2 text-xs opacity-80">({error})</span> : null}
+    </button>
   );
 }

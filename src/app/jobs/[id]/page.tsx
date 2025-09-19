@@ -26,7 +26,7 @@ export default async function JobDetail({ params }: { params: { id: string } }) 
       <h1 className="text-2xl font-semibold">{data.title}</h1>
       <p>{data.description}</p>
       {user ? (
-        <ApplyButton jobId={data.id} />
+        <ApplyButton jobId={data.id} jobTitle={data.title ?? undefined} />
       ) : (
         <LinkApp
           href={loginNext(ROUTES.applications)}
