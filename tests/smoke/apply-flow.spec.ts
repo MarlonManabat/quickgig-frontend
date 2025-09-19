@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { expectAuthAwareRedirect, loginOr } from './_helpers';
+import { expectAuthAwareRedirect, loginOr, visByTestId, expectToBeOnRoute } from './_helpers';
 import { loginAs } from '../e2e/helpers';
 
 for (const device of ['desktop', 'mobile'] as const) {
@@ -17,17 +17,19 @@ for (const device of ['desktop', 'mobile'] as const) {
       await page.goto('/browse-jobs');
       const count = await page.getByTestId('job-card').count();
       if (count === 0) test.skip(true, 'No seeded jobs in preview; skipping apply flow.');
-      const first = page.getByTestId('job-card').first();
+      const cards = page.getByTestId('job-card');
+      const first = cards.first();
       const title = (await first.textContent()) ?? '';
       await first.click();
+      await expectToBeOnRoute(page, /\/browse-jobs\/.+/);
 
       if (!loggedIn) {
-        await page.getByTestId('apply-button').click();
+        await (await visByTestId(page, 'apply-button')).click();
         await expectAuthAwareRedirect(page, loginOr(/\/applications$/));
         return;
       }
 
-      await page.getByTestId('apply-button').click();
+      await (await visByTestId(page, 'apply-button')).click();
       const note = `note ${Date.now()}`;
       await page.getByTestId('apply-cover-note').fill(note);
       page.once('dialog', d => d.dismiss());

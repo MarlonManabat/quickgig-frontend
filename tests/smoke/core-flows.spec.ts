@@ -16,11 +16,11 @@ test.describe('QuickGig core flows (smoke)', () => {
 
   test('Job detail renders and Apply button is present (not necessarily clickable in preview)', async ({ page, baseURL }) => {
     await page.goto(`${baseURL || ''}/browse-jobs`);
-    const first = page.getByTestId('job-card').first();
-    if (await first.count() === 0) test.skip(true, 'No job cards available in preview – skipping apply assertion.');
-    await first.click();
-    await expect(page).toHaveURL(/\/browse-jobs\/.+/);
-    await expect(page.getByRole('button', { name: /apply|mag-apply/i })).toBeVisible();
+    const cards = page.getByTestId('job-card');
+    if ((await cards.count()) === 0) test.skip(true, 'No job cards available in preview – skipping apply assertion.');
+    await cards.first().click();
+    await expectToBeOnRoute(page, /\/browse-jobs\/.+/);
+    await visByTestId(page, 'apply-button');
   });
 
   test('My Applications is auth-gated (redirects to /login) OR renders empty when authenticated', async ({ page, baseURL }) => {

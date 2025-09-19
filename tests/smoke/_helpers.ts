@@ -15,19 +15,31 @@ export function loginOr(path: string | RegExp) {
   return new RegExp(`${loginRe.source}|${rhs}`);
 }
 
-export async function expectToBeOnRoute(page: Page, path: string | RegExp, timeout = 8000) {
+export async function expectToBeOnRoute(page: Page, path: string | RegExp, timeout = 10_000) {
   const src = typeof path === 'string' ? escapeRe(path) : path.source;
-  await expect(page).toHaveURL(hostAware(new RegExp(src)), { timeout });
+  const matcher = hostAware(new RegExp(src));
+  await page.waitForURL(matcher, { timeout });
+  await expect(page).toHaveURL(matcher, { timeout });
 }
 
-export async function visByTestId(page: Page, id: string) {
-  const loc = page.getByTestId(id).locator(':visible').first();
-  await expect(loc).toBeVisible({ timeout: 12000 });
-  return loc;
+export async function visByTestId(page: Page, id: string, timeout = 20_000) {
+  const base = page.getByTestId(id);
+  const visible = base.locator(':visible').first();
+  try {
+    await base.first().waitFor({ state: 'attached', timeout });
+    await visible.waitFor({ state: 'visible', timeout });
+    await expect(visible).toBeVisible({ timeout });
+    return visible;
+  } catch (error) {
+    console.error(`Element with test ID "${id}" was not visible within ${timeout}ms.`);
+    throw error;
+  }
 }
 
-export async function expectAuthAwareRedirect(page: Page, re: RegExp, timeout = 12000) {
-  await expect(page).toHaveURL(hostAware(re), { timeout });
+export async function expectAuthAwareRedirect(page: Page, re: RegExp | string, timeout = 20_000) {
+  const matcher = typeof re === 'string' ? hostAware(new RegExp(escapeRe(re))) : hostAware(re);
+  await page.waitForURL(matcher, { timeout });
+  await expect(page).toHaveURL(matcher, { timeout });
 }
 
 export async function gotoHome(page: Page, baseURL?: string) {

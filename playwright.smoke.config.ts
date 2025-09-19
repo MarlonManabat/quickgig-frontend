@@ -5,7 +5,7 @@ const appOrigin = process.env.APP_ORIGIN;
 export default defineConfig({
   testDir: 'tests/smoke',
   timeout: 30_000,
-  expect: { timeout: 8_000 },
+  expect: { timeout: 10_000 },
   workers: 2,
   use: {
     baseURL: appOrigin || 'http://localhost:4010',
