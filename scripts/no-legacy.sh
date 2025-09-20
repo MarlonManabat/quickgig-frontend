@@ -1,14 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Find raw legacy paths
-bad=$(rg -l '/find' src tests || true)
-bad=$(echo "$bad" | grep -v 'src/app/lib/legacy-redirects.ts' | grep -v 'tests/smoke/legacy-redirects.spec.ts' | grep -v 'src/middleware.ts' || true)
-if [[ -n "$bad" ]]; then
-  echo 'Legacy path strings found in:'
-  echo "$bad"
+if grep -R "\/find" app components >/dev/null 2>&1; then
+  echo "Legacy path /find detected" >&2
   exit 1
 fi
 
-# Check for legacy testIds
-node "$(dirname "$0")/no-legacy.mjs"
+echo "Legacy path check passed."

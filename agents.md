@@ -1,11 +1,10 @@
 # Agents Contract
 ## Contract version
-- **Version**: 2025-09-18
+- **Version**: 2026-10-05
 - **Changes**:
-  - Browse Jobs empty state keeps `data-testid="jobs-empty"` (was briefly renamed to `empty-state`).
-  - Job detail always renders a clickable `data-testid="apply-button"`. If the job source is missing,
-    the anchor is present but marked `aria-disabled="true"`. Apply falls back to `/login?next=/browse-jobs/[id]`
-    when unauthenticated, and respects `NEXT_PUBLIC_APP_HOST` for hosted flows.
+  - Browse Jobs empty state keeps `data-testid="jobs-empty"`.
+  - Job detail renders a form with `data-testid="apply-button"` button that tracks `/api/track/apply` before submit.
+    When unauthenticated the server action redirects to `/login?next=/jobs/[id]`.
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).

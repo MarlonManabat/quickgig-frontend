@@ -1,54 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2022"
-    ],
+    "target": "ES2020",
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "forceConsistentCasingInFileNames": true,
-    "types": [
-      "node"
-    ],
     "incremental": true,
+    "types": ["node"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    },
-    "typeRoots": [
-      "./types",
-      "./node_modules/@types"
-    ],
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"],
+      "@/app/*": ["./app/*"]
+    }
   },
-  "include": [
-    "next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "tests",
-    "tests_disabled",
-    "e2e",
-    "**/*.spec.*",
-    "**/*.test.*",
-    "playwright.*",
-    "playwright.config.*"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts", "**/*.d.ts", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-10-05 — Next.js 14 rebuild + Good Product baseline
+- Replaced the legacy `/src` app with a clean App Router build that keeps canonical `nav-*` selectors and hero CTAs.
+- Added in-memory data store with Supabase fallbacks plus `/api/auth/demo` + `/api/auth/logout` helpers for smoke flows.
+- Implemented new Browse Jobs filters, job detail apply tracking, Post Job form with `post-job-skeleton`, and auth-gated Applications.
+- Regenerated Playwright smoke (`tests/smoke.spec.ts`) covering browse → apply redirect, applications gate, and employer posting.
+
 ## 2026-10-02 — Demo auth routes and login wiring
 - Added `/api/auth/demo` GET helper that issues the shared auth cookie then redirects with `next` fallback to `/my-applications`.
 - `/api/auth/logout` now mirrors the mock helper cookie clearing (domain-aware) so demo logouts clear subdomain cookies.
