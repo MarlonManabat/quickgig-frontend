@@ -5,8 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:smoke": "playwright test -c playwright.config.ts tests/smoke.spec.ts",
     "test:e2e": "playwright test -c playwright.config.ts",
     "db:seed": "ts-node scripts/seed.ts"

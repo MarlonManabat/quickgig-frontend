@@ -1,0 +1,12 @@
+{
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install --frozen-lockfile=false",
+  "framework": "nextjs",
+  "ignoreCommand": "echo 'deploy'",
+  "functions": {
+    "api/**/*": {
+      "memory": 512,
+      "maxDuration": 10
+    }
+  }
+}

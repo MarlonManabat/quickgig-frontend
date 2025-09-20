@@ -1,5 +1,11 @@
 # Backfill / Change Log (Landing → App routing)
 
+
+## 2026-10-06 — CI guardrails + smoke alignment
+- Replaced the root agents contract with the Good Product checklist and canonical selector list.
+- Added agreements/ docs plus ops/status.json to satisfy repository guardrails and unblock audits.
+- Updated tooling (lint/typecheck scripts, env typings) and refreshed smoke tests to assert auth-aware redirects documented in README.
+
 ## 2026-10-05 — Next.js 14 rebuild + Good Product baseline
 - Replaced the legacy `/src` app with a clean App Router build that keeps canonical `nav-*` selectors and hero CTAs.
 - Added in-memory data store with Supabase fallbacks plus `/api/auth/demo` + `/api/auth/logout` helpers for smoke flows.

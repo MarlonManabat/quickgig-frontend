@@ -1,6 +1,6 @@
 # QuickGig Frontend
 
-QuickGig.ph is a Next.js 14 App Router project with Tailwind, shadcn/ui, and Supabase-backed data helpers. It ships with demo seed data so the primary job and employer flows are always available in CI.
+QuickGig.ph is a Next.js 14 App Router project with Tailwind, shadcn/ui, and Supabase-backed data helpers. It ships with demo seed data so the primary job seeker and employer flows are always available in CI.
 
 ## Getting started
 
@@ -30,18 +30,28 @@ Visit <http://localhost:3000> – the home route redirects straight to `/browse-
 | `pnpm dev` | Start the Next.js dev server |
 | `pnpm build` | Build production assets |
 | `pnpm start` | Start the production server |
-| `pnpm lint` | Run ESLint |
-| `pnpm typecheck` | Strict TypeScript checks |
+| `pnpm lint` | Run ESLint across the repository |
+| `pnpm typecheck` | Strict TypeScript checks (`tsc -p tsconfig.json --noEmit`) |
 | `pnpm db:seed` | Seed Supabase with demo gigs |
 | `pnpm test:smoke` | Playwright smoke journey (mobile + desktop) |
 | `pnpm test:e2e` | Run the full Playwright suite |
 
+## CI expectations
+
+Pull Requests must keep the following commands green:
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm test:smoke`
+
+The full end-to-end suite (`pnpm test:e2e`) runs via the manual GitHub workflow when deeper coverage is needed.
+
 ## Smoke workflow
 
 1. `/` redirects to `/browse-jobs`; the list is pre-seeded so CI is never empty.
-2. Job detail pages show the canonical `apply-button` and unauthenticated submits redirect to `/login?next=…`.
-3. `/applications` and `/gigs/create` both redirect to login when the `qg_auth` cookie is absent.
-4. Employers sign in through `/api/auth/demo?role=employer`, post a gig, and see it at the top of `/browse-jobs` with a success banner.
+2. Job detail pages expose the canonical `apply-button`. Clicking it while signed out must redirect to `/api/auth/pkce/start?next=` or `/login?next=`.
+3. `/applications` and `/gigs/create` both enforce the same auth-aware redirects when the `qg_auth` cookie is absent.
 
 ## Demo auth helpers
 
