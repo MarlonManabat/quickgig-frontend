@@ -1,0 +1,26 @@
+name: E2E Manual
+
+on:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.19.0
+          cache: 'pnpm'
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.12.1
+      - run: pnpm install
+      - run: pnpm db:seed
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - run: pnpm build
+      - run: pnpm test:e2e
+        env:
+          NEXT_PUBLIC_APP_ORIGIN: http://127.0.0.1:3000

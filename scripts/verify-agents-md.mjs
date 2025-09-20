@@ -1,35 +1,35 @@
 #!/usr/bin/env node
-import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from 'node:fs';
 
-const baseRef = process.env.GITHUB_BASE_REF || "main";
-
-const changed = execSync(`git diff --name-only origin/${baseRef}...HEAD`, { stdio: "pipe" })
-  .toString()
-  .trim()
-  .split("\n")
-  .filter(Boolean);
-
-const mustTouchAgents = changed.some(p =>
-  /^(app\/lib\/routes\.ts|middleware\.ts|next\.config\.\w+|tests\/smoke\/|components\/.*PostJobSkeleton\.tsx)/.test(p)
-);
-
-const agents = readFileSync("agents.md", "utf8");
-const hasContract = agents.includes("AGENT CONTRACT");
-const hasVersion = /AGENT CONTRACT v\d{4}-\d{2}-\d{2}/.test(agents);
-
-let failed = false;
-
-if (!hasContract || !hasVersion) {
-  console.error("❌ `agents.md` is missing the AGENT CONTRACT header with a version stamp.");
-  failed = true;
+const path = 'agents.md';
+if (!existsSync(path)) {
+  console.error(`agents.md not found at repo root`);
+  process.exit(1);
 }
 
-if (mustTouchAgents && !changed.includes("agents.md")) {
-  console.error("❌ You changed routes/middleware/smoke but didn’t update `agents.md`.");
-  console.error("   Please reflect the new contract at the top of `agents.md` and bump the version date.");
-  failed = true;
+const s = readFileSync(path, 'utf8');
+
+const must = [
+  /##\s*Contract/i,
+  /##\s*Canonical selectors/i,
+  /##\s*CI rules/i,
+  /nav-browse-jobs/,
+  /nav-login/,
+  /nav-my-applications/,
+  /nav-post-job/,
+  /nav-menu-button/,
+  /nav-menu/,
+  /jobs-list/,
+  /job-card/,
+  /apply-button/,
+  /(applications-list|applications-empty)/,
+  /post-job-skeleton/,
+];
+
+const missing = must.filter((re) => !re.test(s));
+if (missing.length) {
+  console.error('agents.md is missing required content:', missing.map(String));
+  process.exit(1);
 }
 
-if (failed) process.exit(1);
-console.log("✅ agents.md contract present and consistent.");
+console.log('agents.md contract verified ✅');

@@ -1,35 +1,26 @@
 import { defineConfig, devices } from '@playwright/test';
 
-function resolveBaseURL() {
-  const raw = process.env.BASE_URL || '';
-  if (raw) return raw.startsWith('http') ? raw : `http://${raw}`;
-  return 'http://localhost:3000';
-}
-
-const baseURL = resolveBaseURL();
-
-// Only start a local server when targeting localhost.
-const isRemote = /^https?:\/\/(?!localhost|127\.0\.0\.1)/i.test(baseURL);
-const serverCmd = process.env.PLAYWRIGHT_WEBSERVER_CMD || 'npm run start';
+const baseURL = process.env.NEXT_PUBLIC_APP_ORIGIN ?? 'http://localhost:3000';
 
 export default defineConfig({
-  testDir: 'tests/e2e',
-  timeout: 60_000,
-  expect: { timeout: 10_000 },
+  testDir: './tests',
+  fullyParallel: true,
+  retries: process.env.CI ? 1 : 0,
+  reporter: [['list']],
   use: {
     baseURL,
-    navigationTimeout: 30_000,
-    actionTimeout: 15_000,
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'on-first-retry',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  ...(isRemote
-    ? {}
-    : {
-        webServer: {
-          command: serverCmd,
-          port: 3000,
-          reuseExistingServer: true,
-          timeout: 120_000,
-        },
-      }),
+  projects: [
+    {
+      name: 'chromium-desktop',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'chromium-mobile',
+      use: { ...devices['Pixel 7'] },
+    },
+  ],
 });

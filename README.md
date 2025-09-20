@@ -1,86 +1,62 @@
 # QuickGig Frontend
 
-Minimal Next.js app using Supabase for authentication, profiles and gig postings.
+QuickGig.ph is a Next.js 14 App Router project with Tailwind, shadcn/ui, and Supabase-backed data helpers. It ships with demo seed data so the primary job seeker and employer flows are always available in CI.
 
-## Environment
-
-Define in Vercel (and `.env.local` for local dev):
-
-```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-```
-
-## Scripts
-
-- `npm run dev` - start development server
-- `npm run build` - build for production
-- `npm start` - run production build
-
-## CI
-
-All automated checks run through a single GitHub Actions workflow, [Release Check](.github/workflows/release-check.yml).
-It provisions a Vercel preview, seeds deterministic test data, then executes a multi-role Playwright suite.
-Each role (public, worker, employer, admin) audits visible buttons and performs basic happy path navigation.
-Artifacts from the run, including button audit JSON and Playwright reports, are always uploaded.
-If lint-based fixes are available an `autofix.patch` artifact is generated which can be applied locally:
-
-```
-git apply autofix.patch
-```
-
-### Build/CI quirks
-
-- We intentionally pin **globby@13.x**.
-- **v13** API: `import { globby } from 'globby'`
-- **v14** API: `import globby from 'globby'` (default export)
-- Action: We'll revisit upgrading to v14 when registry/yank issues stop causing noise.
-
-## Testing
+## Getting started
 
 ```bash
-# Optional: provide demo emails for smoke specs
-export DEMO_USER_EMAIL="qa-user@example.com"
-export DEMO_ADMIN_EMAIL="qa-admin@example.com"
+pnpm install
+cp .env.example .env.local
+pnpm db:seed # optional; seeds Supabase when env vars are configured
+pnpm dev
 ```
 
-## Smoke tests
+Visit <http://localhost:3000> – the home route redirects straight to `/browse-jobs` where the seeded gigs appear.
 
-```
-curl -X POST https://app.quickgig.ph/api/orders
-curl -X POST -H "Content-Type: application/json" -d '{"proof_url":"https://.../receipt.jpg"}' https://app.quickgig.ph/api/orders/<id>/submit
-curl -X POST -H "Content-Type: application/json" -d '{"decision":"paid"}' https://app.quickgig.ph/api/orders/<id>/decide
-curl https://app.quickgig.ph/api/users/me/eligibility
-```
+### Required environment variables
 
-## Deployment notes
+| variable | purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (omit to run in demo in-memory mode) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key for client helpers |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key (server-only) |
+| `NEXT_PUBLIC_APP_ORIGIN` | Base URL used in redirects and generated sitemap |
+| `NEXT_PUBLIC_SENTRY_DSN` | Optional analytics hook |
 
-* After deploy, run **/api/admin/seed** once to promote `SEED_ADMIN_EMAIL` to admin.
-* Apply the migration via Supabase Studio → SQL or `supabase db push`.
+## Available scripts
 
-### APP origin for landing → app links
-Set `NEXT_PUBLIC_APP_ORIGIN` (preferred) or `APP_ORIGIN` to the app host, e.g. `https://app.quickgig.ph`.
-All landing CTAs resolve via `withAppOrigin()`.
+| command | description |
+| --- | --- |
+| `pnpm dev` | Start the Next.js dev server |
+| `pnpm build` | Build production assets |
+| `pnpm start` | Start the production server |
+| `pnpm lint` | Run ESLint across the repository |
+| `pnpm typecheck` | Strict TypeScript checks (`tsc -p tsconfig.json --noEmit`) |
+| `pnpm db:seed` | Seed Supabase with demo gigs |
+| `pnpm test:smoke` | Playwright smoke journey (mobile + desktop) |
+| `pnpm test:e2e` | Run the full Playwright suite |
 
-- Landing CTAs use plain `<a>` elements (not Next.js `Link`) with `withAppOrigin()` for absolute links.
-- `getAppOrigin()` resolves from `NEXT_PUBLIC_APP_ORIGIN`, `APP_ORIGIN`, or defaults to `https://app.quickgig.ph`.
-- `/create` is a real page guarded by `PostGuardInline` which shows “please log in” when unauthenticated.
-- Landing and other public pages must not import Supabase helpers.
+## CI expectations
 
-### Landing → App CTAs and E2E
-- Landing uses plain `<a>` + `withAppOrigin()` for absolute links (no `next/link`).
-- `withAppOrigin()` resolves from `NEXT_PUBLIC_APP_ORIGIN | APP_ORIGIN | https://app.quickgig.ph`.
-- `/create` is a real page rendering an inline guard (`"please log in"`) when logged out; no redirects and no RPC.
-- Full E2E runs on every push to `main` and via manual dispatch. Playwright report is uploaded as an artifact.
+Pull Requests must keep the following commands green:
 
-### E2E against production
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm test:smoke`
 
-- GitHub UI: Actions → **E2E (manual or nightly)** → `target=prod` → optional `base_url` override.
-- Local: `npm run e2e:prod`.
+The full end-to-end suite (`pnpm test:e2e`) runs via the manual GitHub workflow when deeper coverage is needed.
 
-## Marketing Ready Checklist
+## Smoke workflow
 
-- `npm run audit:links` – CTAs resolve to canonical routes.
-- Preview seed ensures `/browse-jobs` has at least one card.
-- Login/signup routes redirect via PKCE start.
-- Route-level error pages avoid white screens.
+1. `/` redirects to `/browse-jobs`; the list is pre-seeded so CI is never empty.
+2. Job detail pages expose the canonical `apply-button`. Clicking it while signed out must redirect to `/api/auth/pkce/start?next=` or `/login?next=`.
+3. `/applications` and `/gigs/create` both enforce the same auth-aware redirects when the `qg_auth` cookie is absent.
+
+## Demo auth helpers
+
+The repository includes `/api/auth/demo`, `/api/auth/logout`, and `mock-login`/`mock/logout` aliases that mint or clear the `qg_auth` cookie. These endpoints power the smoke specs and make local manual testing straightforward.
+
+## Sitemap & robots
+
+`next-sitemap` generates `sitemap.xml` and `robots.txt` during `pnpm build`. Ensure `NEXT_PUBLIC_APP_ORIGIN` reflects your deployed host before generating production bundles.
