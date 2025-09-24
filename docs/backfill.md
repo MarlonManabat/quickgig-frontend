@@ -1,5 +1,13 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-10-03 — Baseline routing & smoke guardrails
+- Routing redirects added (/ → /browse-jobs, /post-job → /gigs/create)
+- Header with canonical testids
+- Applications page list container
+- Browse-jobs MOCK_MODE card + Apply link
+- GeoSelect fallback to local PH dataset
+- Smoke specs covering nav, redirects, geo, browse-jobs
+
 ## 2026-10-02 — Demo auth routes and login wiring
 - Added `/api/auth/demo` GET helper that issues the shared auth cookie then redirects with `next` fallback to `/my-applications`.
 - `/api/auth/logout` now mirrors the mock helper cookie clearing (domain-aware) so demo logouts clear subdomain cookies.

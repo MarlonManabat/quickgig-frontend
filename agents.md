@@ -1,18 +1,18 @@
 # Agents Contract
 ## Contract version
-- **Version**: 2025-09-18
+- **Version**: 2026-10-03
 - **Changes**:
-  - Browse Jobs empty state keeps `data-testid="jobs-empty"` (was briefly renamed to `empty-state`).
-  - Job detail always renders a clickable `data-testid="apply-button"`. If the job source is missing,
-    the anchor is present but marked `aria-disabled="true"`. Apply falls back to `/login?next=/browse-jobs/[id]`
-    when unauthenticated, and respects `NEXT_PUBLIC_APP_HOST` for hosted flows.
+  - Home now redirects to `/browse-jobs` and `/post-job` performs a page-level redirect to `/gigs/create`.
+  - Shared `SiteHeader` adds a mobile toggle and keeps canonical nav test IDs across breakpoints while respecting auth-aware links.
+  - Smoke coverage trimmed to nav, routing, browse jobs mock listing, and Post Job geo fallback (see `tests/smoke/*.spec.ts`).
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
 - Post Job CTAs resolve through `authAware('/gigs/create')` so unauthenticated clicks land on `/login?next=…` on the app host; the `/post-job` route handler performs a host-aware 302 directly to `/gigs/create`.
-- Home (`/`) renders a hero CTA `hero-start` linking to `/browse-jobs`.
+- Home (`/`) redirects to `/browse-jobs`.
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 - Header shows My Applications at all times and swaps `nav-login` ↔ `nav-logout` based on auth cookie presence.
+- Header exposes `data-testid="nav-menu-button"` for the mobile toggle and reuses `data-testid="nav-menu"` for both desktop and mobile menus.
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST redirect to `/login?next=<dest>`.
@@ -32,7 +32,11 @@
 - Header smokes query `:visible` to ignore hidden duplicates; CTA href checks accept relative or absolute app URLs.
 - Tickets top-up smoke is disabled in PR runs and exercised only in full E2E.
 - Applications smoke spec accepts `/login` redirect when unauthenticated.
-- Added core flows smoke `tests/smoke/core.spec.ts` covering Browse Jobs, Apply redirects, Applications gate, Post Job skeleton, header nav, and landing CTAs.
+- Smoke specs cover:
+  - `tests/smoke/nav.spec.ts` for desktop links and mobile toggle visibility.
+  - `tests/smoke/routing.spec.ts` for home redirect and `/applications` auth gating.
+  - `tests/smoke/post_job_geo.spec.ts` for Post Job skeleton visibility and GeoSelect fallback (expects "Quezon City").
+  - `tests/smoke/browse_jobs.spec.ts` for mock job card visibility when `MOCK_MODE=1`.
 - Job detail smoke skips apply assertion when no job cards are seeded.
 - The landing page must not render duplicate CTAs with identical accessible names.
 - Smoke helper `expectAuthAwareRedirect(page, dest, timeout)` waits for the PKCE start request and tolerates `chrome-error://` fallbacks.
@@ -45,7 +49,7 @@
 - `visByTestId(page, id)` selects the first visible element for a test ID to avoid duplicate ID conflicts.
 - `visByTestId(page, id)` falls back to the first match when the CTA is hidden on the current route.
 - `expectAuthAwareRedirect(page, okDest)` matches absolute or relative URLs and tolerates `/login` or `/browse-jobs` fallback for unauthenticated redirects.
-  - `gotoHome(page)` accepts automatic home→/browse-jobs redirects when landing is absent; current landing returns 200 with `hero-browse-cta` CTA.
+- `gotoHome(page)` accepts the `/` → `/browse-jobs` redirect as success when the landing page is absent.
 
 ## CI guardrails
 - `scripts/no-legacy.sh` forbids raw legacy paths (e.g., `/find`).
@@ -53,7 +57,7 @@
 - Middleware (`src/middleware.ts`) handles auth gating for `/applications` and `/my-applications` and short-circuits `/api/auth/pkce/*` in CI.
 - Whenever `app/**/routes.ts`, `middleware/**`, or `tests/smoke/**` change, update this document and bump the **Version** date above.
 
-<!-- AGENT CONTRACT v2025-09-18 -->
+<!-- AGENT CONTRACT v2026-10-03 -->
 
 ---
 
@@ -78,7 +82,7 @@
 
 ## PR acceptance (agent checklist)
 - [ ] No legacy anchors in the UI (run `bash scripts/no-legacy.sh`).
-- [ ] Smoke passes locally: `npx playwright test -c playwright.smoke.ts`.
+- [ ] Smoke passes locally: `npx playwright test -c playwright.smoke.config.ts`.
 - [ ] If unauthenticated flows were touched, smoke specs are **auth-aware** (accept `/login?next=`).
 - [ ] `BACKFILL.md` updated with changes + rationale.
 - [ ] This file’s header **Version** bumped when contracts change.

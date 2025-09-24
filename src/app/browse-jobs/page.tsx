@@ -6,6 +6,7 @@ import { fetchJobs } from "@/lib/jobs";
 import { keepParams, withParams } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
+const MOCK = process.env.MOCK_MODE === "1";
 
 type SearchParams = { [key: string]: string | string[] | undefined } | ReadonlyURLSearchParams;
 
@@ -89,7 +90,18 @@ export default async function BrowseJobsPage({
   }
 
   const derivedTotal = appliedOnly ? items.length : total;
-  const totalPages = Math.max(1, Math.ceil(Math.max(derivedTotal, 0) / pageSize));
+  const mockJobs = MOCK
+    ? [{ id: "mock-1", title: "Delivery Helper (1-day)", location: "Quezon City" }]
+    : [];
+  const shouldUseMock =
+    MOCK &&
+    items.length === 0 &&
+    !appliedOnly &&
+    !q &&
+    !locationFilter;
+  const displayItems = shouldUseMock ? mockJobs : items;
+  const displayTotal = shouldUseMock ? mockJobs.length : derivedTotal;
+  const totalPages = Math.max(1, Math.ceil(Math.max(displayTotal, 0) / pageSize));
 
   const showClear = Boolean(
     rawQuery ||
@@ -103,7 +115,7 @@ export default async function BrowseJobsPage({
   return (
     <main className="mx-auto max-w-4xl p-6">
       <h1 className="text-2xl font-semibold">Browse Jobs</h1>
-      <div className="text-sm text-gray-600">{derivedTotal} results</div>
+      <div className="text-sm text-gray-600">{displayTotal} results</div>
 
       <form
         role="search"
@@ -207,7 +219,7 @@ export default async function BrowseJobsPage({
         </div>
       </form>
 
-      {items.length === 0 ? (
+      {displayItems.length === 0 ? (
         <div className="mt-8 rounded border p-6 text-gray-600" data-testid="jobs-empty">
           {appliedOnly
             ? "No applied jobs yet. Start applying to track them here."
@@ -215,32 +227,40 @@ export default async function BrowseJobsPage({
         </div>
       ) : (
         <ul className="mt-8 space-y-4" data-testid="jobs-list">
-          {items.map((job) => {
+          {displayItems.map((job) => {
+            const jobId = String(job.id);
             const applied = hasApplied(job.id);
             return (
               <li
-                key={String(job.id)}
+                key={jobId}
                 className="flex items-start justify-between gap-4 rounded-lg border p-4"
                 data-testid="job-card"
               >
                 <div>
                   <h3 className="text-lg font-medium">
                     <Link
-                      href={`/browse-jobs/${encodeURIComponent(String(job.id))}`}
+                      href={`/browse-jobs/${encodeURIComponent(jobId)}`}
                       className="hover:underline"
                     >
-                      {job.title ?? `Job #${job.id}`}
+                      {job.title ?? `Job #${jobId}`}
                     </Link>
                   </h3>
                   <div className="text-sm text-gray-600">
                     {job.company ?? "—"} • {job.location ?? job.city ?? "Anywhere"}
                   </div>
-                  <div className="mt-3">
+                  <div className="mt-3 flex flex-wrap gap-3">
                     <Link
                       className="text-blue-600 underline"
-                      href={`/browse-jobs/${encodeURIComponent(String(job.id))}`}
+                      href={`/browse-jobs/${encodeURIComponent(jobId)}`}
                     >
                       View details
+                    </Link>
+                    <Link
+                      className="inline-block rounded border px-3 py-1 text-sm"
+                      href={`/apply/${encodeURIComponent(jobId)}`}
+                      data-testid="job-apply"
+                    >
+                      Apply
                     </Link>
                   </div>
                 </div>
@@ -255,7 +275,7 @@ export default async function BrowseJobsPage({
         </ul>
       )}
 
-      {items.length > 0 && (
+      {displayItems.length > 0 && (
         <nav className="mt-8 flex flex-wrap items-center justify-between gap-3" aria-label="pagination">
           {(() => {
             const prevDisabled = page <= 1;
