@@ -12,20 +12,60 @@ type RawRow = PHRow & {
   psgc_code?: string | null;
 };
 
-function coerceRows(): PHRow[] {
-  if (Array.isArray(rowsJson)) {
-    return (rowsJson as RawRow[])
-      .map((row) => ({
-        region: row.region?.trim() ?? "",
-        province: row.province?.trim() || undefined,
-        city: row.city?.trim() ?? row.city_name?.trim() ?? "",
-      }))
-      .filter((row) => row.region && row.city);
+type Mutable<T> = { -readonly [K in keyof T]: T[K] };
+
+const RAW_ROWS: RawRow[] = Array.isArray(rowsJson) ? (rowsJson as RawRow[]) : [];
+
+const NCR_REGION = "National Capital Region";
+const NCR_PROVINCE = "Metro Manila";
+const NCR_CANONICAL: readonly string[] = [
+  "Caloocan",
+  "Las Piñas",
+  "Makati",
+  "Malabon",
+  "Mandaluyong",
+  "Manila",
+  "Marikina",
+  "Muntinlupa",
+  "Navotas",
+  "Parañaque",
+  "Pasay",
+  "Pasig",
+  "Quezon City",
+  "San Juan",
+  "Taguig",
+  "Valenzuela",
+] as const;
+
+function normalizeRows(rows: RawRow[]): PHRow[] {
+  const out: Mutable<PHRow>[] = rows
+    .map((row) => {
+      const region = row.region?.trim() ?? "";
+      const province = row.province?.trim() ?? "";
+      const city = row.city?.trim() ?? row.city_name?.trim() ?? "";
+      return {
+        region,
+        province: province || undefined,
+        city,
+      } satisfies PHRow;
+    })
+    .filter((row) => row.region && row.city);
+
+  for (const city of NCR_CANONICAL) {
+    const existing = out.find((row) => row.city.toLowerCase() === city.toLowerCase());
+    if (existing) {
+      existing.city = city;
+      if (!existing.region) existing.region = NCR_REGION;
+      if (!existing.province) existing.province = NCR_PROVINCE;
+      continue;
+    }
+    out.push({ region: NCR_REGION, province: NCR_PROVINCE, city });
   }
-  return [];
+
+  return out;
 }
 
-export const ROWS: PHRow[] = coerceRows();
+export const ROWS: PHRow[] = normalizeRows(RAW_ROWS);
 
 export function unique<T>(arr: T[]): T[] {
   return Array.from(new Set(arr));
