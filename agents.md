@@ -1,10 +1,11 @@
 # Agents Contract
 ## Contract version
-- **Version**: 2026-10-03
+- **Version**: 2026-10-04
 - **Changes**:
   - Home now redirects to `/browse-jobs` and `/post-job` performs a page-level redirect to `/gigs/create`.
-  - Shared `SiteHeader` adds a mobile toggle and keeps canonical nav test IDs across breakpoints while respecting auth-aware links.
+  - Shared `SiteHeader` adds a mobile toggle, keeps canonical nav test IDs across breakpoints while respecting auth-aware links, and only the mobile drawer uses `data-testid="nav-menu"` (desktop renders `nav-menu-desktop`).
   - Smoke coverage trimmed to nav, routing, browse jobs mock listing, and Post Job geo fallback (see `tests/smoke/*.spec.ts`).
+  - `/gigs/create` renders a lightweight geo select client component backed by `/data/ph/cities.json` so smoke tests always find Region, Province, and City selects.
 
 ## Routes & CTAs (source of truth)
 - Header CTAs use canonical IDs (`nav-browse-jobs`, `nav-post-job`, `nav-my-applications`, `nav-login`).
@@ -12,7 +13,7 @@
 - Home (`/`) redirects to `/browse-jobs`.
 - `data-testid="browse-jobs-from-empty"` → `/browse-jobs`
 - Header shows My Applications at all times and swaps `nav-login` ↔ `nav-logout` based on auth cookie presence.
-- Header exposes `data-testid="nav-menu-button"` for the mobile toggle and reuses `data-testid="nav-menu"` for both desktop and mobile menus.
+- Header exposes `data-testid="nav-menu-button"` for the mobile toggle. The desktop nav uses `data-testid="nav-menu-desktop"`, while the mobile drawer retains the canonical `data-testid="nav-menu"`.
 
 ## Auth behavior
 - If signed out, clicking either CTA MUST redirect to `/login?next=<dest>`.

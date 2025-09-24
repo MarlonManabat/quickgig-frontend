@@ -79,7 +79,7 @@ export default function SiteHeader({
         <Link href="/browse-jobs" className="font-bold">
           QuickGig
         </Link>
-        <nav className="hidden gap-4 md:flex" data-testid="nav-menu">
+        <nav className="hidden gap-4 md:flex" data-testid="nav-menu-desktop">
           {links.map(({ id, label, href }) => (
             <Link key={id} data-testid={id} href={href} prefetch={false}>
               {label}
@@ -98,7 +98,11 @@ export default function SiteHeader({
         </button>
       </div>
       {open && (
-        <div className="md:hidden px-4 pb-3" data-testid="nav-menu" id="site-header-menu">
+        <div
+          id="site-header-menu"
+          className="md:hidden px-4 pb-3"
+          data-testid="nav-menu"
+        >
           <div className="flex flex-col gap-2">
             {links.map(({ id, label, href, onClick }) => (
               <Link key={id} data-testid={id} href={href} onClick={onClick} prefetch={false}>

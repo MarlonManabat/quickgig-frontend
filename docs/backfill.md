@@ -1,5 +1,9 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-10-04 — Header nav + geo smoke fix
+- Desktop header now uses `nav-menu-desktop` so only the mobile drawer exposes the canonical `nav-menu` test id.
+- `/gigs/create` renders a lightweight geo select smoke helper backed by `/data/ph/cities.json` so Region/Province/City selects always appear.
+
 ## 2026-10-03 — Baseline routing & smoke guardrails
 - Routing redirects added (/ → /browse-jobs, /post-job → /gigs/create)
 - Header with canonical testids
