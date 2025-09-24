@@ -1,50 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import rowsJson from "@/data/ph/cities.json";
 
 type Row = { region: string; province?: string; city: string };
 
 export default function GeoSelectSmoke() {
-  const [rows, setRows] = useState<Row[]>([]);
-  const [region, setRegion] = useState("");
-  const [province, setProvince] = useState("");
-  const [city, setCity] = useState("");
-
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const res = await fetch("/data/ph/cities.json", { cache: "force-cache" });
-        if (!res.ok) return;
-        const json = await res.json();
-        if (alive) {
-          setRows(Array.isArray(json) ? json : []);
-        }
-      } catch {
-        // ignore network issues in smoke environments
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const rows: Row[] = Array.isArray(rowsJson) ? (rowsJson as Row[]) : [];
+  const seeded = rows.find((entry) => /quezon city/i.test(entry.city));
+  const [region, setRegion] = useState<string>(seeded?.region ?? "");
+  const [province, setProvince] = useState<string>(seeded?.province ?? "");
+  const [city, setCity] = useState<string>(seeded ? "Quezon City" : "");
 
   const regions = useMemo(
-    () => Array.from(new Set(rows.map((r) => r.region))).sort(),
+    () => Array.from(new Set(rows.map((entry) => entry.region))).sort(),
     [rows],
   );
   const provinces = useMemo(() => {
-    const filtered = rows.filter((r) => !region || r.region === region);
-    return Array.from(new Set(filtered.map((r) => r.province || "")))
+    const filtered = rows.filter((entry) => !region || entry.region === region);
+    return Array.from(new Set(filtered.map((entry) => entry.province || "")))
       .filter(Boolean)
       .sort();
   }, [rows, region]);
   const cities = useMemo(() => {
     const filtered = rows.filter(
-      (r) => (!region || r.region === region) && (!province || (r.province || "") === province),
+      (entry) =>
+        (!region || entry.region === region) && (!province || (entry.province || "") === province),
     );
-    return Array.from(new Set(filtered.map((r) => r.city))).sort();
+    return Array.from(new Set(filtered.map((entry) => entry.city))).sort();
   }, [rows, region, province]);
 
   return (
