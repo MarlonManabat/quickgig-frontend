@@ -8,8 +8,8 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
-const GeoSelectSmoke = dynamic(
-  () => import("@/components/location/GeoSelectSmoke"),
+const GeoSelectCore = dynamic(
+  () => import("@/components/location/GeoSelectCore"),
   { ssr: false },
 );
 
@@ -55,7 +55,7 @@ export default function CreateGigPage() {
         you can browse candidate activity and our sample jobs.
       </p>
 
-      <GeoSelectSmoke />
+      <GeoSelectCore />
 
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
