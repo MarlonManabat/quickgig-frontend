@@ -1,5 +1,10 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-10-05 — Browse jobs PH filters
+- `/browse-jobs` now renders Region/Province/City selects backed by the local PH dataset and syncs them to the URL.
+- The jobs list filters mock or API responses client-side so NCR/Quezon City appears on first paint in smoke.
+- Empty states remain guarded to avoid white screens when no jobs match the selected filters.
+
 ## 2026-10-04 — Header nav + geo smoke fix
 - Desktop header now uses `nav-menu-desktop` so only the mobile drawer exposes the canonical `nav-menu` test id.
 - `/gigs/create` renders a lightweight geo select smoke helper backed by `/data/ph/cities.json` so Region/Province/City selects always appear.
