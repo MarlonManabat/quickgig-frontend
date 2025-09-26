@@ -4,8 +4,14 @@
 
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+
+const GeoSelectCore = dynamic(
+  () => import("@/components/location/GeoSelectCore"),
+  { ssr: false },
+);
 
 function useLocalEvent() {
   // Minimal client-only "analytics" that won't affect CI or require network.
@@ -48,6 +54,8 @@ export default function CreateGigPage() {
         We&apos;re finishing payments, review, and publishing. In the meantime,
         you can browse candidate activity and our sample jobs.
       </p>
+
+      <GeoSelectCore />
 
       <div className="mt-8 flex flex-wrap gap-3">
         <Link

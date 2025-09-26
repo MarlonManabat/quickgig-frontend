@@ -1,5 +1,22 @@
 # Backfill / Change Log (Landing → App routing)
 
+## 2026-10-05 — Browse jobs PH filters
+- `/browse-jobs` now renders Region/Province/City selects backed by the local PH dataset and syncs them to the URL.
+- The jobs list filters mock or API responses client-side so NCR/Quezon City appears on first paint in smoke.
+- Empty states remain guarded to avoid white screens when no jobs match the selected filters.
+
+## 2026-10-04 — Header nav + geo smoke fix
+- Desktop header now uses `nav-menu-desktop` so only the mobile drawer exposes the canonical `nav-menu` test id.
+- `/gigs/create` renders a lightweight geo select smoke helper backed by `/data/ph/cities.json` so Region/Province/City selects always appear.
+
+## 2026-10-03 — Baseline routing & smoke guardrails
+- Routing redirects added (/ → /browse-jobs, /post-job → /gigs/create)
+- Header with canonical testids
+- Applications page list container
+- Browse-jobs MOCK_MODE card + Apply link
+- GeoSelect fallback to local PH dataset
+- Smoke specs covering nav, redirects, geo, browse-jobs
+
 ## 2026-10-02 — Demo auth routes and login wiring
 - Added `/api/auth/demo` GET helper that issues the shared auth cookie then redirects with `next` fallback to `/my-applications`.
 - `/api/auth/logout` now mirrors the mock helper cookie clearing (domain-aware) so demo logouts clear subdomain cookies.

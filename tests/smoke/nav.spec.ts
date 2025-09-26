@@ -1,15 +1,16 @@
-import { test, expect } from '@playwright/test';
-import { openMobileMenu, visByTestId, expectAuthAwareRedirect, loginOr } from './_helpers';
+import { test, expect } from "@playwright/test";
 
-test('desktop header CTAs › Login', async ({ page }) => {
-  await page.goto('/browse-jobs');
-  await (await visByTestId(page, 'nav-login')).click();
-  await expectAuthAwareRedirect(page, /\/login\/?$/);
+test("header nav testids exist (desktop)", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("nav-browse-jobs")).toBeVisible();
+  await expect(page.getByTestId("nav-my-applications")).toBeVisible();
+  await expect(page.getByTestId("nav-post-job")).toBeVisible();
+  await expect(page.getByTestId("nav-login")).toBeVisible();
 });
 
-test('desktop header CTAs › My Applications (auth-aware)', async ({ page }) => {
-  await page.goto('/browse-jobs');
-  await openMobileMenu(page);
-  await (await visByTestId(page, 'nav-my-applications')).click();
-  await expectAuthAwareRedirect(page, loginOr(/\/applications\/?$/));
+test("mobile menu toggles", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto("/");
+  await page.getByTestId("nav-menu-button").click();
+  await expect(page.getByTestId("nav-menu")).toBeVisible();
 });

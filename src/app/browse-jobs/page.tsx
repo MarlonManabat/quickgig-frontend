@@ -1,315 +1,139 @@
-import Link from "next/link";
-import type { ReadonlyURLSearchParams } from "next/navigation";
+import LocationFilters from "@/components/location/LocationFilters";
+import { apiBaseUrl } from "@/lib/env";
+import { DEFAULT_CITY, DEFAULT_PROVINCE, DEFAULT_REGION } from "@/lib/ph-geo";
 
-import { hasApplied, readAppliedIdsFromCookie } from "@/lib/applications";
-import { fetchJobs } from "@/lib/jobs";
-import { keepParams, withParams } from "@/lib/url";
+import JobsClient from "./JobsClient";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = { [key: string]: string | string[] | undefined } | ReadonlyURLSearchParams;
+type SearchParams = Record<string, string | string[] | undefined>;
 
-function parsePage(value: string | null | undefined, fallback = 1): number {
-  const raw = value ?? undefined;
-  const parsed = raw ? Number(raw) : Number.NaN;
-  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+type JobPayload = {
+  id?: string | number;
+  title?: string;
+  company?: string;
+  region?: string;
+  province?: string;
+  city?: string;
+  location?: string;
+  [key: string]: unknown;
+};
+
+const MOCK = process.env.MOCK_MODE === "1";
+
+function mockJobs(): JobPayload[] {
+  return [
+    {
+      id: "m1",
+      title: "Delivery Helper (1-day)",
+      company: "Metro Movers",
+      region: "National Capital Region",
+      province: "Metro Manila",
+      city: "Quezon City",
+    },
+    {
+      id: "m2",
+      title: "Store Crew",
+      company: "Southside Grocer",
+      region: "Region IV-A (CALABARZON)",
+      province: "Laguna",
+      city: "Calamba",
+    },
+    {
+      id: "m3",
+      title: "Office Runner",
+      company: "Cebu Services",
+      region: "Central Visayas",
+      province: "Cebu",
+      city: "Cebu City",
+    },
+  ];
 }
 
-function parsePageSize(value: string | string[] | undefined, fallback = 10): number {
-  const first = Array.isArray(value) ? value[0] : value;
-  if (!first) return fallback;
-  const n = Number(first);
-  if (!Number.isFinite(n) || n <= 0) return fallback;
-  return Math.min(50, Math.max(1, n));
+function readFirst(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) return value[0] ?? null;
+  if (typeof value === "string") return value;
+  return null;
 }
 
-function parseSort(
-  value: string | null | undefined,
-): "newest" | "relevance" | "pay" {
-  const raw = (value ?? "").toLowerCase();
-  return raw === "relevance" || raw === "pay" ? (raw as "relevance" | "pay") : "newest";
-}
-
-function normalizeSearchParams(
-  value?: SearchParams,
-): ReadonlyURLSearchParams {
-  if (!value) return new URLSearchParams();
-  if (typeof (value as ReadonlyURLSearchParams).entries === "function") {
-    return value as ReadonlyURLSearchParams;
+async function fetchJobsFromApi(query: {
+  region?: string;
+  province?: string;
+  city?: string;
+}): Promise<JobPayload[]> {
+  let base: string | undefined;
+  try {
+    base = apiBaseUrl();
+  } catch {
+    base = undefined;
   }
-  const qs = new URLSearchParams();
-  Object.entries(value).forEach(([key, raw]) => {
-    if (Array.isArray(raw)) {
-      raw.forEach((entry) => {
-        if (entry != null) qs.append(key, entry);
-      });
-    } else if (raw != null) {
-      qs.set(key, raw);
+
+  if (!base) {
+    return [];
+  }
+
+  const params = new URLSearchParams();
+  if (query.region) params.set("region", query.region);
+  if (query.province) params.set("province", query.province);
+  if (query.city) params.set("city", query.city);
+
+  const queryString = params.toString();
+  const url = `${base}/jobs${queryString ? `?${queryString}` : ""}`;
+
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) {
+      return [];
     }
-  });
-  return qs;
+    const data = await res.json();
+    if (Array.isArray(data?.items)) return data.items as JobPayload[];
+    if (Array.isArray(data)) return data as JobPayload[];
+    return [];
+  } catch {
+    return [];
+  }
 }
 
 export default async function BrowseJobsPage({
-  searchParams,
+  searchParams = {},
 }: {
   searchParams?: SearchParams;
 }) {
-  const normalized = normalizeSearchParams(searchParams);
-  const sanitizedFilters = keepParams(normalized, ["q", "location"]);
-  const rawQuery = sanitizedFilters.q ?? "";
-  const rawLocation = sanitizedFilters.location ?? "";
-  const q = rawQuery.trim();
-  const locationFilter = rawLocation.trim();
-  const sort = parseSort(normalized.get("sort"));
-  const page = parsePage(normalized.get("page"), 1);
-  const pageSize = parsePageSize(
-    (() => {
-      const all = normalized.getAll("pageSize");
-      if (all.length > 0) return all;
-      return normalized.get("pageSize") ?? undefined;
-    })(),
-    10,
-  );
-  const appliedOnly = normalized.get("applied") === "1";
+  const hasRegion = Object.prototype.hasOwnProperty.call(searchParams, "region");
+  const hasProvince = Object.prototype.hasOwnProperty.call(searchParams, "province");
+  const hasCity = Object.prototype.hasOwnProperty.call(searchParams, "city");
 
-  const { items: fetchedItems, total } = await fetchJobs({
-    page,
-    pageSize,
-    q,
-    location: locationFilter,
-    sort,
-  });
+  const regionParam = readFirst(searchParams.region);
+  const provinceParam = readFirst(searchParams.province);
+  const cityParam = readFirst(searchParams.city);
 
-  let items = fetchedItems;
+  const region = hasRegion ? regionParam ?? "" : DEFAULT_REGION;
+  const province = hasProvince ? provinceParam ?? "" : hasRegion ? "" : DEFAULT_PROVINCE;
+  const city = hasCity
+    ? cityParam ?? ""
+    : hasProvince
+      ? ""
+      : hasRegion
+        ? ""
+        : DEFAULT_CITY;
 
-  if (appliedOnly) {
-    const ids = new Set(readAppliedIdsFromCookie().map((id) => String(id)));
-    items = ids.size === 0 ? [] : items.filter((job) => ids.has(String(job.id)));
-  }
+  const apiRegion = hasRegion ? regionParam ?? "" : "";
+  const apiProvince = hasProvince ? provinceParam ?? "" : "";
+  const apiCity = hasCity ? cityParam ?? "" : "";
 
-  const derivedTotal = appliedOnly ? items.length : total;
-  const totalPages = Math.max(1, Math.ceil(Math.max(derivedTotal, 0) / pageSize));
-
-  const showClear = Boolean(
-    rawQuery ||
-      rawLocation ||
-      appliedOnly ||
-      sort !== "newest" ||
-      pageSize !== 10 ||
-      page > 1,
-  );
+  const initialJobs = MOCK
+    ? mockJobs()
+    : await fetchJobsFromApi({
+        region: apiRegion || undefined,
+        province: apiProvince || undefined,
+        city: apiCity || undefined,
+      });
 
   return (
-    <main className="mx-auto max-w-4xl p-6">
-      <h1 className="text-2xl font-semibold">Browse Jobs</h1>
-      <div className="text-sm text-gray-600">{derivedTotal} results</div>
-
-      <form
-        role="search"
-        method="get"
-        action="/browse-jobs"
-        className="mt-4 mb-6 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end"
-      >
-        <input type="hidden" name="page" value="1" />
-        <div className="flex min-w-[220px] flex-1 md:min-w-[240px]">
-          <label htmlFor="filter-q" className="sr-only">
-            Search title or company
-          </label>
-          <input
-            id="filter-q"
-            name="q"
-            type="search"
-            defaultValue={rawQuery}
-            placeholder="Search title or company…"
-            className="w-full rounded border px-3 py-2"
-            data-testid="filter-q"
-          />
-        </div>
-        <div className="flex min-w-[200px] flex-1 md:min-w-[220px]">
-          <label htmlFor="filter-location" className="sr-only">
-            City, State or Remote
-          </label>
-          <input
-            id="filter-location"
-            name="location"
-            defaultValue={rawLocation}
-            placeholder="City, State or Remote"
-            className="w-full rounded border px-3 py-2"
-            data-testid="filter-location"
-          />
-        </div>
-        <div className="min-w-[160px]">
-          <label htmlFor="sort" className="block text-sm font-medium">
-            Sort
-          </label>
-          <select
-            id="sort"
-            name="sort"
-            defaultValue={sort}
-            className="mt-1 w-full rounded border px-3 py-2"
-            data-testid="sort-select"
-          >
-            <option value="newest">Newest</option>
-            <option value="relevance">Relevance</option>
-            <option value="pay">Pay</option>
-          </select>
-        </div>
-        <div className="min-w-[140px]">
-          <label htmlFor="pageSize" className="block text-sm font-medium">
-            Page size
-          </label>
-          <select
-            id="pageSize"
-            name="pageSize"
-            defaultValue={String(pageSize)}
-            className="mt-1 w-full rounded border px-3 py-2"
-            data-testid="filter-page-size"
-          >
-            {[10, 20, 30, 50].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center gap-2 md:pl-2">
-          <input
-            id="applied"
-            name="applied"
-            type="checkbox"
-            value="1"
-            defaultChecked={appliedOnly}
-            className="h-4 w-4"
-            data-testid="filter-applied"
-          />
-          <label htmlFor="applied" className="text-sm">
-            Applied only
-          </label>
-        </div>
-        <div className="flex items-center gap-2 md:ml-auto">
-          <button
-            type="submit"
-            className="rounded bg-blue-600 px-4 py-2 text-white"
-            data-testid="filters-apply"
-          >
-            Apply
-          </button>
-          {showClear && (
-            <Link
-              href={withParams("/browse-jobs", { page: 1, pageSize })}
-              className="text-sm text-blue-600 hover:underline"
-              data-testid="filters-clear"
-            >
-              Clear
-            </Link>
-          )}
-        </div>
-      </form>
-
-      {items.length === 0 ? (
-        <div className="mt-8 rounded border p-6 text-gray-600" data-testid="jobs-empty">
-          {appliedOnly
-            ? "No applied jobs yet. Start applying to track them here."
-            : "No jobs found. Try adjusting your filters."}
-        </div>
-      ) : (
-        <ul className="mt-8 space-y-4" data-testid="jobs-list">
-          {items.map((job) => {
-            const applied = hasApplied(job.id);
-            return (
-              <li
-                key={String(job.id)}
-                className="flex items-start justify-between gap-4 rounded-lg border p-4"
-                data-testid="job-card"
-              >
-                <div>
-                  <h3 className="text-lg font-medium">
-                    <Link
-                      href={`/browse-jobs/${encodeURIComponent(String(job.id))}`}
-                      className="hover:underline"
-                    >
-                      {job.title ?? `Job #${job.id}`}
-                    </Link>
-                  </h3>
-                  <div className="text-sm text-gray-600">
-                    {job.company ?? "—"} • {job.location ?? job.city ?? "Anywhere"}
-                  </div>
-                  <div className="mt-3">
-                    <Link
-                      className="text-blue-600 underline"
-                      href={`/browse-jobs/${encodeURIComponent(String(job.id))}`}
-                    >
-                      View details
-                    </Link>
-                  </div>
-                </div>
-                {applied && (
-                  <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
-                    Applied
-                  </span>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      {items.length > 0 && (
-        <nav className="mt-8 flex flex-wrap items-center justify-between gap-3" aria-label="pagination">
-          {(() => {
-            const prevDisabled = page <= 1;
-            const nextDisabled = page >= totalPages;
-            const preservedParams = keepParams(normalized, [
-              "q",
-              "location",
-              "pageSize",
-              "sort",
-              "applied",
-            ]);
-            const baseParams = {
-              ...preservedParams,
-              q: q || undefined,
-              location: locationFilter || undefined,
-              sort: sort !== "newest" ? sort : undefined,
-              pageSize,
-              applied: appliedOnly ? "1" : undefined,
-            } as const;
-            const prevHref = withParams("/browse-jobs", {
-              ...baseParams,
-              page: Math.max(1, page - 1),
-            });
-            const nextHref = withParams("/browse-jobs", {
-              ...baseParams,
-              page: Math.min(totalPages, page + 1),
-            });
-
-            return (
-              <>
-                <a
-                  data-testid="nav-prev"
-                  href={prevDisabled ? undefined : prevHref}
-                  aria-disabled={prevDisabled}
-                  className={`rounded border px-3 py-2 text-sm ${prevDisabled ? "pointer-events-none opacity-50" : ""}`}
-                >
-                  Previous
-                </a>
-                <span className="text-sm text-gray-600">
-                  Page {page} of {totalPages}
-                </span>
-                <a
-                  data-testid="nav-next"
-                  href={nextDisabled ? undefined : nextHref}
-                  aria-disabled={nextDisabled}
-                  className={`rounded border px-3 py-2 text-sm ${nextDisabled ? "pointer-events-none opacity-50" : ""}`}
-                >
-                  Next
-                </a>
-              </>
-            );
-          })()}
-        </nav>
-      )}
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-xl font-semibold mb-4">Browse Jobs</h1>
+      <LocationFilters />
+      <JobsClient initialJobs={initialJobs} region={region} province={province} city={city} />
     </main>
   );
 }
