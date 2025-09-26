@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 
 type JobLike = {
   id?: string | number;
@@ -37,18 +36,16 @@ export default function JobsClient({
 }) {
   const items = Array.isArray(initialJobs) ? initialJobs : [];
 
-  const filtered = useMemo(() => {
-    return items.filter((job) => {
-      const jobRegion = getField(job, ["region", "location_region", "locationRegion"]);
-      const jobProvince = getField(job, ["province", "location_province", "locationProvince"]);
-      const jobCity = getField(job, ["city", "location_city", "locationCity"]);
+  const filtered = items.filter((job) => {
+    const jobRegion = getField(job, ["region", "location_region", "locationRegion"]);
+    const jobProvince = getField(job, ["province", "location_province", "locationProvince"]);
+    const jobCity = getField(job, ["city", "location_city", "locationCity"]);
 
-      if (region && jobRegion !== region) return false;
-      if (province && jobProvince !== province) return false;
-      if (city && jobCity !== city) return false;
-      return true;
-    });
-  }, [items, region, province, city]);
+    if (region && jobRegion !== region) return false;
+    if (province && jobProvince !== province) return false;
+    if (city && jobCity !== city) return false;
+    return true;
+  });
 
   if (filtered.length === 0) {
     return (
@@ -82,6 +79,7 @@ export default function JobsClient({
               <Link
                 href={`/apply/${encodeURIComponent(id)}`}
                 className="inline-block rounded border px-3 py-1 text-sm"
+                data-testid="job-apply"
               >
                 Apply
               </Link>

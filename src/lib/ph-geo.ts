@@ -74,8 +74,8 @@ export function unique<T>(arr: T[]): T[] {
 export const ALL_REGIONS = unique(ROWS.map((r) => r.region)).sort();
 
 export const DEFAULT_QC = ROWS.find((r) => /quezon city/i.test(r.city));
-export const DEFAULT_REGION = DEFAULT_QC?.region ?? ALL_REGIONS[0] ?? "";
-export const DEFAULT_PROVINCE = DEFAULT_QC?.province ?? "";
+export const DEFAULT_REGION = DEFAULT_QC?.region ?? NCR_REGION;
+export const DEFAULT_PROVINCE = DEFAULT_QC?.province ?? NCR_PROVINCE;
 export const DEFAULT_CITY = DEFAULT_QC ? "Quezon City" : "";
 
 export function provincesFor(region: string): string[] {
@@ -87,5 +87,11 @@ export function citiesFor(region: string, province: string): string[] {
   const filtered = ROWS.filter(
     (r) => (!region || r.region === region) && (!province || (r.province || "") === province),
   );
-  return unique(filtered.map((r) => r.city)).sort();
+  const set = new Set(filtered.map((r) => r.city));
+  if (region === NCR_REGION) {
+    for (const city of NCR_CANONICAL) {
+      set.add(city);
+    }
+  }
+  return Array.from(set).sort();
 }
