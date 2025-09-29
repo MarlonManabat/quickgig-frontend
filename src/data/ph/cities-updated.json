@@ -1,0 +1,194 @@
+[
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Caloocan",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137401000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Las Piñas",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137402000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Makati",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137403000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Malabon",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137404000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Mandaluyong",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137405000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Manila",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137406000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Marikina",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137407000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Muntinlupa",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137408000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Navotas",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137409000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Parañaque",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137410000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Pasay",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137411000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Pasig",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137412000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Pateros",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137413000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Quezon City",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137414000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "San Juan",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137415000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Taguig",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137416000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Valenzuela",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137417000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Basilan",
+    "city": "Isabela City",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190701000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Basilan",
+    "city": "Lamitan",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190702000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Lanao del Sur",
+    "city": "Marawi",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190703000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Maguindanao del Norte",
+    "city": "Cotabato City",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190704000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Maguindanao del Sur",
+    "city": "Datu Odin Sinsuat",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190705000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Sulu",
+    "city": "Jolo",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190706000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Tawi-Tawi",
+    "city": "Bongao",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190707000"
+  }
+]

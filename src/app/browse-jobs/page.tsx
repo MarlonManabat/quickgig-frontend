@@ -97,15 +97,17 @@ async function fetchJobsFromApi(query: {
 export default async function BrowseJobsPage({
   searchParams = {},
 }: {
-  searchParams?: SearchParams;
+  searchParams?: Promise<SearchParams> | SearchParams;
 }) {
-  const hasRegion = Object.prototype.hasOwnProperty.call(searchParams, "region");
-  const hasProvince = Object.prototype.hasOwnProperty.call(searchParams, "province");
-  const hasCity = Object.prototype.hasOwnProperty.call(searchParams, "city");
+  const params = await Promise.resolve(searchParams);
+  
+  const hasRegion = Object.prototype.hasOwnProperty.call(params, "region");
+  const hasProvince = Object.prototype.hasOwnProperty.call(params, "province");
+  const hasCity = Object.prototype.hasOwnProperty.call(params, "city");
 
-  const regionParam = readFirst(searchParams.region);
-  const provinceParam = readFirst(searchParams.province);
-  const cityParam = readFirst(searchParams.city);
+  const regionParam = readFirst(params.region);
+  const provinceParam = readFirst(params.province);
+  const cityParam = readFirst(params.city);
 
   const region = hasRegion ? regionParam ?? "" : DEFAULT_REGION;
   const province = hasProvince ? provinceParam ?? "" : hasRegion ? "" : DEFAULT_PROVINCE;

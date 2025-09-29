@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   ALL_REGIONS,
   DEFAULT_CITY,
@@ -10,14 +10,32 @@ import {
   provincesFor,
 } from "@/lib/ph-geo";
 
-export default function GeoSelectCore() {
-  const [region, setRegion] = useState<string>(DEFAULT_REGION);
-  const [province, setProvince] = useState<string>(DEFAULT_PROVINCE);
-  const [city, setCity] = useState<string>(DEFAULT_CITY);
+interface GeoSelectCoreProps {
+  onLocationChange?: (location: { region: string; province: string; city: string }) => void;
+  initialRegion?: string;
+  initialProvince?: string;
+  initialCity?: string;
+}
+
+export default function GeoSelectCore({ 
+  onLocationChange,
+  initialRegion = DEFAULT_REGION,
+  initialProvince = DEFAULT_PROVINCE,
+  initialCity = DEFAULT_CITY
+}: GeoSelectCoreProps = {}) {
+  const [region, setRegion] = useState<string>(initialRegion);
+  const [province, setProvince] = useState<string>(initialProvince);
+  const [city, setCity] = useState<string>(initialCity);
 
   const regions = useMemo(() => ALL_REGIONS, []);
   const provinces = useMemo(() => provincesFor(region), [region]);
   const cities = useMemo(() => citiesFor(region, province), [region, province]);
+
+  useEffect(() => {
+    if (onLocationChange) {
+      onLocationChange({ region, province, city });
+    }
+  }, [region, province, city, onLocationChange]);
 
   return (
     <div className="mt-4 grid gap-3">

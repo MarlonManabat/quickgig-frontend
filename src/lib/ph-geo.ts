@@ -1,4 +1,4 @@
-import rowsJson from "@/data/ph/cities.json";
+import rowsJson from "@/data/ph/cities-complete.json";
 
 export type PHRow = { region: string; province?: string; city: string };
 
