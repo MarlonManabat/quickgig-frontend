@@ -78,10 +78,10 @@ export default function JobsClient({
               </Link>
               <Link
                 href={`/apply/${encodeURIComponent(id)}`}
-                className="inline-block rounded border px-3 py-1 text-sm"
+                className="inline-block rounded bg-yellow-400 hover:bg-yellow-500 text-black px-3 py-1 text-sm font-medium"
                 data-testid="job-apply"
               >
-                Apply
+                Apply (1 🎫)
               </Link>
             </div>
           </article>

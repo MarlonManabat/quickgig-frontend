@@ -1,0 +1,1 @@
+(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[4209,7160,9868],{51:(e,s,t)=>{"use strict";t.d(s,{default:()=>n});var a=t(5155);function n(e){let{className:s=""}=e;return(0,a.jsx)("div",{className:"animate-pulse rounded bg-slate-200/60 ".concat(s).trim()})}},7494:(e,s,t)=>{Promise.resolve().then(t.bind(t,51))}},e=>{e.O(0,[8441,1255,7358],()=>e(e.s=7494)),_N_E=e.O()}]);

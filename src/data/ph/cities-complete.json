@@ -1,0 +1,1434 @@
+[
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Caloocan",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137401000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Las Piñas",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137402000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Makati",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137403000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Malabon",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137404000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Mandaluyong",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137405000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Manila",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137406000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Marikina",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137407000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Muntinlupa",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137408000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Navotas",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137409000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Parañaque",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137410000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Pasay",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137411000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Pasig",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137412000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Pateros",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137413000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Quezon City",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137414000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "San Juan",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137415000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Taguig",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137416000"
+  },
+  {
+    "region": "National Capital Region",
+    "province": "Metro Manila",
+    "city": "Valenzuela",
+    "region_code": "130000000",
+    "province_code": "NCR",
+    "city_code": "137417000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "Ilocos Norte",
+    "city": "Laoag",
+    "region_code": "010000000",
+    "province_code": "ILN",
+    "city_code": "012801000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "Ilocos Norte",
+    "city": "Batac",
+    "region_code": "010000000",
+    "province_code": "ILN",
+    "city_code": "012802000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "Ilocos Sur",
+    "city": "Vigan",
+    "region_code": "010000000",
+    "province_code": "ILS",
+    "city_code": "012901000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "Ilocos Sur",
+    "city": "Candon",
+    "region_code": "010000000",
+    "province_code": "ILS",
+    "city_code": "012902000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "La Union",
+    "city": "San Fernando",
+    "region_code": "010000000",
+    "province_code": "LUN",
+    "city_code": "013301000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "Pangasinan",
+    "city": "Dagupan",
+    "region_code": "010000000",
+    "province_code": "PAN",
+    "city_code": "015501000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "Pangasinan",
+    "city": "San Carlos",
+    "region_code": "010000000",
+    "province_code": "PAN",
+    "city_code": "015502000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "Pangasinan",
+    "city": "Urdaneta",
+    "region_code": "010000000",
+    "province_code": "PAN",
+    "city_code": "015503000"
+  },
+  {
+    "region": "Region I (Ilocos Region)",
+    "province": "Pangasinan",
+    "city": "Alaminos",
+    "region_code": "010000000",
+    "province_code": "PAN",
+    "city_code": "015504000"
+  },
+  {
+    "region": "Region II (Cagayan Valley)",
+    "province": "Batanes",
+    "city": "Basco",
+    "region_code": "020000000",
+    "province_code": "BTN",
+    "city_code": "020901000"
+  },
+  {
+    "region": "Region II (Cagayan Valley)",
+    "province": "Cagayan",
+    "city": "Tuguegarao",
+    "region_code": "020000000",
+    "province_code": "CAG",
+    "city_code": "021501000"
+  },
+  {
+    "region": "Region II (Cagayan Valley)",
+    "province": "Isabela",
+    "city": "Ilagan",
+    "region_code": "020000000",
+    "province_code": "ISA",
+    "city_code": "023101000"
+  },
+  {
+    "region": "Region II (Cagayan Valley)",
+    "province": "Isabela",
+    "city": "Santiago",
+    "region_code": "020000000",
+    "province_code": "ISA",
+    "city_code": "023102000"
+  },
+  {
+    "region": "Region II (Cagayan Valley)",
+    "province": "Nueva Vizcaya",
+    "city": "Bayombong",
+    "region_code": "020000000",
+    "province_code": "NUV",
+    "city_code": "024801000"
+  },
+  {
+    "region": "Region II (Cagayan Valley)",
+    "province": "Quirino",
+    "city": "Cabarroguis",
+    "region_code": "020000000",
+    "province_code": "QUI",
+    "city_code": "025701000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Aurora",
+    "city": "Baler",
+    "region_code": "030000000",
+    "province_code": "AUR",
+    "city_code": "030801000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Bataan",
+    "city": "Balanga",
+    "region_code": "030000000",
+    "province_code": "BAN",
+    "city_code": "030901000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Bulacan",
+    "city": "Malolos",
+    "region_code": "030000000",
+    "province_code": "BUL",
+    "city_code": "031401000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Bulacan",
+    "city": "Meycauayan",
+    "region_code": "030000000",
+    "province_code": "BUL",
+    "city_code": "031402000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Bulacan",
+    "city": "San Jose del Monte",
+    "region_code": "030000000",
+    "province_code": "BUL",
+    "city_code": "031403000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Nueva Ecija",
+    "city": "Palayan",
+    "region_code": "030000000",
+    "province_code": "NUE",
+    "city_code": "034901000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Nueva Ecija",
+    "city": "Cabanatuan",
+    "region_code": "030000000",
+    "province_code": "NUE",
+    "city_code": "034902000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Nueva Ecija",
+    "city": "Gapan",
+    "region_code": "030000000",
+    "province_code": "NUE",
+    "city_code": "034903000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Nueva Ecija",
+    "city": "San Antonio",
+    "region_code": "030000000",
+    "province_code": "NUE",
+    "city_code": "034904000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Nueva Ecija",
+    "city": "San Jose",
+    "region_code": "030000000",
+    "province_code": "NUE",
+    "city_code": "034905000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Pampanga",
+    "city": "San Fernando",
+    "region_code": "030000000",
+    "province_code": "PAM",
+    "city_code": "035401000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Pampanga",
+    "city": "Angeles",
+    "region_code": "030000000",
+    "province_code": "PAM",
+    "city_code": "035402000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Pampanga",
+    "city": "Mabalacat",
+    "region_code": "030000000",
+    "province_code": "PAM",
+    "city_code": "035403000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Tarlac",
+    "city": "Tarlac City",
+    "region_code": "030000000",
+    "province_code": "TAR",
+    "city_code": "036901000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Zambales",
+    "city": "Iba",
+    "region_code": "030000000",
+    "province_code": "ZMB",
+    "city_code": "037101000"
+  },
+  {
+    "region": "Region III (Central Luzon)",
+    "province": "Zambales",
+    "city": "Olongapo",
+    "region_code": "030000000",
+    "province_code": "ZMB",
+    "city_code": "037102000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Batangas",
+    "city": "Batangas City",
+    "region_code": "040000000",
+    "province_code": "BTG",
+    "city_code": "041001000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Batangas",
+    "city": "Lipa",
+    "region_code": "040000000",
+    "province_code": "BTG",
+    "city_code": "041002000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Batangas",
+    "city": "Tanauan",
+    "region_code": "040000000",
+    "province_code": "BTG",
+    "city_code": "041003000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Cavite",
+    "city": "Trece Martires",
+    "region_code": "040000000",
+    "province_code": "CAV",
+    "city_code": "042101000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Cavite",
+    "city": "Cavite City",
+    "region_code": "040000000",
+    "province_code": "CAV",
+    "city_code": "042102000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Cavite",
+    "city": "Bacoor",
+    "region_code": "040000000",
+    "province_code": "CAV",
+    "city_code": "042103000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Cavite",
+    "city": "Imus",
+    "region_code": "040000000",
+    "province_code": "CAV",
+    "city_code": "042104000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Cavite",
+    "city": "Dasmariñas",
+    "region_code": "040000000",
+    "province_code": "CAV",
+    "city_code": "042105000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Laguna",
+    "city": "Santa Rosa",
+    "region_code": "040000000",
+    "province_code": "LAG",
+    "city_code": "043401000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Laguna",
+    "city": "Calamba",
+    "region_code": "040000000",
+    "province_code": "LAG",
+    "city_code": "043402000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Laguna",
+    "city": "Biñan",
+    "region_code": "040000000",
+    "province_code": "LAG",
+    "city_code": "043403000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Laguna",
+    "city": "San Pedro",
+    "region_code": "040000000",
+    "province_code": "LAG",
+    "city_code": "043404000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Laguna",
+    "city": "Cabuyao",
+    "region_code": "040000000",
+    "province_code": "LAG",
+    "city_code": "043405000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Quezon",
+    "city": "Lucena",
+    "region_code": "040000000",
+    "province_code": "QUE",
+    "city_code": "045601000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Quezon",
+    "city": "Tayabas",
+    "region_code": "040000000",
+    "province_code": "QUE",
+    "city_code": "045602000"
+  },
+  {
+    "region": "Region IV-A (CALABARZON)",
+    "province": "Rizal",
+    "city": "Antipolo",
+    "region_code": "040000000",
+    "province_code": "RIZ",
+    "city_code": "045801000"
+  },
+  {
+    "region": "Region IV-B (MIMAROPA)",
+    "province": "Marinduque",
+    "city": "Boac",
+    "region_code": "170000000",
+    "province_code": "MAD",
+    "city_code": "175201000"
+  },
+  {
+    "region": "Region IV-B (MIMAROPA)",
+    "province": "Occidental Mindoro",
+    "city": "Mamburao",
+    "region_code": "170000000",
+    "province_code": "MDC",
+    "city_code": "175101000"
+  },
+  {
+    "region": "Region IV-B (MIMAROPA)",
+    "province": "Oriental Mindoro",
+    "city": "Calapan",
+    "region_code": "170000000",
+    "province_code": "MDR",
+    "city_code": "175301000"
+  },
+  {
+    "region": "Region IV-B (MIMAROPA)",
+    "province": "Palawan",
+    "city": "Puerto Princesa",
+    "region_code": "170000000",
+    "province_code": "PLW",
+    "city_code": "175301000"
+  },
+  {
+    "region": "Region IV-B (MIMAROPA)",
+    "province": "Romblon",
+    "city": "Romblon",
+    "region_code": "170000000",
+    "province_code": "ROM",
+    "city_code": "175701000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Albay",
+    "city": "Legazpi",
+    "region_code": "050000000",
+    "province_code": "ALB",
+    "city_code": "050501000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Albay",
+    "city": "Ligao",
+    "region_code": "050000000",
+    "province_code": "ALB",
+    "city_code": "050502000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Albay",
+    "city": "Tabaco",
+    "region_code": "050000000",
+    "province_code": "ALB",
+    "city_code": "050503000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Camarines Norte",
+    "city": "Daet",
+    "region_code": "050000000",
+    "province_code": "CAN",
+    "city_code": "051401000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Camarines Sur",
+    "city": "Pili",
+    "region_code": "050000000",
+    "province_code": "CAS",
+    "city_code": "051601000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Camarines Sur",
+    "city": "Naga",
+    "region_code": "050000000",
+    "province_code": "CAS",
+    "city_code": "051602000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Camarines Sur",
+    "city": "Iriga",
+    "region_code": "050000000",
+    "province_code": "CAS",
+    "city_code": "051603000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Catanduanes",
+    "city": "Virac",
+    "region_code": "050000000",
+    "province_code": "CAT",
+    "city_code": "052001000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Masbate",
+    "city": "Masbate City",
+    "region_code": "050000000",
+    "province_code": "MAS",
+    "city_code": "054001000"
+  },
+  {
+    "region": "Region V (Bicol Region)",
+    "province": "Sorsogon",
+    "city": "Sorsogon City",
+    "region_code": "050000000",
+    "province_code": "SOR",
+    "city_code": "056201000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Aklan",
+    "city": "Kalibo",
+    "region_code": "060000000",
+    "province_code": "AKL",
+    "city_code": "060401000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Antique",
+    "city": "San Jose de Buenavista",
+    "region_code": "060000000",
+    "province_code": "ANT",
+    "city_code": "060601000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Capiz",
+    "city": "Roxas",
+    "region_code": "060000000",
+    "province_code": "CAP",
+    "city_code": "061901000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Guimaras",
+    "city": "Jordan",
+    "region_code": "060000000",
+    "province_code": "GUI",
+    "city_code": "062601000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Iloilo",
+    "city": "Iloilo City",
+    "region_code": "060000000",
+    "province_code": "ILI",
+    "city_code": "063001000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Iloilo",
+    "city": "Passi",
+    "region_code": "060000000",
+    "province_code": "ILI",
+    "city_code": "063002000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Bacolod",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064501000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Bago",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064502000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Cadiz",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064503000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Escalante",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064504000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Himamaylan",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064505000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Kabankalan",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064506000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "La Carlota",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064507000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Sagay",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064508000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "San Carlos",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064509000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Silay",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064510000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Sipalay",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064511000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Talisay",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064512000"
+  },
+  {
+    "region": "Region VI (Western Visayas)",
+    "province": "Negros Occidental",
+    "city": "Victorias",
+    "region_code": "060000000",
+    "province_code": "NEC",
+    "city_code": "064513000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Bohol",
+    "city": "Tagbilaran",
+    "region_code": "070000000",
+    "province_code": "BOH",
+    "city_code": "071201000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Cebu City",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072201000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Lapu-Lapu",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072202000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Mandaue",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072203000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Bogo",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072204000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Carcar",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072205000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Danao",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072206000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Naga",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072207000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Talisay",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072208000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Cebu",
+    "city": "Toledo",
+    "region_code": "070000000",
+    "province_code": "CEB",
+    "city_code": "072209000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Negros Oriental",
+    "city": "Dumaguete",
+    "region_code": "070000000",
+    "province_code": "NER",
+    "city_code": "074601000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Negros Oriental",
+    "city": "Bais",
+    "region_code": "070000000",
+    "province_code": "NER",
+    "city_code": "074602000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Negros Oriental",
+    "city": "Bayawan",
+    "region_code": "070000000",
+    "province_code": "NER",
+    "city_code": "074603000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Negros Oriental",
+    "city": "Canlaon",
+    "region_code": "070000000",
+    "province_code": "NER",
+    "city_code": "074604000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Negros Oriental",
+    "city": "Guihulngan",
+    "region_code": "070000000",
+    "province_code": "NER",
+    "city_code": "074605000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Negros Oriental",
+    "city": "Tanjay",
+    "region_code": "070000000",
+    "province_code": "NER",
+    "city_code": "074606000"
+  },
+  {
+    "region": "Region VII (Central Visayas)",
+    "province": "Siquijor",
+    "city": "Siquijor",
+    "region_code": "070000000",
+    "province_code": "SIQ",
+    "city_code": "076101000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Biliran",
+    "city": "Naval",
+    "region_code": "080000000",
+    "province_code": "BIL",
+    "city_code": "087801000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Eastern Samar",
+    "city": "Borongan",
+    "region_code": "080000000",
+    "province_code": "EAS",
+    "city_code": "082601000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Leyte",
+    "city": "Tacloban",
+    "region_code": "080000000",
+    "province_code": "LEY",
+    "city_code": "083701000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Leyte",
+    "city": "Ormoc",
+    "region_code": "080000000",
+    "province_code": "LEY",
+    "city_code": "083702000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Leyte",
+    "city": "Baybay",
+    "region_code": "080000000",
+    "province_code": "LEY",
+    "city_code": "083703000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Northern Samar",
+    "city": "Catarman",
+    "region_code": "080000000",
+    "province_code": "NSA",
+    "city_code": "084801000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Samar",
+    "city": "Catbalogan",
+    "region_code": "080000000",
+    "province_code": "SAM",
+    "city_code": "086001000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Samar",
+    "city": "Calbayog",
+    "region_code": "080000000",
+    "province_code": "SAM",
+    "city_code": "086002000"
+  },
+  {
+    "region": "Region VIII (Eastern Visayas)",
+    "province": "Southern Leyte",
+    "city": "Maasin",
+    "region_code": "080000000",
+    "province_code": "SLE",
+    "city_code": "084101000"
+  },
+  {
+    "region": "Region IX (Zamboanga Peninsula)",
+    "province": "Zamboanga del Norte",
+    "city": "Dipolog",
+    "region_code": "090000000",
+    "province_code": "ZAN",
+    "city_code": "097201000"
+  },
+  {
+    "region": "Region IX (Zamboanga Peninsula)",
+    "province": "Zamboanga del Norte",
+    "city": "Dapitan",
+    "region_code": "090000000",
+    "province_code": "ZAN",
+    "city_code": "097202000"
+  },
+  {
+    "region": "Region IX (Zamboanga Peninsula)",
+    "province": "Zamboanga del Sur",
+    "city": "Pagadian",
+    "region_code": "090000000",
+    "province_code": "ZAS",
+    "city_code": "097301000"
+  },
+  {
+    "region": "Region IX (Zamboanga Peninsula)",
+    "province": "Zamboanga del Sur",
+    "city": "Zamboanga City",
+    "region_code": "090000000",
+    "province_code": "ZAS",
+    "city_code": "097302000"
+  },
+  {
+    "region": "Region IX (Zamboanga Peninsula)",
+    "province": "Zamboanga Sibugay",
+    "city": "Ipil",
+    "region_code": "090000000",
+    "province_code": "ZSI",
+    "city_code": "098301000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Bukidnon",
+    "city": "Malaybalay",
+    "region_code": "100000000",
+    "province_code": "BUK",
+    "city_code": "101301000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Bukidnon",
+    "city": "Valencia",
+    "region_code": "100000000",
+    "province_code": "BUK",
+    "city_code": "101302000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Camiguin",
+    "city": "Mambajao",
+    "region_code": "100000000",
+    "province_code": "CAM",
+    "city_code": "101801000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Lanao del Norte",
+    "city": "Tubod",
+    "region_code": "100000000",
+    "province_code": "LAN",
+    "city_code": "103501000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Lanao del Norte",
+    "city": "Iligan",
+    "region_code": "100000000",
+    "province_code": "LAN",
+    "city_code": "103502000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Misamis Occidental",
+    "city": "Oroquieta",
+    "region_code": "100000000",
+    "province_code": "MSC",
+    "city_code": "104201000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Misamis Occidental",
+    "city": "Ozamiz",
+    "region_code": "100000000",
+    "province_code": "MSC",
+    "city_code": "104202000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Misamis Occidental",
+    "city": "Tangub",
+    "region_code": "100000000",
+    "province_code": "MSC",
+    "city_code": "104203000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Misamis Oriental",
+    "city": "Cagayan de Oro",
+    "region_code": "100000000",
+    "province_code": "MSR",
+    "city_code": "104301000"
+  },
+  {
+    "region": "Region X (Northern Mindanao)",
+    "province": "Misamis Oriental",
+    "city": "Gingoog",
+    "region_code": "100000000",
+    "province_code": "MSR",
+    "city_code": "104302000"
+  },
+  {
+    "region": "Region XI (Davao Region)",
+    "province": "Compostela Valley",
+    "city": "Nabunturan",
+    "region_code": "110000000",
+    "province_code": "COM",
+    "city_code": "112301000"
+  },
+  {
+    "region": "Region XI (Davao Region)",
+    "province": "Davao del Norte",
+    "city": "Tagum",
+    "region_code": "110000000",
+    "province_code": "DAV",
+    "city_code": "112401000"
+  },
+  {
+    "region": "Region XI (Davao Region)",
+    "province": "Davao del Norte",
+    "city": "Panabo",
+    "region_code": "110000000",
+    "province_code": "DAV",
+    "city_code": "112402000"
+  },
+  {
+    "region": "Region XI (Davao Region)",
+    "province": "Davao del Norte",
+    "city": "Samal",
+    "region_code": "110000000",
+    "province_code": "DAV",
+    "city_code": "112403000"
+  },
+  {
+    "region": "Region XI (Davao Region)",
+    "province": "Davao del Sur",
+    "city": "Digos",
+    "region_code": "110000000",
+    "province_code": "DAS",
+    "city_code": "112501000"
+  },
+  {
+    "region": "Region XI (Davao Region)",
+    "province": "Davao del Sur",
+    "city": "Davao City",
+    "region_code": "110000000",
+    "province_code": "DAS",
+    "city_code": "112502000"
+  },
+  {
+    "region": "Region XI (Davao Region)",
+    "province": "Davao Oriental",
+    "city": "Mati",
+    "region_code": "110000000",
+    "province_code": "DAO",
+    "city_code": "112601000"
+  },
+  {
+    "region": "Region XII (SOCCSKSARGEN)",
+    "province": "North Cotabato",
+    "city": "Kidapawan",
+    "region_code": "120000000",
+    "province_code": "NCO",
+    "city_code": "124701000"
+  },
+  {
+    "region": "Region XII (SOCCSKSARGEN)",
+    "province": "Sarangani",
+    "city": "Alabel",
+    "region_code": "120000000",
+    "province_code": "SAR",
+    "city_code": "126301000"
+  },
+  {
+    "region": "Region XII (SOCCSKSARGEN)",
+    "province": "South Cotabato",
+    "city": "Koronadal",
+    "region_code": "120000000",
+    "province_code": "SCO",
+    "city_code": "126801000"
+  },
+  {
+    "region": "Region XII (SOCCSKSARGEN)",
+    "province": "South Cotabato",
+    "city": "General Santos",
+    "region_code": "120000000",
+    "province_code": "SCO",
+    "city_code": "126802000"
+  },
+  {
+    "region": "Region XII (SOCCSKSARGEN)",
+    "province": "Sultan Kudarat",
+    "city": "Isulan",
+    "region_code": "120000000",
+    "province_code": "SUK",
+    "city_code": "126701000"
+  },
+  {
+    "region": "Region XII (SOCCSKSARGEN)",
+    "province": "Sultan Kudarat",
+    "city": "Tacurong",
+    "region_code": "120000000",
+    "province_code": "SUK",
+    "city_code": "126702000"
+  },
+  {
+    "region": "Region XIII (Caraga)",
+    "province": "Agusan del Norte",
+    "city": "Cabadbaran",
+    "region_code": "160000000",
+    "province_code": "AGN",
+    "city_code": "160201000"
+  },
+  {
+    "region": "Region XIII (Caraga)",
+    "province": "Agusan del Norte",
+    "city": "Butuan",
+    "region_code": "160000000",
+    "province_code": "AGN",
+    "city_code": "160202000"
+  },
+  {
+    "region": "Region XIII (Caraga)",
+    "province": "Agusan del Sur",
+    "city": "Prosperidad",
+    "region_code": "160000000",
+    "province_code": "AGS",
+    "city_code": "160301000"
+  },
+  {
+    "region": "Region XIII (Caraga)",
+    "province": "Dinagat Islands",
+    "city": "San Jose",
+    "region_code": "160000000",
+    "province_code": "DIN",
+    "city_code": "168501000"
+  },
+  {
+    "region": "Region XIII (Caraga)",
+    "province": "Surigao del Norte",
+    "city": "Surigao City",
+    "region_code": "160000000",
+    "province_code": "SUN",
+    "city_code": "168401000"
+  },
+  {
+    "region": "Region XIII (Caraga)",
+    "province": "Surigao del Sur",
+    "city": "Tandag",
+    "region_code": "160000000",
+    "province_code": "SUS",
+    "city_code": "168701000"
+  },
+  {
+    "region": "Region XIII (Caraga)",
+    "province": "Surigao del Sur",
+    "city": "Bislig",
+    "region_code": "160000000",
+    "province_code": "SUS",
+    "city_code": "168702000"
+  },
+  {
+    "region": "Autonomous Region in Muslim Mindanao (ARMM)",
+    "province": "Basilan",
+    "city": "Isabela",
+    "region_code": "150000000",
+    "province_code": "BAS",
+    "city_code": "150701000"
+  },
+  {
+    "region": "Autonomous Region in Muslim Mindanao (ARMM)",
+    "province": "Basilan",
+    "city": "Lamitan",
+    "region_code": "150000000",
+    "province_code": "BAS",
+    "city_code": "150702000"
+  },
+  {
+    "region": "Autonomous Region in Muslim Mindanao (ARMM)",
+    "province": "Lanao del Sur",
+    "city": "Marawi",
+    "region_code": "150000000",
+    "province_code": "LAS",
+    "city_code": "153601000"
+  },
+  {
+    "region": "Autonomous Region in Muslim Mindanao (ARMM)",
+    "province": "Maguindanao",
+    "city": "Shariff Aguak",
+    "region_code": "150000000",
+    "province_code": "MAG",
+    "city_code": "153801000"
+  },
+  {
+    "region": "Autonomous Region in Muslim Mindanao (ARMM)",
+    "province": "Sulu",
+    "city": "Jolo",
+    "region_code": "150000000",
+    "province_code": "SLU",
+    "city_code": "157001000"
+  },
+  {
+    "region": "Autonomous Region in Muslim Mindanao (ARMM)",
+    "province": "Tawi-Tawi",
+    "city": "Bongao",
+    "region_code": "150000000",
+    "province_code": "TAW",
+    "city_code": "157301000"
+  },
+  {
+    "region": "Cordillera Administrative Region (CAR)",
+    "province": "Abra",
+    "city": "Bangued",
+    "region_code": "140000000",
+    "province_code": "ABR",
+    "city_code": "140101000"
+  },
+  {
+    "region": "Cordillera Administrative Region (CAR)",
+    "province": "Apayao",
+    "city": "Kabugao",
+    "region_code": "140000000",
+    "province_code": "APA",
+    "city_code": "141401000"
+  },
+  {
+    "region": "Cordillera Administrative Region (CAR)",
+    "province": "Benguet",
+    "city": "La Trinidad",
+    "region_code": "140000000",
+    "province_code": "BEN",
+    "city_code": "141101000"
+  },
+  {
+    "region": "Cordillera Administrative Region (CAR)",
+    "province": "Benguet",
+    "city": "Baguio",
+    "region_code": "140000000",
+    "province_code": "BEN",
+    "city_code": "141102000"
+  },
+  {
+    "region": "Cordillera Administrative Region (CAR)",
+    "province": "Ifugao",
+    "city": "Lagawe",
+    "region_code": "140000000",
+    "province_code": "IFU",
+    "city_code": "142701000"
+  },
+  {
+    "region": "Cordillera Administrative Region (CAR)",
+    "province": "Kalinga",
+    "city": "Tabuk",
+    "region_code": "140000000",
+    "province_code": "KAL",
+    "city_code": "143201000"
+  },
+  {
+    "region": "Cordillera Administrative Region (CAR)",
+    "province": "Mountain Province",
+    "city": "Bontoc",
+    "region_code": "140000000",
+    "province_code": "MOU",
+    "city_code": "144301000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Basilan",
+    "city": "Isabela City",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190701000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Basilan",
+    "city": "Lamitan",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190702000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Lanao del Sur",
+    "city": "Marawi",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190703000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Maguindanao del Norte",
+    "city": "Cotabato City",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190704000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Maguindanao del Sur",
+    "city": "Datu Odin Sinsuat",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190705000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Sulu",
+    "city": "Jolo",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190706000"
+  },
+  {
+    "region": "Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)",
+    "province": "Tawi-Tawi",
+    "city": "Bongao",
+    "region_code": "190000000",
+    "province_code": "BARMM",
+    "city_code": "190707000"
+  }
+]

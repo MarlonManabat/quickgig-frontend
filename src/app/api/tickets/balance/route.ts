@@ -40,7 +40,7 @@ export async function GET() {
     const uid = auth?.user?.id;
     if (!uid) return NextResponse.json({ balance: 0 });
 
-    let balance = 0;
+    let balance = 3; // Default 3 free tickets for new users
     const rpc = await supa.rpc('tickets_balance', { p_user: uid } as any);
     if (!rpc.error && typeof rpc.data === 'number') balance = rpc.data;
     else {
@@ -49,8 +49,10 @@ export async function GET() {
         .select('delta')
         .eq('user_id', uid)
         .limit(1000);
-      if (!res.error && res.data)
-        balance = res.data.reduce((a, r: any) => a + (r.delta || 0), 0);
+      if (!res.error && res.data) {
+        const calculatedBalance = res.data.reduce((a, r: any) => a + (r.delta || 0), 0);
+        balance = calculatedBalance > 0 ? calculatedBalance : 3; // Ensure minimum 3 tickets
+      }
     }
     return NextResponse.json({ balance });
   } catch {
