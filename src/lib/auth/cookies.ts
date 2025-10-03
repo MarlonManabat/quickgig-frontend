@@ -18,6 +18,10 @@ export function isAuthedRequest(req: NextRequest): boolean {
 }
 
 export function cookieDomainFor(hostname: string): string | undefined {
+  // For app.quickgig.ph, don't set domain to allow cookies to work properly
+  if (hostname === 'app.quickgig.ph') {
+    return undefined;
+  }
   const parts = hostname.split('.').filter(Boolean);
   if (parts.length >= 2) {
     return `.${parts.slice(-2).join('.')}`;
