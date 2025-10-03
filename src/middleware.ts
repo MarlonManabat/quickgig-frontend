@@ -8,7 +8,11 @@ export function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const path = url.pathname;
   const isGated =
-    path.startsWith("/applications") || path.startsWith("/my-applications");
+    path.startsWith("/applications") || 
+    path.startsWith("/my-applications") ||
+    path.startsWith("/gigs/create") ||
+    path.startsWith("/messages") ||
+    path.startsWith("/tickets");
   if (!isGated) return NextResponse.next();
 
   const authed = hasAuthCookieHeader(req.headers.get("cookie"));
@@ -23,7 +27,12 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Both /applications and /my-applications are auth-gated. Keep gating at the Edge
-  // so unauthenticated users are redirected before any page renders.
-  matcher: ["/applications/:path*", "/my-applications/:path*"],
+  // Protected routes that require authentication
+  matcher: [
+    "/applications/:path*", 
+    "/my-applications/:path*",
+    "/gigs/create/:path*",
+    "/messages/:path*",
+    "/tickets/:path*"
+  ],
 };
