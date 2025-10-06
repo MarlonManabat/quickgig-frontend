@@ -30,9 +30,6 @@ export const config = {
   // Protected routes that require authentication
   matcher: [
     "/applications/:path*", 
-    "/my-applications/:path*",
-    "/gigs/create/:path*",
-    "/messages/:path*",
-    "/tickets/:path*"
+    "/my-applications/:path*"
   ],
 };
