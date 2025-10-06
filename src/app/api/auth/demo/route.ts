@@ -8,20 +8,19 @@ const DEMO_TOKEN = "demo-user";
 
 function resolveNext(req: NextRequest): URL {
   const { origin } = req.nextUrl;
-  const target = req.nextUrl.searchParams.get("next") ?? "/my-applications";
+  const target = req.nextUrl.searchParams.get("next") ?? "/gigs/create";
   try {
     const dest = new URL(target, origin);
     if (dest.origin === origin) {
       return dest;
     }
   } catch {}
-  return new URL("/my-applications", origin);
+  return new URL("/gigs/create", origin);
 }
 
 export async function GET(req: NextRequest) {
   const redirectTo = resolveNext(req);
   const res = NextResponse.redirect(redirectTo, { status: 302 });
-  const domain = cookieDomainFor(req.nextUrl.hostname);
   res.cookies.set({
     name: AUTH_COOKIE,
     value: DEMO_TOKEN,
@@ -30,7 +29,6 @@ export async function GET(req: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
-    ...(domain ? { domain } : {}),
   });
   return res;
 }
