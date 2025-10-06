@@ -9,10 +9,7 @@ export function middleware(req: NextRequest) {
   const path = url.pathname;
   const isGated =
     path.startsWith("/applications") || 
-    path.startsWith("/my-applications") ||
-    path.startsWith("/gigs/create") ||
-    path.startsWith("/messages") ||
-    path.startsWith("/tickets");
+    path.startsWith("/my-applications");
   if (!isGated) return NextResponse.next();
 
   const authed = hasAuthCookieHeader(req.headers.get("cookie"));
