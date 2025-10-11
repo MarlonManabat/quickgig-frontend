@@ -8,79 +8,128 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const q = searchParams.get('q')?.trim() || '';
-  const region = searchParams.get('region')?.trim() || '';
-  const sort = (searchParams.get('sort') as GigSort) || 'new';
-  const page = Math.max(parseInt(searchParams.get('page') || '1', 10), 1);
-  const limit = parseInt(searchParams.get('limit') || '10', 10);
+  try {
+    const { searchParams } = new URL(req.url);
+    const q = searchParams.get('q')?.trim() || '';
+    const region = searchParams.get('region')?.trim() || '';
+    const sort = (searchParams.get('sort') as GigSort) || 'new';
+    const page = Math.max(parseInt(searchParams.get('page') || '1', 10), 1);
+    const limit = parseInt(searchParams.get('limit') || '10', 10);
 
-  const supa = await publicSupabase();
-
-  if (!supa) {
-    let items = [...mockGigs];
-    if (q) {
-      const ql = q.toLowerCase();
-      items = items.filter((g) =>
-        g.title.toLowerCase().includes(ql) || g.description.toLowerCase().includes(ql)
-      );
+    let supa = null;
+    try {
+      supa = await publicSupabase();
+    } catch (error) {
+      console.error('Supabase connection error:', error);
+      supa = null;
     }
-    if (region) {
-      items = items.filter((g) => g.region === region);
+
+    // Use mock data if Supabase is not available
+    if (!supa) {
+      let items = [...mockGigs];
+      if (q) {
+        const ql = q.toLowerCase();
+        items = items.filter((g) =>
+          g.title.toLowerCase().includes(ql) || g.description.toLowerCase().includes(ql)
+        );
+      }
+      if (region) {
+        items = items.filter((g) => g.region === region);
+      }
+      if (sort === 'pay_high') {
+        items.sort((a, b) => (b.rate || 0) - (a.rate || 0));
+      } else {
+        items.sort((a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      }
+      const total = items.length;
+      const start = (page - 1) * limit;
+      const paged = items.slice(start, start + limit);
+      const mapped = paged.map(({ id, title, company, region, rate, created_at }) => ({
+        id,
+        title,
+        company,
+        region: region || 'Unknown',
+        rate: rate || 0,
+        created_at,
+      }));
+      return NextResponse.json({ items: mapped, total, page, limit } satisfies GigsResponse);
     }
-    if (sort === 'pay_high') {
-      items.sort((a, b) => b.rate - a.rate);
-    } else {
-      items.sort((a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
+
+    // Try to use Supabase
+    try {
+      let query = supa
+        .from('gigs')
+        .select('id,title,company,region,rate,created_at', { count: 'exact' })
+        .eq('published', true);
+
+      if (q) {
+        const like = `%${q}%`;
+        query = query.or(`title.ilike.${like},description.ilike.${like}`);
+      }
+      if (region) {
+        query = query.eq('region', region);
+      }
+      if (sort === 'pay_high') {
+        query = query.order('rate', { ascending: false });
+      } else {
+        query = query.order('created_at', { ascending: false });
+      }
+
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+      const { data, count, error } = await query.range(from, to);
+      
+      if (error) {
+        console.error('Supabase query error:', error);
+        throw error;
+      }
+      
+      return NextResponse.json({
+        items: data ?? [],
+        total: count ?? 0,
+        page,
+        limit,
+      } satisfies GigsResponse);
+    } catch (dbError) {
+      console.error('Database error, falling back to mock data:', dbError);
+      // Fall back to mock data on database error
+      let items = [...mockGigs];
+      if (q) {
+        const ql = q.toLowerCase();
+        items = items.filter((g) =>
+          g.title.toLowerCase().includes(ql) || g.description.toLowerCase().includes(ql)
+        );
+      }
+      if (region) {
+        items = items.filter((g) => g.region === region);
+      }
+      if (sort === 'pay_high') {
+        items.sort((a, b) => (b.rate || 0) - (a.rate || 0));
+      } else {
+        items.sort((a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      }
+      const total = items.length;
+      const start = (page - 1) * limit;
+      const paged = items.slice(start, start + limit);
+      const mapped = paged.map(({ id, title, company, region, rate, created_at }) => ({
+        id,
+        title,
+        company,
+        region: region || 'Unknown',
+        rate: rate || 0,
+        created_at,
+      }));
+      return NextResponse.json({ items: mapped, total, page, limit } satisfies GigsResponse);
     }
-    const total = items.length;
-    const start = (page - 1) * limit;
-    const paged = items.slice(start, start + limit);
-    const mapped = paged.map(({ id, title, company, region, rate, created_at }) => ({
-      id,
-      title,
-      company,
-      region,
-      rate,
-      created_at,
-    }));
-    return NextResponse.json({ items: mapped, total, page, limit } satisfies GigsResponse);
+  } catch (error) {
+    console.error('Error in gigs GET route:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  let query = supa
-    .from('gigs')
-    .select('id,title,company,region,rate,created_at', { count: 'exact' })
-    .eq('published', true);
-
-  if (q) {
-    const like = `%${q}%`;
-    query = query.or(`title.ilike.${like},description.ilike.${like}`);
-  }
-  if (region) {
-    query = query.eq('region', region);
-  }
-  if (sort === 'pay_high') {
-    query = query.order('rate', { ascending: false });
-  } else {
-    query = query.order('created_at', { ascending: false });
-  }
-
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
-  const { data, count, error } = await query.range(from, to);
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-  return NextResponse.json({
-    items: data ?? [],
-    total: count ?? 0,
-    page,
-    limit,
-  } satisfies GigsResponse);
 }
-
 
 export async function POST(req: Request) {
   try {
@@ -95,7 +144,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await adminSupabase();
+    let supabase = null;
+    try {
+      supabase = await adminSupabase();
+    } catch (error) {
+      console.error('Supabase connection error:', error);
+    }
+
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
     }
@@ -146,3 +201,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
