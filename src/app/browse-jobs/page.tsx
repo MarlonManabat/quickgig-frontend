@@ -78,7 +78,7 @@ async function fetchJobsFromApi(query: {
   if (query.city) params.set("city", query.city);
 
   const queryString = params.toString();
-  const url = `${base}/jobs${queryString ? `?${queryString}` : ""}`;
+  const url = `${base}/gigs${queryString ? `?${queryString}` : ""}`;
 
   try {
     const res = await fetch(url, { cache: "no-store" });
@@ -109,15 +109,9 @@ export default async function BrowseJobsPage({
   const provinceParam = readFirst(params.province);
   const cityParam = readFirst(params.city);
 
-  const region = hasRegion ? regionParam ?? "" : DEFAULT_REGION;
-  const province = hasProvince ? provinceParam ?? "" : hasRegion ? "" : DEFAULT_PROVINCE;
-  const city = hasCity
-    ? cityParam ?? ""
-    : hasProvince
-      ? ""
-      : hasRegion
-        ? ""
-        : DEFAULT_CITY;
+  const region = hasRegion ? regionParam ?? "" : "";
+  const province = hasProvince ? provinceParam ?? "" : "";
+  const city = hasCity ? cityParam ?? "" : "";
 
   const apiRegion = hasRegion ? regionParam ?? "" : "";
   const apiProvince = hasProvince ? provinceParam ?? "" : "";
