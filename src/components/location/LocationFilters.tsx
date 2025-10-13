@@ -39,19 +39,9 @@ export default function LocationFilters() {
   const rawProvince = getFirst(params.get("province"));
   const rawCity = getFirst(params.get("city"));
 
-  const region = hasRegionParam ? rawRegion ?? "" : DEFAULT_REGION;
-  const province = hasProvinceParam
-    ? rawProvince ?? ""
-    : hasRegionParam
-      ? ""
-      : DEFAULT_PROVINCE;
-  const city = hasCityParam
-    ? rawCity ?? ""
-    : hasProvinceParam
-      ? ""
-      : hasRegionParam
-        ? ""
-        : DEFAULT_CITY;
+  const region = hasRegionParam ? rawRegion ?? "" : "";
+  const province = hasProvinceParam ? rawProvince ?? "" : "";
+  const city = hasCityParam ? rawCity ?? "" : "";
 
   const provinces = useMemo(() => provincesFor(region), [region]);
   const cities = useMemo(() => citiesFor(region, province), [region, province]);
