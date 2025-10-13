@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -25,7 +25,11 @@ function getFirst(value: string | string[] | null): string | null {
   return value;
 }
 
-export default function LocationFilters() {
+interface LocationFiltersProps {
+  onFilterChange?: (region: string, province: string, city: string) => void;
+}
+
+export default function LocationFilters({ onFilterChange }: LocationFiltersProps = {}) {
   const pathname = usePathname() ?? "/browse-jobs";
   const params = useSearchParams();
   const router = useRouter();
@@ -39,12 +43,24 @@ export default function LocationFilters() {
   const rawProvince = getFirst(params.get("province"));
   const rawCity = getFirst(params.get("city"));
 
-  const region = hasRegionParam ? rawRegion ?? "" : "";
-  const province = hasProvinceParam ? rawProvince ?? "" : "";
-  const city = hasCityParam ? rawCity ?? "" : "";
+  const initialRegion = hasRegionParam ? rawRegion ?? "" : "";
+  const initialProvince = hasProvinceParam ? rawProvince ?? "" : "";
+  const initialCity = hasCityParam ? rawCity ?? "" : "";
+
+  // Use local state for immediate updates
+  const [region, setRegion] = useState(initialRegion);
+  const [province, setProvince] = useState(initialProvince);
+  const [city, setCity] = useState(initialCity);
 
   const provinces = useMemo(() => provincesFor(region), [region]);
   const cities = useMemo(() => citiesFor(region, province), [region, province]);
+
+  // Notify parent when filters change
+  useEffect(() => {
+    if (onFilterChange) {
+      onFilterChange(region, province, city);
+    }
+  }, [region, province, city, onFilterChange]);
 
   const navigate = (next: { region?: string; province?: string; city?: string }) => {
     const search = new URLSearchParams(params.toString());
@@ -65,6 +81,30 @@ export default function LocationFilters() {
     });
   };
 
+  const handleRegionChange = (value: string) => {
+    setRegion(value);
+    setProvince(""); // Reset province when region changes
+    setCity(""); // Reset city when region changes
+    if (!onFilterChange) {
+      navigate({ region: value });
+    }
+  };
+
+  const handleProvinceChange = (value: string) => {
+    setProvince(value);
+    setCity(""); // Reset city when province changes
+    if (!onFilterChange) {
+      navigate({ province: value });
+    }
+  };
+
+  const handleCityChange = (value: string) => {
+    setCity(value);
+    if (!onFilterChange) {
+      navigate({ city: value });
+    }
+  };
+
   return (
     <div className="grid gap-3 md:grid-cols-3">
       <label className="block">
@@ -73,7 +113,7 @@ export default function LocationFilters() {
           data-testid="filter-region"
           aria-label="FilterRegion"
           value={region}
-          onChange={(event) => navigate({ region: event.target.value })}
+          onChange={(event) => handleRegionChange(event.target.value)}
         >
           <option value="">All regions</option>
           {ALL_REGIONS.map((reg) => (
@@ -90,7 +130,7 @@ export default function LocationFilters() {
           data-testid="filter-province"
           aria-label="FilterProvince"
           value={province}
-          onChange={(event) => navigate({ province: event.target.value })}
+          onChange={(event) => handleProvinceChange(event.target.value)}
           disabled={!region}
         >
           <option value="">All provinces</option>
@@ -108,7 +148,7 @@ export default function LocationFilters() {
           data-testid="filter-city"
           aria-label="FilterCity"
           value={city}
-          onChange={(event) => navigate({ city: event.target.value })}
+          onChange={(event) => handleCityChange(event.target.value)}
           disabled={!region}
         >
           <option value="">All cities</option>
@@ -122,3 +162,4 @@ export default function LocationFilters() {
     </div>
   );
 }
+
