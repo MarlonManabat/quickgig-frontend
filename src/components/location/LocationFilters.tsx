@@ -58,9 +58,11 @@ export default function LocationFilters({ onFilterChange }: LocationFiltersProps
   // Notify parent when filters change
   useEffect(() => {
     if (onFilterChange) {
+      console.log('[LocationFilters] Calling onFilterChange with:', { region, province, city });
       onFilterChange(region, province, city);
     }
-  }, [region, province, city, onFilterChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [region, province, city]);
 
   const navigate = (next: { region?: string; province?: string; city?: string }) => {
     const search = new URLSearchParams(params.toString());
