@@ -68,9 +68,17 @@ async function fetchJobsFromApi(query: {
     base = undefined;
   }
 
-  // Use relative URL if base is not set (works in production without env vars)
+  // For server-side fetching, construct absolute URL
   if (!base) {
-    base = "/api";
+    // Use Vercel URL or fallback to production domain
+    const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL || process.env.VERCEL_URL;
+    if (vercelUrl) {
+      base = vercelUrl.startsWith('http') ? vercelUrl : `https://${vercelUrl}`;
+    } else {
+      // Fallback to production domain
+      base = "https://app.quickgig.ph";
+    }
+    base = `${base}/api`;
   }
 
   const params = new URLSearchParams();
