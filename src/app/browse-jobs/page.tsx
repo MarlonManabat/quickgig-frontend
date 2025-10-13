@@ -68,8 +68,9 @@ async function fetchJobsFromApi(query: {
     base = undefined;
   }
 
+  // Use relative URL if base is not set (works in production without env vars)
   if (!base) {
-    return [];
+    base = "/api";
   }
 
   const params = new URLSearchParams();
