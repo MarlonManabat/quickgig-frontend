@@ -55,14 +55,15 @@ export default function LocationFilters({ onFilterChange }: LocationFiltersProps
   const provinces = useMemo(() => provincesFor(region), [region]);
   const cities = useMemo(() => citiesFor(region, province), [region, province]);
 
-  // Notify parent when filters change
+  // Notify parent on initial mount and when filters change
   useEffect(() => {
     if (onFilterChange) {
-      console.log('[LocationFilters] Calling onFilterChange with:', { region, province, city });
+      console.log('[LocationFilters] Initial filter state:', { region, province, city });
       onFilterChange(region, province, city);
     }
+    // Only run on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [region, province, city]);
+  }, []);
 
   const navigate = (next: { region?: string; province?: string; city?: string }) => {
     const search = new URLSearchParams(params.toString());
@@ -84,26 +85,56 @@ export default function LocationFilters({ onFilterChange }: LocationFiltersProps
   };
 
   const handleRegionChange = (value: string) => {
-    setRegion(value);
-    setProvince(""); // Reset province when region changes
-    setCity(""); // Reset city when region changes
+    const newRegion = value;
+    const newProvince = ""; // Reset province when region changes
+    const newCity = ""; // Reset city when region changes
+    
+    setRegion(newRegion);
+    setProvince(newProvince);
+    setCity(newCity);
+    
+    // Call onFilterChange immediately with new values
+    if (onFilterChange) {
+      console.log('[LocationFilters] Region changed, calling onFilterChange with:', { region: newRegion, province: newProvince, city: newCity });
+      onFilterChange(newRegion, newProvince, newCity);
+    }
+    
     if (!onFilterChange) {
-      navigate({ region: value });
+      navigate({ region: newRegion });
     }
   };
 
   const handleProvinceChange = (value: string) => {
-    setProvince(value);
-    setCity(""); // Reset city when province changes
+    const newProvince = value;
+    const newCity = ""; // Reset city when province changes
+    
+    setProvince(newProvince);
+    setCity(newCity);
+    
+    // Call onFilterChange immediately with new values
+    if (onFilterChange) {
+      console.log('[LocationFilters] Province changed, calling onFilterChange with:', { region, province: newProvince, city: newCity });
+      onFilterChange(region, newProvince, newCity);
+    }
+    
     if (!onFilterChange) {
-      navigate({ province: value });
+      navigate({ province: newProvince });
     }
   };
 
   const handleCityChange = (value: string) => {
-    setCity(value);
+    const newCity = value;
+    
+    setCity(newCity);
+    
+    // Call onFilterChange immediately with new values
+    if (onFilterChange) {
+      console.log('[LocationFilters] City changed, calling onFilterChange with:', { region, province, city: newCity });
+      onFilterChange(region, province, newCity);
+    }
+    
     if (!onFilterChange) {
-      navigate({ city: value });
+      navigate({ city: newCity });
     }
   };
 
