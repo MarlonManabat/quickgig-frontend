@@ -82,6 +82,7 @@ export default function BrowseJobsPage() {
   return (
     <main className="mx-auto max-w-5xl p-4">
       <h1 className="text-xl font-semibold mb-4">Browse Jobs</h1>
+      {/* Location filtering enabled */}
       <LocationFilters onFilterChange={handleFilterChange} />
       {loading ? (
         <div className="mt-6 text-center text-gray-600">Loading jobs...</div>
