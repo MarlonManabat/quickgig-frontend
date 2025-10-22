@@ -1,7 +1,8 @@
 "use client";
 // Force rebuild to deploy location filtering fix
+// Location filtering enabled
 import { useEffect, useState } from "react";
-import LocationFilters from "@/components/location/LocationFilters";
+import { PHILIPPINE_LOCATIONS } from "@/lib/locations";
 
 type JobPayload = {
   id?: string | number;
@@ -71,19 +72,106 @@ export default function BrowseJobsPage() {
     setFilteredJobs(filtered);
   }, [allJobs, selectedRegion, selectedProvince, selectedCity]);
 
-  // Handle filter changes from LocationFilters
-  const handleFilterChange = (region: string, province: string, city: string) => {
-    console.log('[Browse Jobs] Filter changed:', { region, province, city });
-    setSelectedRegion(region);
-    setSelectedProvince(province);
-    setSelectedCity(city);
+  // Handle region change
+  const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newRegion = e.target.value;
+    console.log('[Browse Jobs] Region changed to:', newRegion);
+    setSelectedRegion(newRegion);
+    setSelectedProvince(""); // Reset dependent filters
+    setSelectedCity("");
   };
+
+  // Handle province change
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newProvince = e.target.value;
+    console.log('[Browse Jobs] Province changed to:', newProvince);
+    setSelectedProvince(newProvince);
+    setSelectedCity(""); // Reset dependent filter
+  };
+
+  // Handle city change
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCity = e.target.value;
+    console.log('[Browse Jobs] City changed to:', newCity);
+    setSelectedCity(newCity);
+  };
+
+  // Get available provinces for selected region
+  const availableProvinces = selectedRegion 
+    ? PHILIPPINE_LOCATIONS.provinces.filter(p => p.region === selectedRegion)
+    : [];
+
+  // Get available cities for selected province
+  const availableCities = selectedProvince
+    ? PHILIPPINE_LOCATIONS.cities.filter(c => c.province === selectedProvince)
+    : [];
 
   return (
     <main className="mx-auto max-w-5xl p-4">
       <h1 className="text-xl font-semibold mb-4">Browse Jobs</h1>
-      {/* Location filtering enabled */}
-      <LocationFilters onFilterChange={handleFilterChange} />
+      
+      {/* Inline Location Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Region Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Region
+          </label>
+          <select
+            value={selectedRegion}
+            onChange={handleRegionChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All regions</option>
+            {PHILIPPINE_LOCATIONS.regions.map((region) => (
+              <option key={region} value={region}>
+                {region}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Province Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Province
+          </label>
+          <select
+            value={selectedProvince}
+            onChange={handleProvinceChange}
+            disabled={!selectedRegion}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            <option value="">All provinces</option>
+            {availableProvinces.map((prov) => (
+              <option key={prov.name} value={prov.name}>
+                {prov.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* City Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            City / Municipality
+          </label>
+          <select
+            value={selectedCity}
+            onChange={handleCityChange}
+            disabled={!selectedProvince}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            <option value="">All cities</option>
+            {availableCities.map((city) => (
+              <option key={city.name} value={city.name}>
+                {city.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {loading ? (
         <div className="mt-6 text-center text-gray-600">Loading jobs...</div>
       ) : (
