@@ -58,3 +58,14 @@ export function safeSortByName<T extends Record<string, any>>(items: T[]) {
   const label = (x: any) => (x?.name ?? x?.region_name ?? x?.city_name ?? '').toString();
   return [...(items ?? [])].sort((a, b) => label(a).localeCompare(label(b)));
 }
+
+// Export PHILIPPINE_LOCATIONS for Browse Jobs page compatibility
+export const PHILIPPINE_LOCATIONS = {
+  regions: FULL_REGIONS.map(r => r.name),
+  provinces: [] as Array<{ name: string; region: string }>, // No province data in current structure
+  cities: (raw?.cities ?? []).map(toCity).filter(c => c.code && c.name).map(c => ({
+    name: c.name,
+    province: '', // No province mapping available
+    region: FULL_REGIONS.find(r => r.code === c.region_code)?.name || ''
+  }))
+};
