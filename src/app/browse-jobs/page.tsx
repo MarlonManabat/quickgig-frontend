@@ -156,11 +156,11 @@ export default function BrowseJobsPage() {
               >
                 <h2 className="text-lg font-semibold">{job.title}</h2>
                 {job.company && <p className="text-gray-600">{job.company}</p>}
-                {job.description && <p className="text-sm text-gray-500 mt-1">{job.description}</p>}
+                {job.description && <p className="text-sm text-gray-500 mt-1 line-clamp-2">{job.description}</p>}
                 <div className="mt-2 flex items-center gap-3 text-sm">
-                  {job.budget && (
+                  {(job.budget || (job as any).rate) && (
                     <span className="text-green-600 font-semibold">
-                      ₱{Number(job.budget).toLocaleString()}
+                      ₱{Number(job.budget || (job as any).rate || 0).toLocaleString()}
                     </span>
                   )}
                   {job.region && (

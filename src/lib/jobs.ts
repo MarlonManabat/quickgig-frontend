@@ -140,11 +140,12 @@ export async function fetchJob(id: string | number): Promise<MockJob | null> {
     return null;
   }
   try {
-    const res = await fetch(`${base}/jobs/${encodeURIComponent(String(id))}`, {
+    const res = await fetch(`${base}/gigs/${encodeURIComponent(String(id))}`, {
       next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error(`HTTP_${res.status}`);
-    return (await res.json()) as MockJob;
+    const data = await res.json();
+    return (data?.gig || data) as MockJob;
   } catch (error) {
     if (!isProd) {
       // eslint-disable-next-line no-console
