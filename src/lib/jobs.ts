@@ -95,17 +95,13 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
     return { items: paginate(filtered, page, pageSize), total: filtered.length };
   };
 
-  if (!base) {
-    if (!isProd) {
-      // eslint-disable-next-line no-console
-      console.warn("[WebServer] using mock jobs fallback:", "API base unset");
-      return mockResponse();
-    }
-    return { items: [], total: 0 };
-  }
+  // Use relative URL if base is not set (works in same-origin deployment)
+  const apiUrl = base
+    ? `${base}/jobs${queryString ? `?${queryString}` : ""}`
+    : `/api/gigs${queryString ? `?${queryString}` : ""}`;
+  
   try {
-    const url = `${base}/jobs${queryString ? `?${queryString}` : ""}`;
-    const res = await fetch(url, { next: { revalidate: 60 } });
+    const res = await fetch(apiUrl, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error(`HTTP_${res.status}`);
     const data: any = await res.json();
     const rawItems = Array.isArray(data?.items)
@@ -131,16 +127,14 @@ export async function fetchJobs(opts: JobsQuery = {}): Promise<{
 export async function fetchJob(id: string | number): Promise<MockJob | null> {
   const isProd = isVercelProd();
   const base = apiBaseUrl();
-  if (!base) {
-    if (!isProd) {
-      // eslint-disable-next-line no-console
-      console.warn("[WebServer] using mock job fallback:", "API base unset");
-      return MOCK_JOB_BY_ID(id);
-    }
-    return null;
-  }
+  
+  // Use relative URL if base is not set (works in same-origin deployment)
+  const url = base 
+    ? `${base}/gigs/${encodeURIComponent(String(id))}`
+    : `/api/gigs/${encodeURIComponent(String(id))}`;
+  
   try {
-    const res = await fetch(`${base}/gigs/${encodeURIComponent(String(id))}`, {
+    const res = await fetch(url, {
       next: { revalidate: 60 },
     });
     if (!res.ok) throw new Error(`HTTP_${res.status}`);
