@@ -1,59 +1,100 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-
 import ApplyButton from "@/components/ApplyButton";
-import { hasApplied } from "@/lib/applications";
-import { isAuthedServer } from "@/lib/auth";
-import { hostAware } from "@/lib/hostAware";
-import { fetchJob } from "@/lib/jobs";
 
-export const dynamic = "force-dynamic";
+type Job = {
+  id: string;
+  title: string;
+  company?: string;
+  description?: string;
+  location?: string;
+  region?: string;
+  rate?: number;
+  pay_min?: number;
+  pay_max?: number;
+  [key: string]: any;
+};
 
-export default async function JobDetailPage({ params }: { params: { id: string } }) {
-  const authed = isAuthedServer();
-  const id = params.id;
-  const job = await fetchJob(id);
+export default function JobDetailPage({ params }: { params: { id: string } }) {
+  const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const jobMissing = !job;
-  const applied = jobMissing ? false : hasApplied(job.id);
-
-  const detailPath = `/browse-jobs/${encodeURIComponent(String(id))}`;
-  const loginFallback = hostAware(`/login?next=${encodeURIComponent(detailPath)}`);
-
-  let applyHref = loginFallback;
-  if (job) {
-    if (job.applyUrl) {
-      applyHref = hostAware(job.applyUrl);
-    } else if (authed) {
-      applyHref = hostAware("/applications");
+  useEffect(() => {
+    async function loadJob() {
+      try {
+        const res = await fetch(`/api/gigs/${params.id}`);
+        if (!res.ok) {
+          setError(true);
+          return;
+        }
+        const data = await res.json();
+        setJob(data.gig || data);
+      } catch (err) {
+        console.error('Error loading job:', err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
     }
+    loadJob();
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <div className="text-center">Loading job details...</div>
+      </main>
+    );
+  }
+
+  if (error || !job) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <h1 className="text-2xl font-semibold">Job not found</h1>
+        <p className="mt-4 text-gray-600">
+          We couldn't find this job. It may have been removed or the link is incorrect.
+        </p>
+        <div className="mt-8">
+          <Link className="text-blue-600 underline" href="/browse-jobs">
+            Back to job list
+          </Link>
+        </div>
+      </main>
+    );
   }
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-semibold">{jobMissing ? "Job details" : job.title}</h1>
-      {!jobMissing && (
-        <div className="text-sm text-gray-600">
-          {job.company ?? "—"} • {job.location ?? "Anywhere"}
+      <h1 className="text-2xl font-semibold">{job.title}</h1>
+      <div className="text-sm text-gray-600 mt-1">
+        {job.company && <span>{job.company}</span>}
+        {job.company && (job.location || job.region) && <span> • </span>}
+        {job.location || job.region || "Anywhere"}
+      </div>
+      
+      {(job.rate || job.pay_min) && (
+        <div className="mt-4 text-lg font-semibold text-green-600">
+          {job.rate && `₱${job.rate.toLocaleString()}`}
+          {!job.rate && job.pay_min && job.pay_max && 
+            `₱${job.pay_min.toLocaleString()} - ₱${job.pay_max.toLocaleString()}`}
         </div>
       )}
-      <p className="mt-6 whitespace-pre-wrap">
-        {jobMissing
-          ? "We couldn’t load this job right now, but you can still start the apply flow and finish after signing in."
-          : job.description ?? ""}
-      </p>
+
+      <div className="mt-6 whitespace-pre-wrap">
+        {job.description || "No description available."}
+      </div>
+
       <div className="mt-6 flex items-center gap-3">
         <ApplyButton
-          href={applyHref}
-          jobId={jobMissing ? undefined : job.id}
-          title={job?.title}
-          disabled={jobMissing}
+          href="/applications"
+          jobId={job.id}
+          title={job.title}
         />
-        {!jobMissing && applied && (
-          <span className="rounded border border-green-200 bg-green-50 px-2 py-1 text-xs text-green-700">
-            You’ve applied to this job
-          </span>
-        )}
       </div>
+
       <div className="mt-8">
         <Link className="text-blue-600 underline" href="/browse-jobs">
           Back to list
@@ -62,3 +103,4 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     </main>
   );
 }
+
