@@ -9,23 +9,48 @@ export async function GET(
   req: Request,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
-  const supa = await publicSupabase();
-  if (!supa) {
-    const gig = gigById(id);
-    if (!gig) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    return NextResponse.json({ gig });
-  }
-  const { data, error } = await supa
-    .from('gigs')
-    .select('*')
-    .eq('id', id)
-    .single();
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  try {
+    const { id } = params;
+    
+    let supa = null;
+    try {
+      supa = await publicSupabase();
+    } catch (error) {
+      console.error('[API /gigs/[id]] Supabase connection error:', error);
+      supa = null;
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    if (!supa) {
+      console.log('[API /gigs/[id]] Using mock data for:', id);
+      const gig = gigById(id);
+      if (!gig) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      return NextResponse.json({ gig });
+    }
+    
+    try {
+      const { data, error } = await supa
+        .from('gigs')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
+        throw error;
+      }
+      
+      return NextResponse.json({ gig: data as GigDetail });
+    } catch (dbError) {
+      console.error('[API /gigs/[id]] Database error, falling back to mock:', dbError);
+      const gig = gigById(id);
+      if (!gig) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      return NextResponse.json({ gig });
+    }
+  } catch (error) {
+    console.error('[API /gigs/[id]] Unexpected error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-  return NextResponse.json({ gig: data as GigDetail });
 }
+
