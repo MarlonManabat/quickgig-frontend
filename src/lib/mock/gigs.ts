@@ -5,7 +5,7 @@ type MockGig = Gig & { region?: string; rate?: number };
 
 const gigs: MockGig[] = [
   {
-    id: randomUUID(),
+    id: 'mock-gig-a',
     title: 'Sample Gig A',
     company: 'Company A',
     description: 'Sample description A',
@@ -19,7 +19,7 @@ const gigs: MockGig[] = [
     rate: 500,
   },
   {
-    id: randomUUID(),
+    id: 'mock-gig-b',
     title: 'Sample Gig B',
     company: 'Company B',
     description: 'Sample description B',
@@ -33,7 +33,7 @@ const gigs: MockGig[] = [
     rate: 300,
   },
   {
-    id: randomUUID(),
+    id: 'mock-gig-c',
     title: 'Another Sample',
     company: 'Company C',
     description: 'Another description',
