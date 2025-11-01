@@ -17,7 +17,7 @@ interface GeoSelectCoreProps {
   initialCity?: string;
 }
 
-export default function GeoSelectCore({ 
+function GeoSelectCore({ 
   onLocationChange,
   initialRegion = DEFAULT_REGION,
   initialProvince = DEFAULT_PROVINCE,
@@ -100,3 +100,6 @@ export default function GeoSelectCore({
     </div>
   );
 }
+
+export default GeoSelectCore;
+export { GeoSelectCore };
