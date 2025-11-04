@@ -2,5 +2,13 @@
   "installCommand": "npm install --no-audit --no-fund --prefer-offline",
   "buildCommand": "next build",
   "ignoreCommand": "node scripts/ignore-build.js",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://duhczsmefhdvhohqlwig.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1aGN6c21lZmhkdmhvaHFsd2lnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3NDU2MTksImV4cCI6MjA3MTMyMTYxOX0.mKFOtjZYS-QHL7VBoUWhCpg2AS3_gf0mul4FWnsOQC0",
+    "NEXT_PUBLIC_SITE_URL": "https://app.quickgig.ph",
+    "NEXT_PUBLIC_APP_HOST_BASE_URL": "https://app.quickgig.ph",
+    "TICKET_PRICE_PHP": "20",
+    "FREE_TICKETS_ON_SIGNUP": "3"
+  }
 }
