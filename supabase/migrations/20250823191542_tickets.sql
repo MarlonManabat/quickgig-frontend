@@ -80,9 +80,17 @@ begin
 end; $$;
 
 drop trigger if exists trg_profiles_welcome_tickets on public.profiles;
+drop trigger if exists trg_auth_welcome_tickets on auth.users;
 create trigger trg_profiles_welcome_tickets
 after insert on public.profiles
 for each row execute function public.grant_welcome_tickets();
+
+-- The welcome tickets should be granted after the profile is created
+-- which is handled by the auth.users trigger
+-- We will rely on the profile creation trigger to fire the welcome tickets
+-- since the profile creation is now handled by the auth.users trigger
+-- We will keep the profile trigger for backwards compatibility
+
 
 -- optional: set default grant via DB setting (override in prod if desired)
 alter database postgres set app.welcome_tickets = '3';

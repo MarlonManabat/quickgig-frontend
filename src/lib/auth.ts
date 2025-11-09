@@ -5,8 +5,10 @@ export const isAdmin = (email?: string) =>
     .map((s) => s.trim())
     .includes((email || "").toLowerCase());
 
-import { supabaseBrowser } from "@/lib/supabase/browser";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Database } from "@/types/db";
+
+const supabaseBrowser = () => createClientComponentClient<Database>();
 
 export async function sendMagicLink(
   email: string,
