@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabaseClient } from '@/lib/supabase/client';
+import type { Gig } from '@/types/gigs';
 
 const regions = [
   'National Capital Region',
@@ -24,10 +26,30 @@ const regions = [
 ];
 
 export default function QuickGigPage() {
-  const [jobs, setJobs] = useState([
-    { id: 1, title: 'Web Developer', budget: '₱25,000', region: 'National Capital Region', description: 'Looking for experienced web developer' },
-    { id: 2, title: 'Graphic Designer', budget: '₱15,000', region: 'Region VII (Central Visayas)', description: 'Need creative graphic designer for marketing materials' }
-  ]);
+  const [jobs, setJobs] = useState<Gig[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      const supa = supabaseClient();
+      if (!supa) return;
+
+      const { data, error } = await supa
+        .from('gigs')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false })
+        .limit(10); // Limit to 10 for a quick view
+
+      if (error) {
+        console.error('Error fetching jobs:', error);
+      } else {
+        setJobs(data as Gig[]);
+      }
+      setLoading(false);
+    };
+    fetchJobs();
+  }, []);
   
   const [showForm, setShowForm] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState('');
@@ -40,20 +62,23 @@ export default function QuickGigPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newJob = {
-      id: jobs.length + 1,
-      title: formData.title,
-      budget: `₱${formData.budget}`,
-      region: formData.region,
-      description: formData.description
-    };
-    setJobs([newJob, ...jobs]);
-    setFormData({ title: '', description: '', budget: '', region: '' });
+    // This form is a mock and should be removed or replaced with a proper API call
+    alert('Job posting is handled by the Post a Job page. This is a mock form.');
     setShowForm(false);
-    alert('Job posted successfully!');
   };
 
-  const filteredJobs = selectedRegion ? jobs.filter(job => job.region === selectedRegion) : jobs;
+  const filteredJobs = selectedRegion
+    ? jobs.filter(job => job.region === selectedRegion)
+    : jobs;
+
+  if (loading) {
+    return (
+      <div className="font-sans max-w-6xl mx-auto p-5 text-center">
+        <h1 className="text-gray-800 text-3xl font-bold mb-8">QuickGig.ph</h1>
+        <p>Loading jobs...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="font-sans max-w-6xl mx-auto p-5">
@@ -163,7 +188,13 @@ export default function QuickGigPage() {
                   <h3 className="text-gray-800 mb-2 text-xl">{job.title}</h3>
                   <p className="text-gray-600 mb-2">{job.description}</p>
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-green-500">{job.budget}</span>
+                    <span className="font-bold text-green-500">
+                      {job.pay_min && job.pay_max
+                        ? `₱${job.pay_min.toLocaleString()} - ₱${job.pay_max.toLocaleString()}`
+                        : job.budget
+                        ? `₱${job.budget.toLocaleString()}`
+                        : 'Negotiable'}
+                    </span>
                     <span className="text-gray-600 text-sm">{job.region}</span>
                   </div>
                 </div>

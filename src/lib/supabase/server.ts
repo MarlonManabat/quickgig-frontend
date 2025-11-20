@@ -5,6 +5,7 @@ import { cookies, headers } from 'next/headers';
 export function getServerSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !anon) return null;
 
   const cookieStore = cookies();
@@ -32,7 +33,16 @@ export function getServerSupabase() {
 export const supabaseServer = getServerSupabase;
 
 export function adminSupabase() {
-  return getServerSupabase();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceRoleKey) return null;
+
+  return createServerClient(url, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
 }
 
 export function publicSupabase() {
