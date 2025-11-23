@@ -103,3 +103,15 @@ export async function spendOneTicket(
   return (data as number) ?? 0;
 }
 
+export async function deductTicketOnApply(userId: string, jobId: string): Promise<void> {
+  const supa = await adminSupabase();
+  if (!supa) throw new Error('Server not configured');
+
+  const { error } = await supa.rpc('rpc_debit_tickets_and_create_application', {
+    p_job_id: jobId,
+    p_worker_id: userId,
+  });
+
+  if (error) throw new Error(error.message);
+}
+

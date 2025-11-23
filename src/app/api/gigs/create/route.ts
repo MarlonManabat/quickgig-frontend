@@ -38,28 +38,44 @@ export async function POST(req: Request) {
     user_id: owner,
   };
 
-  const supa = await adminSupabase();
-  if (supa) {
-    try {
-      const id = await deductTicketOnCreate(owner, {
-        title,
-        description,
-        region_code: body.region_code?.trim(),
-        city_code: body.city_code?.trim(),
-        price_php:
-          body.budget !== undefined ? Number(body.budget) : undefined,
-      });
-      const created_at = new Date().toISOString();
-      const status = payload.status ?? 'open';
-      const gig: Gig = { id, ...payload, status, created_at };
-      return NextResponse.json({ id, gig });
-    } catch (e: any) {
-      const msg = e.message || 'Could not create gig';
-      const status = /ticket/i.test(msg) ? 402 : 400;
-      return NextResponse.json({ error: msg }, { status });
-    }
+  const supa = adminSupabase();
+  if (!supa) {
+    return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
   }
 
-  const gig = mockCreate(payload);
-  return NextResponse.json({ id: gig.id, gig });
+  try {
+    // 1. Deduct ticket (uses admin client to ensure success)
+    const gigId = await deductTicketOnCreate(owner, {
+      title,
+      description,
+      region_code: body.region_code?.trim(),
+      city_code: body.city_code?.trim(),
+      price_php: body.budget !== undefined ? Number(body.budget) : undefined,
+    });
+
+    // 2. Insert gig (uses admin client to ensure success)
+    const { data: gigData, error: gigError } = await supa
+      .from('gigs')
+      .insert({
+        ...payload,
+        id: gigId,
+        owner: owner,
+        status: payload.status ?? 'published',
+        published: true,
+      })
+      .select()
+      .single();
+
+    if (gigError) {
+      // NOTE: In a real app, we would need to refund the ticket here.
+      console.error('Gig insertion failed:', gigError);
+      return NextResponse.json({ error: 'Failed to insert gig after ticket deduction' }, { status: 500 });
+    }
+
+    return NextResponse.json({ id: gigId, gig: gigData });
+  } catch (e: any) {
+    const msg = e.message || 'Could not create gig';
+    const status = /ticket/i.test(msg) ? 402 : 400;
+    return NextResponse.json({ error: msg }, { status });
+  }
 }
